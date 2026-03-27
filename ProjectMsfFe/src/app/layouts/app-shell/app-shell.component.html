@@ -1,0 +1,123 @@
+<header class="topbar">
+  <div class="sidebar__brand">
+    <button class="btn-justify" (click)="toggleSidebar()">
+      <span><i class="fa-solid fa-align-justify"></i></span>
+    </button>
+    <div class="brand__mark">B</div>
+    <div class="brand__name">Barren</div>
+  </div>
+  <div class="topbar__right">
+    <button class="btn btn--ghost" type="button" routerLink="/">My Home</button>
+    <button class="btn btn--ghost" type="button">Explore Events</button>
+    <button
+      class="btn btn--primary"
+      type="button"
+      routerLink="/event-create-page"
+    >
+      Create Event
+    </button>
+    <app-user-dropdown></app-user-dropdown>
+  </div>
+</header>
+
+<div class="shell" [class.shell--collapsed]="!sidebarOpen()">
+  <aside class="sidebar">
+    <nav class="sidebar__nav">
+      <button
+        class="nav-item"
+        type="button"
+        routerLink="/admin/dashboard"
+        routerLinkActive="nav-item--active"
+        [routerLinkActiveOptions]="{ exact: true }"
+      >
+        <span class="nav-item__icon"><i class="fa-solid fa-gauge"></i></span>
+        <span class="nav-item__label">Dashboard</span>
+      </button>
+      <button
+        class="nav-item"
+        type="button"
+        routerLink="/admin/events"
+        routerLinkActive="nav-item--active"
+      >
+        <span class="nav-item__icon"
+          ><i class="fa-regular fa-calendar"></i
+        ></span>
+        <span class="nav-item__label">Events</span>
+      </button>
+
+      <button
+        class="nav-item"
+        type="button"
+        routerLink="/admin/user"
+        routerLinkActive="nav-item--active"
+      >
+        <span class="nav-item__icon"
+          ><i class="fa-solid fa-address-book"></i
+        ></span>
+        <span class="nav-item__label">User List</span>
+      </button>
+
+      <button
+        class="nav-item"
+        type="button"
+        routerLinkActive="nav-item--active"
+      >
+        <span class="nav-item__icon"><i class="fa-solid fa-tag"></i></span>
+        <span class="nav-item__label">Promotion</span>
+      </button>
+
+      <button
+        class="nav-item"
+        type="button"
+        routerLinkActive="nav-item--active"
+      >
+        <span class="nav-item__icon"
+          ><i class="fa-regular fa-credit-card"></i
+        ></span>
+        <span class="nav-item__label">Payouts</span>
+      </button>
+      <button
+        class="nav-item"
+        type="button"
+        routerLinkActive="nav-item--active"
+      >
+        <span class="nav-item__icon"
+          ><i class="fa-solid fa-chart-pie"></i
+        ></span>
+        <span class="nav-item__label">Reports</span>
+      </button>
+      <button
+        class="nav-item"
+        type="button"
+        routerLinkActive="nav-item--active"
+      >
+        <span class="nav-item__icon">🔁</span>
+        <span class="nav-item__label">Subscription</span>
+      </button>
+      <button
+        class="nav-item"
+        type="button"
+        routerLinkActive="nav-item--active"
+      >
+        <span class="nav-item__icon">⚙️</span>
+        <span class="nav-item__label">Conversion Setup</span>
+      </button>
+      <button
+        class="nav-item"
+        type="button"
+        routerLinkActive="nav-item--active"
+      >
+        <span class="nav-item__icon"
+          ><i class="fa-solid fa-user-group"></i
+        ></span>
+        <span class="nav-item__label">My Team</span>
+      </button>
+    </nav>
+  </aside>
+
+  <div class="main">
+    <main class="content">
+      <ng-content />
+    </main>
+  </div>
+</div>

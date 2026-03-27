@@ -1,0 +1,52 @@
+<div class="auth">
+  <section class="auth__left" aria-hidden="true">
+    <div class="auth__leftInner">
+      <div class="brand">
+        <div class="brand__mark">B</div>
+        <div class="brand__name">Barren</div>
+      </div>
+
+      <h1 class="headline">
+        The Easiest Way to Create<br />
+        Events and Sell More Tickets<br />
+        Online
+      </h1>
+    </div>
+  </section>
+
+  <section class="auth__right">
+    <div class="auth__top">
+      <span>{{ topText }}</span>
+      <a class="link" [routerLink]="topLinkTo">{{ topLinkText }}</a>
+    </div>
+
+    <div class="card">
+      <div class="card__title">
+        <div class="brand brand--small">
+          <div class="brand__mark">B</div>
+          <div class="brand__name">Barren</div>
+        </div>
+        <h2>{{ title }}</h2>
+      </div>
+
+      <ng-content />
+      <div class="auth__social">
+        <button class="btn btn--social" type="button" (click)="logingoogle()">
+          <span class="btn__icon" aria-hidden="true"
+            ><i class="fa-brands fa-google"></i
+          ></span>
+          Sign in with Google
+        </button>
+        <button class="btn btn--social" type="button">
+          <span class="btn__icon btn__icon--fb" aria-hidden="true"
+            ><i class="fa-brands fa-facebook"></i
+          ></span>
+          Sign in with Facebook
+        </button>
+      </div>
+      <div class="footer">
+        © 2024, Barren. All rights reserved. Powered by Gambolthemes
+      </div>
+    </div>
+  </section>
+</div>

@@ -1,0 +1,12 @@
+{
+  "ExpandedNodes": [
+    "",
+    "\\Controllers",
+    "\\Service",
+    "\\Service\\CatetoryService",
+    "\\Service\\TicketTypeService",
+    "\\Service\\UserService"
+  ],
+  "SelectedNode": "\\Service\\TicketTypeService\\TypeTicketService.cs",
+  "PreviewInSolutionExplorer": false
+}

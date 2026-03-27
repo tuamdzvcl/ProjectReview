@@ -1,0 +1,26 @@
+admin@system.com
+Admin@123
+"email": "phamngoctuananh161@gmail.com",
+  "password": "123456"
+
+{
+  "username": "Tuananh",
+  "firstName": "Phạm Ngọc ",
+  "lastName": "Tuấn Anh",
+  "email": "phamngoctuananh161@gmail.com",
+  "password": "123456"
+}
+
+{
+  "email": "admin@system.com",
+  "password": "Admin@123"
+}
+{
+  "email": "phamngoctuananh497@gmail.com",
+  "password": "1234567"
+}
+Lệnh thêm DB trong C#:		
+Drop-Database	
+Add-Migration InitDatabase	
+Update-Database
+Remove-Migration	

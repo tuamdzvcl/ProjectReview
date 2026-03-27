@@ -1,0 +1,309 @@
+// .box{
+//     max-width: 1200px;
+//     width: 100%;
+//     background-color: #fff;
+//     border: 1px solid #ddd;
+//     padding: 15px 7px;
+// }
+// .title{
+//     border-bottom: 1px solid #ddd;
+// }
+// .title h2{
+//     font-size: 2rem;
+// }
+// .des{
+//     margin-top:5px ;
+// }
+// .des h3{
+//     font-size: 1.5rem;
+//     margin: 0;
+// }
+// .cart{
+//     width: 100%;
+// }
+// .cart-left{
+//     margin-top: 50px;
+//     display: flex;
+//     justify-content: space-between;
+
+// }
+// .cart-left .cart-title{
+//     width: 60px;
+//     font-size: 1.3rem;
+
+// }
+// .cart-btn{
+
+// }
+
+
+.box {
+    background: #fff;
+    border-radius: 8px;
+    padding: 20px;
+    font-family: Arial, sans-serif;
+}
+
+.title h2 {
+    margin-bottom: 10px;
+}
+
+.des h3 {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 0;
+}
+
+.des p {
+    color: #777;
+    margin-bottom: 20px;
+}
+
+/* HEADER */
+.cart-left {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.cart-title {
+    font-weight: bold;
+}
+
+.cart-btn button {
+    background: #4caf50;
+    color: white;
+    border: none;
+    padding: 8px 14px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+/* LIST */
+.cart-lits {
+    margin-top: 24px;
+}
+
+.cart-item {
+    border: 1px solid #eef0f2;
+    border-radius: 12px;
+    padding: 24px;
+    margin-bottom: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #fff;
+    transition: all 0.2s ease;
+    
+    &:hover {
+        border-color: #d1d5db;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
+    }
+}
+
+/* LEFT CONTENT */
+.cart-item-text {
+    display: flex;
+    align-items: flex-start;
+    gap: 24px;
+}
+
+/* Biểu tượng vé lớn bên trái */
+.cart-item-text > span {
+    width: 52px;
+    height: 52px;
+    min-width: 52px;
+    background: #f0f2ff;
+    color: #4f46e5;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 14px;
+    font-size: 1.3rem;
+}
+
+.cart-item-title h3 {
+    margin: 0;
+    font-size: 18px;
+    color: #111827;
+    font-weight: 700;
+}
+
+.cart-item-title p {
+    margin: 4px 0 0;
+    color: #6b7280;
+    font-size: 14px;
+}
+
+/* RIGHT FUNCTION */
+.cart-item-function {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+/* Toggle Switch */
+.cart-item-function input[type="radio"] {
+    appearance: none;
+    width: 40px;
+    height: 20px;
+    background: #ddd;
+    border-radius: 20px;
+    position: relative;
+    cursor: pointer;
+}
+
+.cart-item-function input[type="radio"]:checked {
+    background: #2ecc71;
+}
+
+.cart-item-function input[type="radio"]::before {
+    content: "";
+    width: 16px;
+    height: 16px;
+    background: white;
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    border-radius: 50%;
+    transition: 0.3s;
+}
+
+.cart-item-function input[type="radio"]:checked::before {
+    transform: translateX(20px);
+}
+
+/* MENU */
+.cart-item-function-box {
+    position: relative;
+}
+
+.cart-item-function-box label {
+    cursor: pointer;
+    padding: 6px;
+}
+
+.cart-item-function-box .action {
+    position: absolute;
+    right: 0;
+    top: 30px;
+    background: white;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    display: none;
+    flex-direction: column;
+    min-width: 100px;
+    z-index: 10;
+}
+
+.cart-item-function-box .action button {
+    padding: 10px 15px;
+    border: none;
+    background: white;
+    text-align: left;
+    cursor: pointer;
+}
+
+.cart-item-function-box .action button:hover {
+    background: #f5f5f5;
+}
+
+/* SHOW DROPDOWN */
+#function:checked~.cart-item-function-box .action {
+    display: flex;
+}
+
+/* SWITCH CONTAINER */
+/* SUMMARY DETAILS TRONG TỪNG VÉ (GỐNG ẢNH MẪU) */
+.summary-details {
+    display: flex;
+    justify-content: flex-start;
+    gap: 70px;
+    margin-top: 18px;
+}
+
+.summary-details .summary-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.summary-details .icon-box {
+    width: 44px;
+    height: 44px;
+    background-color: #f6f8ff;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #4b5563;
+    font-size: 1rem;
+}
+
+.summary-details .content {
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+}
+
+.summary-details .content label {
+    font-size: 11px;
+    color: #6b7280;
+    margin: 0;
+    font-weight: 500;
+    white-space: nowrap;
+}
+
+.summary-details .content strong {
+    font-size: 15px;
+    color: #111827;
+    font-weight: 800;
+}
+
+.switch {
+    position: relative;
+    display: inline-block;
+    width: 46px;
+    height: 24px;
+}
+
+/* Ẩn checkbox */
+.switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+/* Thanh nền */
+.slider {
+    position: absolute;
+    cursor: pointer;
+    inset: 0;
+    background-color: #e5e7eb;
+    border-radius: 50px;
+    transition: 0.3s;
+}
+
+/* Nút tròn */
+.slider::before {
+    content: "";
+    position: absolute;
+    height: 18px;
+    width: 18px;
+    left: 3px;
+    top: 3px;
+    background: white;
+    border-radius: 50%;
+    transition: 0.3s;
+}
+
+/* Khi bật */
+.switch input:checked+.slider {
+    background: #00d1b2;
+}
+
+/* Nút trượt qua */
+.switch input:checked+.slider::before {
+    transform: translateX(22px);
+}

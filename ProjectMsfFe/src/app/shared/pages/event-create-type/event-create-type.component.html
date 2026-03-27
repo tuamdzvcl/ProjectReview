@@ -1,0 +1,117 @@
+<div class="box">
+  <div class="title">
+    <h2>Loại vé</h2>
+  </div>
+  <div class="des">
+    <h3>
+      <span><i class="fa-solid fa-ticket-simple"></i></span> Hãy tạo vé
+    </h3>
+    <p>Phân loại các giá tiền của vé</p>
+  </div>
+  <div class="cart">
+    <div class="cart-left">
+      <div class="cart-title">Tổng({{ tickets.length }})</div>
+      <div class="cart-btn" id="btn-add"><button (click)="openNew()">Thêm vé</button></div>
+    </div>
+
+    <div class="cart-lits">
+      <div class="cart-item" *ngFor="let t of tickets; let i = index">
+        <div class="cart-item-text">
+          <span><i class="fa-solid fa-ticket"></i></span>
+          <div class="cart-item-title">
+            <h3>{{ t.name }} - {{ t.price |vndCurrency }}</h3>
+            <p>{{ t.date }}</p>
+
+            <!-- Summary Row cho từng vé (Giống ảnh mẫu) -->
+            <div class="summary-details mt-3">
+              <div class="summary-item">
+                <div class="icon-box"><i class="fa-solid fa-ticket"></i></div>
+                <div class="content">
+                  <label>Total tickets</label>
+                  <strong>{{ t.quantity }}</strong>
+                </div>
+              </div>
+              <div class="summary-item">
+                <div class="icon-box"><i class="fa-solid fa-users"></i></div>
+                <div class="content">
+                  <label>Ticket limit per customer</label>
+                  <strong>{{ t.limit }}</strong>
+                </div>
+              </div>
+              <div class="summary-item">
+                <div class="icon-box"><i class="fa-solid fa-cart-shopping"></i></div>
+                <div class="content">
+                  <label>Discount</label>
+                  <strong>{{ t.discount }}%</strong>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="cart-item-function">
+          <label class="switch">
+            <input type="checkbox" [(ngModel)]="t.active" />
+            <span class="slider"></span>
+          </label>
+          <div class="cart-item-function-box">
+            <button #menuBtn type="button" pButton icon="pi pi-ellipsis-v"
+              class="p-button-text p-button-secondary border-none bg-transparent"
+              (click)="selectedTicketIndex = i; menu.toggle($event)">
+            </button>
+            <!-- Menu ẩn hiện khi click -->
+            <p-menu #menu [model]="ticketMenuItems" [popup]="true" appendTo="body"></p-menu>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<p-dialog [header]="isEditMode ? 'Sửa thông tin vé' : 'Thêm vé mới'" [(visible)]="showDialog" [modal]="true"
+  [style]="{ width: '450px' }" headerStyleClass="text-2xl font-bold" [draggable]="false" [resizable]="false">
+
+  <div class="flex flex-column gap-3 py-2">
+    <div class="flex flex-column gap-1">
+      <label for="name" class="font-semibold block mb-2">Tên vé *</label>
+      <input pInputText id="name" [(ngModel)]="ticket.name" placeholder="Nhập tên loại vé" class="w-full" />
+    </div>
+
+    <div class="grid flex mt-3">
+      <div class="col-6 flex flex-column gap-1">
+        <label for="price" class="font-semibold block mb-2">Giá vé (đ) *</label>
+        <p-inputNumber id="price" [(ngModel)]="ticket.price" mode="currency" currency="VND" locale="vi-VN"
+          styleClass="w-full"></p-inputNumber>
+      </div>
+      <div class="col-6 flex flex-column gap-1">
+        <label for="quantity" class="font-semibold block mb-2">Số lượng *</label>
+        <p-inputNumber id="quantity" [(ngModel)]="ticket.quantity" styleClass="w-full"></p-inputNumber>
+      </div>
+    </div>
+
+    <div class="grid flex mt-3">
+      <div class="col-6 flex flex-column gap-1">
+        <label for="limit" class="font-semibold block mb-2">
+          <i class="fa-solid fa-users mr-1 opacity-70"></i> Giới hạn mỗi khách
+        </label>
+        <p-inputNumber id="limit" [(ngModel)]="ticket.limit" [min]="1" styleClass="w-full"></p-inputNumber>
+      </div>
+      <div class="col-6 flex flex-column gap-1">
+        <label for="discount" class="font-semibold block mb-2">
+          <i class="fa-solid fa-percent mr-1 opacity-70"></i> Giảm giá (%)
+        </label>
+        <p-inputNumber id="discount" [(ngModel)]="ticket.discount" [min]="0" [max]="100" suffix="%"
+          styleClass="w-full"></p-inputNumber>
+      </div>
+    </div>
+
+
+  </div>
+
+  <ng-template pTemplate="footer">
+    <div class="flex justify-content-end gap-2 mt-4">
+      <button pButton label="Hủy" icon="pi pi-times" class="p-button-text p-button-secondary"
+        (click)="showDialog = false"></button>
+      <button pButton label="Lưu vé" icon="pi pi-check" (click)="saveTicket()" [disabled]="!ticket.name"></button>
+    </div>
+  </ng-template>
+</p-dialog>

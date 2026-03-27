@@ -1,0 +1,127 @@
+<app-shell>
+  <div class="box">
+    <div class="topbar__left">
+      <h1 class="topbar__title">Event</h1>
+    </div>
+    <section class="events-header card">
+      <div style="display: flex; flex-direction: column; gap: 10px">
+        <div class="events-header__left">
+          <h2 class="events-header__title">Events ({{ totalRecords }})</h2>
+        </div>
+        <div class="events-search__control">
+          <span class="events-search__icon">🔍</span>
+          <input
+            class="events-search__input"
+            type="text"
+            placeholder="Search by event name, status"
+            (input)="onSearch($event)"
+          />
+        </div>
+      </div>
+
+      <div class="events-header__right">
+        <div class="events-header__filters">
+          <button
+            class="btn btn--tab btn--tab-active"
+            type="button"
+            (click)="onTabChange('')"
+          >
+            All Event ({{ totalRecords }})
+          </button>
+          <button
+            class="btn btn--tab"
+            type="button"
+            (click)="onTabChange('online')"
+          >
+            Online Event (0)
+          </button>
+          <button
+            class="btn btn--tab"
+            type="button"
+            (click)="onTabChange('venue')"
+          >
+            Venue Event ({{ totalRecords }})
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Render Events from API -->
+    <section
+      class="event-item card"
+      *ngFor="let event of events; let i = index"
+    >
+      <div class="event-item__media">
+        <div class="event-item__thumbnail">
+          <img
+            [src]="event.PosterUrl | imageUrl"
+            [alt]="event.name || 'Event'"
+          />
+        </div>
+      </div>
+      <div class="event-item__body">
+        <div class="event-item__title">
+          {{ event.Title || "Untitled Event" }}
+        </div>
+        <div class="event-item__meta-row">
+          <div class="event-meta">
+            <div class="event-meta__label">Status</div>
+            <div class="event-meta__value event-meta__value--green">
+              {{ event.Status || "Publish" }}
+            </div>
+          </div>
+
+          <div class="event-meta">
+            <div class="event-meta__label">Starts on</div>
+            <div class="event-meta__value">
+              {{ event.StartDate | formatDate }}
+            </div>
+          </div>
+
+          <div class="event-meta">
+            <div class="event-meta__label">Ticket</div>
+            <div class="event-meta__value">
+              {{ event.ListTypeTick?.[0]?.TotalQuantity }}
+            </div>
+          </div>
+
+          <div class="event-meta">
+            <div class="event-meta__label">Tickets sold</div>
+            <div class="event-meta__value">
+              {{ event.ListTypeTick[0]?.SoldQuantity || 0 }}
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="event-item__actions">
+        <div class="action-dropdown" [class.active]="showDropdown === event.Id">
+          <button class="btn btn--icon" type="button" (click)="toggleDropdown(event.Id)">⋮</button>
+          <div class="dropdown-menu">
+            <button class="dropdown-item" (click)="editEvent(event)">
+              <i class="fa-regular fa-edit"></i>
+              Edit
+            </button>
+            <button class="dropdown-item" (click)="deleteEvent(event)">
+              <i class="fa-regular fa-trash-can"></i>
+              Delete
+            </button>
+           
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- No Events Message -->
+    <section class="no-events" *ngIf="events.length == 0">
+      <div class="no-events__content">
+        <div class="no-events__icon">
+          <span><i class="fa-regular fa-calendar-days"></i></span>
+        </div>
+        <h3 class="no-events__title">No Events Found</h3>
+        <p class="no-events__description">
+          There are no events matching your search criteria.
+        </p>
+      </div>
+    </section>
+  </div>
+</app-shell>

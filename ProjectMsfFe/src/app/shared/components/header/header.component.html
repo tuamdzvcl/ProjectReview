@@ -1,0 +1,27 @@
+
+<header class="header">
+  <div class="logo">
+    <span class="logo-circle">B</span>
+    <span class="logo-text">Barren</span>
+  </div>
+
+  <nav class="nav">
+    <a routerLink="/">Home</a>
+    <a>Explore Events</a>
+    <a>Pricing</a>
+    <a>Blog</a>
+    <a>Help</a>
+  </nav>
+
+  <div class="actions">
+    <button 
+      *ngIf="canCreateEvent()" 
+      class="create-btn" 
+      routerLink="/event-create-page"
+    >
+      Create Event
+    </button>
+
+    <app-user-dropdown></app-user-dropdown>
+  </div>
+</header>

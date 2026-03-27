@@ -1,0 +1,137 @@
+.box {
+    background: #fff;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    padding: 20px 24px;
+    font-family: Arial, sans-serif;
+}
+
+/* Title */
+.box h2 {
+    font-size: 18px;
+    font-weight: 600;
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+/* Description */
+.des h3 {
+    font-size: 15px;
+    font-weight: 600;
+    margin-bottom: 4px;
+}
+
+.des p {
+    font-size: 13px;
+    color: #6b7280;
+    margin-bottom: 20px;
+}
+
+/* Setting item */
+.setting-item {
+    border-top: 1px solid #e5e7eb;
+    padding: 16px 0;
+}
+
+/* Layout */
+.setting-item {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.setting-box h3 {
+    font-size: 14px;
+    font-weight: 600;
+    margin-bottom: 4px;
+}
+
+.setting-box p {
+    font-size: 13px;
+    color: #6b7280;
+}
+
+/* Model box */
+.model {
+    background: #f9fafb;
+    border: 1px solid #e5e7eb;
+    border-radius: 6px;
+    padding: 16px;
+}
+
+/* Detail */
+.detail-setting h3 {
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.detail-setting p {
+    font-size: 13px;
+    color: #6b7280;
+    margin-bottom: 12px;
+}
+
+/* Inputs */
+.model input[type="date"],
+.model input[type="time"] {
+    width: 48%;
+    padding: 8px 10px;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    font-size: 13px;
+    margin-right: 4%;
+}
+
+.model input:last-child {
+    margin-right: 0;
+}
+
+.switch {
+    position: relative;
+    display: inline-block;
+    width: 46px;
+    height: 24px;
+}
+
+/* Ẩn checkbox */
+.switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+/* Thanh nền */
+.slider {
+    position: absolute;
+    cursor: pointer;
+    inset: 0;
+    background-color: #ddd;
+    border-radius: 50px;
+    transition: 0.3s;
+}
+
+/* Nút tròn */
+.slider::before {
+    content: "";
+    position: absolute;
+    height: 18px;
+    width: 18px;
+    left: 3px;
+    top: 3px;
+    background: white;
+    border-radius: 50%;
+    transition: 0.3s;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+}
+
+/* Khi bật */
+.switch input:checked+.slider {
+    background: linear-gradient(135deg, #00c6ff, #00e676);
+}
+
+/* Nút trượt qua */
+.switch input:checked+.slider::before {
+    transform: translateX(22px);
+}

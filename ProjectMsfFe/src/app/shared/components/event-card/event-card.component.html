@@ -1,0 +1,34 @@
+<div class="event-card">
+  <!-- IMAGE -->
+  <div class="card-image">
+    <img [src]="eventmodel.PosterUrl | imageUrl" />
+
+    <button class="bookmark">
+      <i class="icon"><i class="fa-solid fa-bookmark"></i></i>
+    </button>
+  </div>
+
+  <!-- CONTENT -->
+  <div class="card-content">
+    <h3 class="title">
+      {{ eventmodel.Title }}
+    </h3>
+
+    <div class="price">
+      {{ firstPrice() | vndCurrency }}
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <div class="card-footer">
+    <div class="date">
+      <i class="fa-regular fa-calendar-days"></i>
+      {{ eventmodel.StartDate | formatDate }}
+    </div>
+
+    <div class="time-left">
+      <i class="fa-regular fa-clock"></i>
+      {{ eventmodel.StartDate | duration : eventmodel.EndDate }}
+    </div>
+  </div>
+</div>

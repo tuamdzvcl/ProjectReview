@@ -1,0 +1,95 @@
+<app-auth-layout
+  topText="Already have an account?"
+  topLinkText="Sign In"
+  [topLinkTo]="['/auth/login']"
+  title="Sign up to Barren"
+>
+  <form class="form" [formGroup]="form" (ngSubmit)="submit()">
+    <div class="grid-2">
+      <label class="field">
+        <span class="field__label">First Name*</span>
+        <input
+          class="field__control"
+          type="text"
+          autocomplete="given-name"
+          formControlName="firstName"
+        />
+        @if (form.controls.firstName.touched && form.controls.firstName.invalid)
+        {
+        <span class="field__error">First name is required.</span>
+        }
+      </label>
+
+      <label class="field">
+        <span class="field__label">Last Name*</span>
+        <input
+          class="field__control"
+          type="text"
+          autocomplete="family-name"
+          formControlName="lastName"
+        />
+        @if (form.controls.lastName.touched && form.controls.lastName.invalid) {
+        <span class="field__error">Last name is required.</span>
+        }
+      </label>
+    </div>
+
+    <label class="field">
+      <span class="field__label">Your Email*</span>
+      <input
+        class="field__control"
+        type="email"
+        inputmode="email"
+        autocomplete="email"
+        formControlName="email"
+      />
+      @if (form.controls.email.touched && form.controls.email.invalid) {
+      <span class="field__error">Please enter a valid email.</span>
+      }
+    </label>
+
+    <label class="field">
+      <span class="field__label">Password*</span>
+      <div class="field__controlWrap">
+        <input
+          class="field__control"
+          [type]="passwordVisible() ? 'text' : 'password'"
+          autocomplete="new-password"
+          formControlName="password"
+        />
+        <button
+          class="field__toggle"
+          type="button"
+          (click)="togglePassword()"
+          [attr.aria-label]="
+            passwordVisible() ? 'Hide password' : 'Show password'
+          "
+          [attr.aria-pressed]="passwordVisible()"
+        >
+          <i
+            class="fa"
+            [ngClass]="passwordVisible() ? 'fa-eye-slash' : 'fa-eye'"
+          ></i>
+        </button>
+      </div>
+      @if (form.controls.password.touched && form.controls.password.invalid) {
+      <span class="field__error">Password must be at least 6 characters.</span>
+      }
+    </label>
+
+    <button class="btn btn--primary" type="submit" [disabled]="isSubmitting()">
+      @if (isSubmitting()) { Signing up... } @else { Sign Up }
+    </button>
+
+    <div class="muted">
+      By clicking “Sign up”, you agree to Barren
+      <a class="link" href="#" (click)="$event.preventDefault()"
+        >Terms &amp; Conditions</a
+      >
+      and have read the
+      <a class="link" href="#" (click)="$event.preventDefault()"
+        >Privacy Policy</a
+      >.
+    </div>
+  </form>
+</app-auth-layout>

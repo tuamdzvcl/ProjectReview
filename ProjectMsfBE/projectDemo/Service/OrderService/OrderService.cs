@@ -1,0 +1,245 @@
+﻿using AutoMapper;
+using Azure;
+using EventTick.Model.Enum;
+using EventTick.Model.Models;
+using Microsoft.EntityFrameworkCore;
+using projectDemo.Data;
+using projectDemo.DTO.Request;
+using projectDemo.DTO.Respone;
+using projectDemo.DTO.Response;
+using projectDemo.DTO.UpdateRequest;
+using projectDemo.Entity.Enum;
+using projectDemo.Repository.Ipml;
+using projectDemo.Repository.OrderRepository;
+using projectDemo.Repository.TickTypeRepository;
+using projectDemo.UnitOfWorks;
+using System.Collections.Generic;
+using System.Net.WebSockets;
+
+namespace projectDemo.Service.OrderService
+{
+    public class OrderService : IOrderService
+    {
+        private readonly ITypeTicketRepositorys _ticketRepositorys;
+        private readonly IUserReposiotry _userReposiotry;
+        private readonly IEventRepository _eventRepository;
+        private readonly IMapper _mapper;
+        private readonly IOrderRepository _orderRepository;
+        private readonly IOrderDetailRepository _orderDetailRepository;
+        private readonly IUnitOfWork _uow;
+       
+
+        public OrderService(IUserReposiotry userReposiotry,IUnitOfWork uow, IOrderDetailRepository orderDetailRepository, ITypeTicketRepositorys ticketRepositorys, IEventRepository eventRepository, IMapper mapper, IOrderRepository order)
+        {
+            _ticketRepositorys = ticketRepositorys;
+            _eventRepository = eventRepository;
+            _mapper = mapper;
+            _orderRepository = order;
+            _orderDetailRepository = orderDetailRepository;
+            _uow = uow;
+            _userReposiotry = userReposiotry;
+            
+
+        }
+        //reder orderCode 
+        public static string GenerateCode()
+        {
+           return Guid.NewGuid().ToString("N").Substring(0, 8).ToUpper();
+        }
+        //chuyển từ enum sang string 
+        public static EnumStatusOrder ConvertStatus(string status)
+        {
+            if (!Enum.TryParse<EnumStatusOrder>(status, true, out var result))
+                throw new Exception("Status không hợp lệ");
+
+            return result;
+        }
+        // lấy giá của event theo loại vé
+        public   decimal GetPriceTypeTick(int TypeTicketID)
+        {
+            var TypeTick =  _ticketRepositorys.GetTicketTypebyId(TypeTicketID);
+            return TypeTick.Price;
+        }
+        //tạo order rồi tạo orderdetail
+        public async Task<ApiResponse<OrderResponseCreate>> CreateOrder(CreateOrderRequest request,Guid userid)
+        {
+            using var transaction =  _uow.BeginTransactionAsync();
+            try
+            {
+                var user = await _userReposiotry.GetUserByid(userid);
+                if (user == null)
+                {
+                    return ApiResponse<OrderResponseCreate>
+                        .FailResponse(EnumStatusCode.USERNOTFOUND, "User không tồn tại");
+                }
+                decimal TotalAmount =0;
+                var order = new Order()
+                {
+                    Id = Guid.NewGuid(),
+                    OrderCode=GenerateCode(),
+                    Status = EnumStatusOrder.PENDING,
+                    CreatedBy = user.Username,
+                    CreatedDate = DateTime.Now,
+                    UserID = user.Id,
+                    IsDeleted = false,
+                    OrderDetails = new List<OrderDetail>()
+                };
+                foreach(var item in request.Items)
+                {
+                    var typeTicket =  _ticketRepositorys.GetTicketTypebyId(item.TicketTypeId);
+                    if(typeTicket == null) 
+                    {
+                        return ApiResponse<OrderResponseCreate>.FailResponse(Entity.Enum.EnumStatusCode.TYPETICKET, "Không tìm thấy loại vé ");
+                    }
+                    var available = typeTicket.TotalQuantity - typeTicket.SoldQuantity;
+                    if(available < item.Quantity)
+                    {
+                        return ApiResponse<OrderResponseCreate>.FailResponse(Entity.Enum.EnumStatusCode.Tick, "Không tìm thấy loại vé ");
+                    }
+                    typeTicket.SoldQuantity += item.Quantity;
+                    var detail = new OrderDetail
+                    {
+                        Id = Guid.NewGuid(),
+                        OrderID = order.Id,
+                        TicketTypeId = typeTicket.Id,
+                        Quantity = item.Quantity,
+                        Price = typeTicket.Price,
+                    };
+                    order.OrderDetails.Add(detail);
+                    TotalAmount += typeTicket.Price * item.Quantity;
+                }
+                order.TotalAmount = TotalAmount;
+                await _orderRepository.CreateOrder(order);
+                 await _uow.SaveChangesAsync();
+                 await _uow.CommitAsync();
+                var response = new OrderResponseCreate
+
+                {
+                    OrderId = order.Id,
+                    TotalAmount = order.TotalAmount,
+                    Items = order.OrderDetails.Select(x => new OrderDetailResponse
+                    {
+                        Quantity = x.Quantity,
+                        Price = x.Price
+                    }).ToList()
+                };
+               
+                return ApiResponse<OrderResponseCreate>.SuccessResponse(Entity.Enum.EnumStatusCode.SUCCESS, response);
+
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"lỗi đây này {ex.Message}");
+                await _uow.RollbackAsync();
+                return ApiResponse<OrderResponseCreate>.FailResponse(Entity.Enum.EnumStatusCode.SERVER, "Lỗi ");
+
+
+            }
+        }
+        //xóa order
+        public async Task<ApiResponse<string>> DeleteOrder(Guid OrderID)
+        {
+           var order = await _orderRepository.GetOrderbyID(OrderID);
+            if(order == null)   
+                return ApiResponse<string>.FailResponse(Entity.Enum.EnumStatusCode.OrderNOTFOUND, "Không tìm thấy order");
+            order.IsDeleted= true;
+           await _uow.SaveChangesAsync();
+            return ApiResponse<string>.SuccessResponse(Entity.Enum.EnumStatusCode.SUCCESS, "Xóa thành công");
+
+        }
+
+        //lấy list danh sách order của user
+        public async Task<PageResponse<Guid>> GetListOrderbyIdUser(Guid UserID,int pageindex,int pagesize)
+        {
+            if (pageindex <= 0)
+                pageindex = 1;
+
+            if (pagesize <= 0)
+                pagesize = 10;
+
+            var (orders, total) = await _orderRepository.GetListOrderByUserId(UserID,pageindex,pagesize);
+            var response = new PageResponse<Guid>
+            {
+                Message = "List OrderID",
+                TotalRecords = total,
+                Items= orders,
+                PageIndex=pageindex,
+                PageSize=pagesize,
+                TotalPages = (int)Math.Ceiling((double)total / pagesize)
+            };
+
+            return   response;
+
+        }
+        // lấy list danh sách orderdetail theo order
+        public async Task<ApiResponse<OrderResponse>> GetListOrderDetail(Guid OrderID)
+        {
+            try
+            {
+                var (order, code, mes) = await _orderRepository.GetOrderListOrderDetail(OrderID);
+                if (code != 200)
+                {
+                    return ApiResponse<OrderResponse>.FailResponse(Entity.Enum.EnumStatusCode.OrderNOTFOUND, "Không tìm thấy Order ");
+                }
+
+                var orderDetails = order.orderDetails.Select(x => new OrderDetailResponse
+                {
+                    OrderIdDetail = x.Id,
+                    Price = x.Price,
+                    Quantity = x.Quantity,
+                    TicketTypeName = x.TicketTypeName.ToString()
+                }).ToList();
+                var response = new OrderResponse()
+                {
+                    OrderID = order.Id,
+                    OrderCode = order.OrderCode,
+                    Status = order.Status.ToString(),
+                    FullName = $"{order.FirstName} {order.LastName}",
+                    TotalAmount = order.TotalAmount,
+                    orderDetails = orderDetails
+                };
+
+                return ApiResponse<OrderResponse>.SuccessResponse(Entity.Enum.EnumStatusCode.SUCCESS, response);
+            }
+            catch (Exception ex)
+            {
+                return ApiResponse<OrderResponse>.FailResponse(Entity.Enum.EnumStatusCode.SUCCESS, ex.Message);
+
+            }
+
+        }
+
+        //lấy tất cả order
+        public async Task<ApiResponse<List<OrderResponse>>> GetOrder()
+        {
+           var order = await _orderRepository.GetALl();
+          var response =  order.Select(x => new OrderResponse
+          {
+                OrderCode=x.OrderCode,
+                OrderID=x.Id,
+                TotalAmount=x.TotalAmount,
+                Status=x.Status.ToString()
+                
+
+          }).ToList();
+            return ApiResponse <List<OrderResponse>>.SuccessResponse(Entity.Enum.EnumStatusCode.SUCCESS, response);
+            
+        }
+        //sủa order
+        public async Task<ApiResponse<string>> UpdateOrder(Guid orderID, OrderUpdate request)
+        {
+            var order = await _orderRepository.GetOrderbyID(orderID);
+            if (order == null)
+            {
+                return ApiResponse<string>.FailResponse(Entity.Enum.EnumStatusCode.SERVER, "Không tìm thấy order");
+            }
+            var map = new OrderUpdate
+            {
+                TotalAmount = request.TotalAmount,
+                Status = request.Status,
+            };
+            await _uow.SaveChangesAsync();
+            return ApiResponse<string>.SuccessResponse(Entity.Enum.EnumStatusCode.SUCCESS, "Sửa thành công ");
+        }
+    }
+}

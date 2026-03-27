@@ -1,0 +1,118 @@
+.speet {
+    position: relative;
+    right: 0;
+    left: 0;
+    padding: 10px;
+    margin: 20px 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1;
+
+    .custom-steps {
+        display: flex;
+        width: 100%;
+        max-width: 600px;
+        justify-content: space-between;
+        align-items: center;
+
+        .step-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            flex: 1;
+            position: relative;
+
+            &:not(:last-child)::after {
+                content: '';
+                position: absolute;
+                top: 20px;
+                right: -50%;
+                width: 100%;
+                height: 2px;
+                background-color: #ddd;
+                z-index: -1;
+            }
+
+            &.active {
+                .step-number {
+                    background-color: #2dbd26;
+                    color: white;
+                    border-color: #2dbd26;
+                }
+
+                .step-label {
+                    color: #2dbd26;
+                    font-weight: 600;
+                }
+
+                &:not(:last-child)::after {
+                    background-color: #2dbd26;
+                }
+            }
+
+            .step-number {
+                width: 40px;
+                height: 40px;
+                border-radius: 50%;
+                background-color: #f8f9fa;
+                border: 2px solid #ddd;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-weight: 600;
+                margin-bottom: 8px;
+                transition: all 0.3s ease;
+            }
+
+            .step-label {
+                font-size: 14px;
+                color: #666;
+                text-align: center;
+                transition: all 0.3s ease;
+            }
+        }
+    }
+}
+
+.wrapper {
+    max-width: 75rem; 
+    margin: 0 auto;
+    position: relative;
+}
+
+.btn-save {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 20px 0;
+    padding: 10px;
+    gap: 15px; 
+}
+
+.btn-save button {
+    padding: 12px 50px;
+    background-color: #2dbd26;
+    border: 0;
+    color: #fff;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: background-color 0.2s;
+}
+
+.btn-save button:hover {
+    background-color: #25a01e;
+}
+
+.btn-save .btn-back {
+    background-color: #f1f5f9;
+    color: #475569;
+    border: 1px solid #e2e8f0;
+}
+
+.btn-save .btn-back:hover {
+    background-color: #e2e8f0;
+}

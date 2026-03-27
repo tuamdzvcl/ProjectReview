@@ -1,0 +1,29 @@
+<div class="user">
+  <!-- Nếu chưa login - Hiển thị nút Login -->
+  <div *ngIf="!user" class="login-btn">
+    <a routerLink="/auth/login" class="btn-login">Login</a>
+  </div>
+
+  <!-- Nếu đã login - Hiển thị avatar và dropdown -->
+  <div *ngIf="user">
+    <img src="cat.jpg" class="avatar" (click)="toggleDropdown()" />
+
+    <div class="dropdown" *ngIf="isOpen">
+      <div class="user-info">
+        <img src="cat.jpg" alt="avarta" />
+        <div class="infor">
+          <h4>{{ fullName }}</h4>
+          <p>{{ user?.Email }}</p>
+        </div>
+      </div>
+
+      <ul>
+        <li *ngIf="hasRole(['ADMIN', 'ORGANISATION'])">
+          <a routerLink="/admin/dashboard">My Organisation</a>
+        </li>
+        <li><a href="">My Profile</a></li>
+        <li><a (click)="signOut()">Sign Out</a></li>
+      </ul>
+    </div>
+  </div>
+</div>

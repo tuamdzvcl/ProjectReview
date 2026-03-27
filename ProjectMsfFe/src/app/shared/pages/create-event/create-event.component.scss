@@ -1,0 +1,149 @@
+.content {
+    max-width: 1000px;
+    width: 100%;
+    background-color: #fff;
+}
+
+.card {
+    border: 1px solid #ddd;
+    background: #fff;
+}
+
+
+
+.form-card {
+    padding: 2rem;
+}
+
+.title {
+    font-size: 1.6rem;
+    margin-bottom: 0.2rem;
+}
+
+.border {
+    width: 100%;
+    margin-bottom: 1.5rem;
+    border: 1px solid rgb(165, 160, 160);
+}
+
+.field {
+    margin-bottom: 2rem;
+
+    label {
+        display: block;
+        font-size: 1.3rem;
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+        line-height: 3.2rem;
+    }
+
+    .desc {
+        display: block;
+        font-size: 1.1rem;
+        color: #6b7280;
+        margin-bottom: 0.8rem;
+    }
+}
+
+
+.banner {
+    position: relative;
+    border-radius: 6px;
+}
+
+.image-upload-area {
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    background: linear-gradient(135deg, #2b5876, #4e4376);
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    overflow: hidden;
+    border: 2px dashed rgba(255, 255, 255, 0.3);
+    transition: border-color 0.2s;
+
+    &:hover {
+        border-color: rgba(255, 255, 255, 0.7);
+    }
+}
+
+.upload-placeholder {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    opacity: 0.7;
+}
+
+.banner-preview {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+    display: block;
+}
+
+.banner-preview {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    display: block;
+    background: #f3f4f6;
+}
+
+.banner-placeholder {
+    color: white;
+    font-size: 1.1rem;
+}
+
+.upload-box {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+}
+
+.overlay {
+    font-size: 6rem;
+    color: white;
+    opacity: 0.7;
+}
+
+.btn-upload {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+}
+
+
+
+.custom-steps .p-steps-item .p-menuitem-link {
+    font-size: 1.2rem;
+    padding: 1rem 1.5rem;
+
+}
+
+.custom-steps .p-steps-number {
+    width: 2.4rem;
+    height: 2.4rem;
+    font-size: 1.2rem;
+    border-radius: 0;
+}
+
+
+.custom-steps .p-steps-item.p-highlight .p-steps-number {
+    background: #2563eb;
+    color: #fff;
+    border: none;
+}
+
+.custom-steps .p-steps-item .p-steps-number {
+    border: 2px solid #d1d5db;
+    color: #6b7280;
+}
+
+.custom-steps .p-steps-item:before {
+    border-top: 2px solid #e5e7eb;
+}

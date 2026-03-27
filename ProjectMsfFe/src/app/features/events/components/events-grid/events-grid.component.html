@@ -1,0 +1,15 @@
+<div class="events-grid">
+  <app-event-card *ngFor="let event of events" [eventmodel]="event">
+  </app-event-card>
+</div>
+
+<div class="page">
+  <button
+    *ngIf="hasMore"
+    type="button"
+    class="btn-loadmode"
+    (click)="loadMore()"
+  >
+    Load more
+  </button>
+</div>

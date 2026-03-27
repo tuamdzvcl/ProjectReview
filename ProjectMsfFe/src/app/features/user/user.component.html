@@ -1,0 +1,114 @@
+<app-shell>
+  <div class="topbar__left">
+    <h1 class="topbar__title">User</h1>
+  </div>
+  <section class="users-header card">
+    <div style="display: flex; flex-direction: column; gap: 10px">
+      <div class="users-header__left">
+        <h2 class="users-header__title">User({{ totalRecords }})</h2>
+      </div>
+      <div class="users-search__control">
+        <span class="users-search__icon">🔍</span>
+        <input
+          class="users-search__input"
+          type="text"
+          placeholder="Search by event name, status"
+        />
+      </div>
+    </div>
+
+    <div class="users-header__right">
+      <div class="users-header__filters">
+        <button (click)="onSave()" class="btn btn--tab" type="button">
+          Add User
+        </button>
+        <button
+          class="btn btn--tab"
+          [class.btn--tab-active]="selectedRole === ''"
+          (click)="filterRole('')"
+          type="button"
+        >
+          UserAtice ({{ totalAll }})
+        </button>
+        <button
+          class="btn btn--tab"
+          type="button"
+          class="btn btn--tab"
+          [class.btn--tab-active]="selectedRole === 'organizer'"
+          (click)="filterRole('organizer')"
+        >
+          Organisation({{ totalOrganizer }})
+        </button>
+        <button
+          class="btn btn--tab"
+          type="button"
+          class="btn btn--tab"
+          [class.btn--tab-active]="selectedRole === 'customer'"
+          (click)="filterRole('customer')"
+        >
+          Customer ({{ totalCustomer }})
+        </button>
+      </div>
+    </div>
+  </section>
+  <section class="card">
+    <div class="card table-wrapper">
+      <p-table
+        [value]="users"
+        [paginator]="true"
+        [rows]="rows"
+        [first]="first"
+        [totalRecords]="totalRecords"
+        [lazy]="true"
+        (onPage)="pageChange($event)"
+        [tableStyle]="{ 'min-width': '50rem' }"
+        [rowsPerPageOptions]="[5, 10, 20]"
+      >
+        <ng-template pTemplate="header">
+          <tr>
+            <th style="width: 20%">STT</th>
+            <th style="width: 20%">Email</th>
+            <th style="width: 20%">FullName</th>
+            <th style="width: 20%">Role</th>
+            <th style="width: 20%">Active</th>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-user as index let-rowIndex="rowIndex">
+          <tr>
+            <td>{{ rowIndex + 1 }}</td>
+            <td>{{ user.Email }}</td>
+            <td>{{ user.LastName }} {{ user.FirstName }}</td>
+            <td>
+              <span *ngFor="let role of user.RoleName" class="role-badge">{{
+                role
+              }}</span>
+            </td>
+
+            <td>
+              <div class="p-button-group">
+                <p-button
+                  label="Edit"
+                  icon="fa-regular fa-pen-to-square"
+                  class="m-2"
+                  (onClick)="onEdit(user)"
+                ></p-button>
+                <p-button
+                  label="Delete"
+                  icon="pi pi-trash"
+                  class="m-2"
+                  (onClick)="onDelete(user)"
+                ></p-button>
+              </div>
+            </td>
+          </tr>
+        </ng-template>
+      </p-table>
+    </div>
+  </section>
+</app-shell>
+<app-user-form
+  [(visible)]="display"
+  [data]="selectedUser"
+  (submitForm)="handleSubmit($event)"
+>
+</app-user-form>

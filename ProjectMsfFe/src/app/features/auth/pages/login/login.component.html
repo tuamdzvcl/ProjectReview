@@ -1,0 +1,50 @@
+<app-auth-layout
+  topText="New to Barren?"
+  topLinkText="Sign up"
+  [topLinkTo]="['/auth/signup']"
+  title="Sign in to Barren"
+>
+  <form class="form" [formGroup]="form" (ngSubmit)="submit()">
+    <label class="field">
+      <span class="field__label">Your Email*</span>
+      <input
+        class="field__control"
+        type="email"
+        inputmode="email"
+        autocomplete="email"
+        placeholder="Enter your email"
+        formControlName="email"
+      />
+      @if (form.controls.email.touched && form.controls.email.invalid) {
+      <span class="field__error">Please enter a valid email.</span>
+      }
+    </label>
+
+    <label class="field">
+      <div class="field__row">
+        <span class="field__label">Password*</span>
+        <a class="link link--muted" href="#" (click)="$event.preventDefault()"
+          >Forgot Password?</a
+        >
+      </div>
+      <input
+        class="field__control"
+        type="password"
+        autocomplete="current-password"
+        placeholder="Enter your password"
+        formControlName="password"
+      />
+      @if (form.controls.password.touched && form.controls.password.invalid) {
+      <span class="field__error">Password must be at least 6 characters.</span>
+      }
+    </label>
+
+    <button class="btn btn--primary" type="submit" [disabled]="isSubmitting()">
+      @if (isSubmitting()) { Signing in... } @else { Sign In }
+    </button>
+
+    <div class="divider">
+      <span>or</span>
+    </div>
+  </form>
+</app-auth-layout>

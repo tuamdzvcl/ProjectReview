@@ -1,0 +1,149 @@
+.card {
+  border-radius: 8px;
+  background: #ffffff;
+  padding: 14px 16px;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.03);
+}
+
+.profile {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.profile__avatar {
+  width: 42px;
+  height: 42px;
+  border-radius: 999px;
+  background: #6cc04a;
+  color: #ffffff;
+  display: grid;
+  place-items: center;
+  font-weight: 700;
+}
+
+.profile__name {
+  font-weight: 600;
+}
+
+.profile__org {
+  font-size: 12px;
+  color: #6b7280;
+}
+
+.summary {
+  margin-top: 15px;
+  padding: 15px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  background: #ffffff;
+}
+
+.summary__row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 13px;
+  color: #4b5563;
+}
+
+.summary__cards {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.stat {
+  border-radius: 8px;
+  padding: 12px 14px;
+  color: #ffffff;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.stat__label {
+  font-size: 11px;
+  text-transform: uppercase;
+  opacity: 0.9;
+}
+
+.stat__value {
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.stat__meta {
+  font-size: 11px;
+  opacity: 0.9;
+}
+
+.stat--purple {
+  background: #6366f1;
+}
+
+.stat--red {
+  background: #ef4444;
+}
+
+.stat--blue {
+  background: #0ea5e9;
+}
+
+.stat--green {
+  background: #22c55e;
+}
+
+.chart {
+  margin-top: 20px;
+}
+
+.chart__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.chart__title {
+  font-weight: 400;
+  padding: 10px 20px;
+  width: 150px;
+}
+
+.chart__tabs {
+  display: inline-flex;
+  gap: 10px;
+}
+
+.chip {
+  border-radius: 2px;
+  border: 1px solid #e5e7eb;
+  background: #ffffff;
+  padding: 8px 10px;
+  font-size: 11px;
+  cursor: pointer;
+}
+
+.chip--active {
+  background: #6cc04a;
+  color: #ffffff;
+  border-color: #6cc04a;
+}
+
+.chart__body {
+  margin-top: 10px;
+}
+
+.chart__body {
+  margin-top: 10px;
+}
+
+@media (max-width: 1024px) {
+  .summary__cards {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+

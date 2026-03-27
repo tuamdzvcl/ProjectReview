@@ -1,0 +1,34 @@
+<div class="card text-3xl justify-center mt-2">
+  <p-breadcrumb [model]="item" />
+</div>
+<div class="wrapper">
+  <!-- Steps -->
+  <div class="speet">
+    <div class="custom-steps">
+      <div *ngFor="let step of steps; let i = index" class="step-item" [class.active]="i === activeIndex"
+        (click)="onStepClick(i)">
+        <div class="step-number">{{ i + 1 }}</div>
+        <div class="step-label">{{ step.label }}</div>
+      </div>
+    </div>
+  </div>
+  <ng-container *ngIf="isDataLoaded; else loading">
+    <router-outlet></router-outlet>
+  </ng-container>
+
+  <ng-template #loading>
+    <div class="flex justify-content-center align-items-center py-8">
+      <i class="pi pi-spin pi-spinner text-4xl text-primary"></i>
+    </div>
+  </ng-template>
+</div>
+<div class="btn-save flex gap-3">
+  <button *ngIf="activeIndex > 0" class="btn-back" (click)="onBackStep()">Quay lại</button>
+
+  <button (click)="onNextStep()">
+    <ng-container *ngIf="activeIndex < 2">Tiếp tục</ng-container>
+    <ng-container *ngIf="activeIndex === 2">
+      {{ eventId ? 'Cập nhật sự kiện' : 'Lưu sự kiện' }}
+    </ng-container>
+  </button>
+</div>

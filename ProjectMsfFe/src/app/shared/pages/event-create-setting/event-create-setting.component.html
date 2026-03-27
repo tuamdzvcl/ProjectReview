@@ -1,0 +1,66 @@
+<div class="box">
+  <h2>
+    <span><i class="fa-solid fa-gear"></i></span> Cài đặt
+  </h2>
+
+  <div class="des">
+    <h3>Cài đặt cho sự kiện của bạn</h3>
+    <p>Hãy tùy chỉnh thời gian bán vé theo nhu cầu của bạn</p>
+  </div>
+
+  <div class="list-setting">
+    <!-- CÀI ĐẶT 1: THỜI GIAN BẮT ĐẦU BÁN VÉ -->
+    <div class="setting-item">
+      <label class="switch" for="isImmediateStart">
+        <input type="checkbox" id="isImmediateStart" [(ngModel)]="isImmediateStart" />
+        <span class="slider"></span>
+      </label>
+      <div class="setting-box">
+        <h3>Bắt đầu bán vé ngay lập tức.</h3>
+        <p>
+          Tắt tùy chọn này nếu bạn muốn hoạt động đặt chỗ bắt đầu vào một ngày và giờ cụ thể.
+        </p>
+      </div>
+
+      <!-- Hiển thị khi không muốn bắt đầu ngay lập tức -->
+      <div class="model" *ngIf="!isImmediateStart">
+        <div class="detail-setting">
+          <h3>Việc đặt chỗ bắt đầu vào...</h3>
+          <p>Chỉ định thời điểm vé được phép mở bán.</p>
+        </div>
+
+        <div class="mt-3 flex gap-2">
+          <input type="date" [(ngModel)]="saleStartDate" class="p-2 border-1 border-300 border-round" />
+          <input type="time" [(ngModel)]="saleStartTime" class="p-2 border-1 border-300 border-round" />
+        </div>
+      </div>
+    </div>
+
+    <!-- CÀI ĐẶT 2: THỜI GIAN KẾT THÚC BÁN VÉ -->
+    <div class="setting-item">
+      <label class="switch" for="isAutoEnd">
+        <input type="checkbox" id="isAutoEnd" [(ngModel)]="isAutoEnd" />
+        <span class="slider"></span>
+      </label>
+      <div class="setting-box">
+        <h3>Tự động đóng bán vé kết thúc sau 1 ngày tính từ lúc bắt đầu bán vé.</h3>
+        <p>
+          Bật tùy chọn này nếu bạn muốn ngừng nhận đặt chỗ vào một thời điểm cụ thể trước sự kiện.
+        </p>
+      </div>
+
+      <!-- Hiển thị khi muốn tự động đóng bán vé -->
+      <div class="model" *ngIf="isAutoEnd">
+        <div class="detail-setting">
+          <h3>Việc bán vé kết thúc vào...</h3>
+          <p>Chỉ định thời điểm vé sẽ đóng bán tự động.</p>
+        </div>
+
+        <div class="mt-3 flex gap-2">
+          <input type="date" [(ngModel)]="saleEndDate" class="p-2 border-1 border-300 border-round" />
+          <input type="time" [(ngModel)]="saleEndTime" class="p-2 border-1 border-300 border-round" />
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

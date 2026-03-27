@@ -1,0 +1,20 @@
+.filter-tabs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin: 20px 0;
+}
+
+.filter-tabs button {
+    border: 1px solid #ddd;
+    background: white;
+    padding: 8px 15px;
+    border-radius: 20px;
+    cursor: pointer;
+}
+
+.filter-tabs button.active {
+    background: #3dbb3d;
+    color: white;
+    border: none;
+}

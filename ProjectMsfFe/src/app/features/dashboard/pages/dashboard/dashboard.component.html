@@ -1,0 +1,73 @@
+<app-shell>
+  <main>
+    <div class="topbar__left">
+      <h1 class="topbar__title">Dashboard</h1>
+    </div>
+
+    <section class="card profile">
+      <div style="display: flex; gap: 10px">
+        <div class="profile__avatar">JD</div>
+        <div class="profile__info">
+          <div class="profile__name">John Doe</div>
+          <div class="profile__org">My Organisation</div>
+        </div>
+      </div>
+      <button class="btn btn--ghost btn--small" type="button">
+        <span><i class="fa-solid fa-plus"></i></span>
+        Add Organisation
+      </button>
+    </section>
+
+    <section class="summary">
+      <div class="summary__row">
+        <div class="summary__date">01/04/2026 - 30/04/2026</div>
+      </div>
+
+      <div class="summary__cards">
+        <article class="stat stat--purple">
+          <div class="stat__label">DOANH THU (VNĐ)</div>
+          <div class="stat__value">15.500.000đ</div>
+          <div class="stat__meta">0.00% So với kỳ trước</div>
+        </article>
+
+        <article class="stat stat--red">
+          <div class="stat__label">ĐƠN HÀNG</div>
+          <div class="stat__value">25</div>
+          <div class="stat__meta">0.00% So với kỳ trước</div>
+        </article>
+
+        <article class="stat stat--blue">
+          <div class="stat__label">LƯỢT XEM TRANG</div>
+          <div class="stat__value">3.200</div>
+          <div class="stat__meta">0.00% So với kỳ trước</div>
+        </article>
+
+        <article class="stat stat--green">
+          <div class="stat__label">VÉ ĐÃ BÁN</div>
+          <div class="stat__value">45</div>
+          <div class="stat__meta">0.00% So với kỳ trước</div>
+        </article>
+      </div>
+    </section>
+
+    <section class="chart card">
+      <header class="chart__header">
+        <select class="chart__title">
+          <option value="Revenue">Revenue</option>
+        </select>
+        <div class="chart__tabs">
+          <button class="chip" [class.chip--active]="selectedTab === 'Monthly'" type="button"
+            (click)="fetchRevenueStats('Monthly')">Monthly</button>
+          <button class="chip" [class.chip--active]="selectedTab === 'Weekly'"
+            [class.chip--active]="selectedTab === 'Weekly'" type="button"
+            (click)="fetchRevenueStats('Weekly')">Weekly</button>
+          <button class="chip" [class.chip--active]="selectedTab === 'Daily'" type="button"
+            (click)="fetchRevenueStats('Daily')">Daily</button>
+        </div>
+      </header>
+      <div class="chart__body">
+        <p-chart type="line" [data]="chartData" [options]="chartOptions" height="250px" />
+      </div>
+    </section>
+  </main>
+</app-shell>
