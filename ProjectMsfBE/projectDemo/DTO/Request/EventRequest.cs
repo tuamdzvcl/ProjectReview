@@ -13,7 +13,7 @@ namespace projectDemo.DTO.Request
         public DateTime SaleEndDate { get; set; }
         public string CatetoryName { get; set; }
 
-        public List<TypeTicketRequest> typeTicketRequests { get; set; }
+        public List<CreateEventTicketTypeItemRequest> TicketTypes { get; set; }
         public IFormFile? PosterUrl { get; set; }
     }
 }

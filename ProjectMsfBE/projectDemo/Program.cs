@@ -1,5 +1,6 @@
 ﻿    using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
     using Microsoft.IdentityModel.Tokens;
 using projectDemo.config;
@@ -52,6 +53,29 @@ using System.Text.Json.Serialization;
               options.JsonSerializerOptions.DefaultIgnoreCondition =
                 JsonIgnoreCondition.WhenWritingNull;
                 });
+
+            builder.Services.Configure<ApiBehaviorOptions>(options =>
+            {
+                options.InvalidModelStateResponseFactory = context =>
+                {
+                    var errors = context.ModelState
+                        .Where(x => x.Value?.Errors.Count > 0)
+                        .ToDictionary(
+                            x => x.Key,
+                            x => x.Value!.Errors
+                                .Select(e => string.IsNullOrWhiteSpace(e.ErrorMessage) ? "Gia tri khong hop le" : e.ErrorMessage)
+                                .ToArray()
+                        );
+
+                    var response = DTO.Respone.ApiResponse<object>.FailResponse(
+                        Entity.Enum.EnumStatusCode.BAD_REQUEST,
+                        "Du lieu gui len khong hop le",
+                        errors
+                    );
+
+                    return new BadRequestObjectResult(response);
+                };
+            });
 
             var jwtSettings = builder.Configuration.GetSection("JwtSettings");
 

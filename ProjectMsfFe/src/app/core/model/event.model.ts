@@ -1,7 +1,8 @@
 import { TypeTickResponse } from './TypeTickResponse';
 
 export interface EventModel {
-  EventID: number;
+  Id: number;
+  EventID?: number;
   Title: string;
   Description: string;
   PosterUrl: string;
@@ -11,7 +12,7 @@ export interface EventModel {
   EndDate: Date;
   SaleStartDate: Date;
   SaleEndDate: Date;
-  UserID: number;
+  UserName: string;
   CatetoryName: string;
   ListTypeTick: Array<TypeTickResponse>;
 }

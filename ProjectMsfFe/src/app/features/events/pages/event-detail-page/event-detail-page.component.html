@@ -1,14 +1,15 @@
 <div class="event-detail-container" *ngIf="event; else stateTemplate">
   <!-- Breadcrumbs -->
   <nav class="breadcrumbs">
-    <a href="/">Trang chủ</a> / <a href="/events">Khám phá sự kiện</a> / <span>Thông tin chi tiết sự kiện</span>
+    <a href="/">Trang chủ</a> / <a href="/events">Khám phá sự kiện</a> /
+    <span>Thông tin chi tiết sự kiện</span>
   </nav>
 
   <!-- Event Header Section -->
   <header class="event-header">
     <div class="date-badge">
-      <div class="month">{{ event.StartDate | date: 'MMM' | uppercase }}</div>
-      <div class="day">{{ event.StartDate | date: 'dd' }}</div>
+      <div class="month">{{ event.StartDate | date : "MMM" | uppercase }}</div>
+      <div class="day">{{ event.StartDate | date : "dd" }}</div>
     </div>
     <div class="header-info">
       <h1>{{ event.Title }}</h1>
@@ -18,7 +19,7 @@
         </span>
         <span class="divider">•</span>
         <span class="meta-item">
-          Bắt đầu lúc {{ event.StartDate | date: 'EEE, d MMM, y, h:mm a' }}
+          Bắt đầu lúc {{ event.StartDate | date : "EEE, d MMM, y, h:mm a" }}
         </span>
         <span class="divider">•</span>
         <span class="meta-item">
@@ -32,7 +33,7 @@
     <!-- Main Content Column -->
     <main class="main-content">
       <div class="poster-image">
-        <img [src]="event.PosterUrl || 'assets/default-event.jpg'" [alt]="event.Title">
+        <img [src]="event.PosterUrl | imageUrl" [alt]="event.Title" />
       </div>
 
       <div class="action-buttons">
@@ -79,7 +80,7 @@
             <div class="icon"><i class="material-icons">person</i></div>
             <div class="text">
               <label>Được tổ chức bởi</label>
-              <strong>Người dùng #{{ event.UserID }}</strong>
+              <strong>{{ event.UserName }}</strong>
               <a href="#" class="view-link">Xem hồ sơ</a>
             </div>
           </div>
@@ -88,7 +89,9 @@
             <div class="icon"><i class="material-icons">calendar_today</i></div>
             <div class="text">
               <label>Ngày và Giờ</label>
-              <strong>{{ event.StartDate | date: 'EEE, d MMM, y, h:mm a' }}</strong>
+              <strong>{{
+                event.StartDate | date : "EEE, d MMM, y, h:mm a"
+              }}</strong>
               <button class="add-calendar">
                 <i class="material-icons">event</i> Thêm vào lịch
               </button>
@@ -114,15 +117,31 @@
         <div class="ticket-list">
           <div class="ticket-item" *ngFor="let ticket of event.ListTypeTick">
             <div class="ticket-header">
-              <span class="ticket-price">{{ formatCurrency(ticket.Price) }}</span>
+              <span class="ticket-price">{{
+                formatCurrency(ticket.Price) | vndCurrency
+              }}</span>
               <div class="quantity-selector">
-                <button (click)="updateTicketQuantity(ticket.Id, -1)" [disabled]="selectedTickets[ticket.Id] === 0">-</button>
+                <button
+                  (click)="updateTicketQuantity(ticket.Id, -1)"
+                  [disabled]="selectedTickets[ticket.Id] === 0"
+                >
+                  -
+                </button>
                 <span class="qty">{{ selectedTickets[ticket.Id] || 0 }}</span>
-                <button (click)="updateTicketQuantity(ticket.Id, 1)" [disabled]="selectedTickets[ticket.Id] >= (ticket.TotalQuantity - ticket.SoldQuantity)">+</button>
+                <button
+                  (click)="updateTicketQuantity(ticket.Id, 1)"
+                  [disabled]="
+                    selectedTickets[ticket.Id] >=
+                    ticket.TotalQuantity - ticket.SoldQuantity
+                  "
+                >
+                  +
+                </button>
               </div>
             </div>
             <div class="ticket-desc">
-              {{ ticket.Name }} - Còn lại {{ ticket.TotalQuantity - ticket.SoldQuantity }} vé
+              {{ ticket.Name }} - Còn lại
+              {{ ticket.TotalQuantity - ticket.SoldQuantity }} vé
             </div>
           </div>
         </div>
@@ -132,14 +151,28 @@
             <span>{{ totalTicketCount }} Vé</span>
             <strong>{{ formatCurrency(totalPrice) }}</strong>
           </div>
-          <button class="btn-primary btn-book" (click)="onBookNow()" [disabled]="totalTicketCount === 0">
+          <button
+            class="btn-primary btn-book"
+            (click)="onBookNow()"
+            [disabled]="totalTicketCount === 0"
+          >
             Đặt vé ngay
           </button>
         </div>
       </div>
     </aside>
   </div>
+  <section class="more-events-section">
+    <div class="section-header">
+      <h2>Sự kiện tương tự</h2>
+      <a href="/events" class="browse-all"
+        >Xem tất cả <i class="material-icons">east</i></a
+      >
+    </div>
+    <app-events-grid></app-events-grid>
+  </section>
 </div>
+<!-- More Events Section -->
 
 <ng-template #stateTemplate>
   <div class="loading-state" *ngIf="loading">

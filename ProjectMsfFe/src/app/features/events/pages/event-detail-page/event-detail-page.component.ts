@@ -4,11 +4,14 @@ import { EventService } from '../../../../core/services/event.service';
 import { EventModel } from '../../../../core/model/event.model';
 import { CommonModule } from '@angular/common';
 import { Subscription, interval } from 'rxjs';
+import { ImageUrlPipe } from '../../../../shared/pipes/image-url.pipe';
+import { VndCurrencyPipe } from '../../../../shared/pipes/vnd-currency.pipe';
+import { EventsGridComponent } from '../../components/events-grid/events-grid.component';
 
 @Component({
   selector: 'app-event-detail-page',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, ImageUrlPipe, VndCurrencyPipe, EventsGridComponent],
   templateUrl: './event-detail-page.component.html',
   styleUrls: ['./event-detail-page.component.scss']
 })
@@ -31,7 +34,7 @@ export class EventDetailPageComponent implements OnInit, OnDestroy {
   constructor(
     private route: ActivatedRoute,
     private eventService: EventService
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     const eventId = this.route.snapshot.paramMap.get('id');
@@ -103,7 +106,7 @@ export class EventDetailPageComponent implements OnInit, OnDestroy {
   updateTicketQuantity(ticketId: number, delta: number): void {
     const currentQty = this.selectedTickets[ticketId] || 0;
     const newQty = Math.max(0, currentQty + delta);
-    
+
     // Check against total quantity (simplified)
     const ticket = this.event?.ListTypeTick.find((t: any) => t.Id === ticketId);
     if (ticket && newQty <= (ticket.TotalQuantity - ticket.SoldQuantity)) {
