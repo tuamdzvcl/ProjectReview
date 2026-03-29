@@ -29,6 +29,13 @@ namespace projectDemo.Repository.TickTypeRepository
             await _dbSet.AddRangeAsync(ticketTypes);
         }
 
+        public async Task<List<TicketType>> GetByEventIdAsync(Guid eventId)
+        {
+            return await _dbSet
+                .Where(x => x.EventID == eventId && x.IsDeleted == false)
+                .ToListAsync();
+        }
+
         public  string DeleteTicket(TicketType ticketType)
         {
              _dbSet.Remove(ticketType);

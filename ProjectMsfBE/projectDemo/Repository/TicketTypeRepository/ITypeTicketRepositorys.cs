@@ -9,6 +9,7 @@ public interface ITypeTicketRepositorys
     Task<TicketType> GetTypeTickectByEventID(Guid EventID);
     Task<TicketType> CreateTicketType(TicketType ticketType);
     Task CreateRangeTicketTypes(IEnumerable<TicketType> ticketTypes);
+    Task<List<TicketType>> GetByEventIdAsync(Guid eventId);
     TicketType UpdateTicket(TicketType ticketType);
     string DeleteTicket(TicketType ticketType);
     TicketType? GetTicketTypebyId(int tickettype);

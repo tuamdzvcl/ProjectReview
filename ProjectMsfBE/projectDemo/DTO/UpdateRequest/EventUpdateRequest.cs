@@ -14,7 +14,7 @@ namespace projectDemo.DTO.UpdateRequest
         public IFormFile? PosterUrl { get; set; }
         public EnumStatusEvent? Status { get; set; }
         public string? CatetoryName { get; set; }
-
+        public List<UpdateEventTicketTypeItemRequest>? TicketTypes { get; set; }
 
     }
 }

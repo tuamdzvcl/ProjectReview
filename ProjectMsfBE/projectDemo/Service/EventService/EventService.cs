@@ -63,6 +63,27 @@ namespace projectDemo.Service.EventService
             return true;
         }
 
+        private static bool IsEventNotFound(Event events)
+        {
+            return events == null || events.Id == Guid.Empty;
+        }
+
+        private static EventRequest BuildEventValidationRequest(Event existingEvent, EventUpdateRequest request)
+        {
+            return new EventRequest
+            {
+                Title = request.Title ?? existingEvent.Title,
+                Description = request.Description ?? existingEvent.Description,
+                Location = request.Location ?? existingEvent.Location,
+                StartDate = request.StartDate ?? existingEvent.StartDate,
+                EndDate = request.EndDate ?? existingEvent.EndDate,
+                SaleStartDate = request.SaleStartDate ?? existingEvent.SaleStartDate,
+                SaleEndDate = request.SaleEndDate ?? existingEvent.SaleEndDate,
+                CatetoryName = request.CatetoryName ?? existingEvent.Catetory?.Name ?? string.Empty,
+                PosterUrl = request.PosterUrl
+            };
+        }
+
         private static bool HasInvalidTicketTypes(IEnumerable<CreateEventTicketTypeItemRequest> ticketTypes)
         {
             return ticketTypes.Any(ticket =>
@@ -72,6 +93,19 @@ namespace projectDemo.Service.EventService
                 ticket.Price <= 0);
         }
 
+        private static bool HasInvalidTicketTypeUpdates(IEnumerable<UpdateEventTicketTypeItemRequest> ticketTypes)
+        {
+            return ticketTypes.Any(ticket =>
+                !ticket.Name.HasValue ||
+                !ticket.TotalQuantity.HasValue ||
+                !ticket.Price.HasValue ||
+                !ticket.SoldQuantity.HasValue ||
+                !ticket.Status.HasValue ||
+                ticket.TotalQuantity <= 0 ||
+                ticket.SoldQuantity < 0 ||
+                ticket.SoldQuantity > ticket.TotalQuantity ||
+                ticket.Price <= 0);
+        }
 
         //lấy userName
         public async Task<List<string>> rederNameByUserID(Guid UserID)
@@ -350,24 +384,45 @@ namespace projectDemo.Service.EventService
         //update event done
         public async Task<ApiResponse<string>> UpdateEvent(Guid EventID, EventUpdateRequest resquest)
         {
+            string? oldImageUrl = null;
+            string? newImageUrl = null;
+            var transactionStarted = false;
             try
             {
                 var events = await _eventRepository.GetEventById(EventID);
-                if (events == null)
+                if (IsEventNotFound(events))
                     return ApiResponse<string>.FailResponse(Entity.Enum.EnumStatusCode.EVENTNOTFOUD, "even không tồn tại ");
-                if (resquest.PosterUrl != null)
-                {
-                    _imageService.Delete(events.PosterUrl);
-                    var newImageUrl = await _imageService.UploadAsync(resquest.PosterUrl);
 
-                    events.PosterUrl = newImageUrl;
+                var validationRequest = BuildEventValidationRequest(events, resquest);
+                if (!checkVadidate(validationRequest))
+                {
+                    return ApiResponse<string>.FailResponse(Entity.Enum.EnumStatusCode.DATE, "Kiểm tra lại ngày giờ của event");
                 }
 
-                var catetory = await _catrtoeyRepository.GetByName(resquest.CatetoryName.ToLower());
-                if(catetory == null)
+                if (resquest.TicketTypes != null && resquest.TicketTypes.Any() && HasInvalidTicketTypeUpdates(resquest.TicketTypes))
                 {
-                    return ApiResponse<string>.FailResponse(Entity.Enum.EnumStatusCode.EVENTNOTFOUD, "catetory không tồn tại không tồn tại ");
+                    return ApiResponse<string>.FailResponse(Entity.Enum.EnumStatusCode.BAD_REQUEST, "Thông tin loại vé không hợp lệ");
+                }
 
+                await _uow.BeginTransactionAsync();
+                transactionStarted = true;
+
+                if (!string.IsNullOrWhiteSpace(resquest.CatetoryName))
+                {
+                    var catetory = await _catrtoeyRepository.GetByName(resquest.CatetoryName.ToUpper());
+                    if (catetory == null)
+                    {
+                        return ApiResponse<string>.FailResponse(Entity.Enum.EnumStatusCode.NOT_FOUND, "Không tìm thấy thể loại");
+                    }
+
+                    events.CatetoryID = catetory.Id;
+                }
+
+                if (resquest.PosterUrl != null)
+                {
+                    oldImageUrl = events.PosterUrl;
+                    newImageUrl = await _imageService.UploadAsync(resquest.PosterUrl);
+                    events.PosterUrl = newImageUrl;
                 }
 
                 events.Title = resquest.Title ?? events.Title;
@@ -378,15 +433,88 @@ namespace projectDemo.Service.EventService
                 events.SaleEndDate = resquest.SaleEndDate ?? events.SaleEndDate;
                 events.Description = resquest.Description ?? events.Description;
                 events.Location = resquest.Location ?? events.Location;
-                events.CatetoryID = catetory.Id;
                 events.UpdatedDate = DateTime.Now;
 
+                if (resquest.TicketTypes != null)
+                {
+                    var existingTickets = await _typeTicketRepository.GetByEventIdAsync(EventID);
+                    var existingTicketsById = existingTickets.ToDictionary(x => x.Id, x => x);
+                    var requestIds = resquest.TicketTypes
+                        .Where(x => x.Id.HasValue)
+                        .Select(x => x.Id!.Value)
+                        .ToHashSet();
+
+                    foreach (var ticketRequest in resquest.TicketTypes)
+                    {
+                        if (ticketRequest.Id.HasValue)
+                        {
+                            if (!existingTicketsById.TryGetValue(ticketRequest.Id.Value, out var ticketEntity))
+                            {
+                                return ApiResponse<string>.FailResponse(Entity.Enum.EnumStatusCode.TYPETICKET, $"Không tìm thấy loại vé với id {ticketRequest.Id.Value}");
+                            }
+
+                            ticketEntity.Name = ticketRequest.Name!.Value;
+                            ticketEntity.TotalQuantity = ticketRequest.TotalQuantity!.Value;
+                            ticketEntity.Price = ticketRequest.Price!.Value;
+                            ticketEntity.SoldQuantity = ticketRequest.SoldQuantity!.Value;
+                            ticketEntity.Status = ticketRequest.Status!.Value;
+                            ticketEntity.UpdatedDate = DateTime.Now;
+                            ticketEntity.IsDeleted = false;
+                        }
+                        else
+                        {
+                            var newTicket = new TicketType
+                            {
+                                Name = ticketRequest.Name!.Value,
+                                TotalQuantity = ticketRequest.TotalQuantity!.Value,
+                                Price = ticketRequest.Price!.Value,
+                                SoldQuantity = ticketRequest.SoldQuantity!.Value,
+                                Status = ticketRequest.Status!.Value,
+                                EventID = EventID,
+                                IsDeleted = false,
+                                CreatedDate = DateTime.Now
+                            };
+
+                            await _typeTicketRepository.CreateTicketType(newTicket);
+                        }
+                    }
+
+                    var deletedTickets = existingTickets
+                        .Where(x => !requestIds.Contains(x.Id))
+                        .ToList();
+
+                    foreach (var deletedTicket in deletedTickets)
+                    {
+                        deletedTicket.IsDeleted = true;
+                        deletedTicket.Status = EnumStatusTickType.STOP;
+                        deletedTicket.UpdatedDate = DateTime.Now;
+                    }
+                }
+
                 await _uow.SaveChangesAsync();
+                await _uow.CommitAsync();
+
+                if (!string.IsNullOrWhiteSpace(oldImageUrl) && !string.Equals(oldImageUrl, newImageUrl, StringComparison.OrdinalIgnoreCase))
+                {
+                    _imageService.Delete(oldImageUrl);
+                }
+
                 return ApiResponse<string>.SuccessResponse(Entity.Enum.EnumStatusCode.SUCCESS, "Update Thành công");
             }
             catch (Exception ex)
             {
                 Console.WriteLine($"System Error: {ex.Message}");
+
+                if (transactionStarted)
+                {
+                    await _uow.RollbackAsync();
+                }
+
+                if (!string.IsNullOrWhiteSpace(newImageUrl))
+                {
+                    _imageService.Delete(newImageUrl);
+                }
+
                 return ApiResponse<string>.FailResponse(Entity.Enum.EnumStatusCode.SERVER, "lỗi", ex.Message);
             }
         }
