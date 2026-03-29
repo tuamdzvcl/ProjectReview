@@ -24,11 +24,11 @@ namespace projectDemo.Controllers
         }
 
         [HttpPost()]
-        public async Task<IActionResult> CreateEvent([FromForm] EventRequest resquest)
+        public async Task<IActionResult> CreateEvent([FromForm] CreateEventWithTicketTypesRequest resquest)
         {
             var userId = Guid.Parse(User.FindFirst("id").Value);
 
-            var result = await _eventService.CreateEvent(resquest, userId);
+            var result = await _eventService.CreateEventWithTicketTypes(resquest, userId);
 
             return Ok(result);
         }

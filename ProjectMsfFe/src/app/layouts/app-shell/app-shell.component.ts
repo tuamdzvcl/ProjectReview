@@ -2,7 +2,7 @@ import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, signal } from '@angular/core';
 import { RouterLink, RouterLinkActive } from '@angular/router';
 import { UserDropdownComponent } from '../../shared/components/user-dropdown/user-dropdown.component';
-import { CreateEventComponent } from '../../shared/pages/create-event/create-event.component';
+import { CreateEventComponent } from '../../features/events/components/create-event/create-event.component';
 
 @Component({
   selector: 'app-shell',

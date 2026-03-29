@@ -24,6 +24,11 @@ namespace projectDemo.Repository.TickTypeRepository
             return ticketType;
         }
 
+        public async Task CreateRangeTicketTypes(IEnumerable<TicketType> ticketTypes)
+        {
+            await _dbSet.AddRangeAsync(ticketTypes);
+        }
+
         public  string DeleteTicket(TicketType ticketType)
         {
              _dbSet.Remove(ticketType);

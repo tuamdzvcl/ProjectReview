@@ -2,21 +2,19 @@ import { Routes } from '@angular/router';
 import { LoginComponent } from './features/auth/pages/login/login.component';
 import { SignupComponent } from './features/auth/pages/signup/signup.component';
 import { DashboardComponent } from './features/dashboard/pages/dashboard/dashboard.component';
-import { EventsComponent } from './features/events/pages/events/events.component';
+import { EventsComponent } from './features/events/pages/admin-events/events.component';
 import { HeaderComponent } from './shared/components/header/header.component';
 import { EventsPageComponent } from './features/events/pages/events-page/events-page.component';
-import { EventCardComponent } from './shared/components/event-card/event-card.component';
-import { EventsGridComponent } from './features/events/components/events-grid/events-grid.component';
-import { UserDropdownComponent } from './shared/components/user-dropdown/user-dropdown.component';
-import { CreateEventComponent } from './shared/pages/create-event/create-event.component';
+import { CreateEventComponent } from './features/events/components/create-event/create-event.component';
 import { MainLayoutComponent } from './layouts/main-layout/main-layout.component';
 import { LoginSuccessComponent } from './features/auth/pages/login-success/login-success.component';
-import { UserComponent } from './features/user/user.component';
-import { UserFormComponent } from './features/user-form/user-form.component';
+import { UserFormComponent } from './features/user/componnets/user-form/user-form.component';
 import { authGuard } from './core/guards/auth.guard';
-import { EventCreatePageComponent } from './shared/pages/event-create-page/event-create-page.component';
-import { EventCreateTypeComponent } from './shared/pages/event-create-type/event-create-type.component';
-import { EventCreateSettingComponent } from './shared/pages/event-create-setting/event-create-setting.component';
+import { EventCreateTypeComponent } from './features/events/components/event-create-type/event-create-type.component';
+import { EventCreateSettingComponent } from './features/events/components/event-create-setting/event-create-setting.component';
+import { EventCreatePageComponent } from './features/events/pages/event-create-page/event-create-page.component';
+import { UserComponent } from './features/user/pages/admin-user/user.component';
+import { EventDetailPageComponent } from './features/events/pages/event-detail-page/event-detail-page.component';
 
 export const routes: Routes = [
   { path: 'header', component: HeaderComponent },
@@ -74,6 +72,10 @@ export const routes: Routes = [
             component: EventCreateSettingComponent,
           },
         ],
+      },
+      {
+        path: 'event/:id',
+        component: EventDetailPageComponent,
       },
     ],
   },

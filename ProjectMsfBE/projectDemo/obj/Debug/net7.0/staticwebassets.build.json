@@ -1,0 +1,71 @@
+{
+  "Version": 1,
+  "Hash": "a4EOgfRk+HBa3Sh5TUf2IPIxt4hrHMsoxwD4CP+jTlI=",
+  "Source": "projectDemo",
+  "BasePath": "_content/projectDemo",
+  "Mode": "Default",
+  "ManifestType": "Build",
+  "ReferencedProjectsConfiguration": [],
+  "DiscoveryPatterns": [
+    {
+      "Name": "projectDemo\\wwwroot",
+      "Source": "projectDemo",
+      "ContentRoot": "D:\\Msf\\ProjectMsfBE\\projectDemo\\wwwroot\\",
+      "BasePath": "_content/projectDemo",
+      "Pattern": "**"
+    }
+  ],
+  "Assets": [
+    {
+      "Identity": "D:\\Msf\\ProjectMsfBE\\projectDemo\\wwwroot\\images\\2d9e83d9-6732-4bfb-8263-3679af80d5c1.png",
+      "SourceId": "projectDemo",
+      "SourceType": "Discovered",
+      "ContentRoot": "D:\\Msf\\ProjectMsfBE\\projectDemo\\wwwroot\\",
+      "BasePath": "_content/projectDemo",
+      "RelativePath": "images/2d9e83d9-6732-4bfb-8263-3679af80d5c1.png",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "RelatedAsset": "",
+      "AssetTraitName": "",
+      "AssetTraitValue": "",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "wwwroot\\images\\2d9e83d9-6732-4bfb-8263-3679af80d5c1.png"
+    },
+    {
+      "Identity": "D:\\Msf\\ProjectMsfBE\\projectDemo\\wwwroot\\images\\857e9a51-66e2-415e-9d65-e742386a8831.jpg",
+      "SourceId": "projectDemo",
+      "SourceType": "Discovered",
+      "ContentRoot": "D:\\Msf\\ProjectMsfBE\\projectDemo\\wwwroot\\",
+      "BasePath": "_content/projectDemo",
+      "RelativePath": "images/857e9a51-66e2-415e-9d65-e742386a8831.jpg",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "RelatedAsset": "",
+      "AssetTraitName": "",
+      "AssetTraitValue": "",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "wwwroot\\images\\857e9a51-66e2-415e-9d65-e742386a8831.jpg"
+    },
+    {
+      "Identity": "D:\\Msf\\ProjectMsfBE\\projectDemo\\wwwroot\\images\\a046d52c-ba9f-499c-a2c1-1b3dc80ab827.png",
+      "SourceId": "projectDemo",
+      "SourceType": "Discovered",
+      "ContentRoot": "D:\\Msf\\ProjectMsfBE\\projectDemo\\wwwroot\\",
+      "BasePath": "_content/projectDemo",
+      "RelativePath": "images/a046d52c-ba9f-499c-a2c1-1b3dc80ab827.png",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "RelatedAsset": "",
+      "AssetTraitName": "",
+      "AssetTraitValue": "",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "wwwroot\\images\\a046d52c-ba9f-499c-a2c1-1b3dc80ab827.png"
+    }
+  ]
+}

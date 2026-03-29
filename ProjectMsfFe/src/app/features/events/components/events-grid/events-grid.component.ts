@@ -2,7 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component, Input } from '@angular/core';
 import { EventService } from '../../../../core/services/event.service';
 import { EventModel } from '../../../../core/model/event.model';
-import { EventCardComponent } from '../../../../shared/components/event-card/event-card.component';
+import { EventCardComponent } from '../event-card/event-card.component';
 
 @Component({
   selector: 'app-events-grid',
