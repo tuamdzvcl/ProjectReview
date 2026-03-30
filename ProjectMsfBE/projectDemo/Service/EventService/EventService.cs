@@ -10,15 +10,10 @@ using EventTick.Model.Models;
 using EventTick.Model.Enum;
 using projectDemo.DTO.UpdateRequest;
 using projectDemo.Service.ImageService;
-using static System.Net.Mime.MediaTypeNames;
-using Azure.Core;
-using static Dapper.SqlMapper;
 using projectDemo.UnitOfWorks;
 using projectDemo.Repository.CatetoryRepository;
 using projectDemo.Repository.TickTypeRepository;
-using System.Management;
 using projectDemo.Common.PageRequest;
-using Microsoft.Extensions.Logging;
 
 namespace projectDemo.Service.EventService
 {
@@ -67,7 +62,7 @@ namespace projectDemo.Service.EventService
         {
             return events == null || events.Id == Guid.Empty;
         }
-
+        // gắn entity->dto
         private static EventRequest BuildEventValidationRequest(Event existingEvent, EventUpdateRequest request)
         {
             return new EventRequest
@@ -96,15 +91,25 @@ namespace projectDemo.Service.EventService
         private static bool HasInvalidTicketTypeUpdates(IEnumerable<UpdateEventTicketTypeItemRequest> ticketTypes)
         {
             return ticketTypes.Any(ticket =>
-                !ticket.Name.HasValue ||
-                !ticket.TotalQuantity.HasValue ||
-                !ticket.Price.HasValue ||
-                !ticket.SoldQuantity.HasValue ||
-                !ticket.Status.HasValue ||
-                ticket.TotalQuantity <= 0 ||
-                ticket.SoldQuantity < 0 ||
-                ticket.SoldQuantity > ticket.TotalQuantity ||
-                ticket.Price <= 0);
+            {
+                if (ticket.Name==null ||
+                    !ticket.TotalQuantity.HasValue ||
+                    !ticket.Price.HasValue ||
+                    !ticket.SoldQuantity.HasValue ||
+                    ticket.Status==null)
+                {
+                    return true;
+                }
+
+                var totalQuantity = ticket.TotalQuantity.Value;
+                var soldQuantity = ticket.SoldQuantity.Value;
+                var price = ticket.Price.Value;
+
+                return totalQuantity <= 0 ||
+                       soldQuantity < 0 ||
+                       soldQuantity > totalQuantity ||
+                       price <= 0;
+            });
         }
 
         //lấy userName
@@ -112,7 +117,7 @@ namespace projectDemo.Service.EventService
         {
             return await _userReposiotry.GetRoleByUser(UserID);
         }
-        //tạo event -> chưa tạo typetick
+        //tạo event ->done
         public async Task<ApiResponse<EventResponse>> CreateEvent(EventRequest resquest,Guid Userid)
         {
             try
@@ -184,7 +189,7 @@ namespace projectDemo.Service.EventService
 
 
         }
-
+        //done
         public async Task<ApiResponse<CreateEventWithTicketTypesResponse>> CreateEventWithTicketTypes(CreateEventWithTicketTypesRequest request, Guid userId)
         {
             string? imageUrl = null;
@@ -515,6 +520,35 @@ namespace projectDemo.Service.EventService
                     _imageService.Delete(newImageUrl);
                 }
 
+                return ApiResponse<string>.FailResponse(Entity.Enum.EnumStatusCode.SERVER, "lỗi", ex.Message);
+            }
+        }
+
+        public async Task<ApiResponse<string>> UpdateEventStatus(Guid eventId, EventStatusUpdateRequest request)
+        {
+            try
+            {
+                if (request == null || !request.Status.HasValue)
+                {
+                    return ApiResponse<string>.FailResponse(Entity.Enum.EnumStatusCode.BAD_REQUEST, "Status không hợp lệ");
+                }
+
+                var events = await _eventRepository.GetEventById(eventId);
+                if (IsEventNotFound(events))
+                {
+                    return ApiResponse<string>.FailResponse(Entity.Enum.EnumStatusCode.EVENTNOTFOUD, "event không tồn tại");
+                }
+
+                events.Status = request.Status.Value;
+                events.UpdatedDate = DateTime.Now;
+
+                await _uow.SaveChangesAsync();
+
+                return ApiResponse<string>.SuccessResponse(Entity.Enum.EnumStatusCode.SUCCESS, "Cập nhật status event thành công");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"System Error: {ex.Message}");
                 return ApiResponse<string>.FailResponse(Entity.Enum.EnumStatusCode.SERVER, "lỗi", ex.Message);
             }
         }

@@ -1,5 +1,3 @@
-﻿using EventTick.Model.Enum;
-
 namespace projectDemo.DTO.Response
 {
     public class EventTypeTickResponses
@@ -17,7 +15,6 @@ namespace projectDemo.DTO.Response
         public string UserName { get; set; }
         public string RoleName { get; set; }
         public string CatetoryName { get; set; }
-
         public List<TypeTickResponse> ListTypeTick { get; set; } = new();
     }
 }

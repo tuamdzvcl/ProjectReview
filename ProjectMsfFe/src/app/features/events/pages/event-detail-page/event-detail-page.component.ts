@@ -1,5 +1,5 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, RouterLink } from '@angular/router';
 import { EventService } from '../../../../core/services/event.service';
 import { EventModel } from '../../../../core/model/event.model';
 import { CommonModule } from '@angular/common';
@@ -11,7 +11,7 @@ import { EventsGridComponent } from '../../components/events-grid/events-grid.co
 @Component({
   selector: 'app-event-detail-page',
   standalone: true,
-  imports: [CommonModule, ImageUrlPipe, VndCurrencyPipe, EventsGridComponent],
+  imports: [CommonModule, ImageUrlPipe, VndCurrencyPipe, EventsGridComponent, RouterLink],
   templateUrl: './event-detail-page.component.html',
   styleUrls: ['./event-detail-page.component.scss']
 })
@@ -37,13 +37,15 @@ export class EventDetailPageComponent implements OnInit, OnDestroy {
   ) { }
 
   ngOnInit(): void {
-    const eventId = this.route.snapshot.paramMap.get('id');
-    if (eventId) {
-      this.loadEvent(eventId);
-    } else {
-      this.error = 'Event ID not found';
-      this.loading = false;
-    }
+    this.route.paramMap.subscribe(params => {
+      const eventId = params.get('id');
+      if (eventId) {
+        this.loadEvent(eventId);
+      } else {
+        this.error = 'Event ID not found';
+        this.loading = false;
+      }
+    });
   }
 
   ngOnDestroy(): void {
@@ -53,12 +55,27 @@ export class EventDetailPageComponent implements OnInit, OnDestroy {
   }
 
   loadEvent(id: string): void {
+    // Reset state before loading new event
+    this.loading = true;
+    this.error = null;
+    this.event = null;
+    this.selectedTickets = {};
+    this.totalPrice = 0;
+
+    // Clear previous timer if exists
+    if (this.timerSubscription) {
+      this.timerSubscription.unsubscribe();
+      this.timerSubscription = null;
+    }
+
     this.eventService.GetEventId(id).subscribe({
       next: (data: EventModel) => {
         this.event = data;
         this.loading = false;
         this.initializeTickets();
         this.startCountdown();
+        // Scroll to top for better UX
+        window.scrollTo(0, 0);
       },
       error: (err: any) => {
         console.error('Error loading event', err);

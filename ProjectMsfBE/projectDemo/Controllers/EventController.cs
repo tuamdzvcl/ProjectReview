@@ -38,6 +38,14 @@ namespace projectDemo.Controllers
             var result = await _eventService.UpdateEvent(id, resquest);
             return Ok(result);
         }
+
+        [HttpPatch("{id}/status")]
+        public async Task<IActionResult> UpdateEventStatus(Guid id, [FromBody] EventStatusUpdateRequest request)
+        {
+            var result = await _eventService.UpdateEventStatus(id, request);
+            return Ok(result);
+        }
+
         [HttpGet()]
         public async Task<IActionResult> GetAllEvent()
         {
@@ -45,6 +53,7 @@ namespace projectDemo.Controllers
             return Ok(result);
         }
         [HttpGet("{id}")]
+        [AllowAnonymous]
         public async Task<IActionResult> GetEventbyId(Guid id)
         {
             var result = await _eventService.GetEventById(id);

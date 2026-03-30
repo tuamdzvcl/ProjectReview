@@ -7,13 +7,16 @@ import { EventService } from '../../../../core/services/event.service';
 import { CatetoryService } from '../../../../core/services/catetory.service';
 import { EventDraftService } from '../../../../core/services/event-draft.service';
 import { environment } from '../../../../../environments/environment';
+import { Toast } from 'primeng/toast';
+import { MessageService } from 'primeng/api';
 
 @Component({
   selector: 'app-event-create-page',
   standalone: true,
-  imports: [CommonModule, RouterOutlet, BreadcrumbModule],
+  imports: [CommonModule, RouterOutlet, BreadcrumbModule, Toast],
   templateUrl: './event-create-page.component.html',
   styleUrl: './event-create-page.component.scss',
+  providers: [MessageService]
 })
 export class EventCreatePageComponent {
   private router = inject(Router);
@@ -21,6 +24,7 @@ export class EventCreatePageComponent {
   private eventService = inject(EventService);
   private categoryService = inject(CatetoryService);
   private draftService = inject(EventDraftService);
+  private messageService = inject(MessageService);
 
   item: any;
   steps = [{ label: 'Chi Tiết' }, { label: 'Vé' }, { label: 'Cài Đặt' }];
@@ -155,9 +159,167 @@ export class EventCreatePageComponent {
     }
   }
 
+  /** 
+   * Hàm chính để lưu sự kiện. 
+   * Được chia nhỏ thành các bước để người mới dễ dàng đọc hiểu.
+   */
   private saveEvent() {
-    console.log('Đang thực hiện lưu dữ liệu từ DraftService...', this.draftService.load());
-    // TODO: Gọi API Create hoặc Update ở đây
+    const draft = this.draftService.load();
+    const file = this.draftService.selectedFile;
+
+    // Bước 1: Kiểm tra các thông tin bắt buộc
+    if (!this.isFormDataValid(draft)) {
+      console.warn('Vui lòng điền đầy đủ thông tin bắt buộc');
+      return;
+    }
+
+    // Bước 2: Tính toán tất cả các mốc thời gian cần thiết
+    const { startDate, endDate } = this.calculateEventDates(draft);
+    const { saleStartDate, saleEndDate } = this.calculateSaleDates(draft);
+
+    // Bước 3: Lấy danh mục, xây dựng FormData và gọi API
+    this.categoryService.GetCatetory().subscribe({
+      next: (res: any) => {
+        const categories = res.Data || [];
+        const matchedCategory = categories.find((c: any) => c.CatetoryId === draft.selectedCategory);
+        const categoryName = matchedCategory ? matchedCategory.Name : '';
+
+        // Tạo FormData để gửi lên server (bao gồm cả file ảnh)
+        const formData = this.buildFormData({
+          draft,
+          file,
+          startDate,
+          endDate,
+          saleStartDate,
+          saleEndDate,
+          categoryName
+        });
+
+        // Gửi dữ liệu tới Server
+        this.submitEvent(formData);
+      },
+      error: (err) => {
+        console.error('Không thể lấy danh mục:', err);
+      }
+    });
+  }
+
+  /**
+   * Bước 1: Kiểm tra tính hợp lệ của dữ liệu
+   */
+  private isFormDataValid(draft: any): boolean {
+    return !!(draft.title && draft.eventDate);
+  }
+
+  /**
+   * Bước 2a: Tính toán ngày bắt đầu và kết thúc sự kiện
+   */
+  private calculateEventDates(draft: any) {
+    const startDate = new Date(draft.eventDate);
+    if (draft.eventTime) {
+      const time = new Date(draft.eventTime);
+      startDate.setHours(time.getHours(), time.getMinutes(), 0, 0);
+    }
+
+    const endDate = new Date(startDate);
+    endDate.setHours(endDate.getHours() + (draft.duration || 0));
+
+    return { startDate, endDate };
+  }
+
+  /**
+   * Bước 2b: Tính toán ngày bắt đầu và kết thúc bán vé
+   */
+  private calculateSaleDates(draft: any) {
+    let saleStartDate: Date;
+    if (draft.isImmediateStart) {
+      saleStartDate = new Date(); // Bán ngay bây giờ
+    } else {
+      saleStartDate = new Date(`${draft.saleStartDate}T${draft.saleStartTime}`);
+    }
+
+    let saleEndDate: Date;
+    if (draft.isAutoEnd) {
+      // Tự động đóng sau 24h kể từ khi bắt đầu bán
+      saleEndDate = new Date(saleStartDate.getTime() + 24 * 60 * 60 * 1000);
+    } else {
+      saleEndDate = new Date(`${draft.saleEndDate}T${draft.saleEndTime}`);
+    }
+
+    return { saleStartDate, saleEndDate };
+  }
+
+
+  private buildFormData(data: any): FormData {
+    const { draft, file, startDate, endDate, saleStartDate, saleEndDate, categoryName } = data;
+    const formData = new FormData();
+
+    // Thông tin cơ bản
+    formData.append('Title', draft.title);
+    formData.append('Description', draft.description);
+    formData.append('Location', draft.location);
+    formData.append('CatetoryName', categoryName);
+
+    // Các mốc thời gian (chuyển về định dạng chuẩn ISO)
+    formData.append('StartDate', startDate.toISOString());
+    formData.append('EndDate', endDate.toISOString());
+    formData.append('SaleStartDate', saleStartDate.toISOString());
+    formData.append('SaleEndDate', saleEndDate.toISOString());
+
+    // File ảnh poster (nếu có)
+    if (file) {
+      formData.append('PosterUrl', file);
+    }
+
+    // Danh sách các loại vé
+    this.appendTicketsToFormData(formData, draft.tickets || []);
+
+    return formData;
+  }
+
+  private appendTicketsToFormData(formData: FormData, tickets: any[]) {
+    tickets.forEach((ticket, index) => {
+      formData.append(`TicketTypes[${index}].Name`, ticket.name);
+      formData.append(`TicketTypes[${index}].Price`, ticket.price.toString());
+      formData.append(`TicketTypes[${index}].TotalQuantity`, ticket.quantity.toString());
+    });
+  }
+
+  /**
+   * Bước cuối: Thực hiện lệnh gửi API
+   */
+  private submitEvent(formData: FormData) {
+    console.log('Đang gửi dữ liệu...');
+
+    const request$ = this.eventId
+      ? this.eventService.UpdateEvent(this.eventId, formData)
+      : this.eventService.CreateEvent(formData);
+
+    request$.subscribe({
+      next: (result) => {
+        this.messageService.add({ 
+          severity: 'success', 
+          summary: 'Thành công', 
+          detail: `Sự kiện đã được ${this.eventId ? 'cập nhật' : 'tạo'} thành công!` 
+        });
+        
+        console.log('Lưu thành công:', result);
+        this.draftService.clear(); // Xóa bản nháp sau khi lưu xong
+        
+        // Chờ 1 chút để người dùng thấy thông báo rồi mới chuyển trang
+        setTimeout(() => {
+          this.router.navigate(['/admin/events']); 
+        }, 1500);
+      },
+      error: (err) => {
+        this.messageService.add({ 
+          severity: 'error', 
+          summary: 'Lỗi', 
+          detail: 'Có lỗi xảy ra khi lưu sự kiện. Vui lòng thử lại!' 
+        });
+        console.error('Lỗi API:', err);
+      },
+    });
   }
 
   onStepClick(index: number) {

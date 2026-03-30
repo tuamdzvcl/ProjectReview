@@ -48,10 +48,9 @@ namespace projectDemo.Service.Auth
                 
             
                 var user = await _authRepository.GetByEmailAsync(resquest.email);
-
                 if (user == null)
                     return ApiResponse<LoginResponse>.FailResponse(EnumStatusCode.EMAILNOTFOUD, "Email hoặc mật khẩu không đúng");
-                if (user.IsLock || !user.IsActive)
+                if (user.IsLock || !user.IsActive || user.IsDeleted==true)
                     return ApiResponse<LoginResponse>.FailResponse(EnumStatusCode.ISLOOK, "Tài khoản đã bị khóa ");
 
                 bool isPasswordValid = BCrypt.Net.BCrypt.Verify(resquest.password, user.PasswordHash);
@@ -173,6 +172,8 @@ namespace projectDemo.Service.Auth
                     "Dữ liệu không hợp lệ"
                 );
             }
+
+
 
             using var tran = _context.Database.BeginTransaction();
             try

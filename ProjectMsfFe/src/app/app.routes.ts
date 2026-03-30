@@ -15,6 +15,7 @@ import { EventCreateSettingComponent } from './features/events/components/event-
 import { EventCreatePageComponent } from './features/events/pages/event-create-page/event-create-page.component';
 import { UserComponent } from './features/user/pages/admin-user/user.component';
 import { EventDetailPageComponent } from './features/events/pages/event-detail-page/event-detail-page.component';
+import { NotFoundComponent } from './shared/components/not-found/not-found.component';
 
 export const routes: Routes = [
   { path: 'header', component: HeaderComponent },
@@ -105,5 +106,9 @@ export const routes: Routes = [
         data: { requiresAuth: true },
       },
     ],
+  },
+  {
+    path: '**',
+    component: NotFoundComponent,
   },
 ];

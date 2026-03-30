@@ -13,6 +13,10 @@
       "PackagePath": "staticwebassets\\images\\a046d52c-ba9f-499c-a2c1-1b3dc80ab827.png"
     },
     {
+      "Id": "D:\\Msf\\ProjectMsfBE\\projectDemo\\wwwroot\\images\\fb9c44af-0921-4523-b65b-a55e1f1faac2.png",
+      "PackagePath": "staticwebassets\\images\\fb9c44af-0921-4523-b65b-a55e1f1faac2.png"
+    },
+    {
       "Id": "obj\\Debug\\net7.0\\staticwebassets\\msbuild.build.projectDemo.props",
       "PackagePath": "build\\projectDemo.props"
     },

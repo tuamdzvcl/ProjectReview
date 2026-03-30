@@ -43,45 +43,77 @@ namespace projectDemo.Repository
         public async Task<List<Event>> GetAllEvent()
         {
             return await _dbSet
-                .Where(e => e.Status != EnumStatusEvent.CANNEL && e.IsDeleted==false)
+                .Where(e => e.Status != EnumStatusEvent.CANNEL && e.IsDeleted == false)
                 .AsNoTracking()
                 .ToListAsync();
         }
         //get event anh typeticj
         public async Task<PageResponse<EventTypeTickResponses>> GetAllWithTicketTypesAsync(PageRequest request)
         {
-            var query =  _dbSet
-                .AsNoTracking()
-                .Where(e => e.IsDeleted==false && e.Status != EnumStatusEvent.CANNEL);
-            if (!string.IsNullOrWhiteSpace(request.key))
+            try
             {
-                var key = request.key.Trim();
-                query = query
-                    .Where(e =>
-                    e.Title.Contains(key) ||
-                    e.Location.Contains(key));
+                var query = _dbSet
+                    .AsNoTracking()
+                    .Where(e => e.IsDeleted == false );
+                if (!string.IsNullOrWhiteSpace(request.key))
+                {
+                    var key = request.key.Trim();
+                    query = query
+                        .Where(e =>
+                        e.Title.Contains(key) ||
+                        e.Location.Contains(key));
 
+                }
+                var totolRecords = await query.CountAsync();
+
+                var items = await query
+           .OrderByDescending(e => e.CreatedDate)
+           .Skip((request.PageIndex - 1) * request.PageSize)
+           .Take(request.PageSize)
+           .Select(e => new EventTypeTickResponses
+           {
+               Id = e.Id,
+               Title = e.Title,
+               Description = e.Description,
+               Location = e.Location,
+               StartDate = e.StartDate,
+               EndDate = e.EndDate,
+               SaleStartDate = e.SaleStartDate,
+               SaleEndDate = e.SaleEndDate,
+               PosterUrl = e.PosterUrl,
+               Status = e.Status.ToString(),
+               UserName = e.User.Username,
+               CatetoryName = e.Catetory.Name,
+               ListTypeTick = e.TicketTypes.Select(t => new TypeTickResponse
+               {
+                   Id = t.Id,
+                   Name = t.Name.ToString(),
+                   Price = t.Price,
+                   TotalQuantity = t.TotalQuantity,
+                   SoldQuantity = t.SoldQuantity,
+                   Status = t.Status.ToString()
+               }).ToList()
+           })
+           .ToListAsync();
+
+                return new PageResponse<EventTypeTickResponses>
+                {
+                    Items = items,
+                    PageIndex = request.PageIndex,
+                    PageSize = request.PageSize,
+                    TotalRecords = totolRecords,
+                    TotalPages = (int)Math.Ceiling((double)totolRecords / request.PageSize),
+                    Success = true,
+                    Message = "Lấy danh sách event thành công"
+                };
+
+            }catch(Exception ex)
+            {
+                Console.WriteLine( $"Lỗi {ex.ToString()}");
+                return new PageResponse<EventTypeTickResponses> {
+                Message = ex.ToString(),
+                };
             }
-            var totolRecords = await query.CountAsync();
-
-            var items = await query
-       .OrderByDescending(e => e.CreatedDate)
-       .Skip((request.PageIndex - 1) * request.PageSize)
-       .Take(request.PageSize)
-       .ProjectTo<EventTypeTickResponses>(_mapper.ConfigurationProvider)
-       .ToListAsync();
-
-            return new PageResponse<EventTypeTickResponses>
-            {
-                Items = items,
-                PageIndex = request.PageIndex,
-                PageSize = request.PageSize,
-                TotalRecords = totolRecords,
-                TotalPages = (int)Math.Ceiling((double)totolRecords / request.PageSize),
-                Success = true,
-                Message = "Lấy danh sách event thành công"
-            };
-
         }        //get Event
         public async Task<Event> GetEventById(Guid eventId)
         {
