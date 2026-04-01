@@ -27,21 +27,21 @@
               <div class="summary-item">
                 <div class="icon-box"><i class="fa-solid fa-ticket"></i></div>
                 <div class="content">
-                  <label>Total tickets</label>
+                  <label>Tổng số vé</label>
                   <strong>{{ t.quantity }}</strong>
                 </div>
               </div>
               <div class="summary-item">
                 <div class="icon-box"><i class="fa-solid fa-users"></i></div>
                 <div class="content">
-                  <label>Ticket limit per customer</label>
+                  <label>Số lượng tối đa</label>
                   <strong>{{ t.limit }}</strong>
                 </div>
               </div>
               <div class="summary-item">
                 <div class="icon-box"><i class="fa-solid fa-cart-shopping"></i></div>
                 <div class="content">
-                  <label>Discount</label>
+                  <label>Giảm giá</label>
                   <strong>{{ t.discount }}%</strong>
                 </div>
               </div>
@@ -107,11 +107,11 @@
 
   </div>
 
-  <ng-template pTemplate="footer">
+  <!-- <ng-template pTemplate="footer">
     <div class="flex justify-content-end gap-2 mt-4">
       <button pButton label="Hủy" icon="pi pi-times" class="p-button-text p-button-secondary"
         (click)="showDialog = false"></button>
       <button pButton label="Lưu vé" icon="pi pi-check" (click)="saveTicket()" [disabled]="!ticket.name"></button>
     </div>
-  </ng-template>
+  </ng-template> -->
 </p-dialog>

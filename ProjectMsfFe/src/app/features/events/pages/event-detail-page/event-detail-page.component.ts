@@ -7,11 +7,19 @@ import { Subscription, interval } from 'rxjs';
 import { ImageUrlPipe } from '../../../../shared/pipes/image-url.pipe';
 import { VndCurrencyPipe } from '../../../../shared/pipes/vnd-currency.pipe';
 import { EventsGridComponent } from '../../components/events-grid/events-grid.component';
+import { FormatDatePipe } from '../../../../shared/pipes/format-date.pipe';
 
 @Component({
   selector: 'app-event-detail-page',
   standalone: true,
-  imports: [CommonModule, ImageUrlPipe, VndCurrencyPipe, EventsGridComponent, RouterLink],
+  imports: [
+    CommonModule,
+    ImageUrlPipe,
+    VndCurrencyPipe,
+    EventsGridComponent,
+    RouterLink,
+    FormatDatePipe
+  ],
   templateUrl: './event-detail-page.component.html',
   styleUrls: ['./event-detail-page.component.scss']
 })
@@ -55,14 +63,12 @@ export class EventDetailPageComponent implements OnInit, OnDestroy {
   }
 
   loadEvent(id: string): void {
-    // Reset state before loading new event
     this.loading = true;
     this.error = null;
     this.event = null;
     this.selectedTickets = {};
     this.totalPrice = 0;
 
-    // Clear previous timer if exists
     if (this.timerSubscription) {
       this.timerSubscription.unsubscribe();
       this.timerSubscription = null;
@@ -74,7 +80,6 @@ export class EventDetailPageComponent implements OnInit, OnDestroy {
         this.loading = false;
         this.initializeTickets();
         this.startCountdown();
-        // Scroll to top for better UX
         window.scrollTo(0, 0);
       },
       error: (err: any) => {
@@ -124,7 +129,6 @@ export class EventDetailPageComponent implements OnInit, OnDestroy {
     const currentQty = this.selectedTickets[ticketId] || 0;
     const newQty = Math.max(0, currentQty + delta);
 
-    // Check against total quantity (simplified)
     const ticket = this.event?.ListTypeTick.find((t: any) => t.Id === ticketId);
     if (ticket && newQty <= (ticket.TotalQuantity - ticket.SoldQuantity)) {
       this.selectedTickets[ticketId] = newQty;
@@ -142,15 +146,12 @@ export class EventDetailPageComponent implements OnInit, OnDestroy {
 
   onBookNow(): void {
     console.log('Booking tickets:', this.selectedTickets);
-    // Future implementation: handle booking logic
     alert('Chức năng đặt vé đang được phát triển!');
   }
-
-  formatCurrency(value: number): string {
-    return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(value);
-  }
-
   get totalTicketCount(): number {
     return Object.values(this.selectedTickets).reduce((a, b) => a + b, 0);
+  }
+  get activeTickets(): any[] {
+    return this.event?.ListTypeTick.filter((t: any) => t.Status?.toLowerCase() === 'active') || [];
   }
 }

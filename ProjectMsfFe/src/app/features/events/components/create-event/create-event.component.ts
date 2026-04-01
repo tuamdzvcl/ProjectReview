@@ -1,4 +1,11 @@
-import { Component, inject, ViewChild, ElementRef, OnInit, OnDestroy } from '@angular/core';
+import {
+  Component,
+  inject,
+  ViewChild,
+  ElementRef,
+  OnInit,
+  OnDestroy,
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
@@ -41,13 +48,11 @@ import { ImageUrlPipe } from '../../../../shared/pipes/image-url.pipe';
     EditorModule,
     DatePickerModule,
     SelectModule,
-    ImageUrlPipe
   ],
   templateUrl: './create-event.component.html',
   styleUrl: './create-event.component.scss',
 })
 export class CreateEventComponent implements OnInit, OnDestroy {
-
   private route = inject(ActivatedRoute);
   private router = inject(Router);
   private messageService = inject(MessageService);
@@ -83,14 +88,11 @@ export class CreateEventComponent implements OnInit, OnDestroy {
     this.restoreFromDraft();
     this.eventId = this.route.snapshot.paramMap.get('id');
     this.isEdit = !!this.eventId;
-    if (this.isEdit) {
-      this.loadEventData();
-    }
   }
+
   ngOnDestroy(): void {
-    if (!this.isEdit) {
-      this.saveFormToDraft();
-    }
+    // Luôn lưu dữ liệu vào draft trước khi rời component (chuyển tab) bất kể là Tạo mới hay Cập nhật
+    this.saveFormToDraft();
   }
 
   private loadCategories(): void {
@@ -104,20 +106,7 @@ export class CreateEventComponent implements OnInit, OnDestroy {
     });
   }
 
-  private loadEventData() {
-    if (!this.eventId) return;
 
-    this.eventService.GetEventId(this.eventId).subscribe({
-      next: (eventData: any) => {
-        this.eventData = eventData;
-        this.fillFormFromEventData();
-      },
-      error: (err: any) => {
-        console.error('Failed to load event data:', err);
-        this.showToast('error', 'Lỗi', 'Không thể tải dữ liệu sự kiện');
-      },
-    });
-  }
   // lưu dữ liệu tạo thời vào formDratf
   private saveFormToDraft(): void {
     this.draftService.save(
@@ -132,7 +121,7 @@ export class CreateEventComponent implements OnInit, OnDestroy {
         previewUrl: this.previewUrl,
         tickets: this.draftService.load().tickets || [],
       },
-      this.selectedFile,
+      this.selectedFile
     );
   }
 
@@ -141,6 +130,7 @@ export class CreateEventComponent implements OnInit, OnDestroy {
     if (!this.draftService.hasDraft()) return;
 
     const draft = this.draftService.load();
+
     this.title = draft.title;
     this.description = draft.description;
     this.location = draft.location;
@@ -152,28 +142,7 @@ export class CreateEventComponent implements OnInit, OnDestroy {
     this.selectedFile = this.draftService.selectedFile;
   }
 
-  // ĐIỀN DỮ LIỆU VÀO FORM (mode chỉnh sửa)
-  private fillFormFromEventData(): void {
-    if (!this.eventData) return;
 
-    this.title = this.eventData.Title || '';
-    this.description = this.eventData.Description || '';
-    this.location = this.eventData.Location || '';
-    this.eventDate = new Date(this.eventData.StartDate);
-    this.eventTime = new Date(this.eventData.StartDate);
-    this.duration = this.calcDurationHours(this.eventData.StartDate, this.eventData.EndDate);
-
-    const matched = this.categories.find(c => c.Name === this.eventData.CatetoryName);
-    this.selectedCategory = matched ? matched.CatetoryId : null;
-
-    if (this.eventData.PosterUrl) {
-      const serverOrigin = environment.apiBaseUrl.replace('/api', '');
-      const posterPath = this.eventData.PosterUrl;
-      this.previewUrl = posterPath.startsWith('http')
-        ? posterPath
-        : `${serverOrigin}${posterPath}`;
-    }
-  }
 
   private calcDurationHours(startDate: string, endDate: string): number {
     const diffMs = new Date(endDate).getTime() - new Date(startDate).getTime();
@@ -196,60 +165,6 @@ export class CreateEventComponent implements OnInit, OnDestroy {
     };
     reader.readAsDataURL(this.selectedFile);
   }
-
-  // LƯU SỰ KIỆN
-  saveEvent(): void {
-    if (!this.title || !this.selectedCategory || !this.eventDate || !this.location) {
-      this.showToast('warn', 'Cảnh báo', 'Vui lòng điền đầy đủ thông tin bắt buộc (*)');
-      return;
-    }
-
-    const startDate = new Date(this.eventDate!);
-    if (this.eventTime) {
-      startDate.setHours(this.eventTime.getHours(), this.eventTime.getMinutes());
-    }
-
-    const endDate = new Date(startDate);
-    endDate.setHours(endDate.getHours() + this.duration);
-
-    const matchedCategory = this.categories.find(c => c.CatetoryId === this.selectedCategory);
-    const categoryName = matchedCategory ? matchedCategory.Name : '';
-
-    const formData = new FormData();
-    formData.append('Title', this.title);
-    formData.append('Description', this.description);
-    formData.append('Location', this.location);
-    formData.append('CatetoryName', categoryName);
-    formData.append('StartDate', startDate.toISOString());
-    formData.append('EndDate', endDate.toISOString());
-
-    if (this.selectedFile) {
-      formData.append('PosterUrl', this.selectedFile);
-    }
-
-    const obs = this.isEdit && this.eventId
-      ? this.eventService.UpdateEvent(this.eventId, formData)
-      : this.eventService.CreateEvent(formData);
-
-    obs.subscribe({
-      next: () => {
-        this.draftService.clear();
-        this.showToast('success', 'Thành công', `Sự kiện đã được ${this.isEdit ? 'cập nhật' : 'tạo'} thành công!`);
-        setTimeout(() => this.router.navigate(['/events']), 1000);
-      },
-      error: (err: any) => {
-        console.error('Save event error:', err);
-        this.showToast('error', 'Lỗi', 'Không thể lưu sự kiện, vui lòng thử lại');
-      },
-    });
-  }
-
-  cancel(): void {
-    this.draftService.clear();
-    this.showToast('info', 'Đã hủy', 'Đã hủy bỏ các thay đổi');
-    this.router.navigate(['/events']);
-  }
-
   private showToast(severity: string, summary: string, detail: string): void {
     this.messageService.add({ severity, summary, detail });
   }

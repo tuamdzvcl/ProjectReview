@@ -13,18 +13,17 @@ import { EventDraftService } from '../../../../core/services/event-draft.service
 export class EventCreateSettingComponent implements OnInit, OnDestroy {
   private draftService = inject(EventDraftService);
 
-  // Bắt đầu bán vé
   isImmediateStart: boolean = true;
-  saleStartDate: string = ''; // yyyy-mm-dd
+  saleStartDate: string = '';
   saleStartTime: string = '00:00';
 
-  // Kết thúc bán vé
   isAutoEnd: boolean = false;
-  saleEndDate: string = ''; // yyyy-mm-dd
+  saleEndDate: string = '';
   saleEndTime: string = '23:59';
 
+  eventDate: Date | undefined = undefined;
+
   ngOnInit(): void {
-    // Tải dữ liệu từ Draft (đã được CreateEventComponent điền nếu là mode Edit)
     const draft = this.draftService.load();
     this.isImmediateStart = draft.isImmediateStart;
     this.saleStartDate = draft.saleStartDate;
@@ -32,10 +31,14 @@ export class EventCreateSettingComponent implements OnInit, OnDestroy {
     this.isAutoEnd = draft.isAutoEnd;
     this.saleEndDate = draft.saleEndDate;
     this.saleEndTime = draft.saleEndTime;
+    this.eventDate = draft.eventDate ? new Date(draft.eventDate) : undefined;
+
+    if (!this.saleEndDate && this.eventDate) {
+      this.saleEndDate = this.eventDate.toISOString().split('T')[0];
+    }
   }
 
   ngOnDestroy(): void {
-    // Lưu lại cài đặt trước khi rời trang
     this.saveToDraft();
   }
 

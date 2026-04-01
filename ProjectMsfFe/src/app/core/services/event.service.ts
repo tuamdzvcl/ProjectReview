@@ -75,4 +75,7 @@ export class EventService extends BaseApiService {
   UpdateEvent(id: string, data: FormData) {
     return this.put<ApiResponse<EventModel>>(`event/${id}`, data);
   }
+  DeleteEvent(id: string) {
+    return this.delete<ApiResponse<any>>(`event/${id}`);
+  }
 }

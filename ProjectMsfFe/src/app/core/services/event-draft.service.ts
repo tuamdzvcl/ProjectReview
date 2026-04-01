@@ -43,7 +43,6 @@ const DEFAULT_DRAFT: EventDraft = {
 })
 export class EventDraftService {
   private draft: EventDraft = { ...DEFAULT_DRAFT };
-  // File object cannot be stored in JSON, keep it separately in memory
   private _selectedFile: File | null = null;
 
   get selectedFile(): File | null {

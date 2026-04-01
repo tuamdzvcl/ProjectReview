@@ -36,21 +36,20 @@
       </div>
     </div>
 
-    <!-- CÀI ĐẶT 2: THỜI GIAN KẾT THÚC BÁN VÉ -->
     <div class="setting-item">
       <label class="switch" for="isAutoEnd">
         <input type="checkbox" id="isAutoEnd" [(ngModel)]="isAutoEnd" />
         <span class="slider"></span>
       </label>
       <div class="setting-box">
-        <h3>Tự động đóng bán vé kết thúc sau 1 ngày tính từ lúc bắt đầu bán vé.</h3>
+        <h3>Tự động đóng bán vé vào lúc sự kiện bắt đầu.</h3>
         <p>
-          Bật tùy chọn này nếu bạn muốn ngừng nhận đặt chỗ vào một thời điểm cụ thể trước sự kiện.
+          Tắt tùy chọn này nếu bạn muốn ngừng nhận đặt chỗ vào một thời điểm cụ thể trước sự kiện.
         </p>
       </div>
 
-      <!-- Hiển thị khi muốn tự động đóng bán vé -->
-      <div class="model" *ngIf="isAutoEnd">
+      <!-- Hiển thị khi TẮT tùy chọn tự động đóng (nhập thời gian cụ thể) -->
+      <div class="model" *ngIf="!isAutoEnd">
         <div class="detail-setting">
           <h3>Việc bán vé kết thúc vào...</h3>
           <p>Chỉ định thời điểm vé sẽ đóng bán tự động.</p>

@@ -12,6 +12,9 @@ import { FormatDatePipe } from '../../../../shared/pipes/format-date.pipe';
 import { ChangeDetectorRef } from '@angular/core';
 import { VndCurrencyPipe } from '../../../../shared/pipes/vnd-currency.pipe';
 import { Router } from '@angular/router';
+import { ConfirmationService, MessageService } from 'primeng/api';
+import { ConfirmDialog } from 'primeng/confirmdialog';
+import { Toast } from 'primeng/toast';
 
 @Component({
   selector: 'app-events',
@@ -22,16 +25,20 @@ import { Router } from '@angular/router';
     ImageUrlPipe,
     FormatDatePipe,
     VndCurrencyPipe,
+    ConfirmDialog,
+    Toast
   ],
   templateUrl: './events.component.html',
   styleUrls: ['./events.component.scss'],
-  changeDetection: ChangeDetectionStrategy.Default, // Thay đổi từ OnPush thành Default
+  changeDetection: ChangeDetectionStrategy.Default,
 })
 export class EventsComponent implements OnInit {
   constructor(
     private eventService: EventService,
     private cdr: ChangeDetectorRef,
-    private router: Router
+    private router: Router,
+    private confirmationService: ConfirmationService,
+    private messageService: MessageService
   ) { }
 
   events: any[] = [];
@@ -79,7 +86,6 @@ export class EventsComponent implements OnInit {
   }
 
   editEvent(event: any) {
-    console.log('Edit event:', event);
     this.router.navigate(['/event-create-page', event.Id]);
   }
 
@@ -88,12 +94,39 @@ export class EventsComponent implements OnInit {
   }
 
   deleteEvent(event: any) {
-    console.log('Delete event:', event);
-
+    this.confirmationService.confirm({
+      message: `Bạn có chắc chắn muốn xóa sự kiện "${event.Title}" không?`,
+      header: 'Xác nhận xóa',
+      icon: 'pi pi-exclamation-triangle',
+      acceptLabel: 'Xóa',
+      rejectLabel: 'Hủy',
+      acceptButtonStyleClass: 'p-button-danger',
+      rejectButtonStyleClass: 'p-button-text',
+      accept: () => {
+        this.eventService.DeleteEvent(event.Id).subscribe({
+          next: () => {
+            this.messageService.add({
+              severity: 'success',
+              summary: 'Thành công',
+              detail: `Đã xóa sự kiện "${event.Title}" thành công!`,
+            });
+            this.loadEvents();
+          },
+          error: (err) => {
+            console.error('Lỗi khi xóa sự kiện:', err);
+            this.messageService.add({
+              severity: 'error',
+              summary: 'Lỗi',
+              detail: 'Có lỗi xảy ra khi xóa sự kiện. Vui lòng thử lại!',
+            });
+          }
+        });
+      }
+    });
   }
 
   viewDetails(event: any) {
-    console.log('View details:', event);
+    this.router.navigate(['/event-detail-page', event.Id]);
 
   }
 }

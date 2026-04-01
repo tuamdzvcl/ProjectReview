@@ -1,3 +1,5 @@
+import { TicketTypes } from "./typeTickRequest.model";
+
 export interface EventRequest {
   Title: string;
   Description: string;
@@ -9,6 +11,6 @@ export interface EventRequest {
   SaleStartDate: Date;
   SaleEndDate: Date;
   UserID: number;
-  CatetoryName: string
-
+  CatetoryName: string;
+  TicketTypes: Array<TicketTypes>;
 }

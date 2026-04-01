@@ -10,36 +10,20 @@
         </div>
         <div class="events-search__control">
           <span class="events-search__icon">🔍</span>
-          <input
-            class="events-search__input"
-            type="text"
-            placeholder="Search by event name, status"
-            (input)="onSearch($event)"
-          />
+          <input class="events-search__input" type="text" placeholder="Search by event name, status"
+            (input)="onSearch($event)" />
         </div>
       </div>
 
       <div class="events-header__right">
         <div class="events-header__filters">
-          <button
-            class="btn btn--tab btn--tab-active"
-            type="button"
-            (click)="onTabChange('')"
-          >
+          <button class="btn btn--tab btn--tab-active" type="button" (click)="onTabChange('')">
             All Event ({{ totalRecords }})
           </button>
-          <button
-            class="btn btn--tab"
-            type="button"
-            (click)="onTabChange('online')"
-          >
+          <button class="btn btn--tab" type="button" (click)="onTabChange('online')">
             Online Event (0)
           </button>
-          <button
-            class="btn btn--tab"
-            type="button"
-            (click)="onTabChange('venue')"
-          >
+          <button class="btn btn--tab" type="button" (click)="onTabChange('venue')">
             Venue Event ({{ totalRecords }})
           </button>
         </div>
@@ -47,16 +31,10 @@
     </section>
 
     <!-- Render Events from API -->
-    <section
-      class="event-item card"
-      *ngFor="let event of events; let i = index"
-    >
+    <section class="event-item card" *ngFor="let event of events; let i = index">
       <div class="event-item__media">
         <div class="event-item__thumbnail">
-          <img
-            [src]="event.PosterUrl | imageUrl"
-            [alt]="event.name || 'Event'"
-          />
+          <img [src]="event.PosterUrl | imageUrl" [alt]="event.name || 'Event'" />
         </div>
       </div>
       <div class="event-item__body">
@@ -105,7 +83,11 @@
               <i class="fa-regular fa-trash-can"></i>
               Delete
             </button>
-           
+            <button class="dropdown-item" (click)="viewDetails(event)">
+              <i class="fa-regular fa-trash-can"></i>
+              View Details
+            </button>
+
           </div>
         </div>
       </div>
@@ -124,4 +106,6 @@
       </div>
     </section>
   </div>
+  <p-toast />
+  <p-confirmDialog />
 </app-shell>

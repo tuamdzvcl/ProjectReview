@@ -90,8 +90,8 @@
             <div class="text">
               <label>Ngày và Giờ</label>
               <strong>{{
-                event.StartDate | date : "EEE, d MMM, y, h:mm a"
-              }}</strong>
+                event.StartDate |formatDate
+                }}</strong>
               <button class="add-calendar">
                 <i class="material-icons">event</i> Thêm vào lịch
               </button>
@@ -115,26 +115,18 @@
       <div class="sidebar-card ticket-card">
         <h3>Chọn vé</h3>
         <div class="ticket-list">
-          <div class="ticket-item" *ngFor="let ticket of event.ListTypeTick">
+          <div class="ticket-item" *ngFor="let ticket of activeTickets">
             <div class="ticket-header">
-              <span class="ticket-price">{{
-                formatCurrency(ticket.Price) | vndCurrency
-              }}</span>
+              <span class="ticket-price">{{ ticket.Price | vndCurrency }}</span>
               <div class="quantity-selector">
-                <button
-                  (click)="updateTicketQuantity(ticket.Id, -1)"
-                  [disabled]="selectedTickets[ticket.Id] === 0"
-                >
+                <button (click)="updateTicketQuantity(ticket.Id, -1)" [disabled]="selectedTickets[ticket.Id] === 0">
                   -
                 </button>
                 <span class="qty">{{ selectedTickets[ticket.Id] || 0 }}</span>
-                <button
-                  (click)="updateTicketQuantity(ticket.Id, 1)"
-                  [disabled]="
+                <button (click)="updateTicketQuantity(ticket.Id, 1)" [disabled]="
                     selectedTickets[ticket.Id] >=
                     ticket.TotalQuantity - ticket.SoldQuantity
-                  "
-                >
+                  ">
                   +
                 </button>
               </div>
@@ -149,13 +141,9 @@
         <div class="ticket-summary">
           <div class="summary-line">
             <span>{{ totalTicketCount }} Vé</span>
-            <strong>{{ formatCurrency(totalPrice) }}</strong>
+            <strong>{{ totalPrice | vndCurrency }}</strong>
           </div>
-          <button
-            class="btn-primary btn-book"
-            (click)="onBookNow()"
-            [disabled]="totalTicketCount === 0"
-          >
+          <button class="btn-primary btn-book" (click)="onBookNow()" [disabled]="totalTicketCount === 0">
             Đặt vé ngay
           </button>
         </div>
@@ -165,9 +153,7 @@
   <section class="more-events-section">
     <div class="section-header">
       <h2>Sự kiện tương tự</h2>
-      <a routerLink="/" class="browse-all"
-        >Xem tất cả <i class="material-icons">east</i></a
-      >
+      <a routerLink="/" class="browse-all">Xem tất cả <i class="material-icons">east</i></a>
     </div>
     <app-events-grid></app-events-grid>
   </section>

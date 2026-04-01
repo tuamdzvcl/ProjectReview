@@ -55,7 +55,6 @@ export class EventCreateTypeComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    // Tải danh sách vé từ Draft (đã được CreateEventComponent điền nếu là mode Edit)
     const draft = this.draftService.load();
     if (draft.tickets && draft.tickets.length > 0) {
       this.tickets = [...draft.tickets];
@@ -63,11 +62,11 @@ export class EventCreateTypeComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    // Lưu lại danh sách vé trước khi rời trang
     this.saveToDraft();
   }
 
   saveToDraft(): void {
+    console.log('tickets :', this.tickets);
     this.draftService.save({ tickets: this.tickets });
   }
 
