@@ -46,23 +46,28 @@ namespace projectDemo.Service.UserService
 
 
         // lấy tất cả các e event do user tạo
-        public async Task<ApiResponse<List<EventResponse>>> GetListEventByUserID(Guid guid)
+        public async Task<ApiResponse<UserEventsResponse>> GetListEventByUserID(Guid guid)
         {
             try
             {
-                var (entitys, status, messger) = await _userReposiotry.GetListEventByUserID(guid);
+                var (user, events, status, messger) = await _userReposiotry.GetListEventByUserID(guid);
                 if (status != 200)
                 {
-                    return ApiResponse<List<EventResponse>>.FailResponse(Entity.Enum.EnumStatusCode.EVENTNOTFOUD, messger);
+                    return ApiResponse<UserEventsResponse>.FailResponse(Entity.Enum.EnumStatusCode.EVENTNOTFOUD, messger);
 
                 }
-                var response = _mapper.Map<List<EventResponse>>(entitys);
-                return ApiResponse<List<EventResponse>>.SuccessResponse(Entity.Enum.EnumStatusCode.SUCCESS, response);
+                var response = new UserEventsResponse
+                {
+                    User = _mapper.Map<UserResponse>(user),
+                    Events = _mapper.Map<List<EventResponse>>(events)
+                };
+
+                return ApiResponse<UserEventsResponse>.SuccessResponse(Entity.Enum.EnumStatusCode.SUCCESS, response);
             }
             catch (Exception ex)
             {
                 Console.WriteLine(ex.ToString());
-                return ApiResponse<List<EventResponse>>.FailResponse(Entity.Enum.EnumStatusCode.SUCCESS,"thích làm test lỗi không");
+                return ApiResponse<UserEventsResponse>.FailResponse(Entity.Enum.EnumStatusCode.SUCCESS,"thích làm test lỗi không");
 
             }
 
@@ -159,7 +164,7 @@ namespace projectDemo.Service.UserService
             var entitys = await _userReposiotry.GetListEventByUserID(id); 
  
             var Order = await _orderRepository.GetListOrderByUserId(user.Id,1,1);
-            var hasEvents = entitys.status == 200 && entitys.Item1.Any();
+            var hasEvents = entitys.status == 200 && entitys.events.Any();
             var hasOrders = Order.TotalCount > 0;
 
             if (hasEvents || hasOrders)

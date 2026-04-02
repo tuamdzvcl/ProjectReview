@@ -60,7 +60,6 @@ namespace projectDemo.Controllers
             return Ok(result);
         }
         [HttpDelete("{id}")]
-        [AllowAnonymous]
         public async Task<IActionResult> DeleteId(Guid id)
         {
             var result = await _eventService.DeleteEvent(id);

@@ -7,6 +7,7 @@ import { Observable, map } from 'rxjs';
 import { ApiResponse } from '../model/api-response.model';
 import { UserUpdata } from '../model/update/userupdate.model';
 import { UserRequest } from '../model/request/userRequest.model';
+import { UserEventsResponse } from '../model/user-events-response.model';
 
 @Injectable({
   providedIn: 'root',
@@ -49,4 +50,10 @@ export class UserService extends BaseApiService {
   CreateUser(data: UserRequest) {
     return this.post<ApiResponse<UserResponse>>('users', data)
   }
+
+  getUserEvents(userId?: string) {
+    const url = userId ? `users/events/${userId}` : 'users/events';
+    return this.get<UserEventsResponse>(url);
+  }
 }
+

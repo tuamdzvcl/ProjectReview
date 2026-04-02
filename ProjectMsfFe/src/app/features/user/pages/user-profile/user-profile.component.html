@@ -1,203 +1,27 @@
 <div class="profile-page">
+  <!-- ====== ẢNH BÌA ====== -->
+  <app-profile-cover
+    [coverImageUrl]="coverImageUrl"
+    [isOwner]="isOwner"
+    (coverChange)="onCoverChange($event)"
+  ></app-profile-cover>
 
-    <!-- ====== ẢNH BÌA ====== -->
-    <div class="profile-cover">
-      <img [src]="coverImageUrl" alt="Ảnh bìa" />
+  <div class="profile-container">
+    <div class="profile-layout">
+      <!-- ====== CỘT TRÁI - SIDEBAR ====== -->
+      <app-profile-sidebar
+        [user]="user"
+        [profileImageUrl]="profileImageUrl"
+        [isOwner]="isOwner"
+        (avatarChange)="onAvatarChange($event)"
+        (followClick)="onFollow()"
+      ></app-profile-sidebar>
 
-      <!-- Nút đổi ảnh bìa (góc trên phải) -->
-      <div class="profile-cover__actions">
-        <label class="btn-change-image" for="cover-upload">
-          <i class="fa-solid fa-image"></i>
-          Change Image
-          <input
-            id="cover-upload"
-            type="file"
-            class="hidden-input"
-            accept="image/*"
-            (change)="onCoverImageSelected($event)"
-          />
-        </label>
-      </div>
+      <!-- ====== CỘT PHẢI - NỘI DUNG CHÍNH ====== -->
+      <app-profile-content
+        [isOwner]="isOwner"
+        [events]="events"
+      ></app-profile-content>
     </div>
-
-    <!-- ====== NỘI DUNG CHÍNH ====== -->
-    <div class="profile-container">
-      <div class="profile-layout">
-
-        <!-- === CỘT TRÁI: Thông tin cá nhân === -->
-        <aside class="profile-sidebar">
-          <div class="profile-card">
-
-            <!-- Ảnh đại diện (nằm nhô lên trên) -->
-            <div class="avatar-wrapper">
-              <div class="avatar-circle">
-                <img [src]="profileImageUrl" alt="Ảnh đại diện" />
-              </div>
-
-              <!-- Nút camera nhỏ để đổi ảnh đại diện -->
-              <label class="avatar-edit-btn" for="avatar-upload">
-                <i class="fa-solid fa-camera"></i>
-                <input
-                  id="avatar-upload"
-                  type="file"
-                  class="hidden-input"
-                  accept="image/*"
-                  (change)="onProfileImageSelected($event)"
-                />
-              </label>
-            </div>
-
-            <!-- Tên + tick xanh -->
-            <h2 class="profile-name">
-              John Doe
-              <i class="fa-solid fa-circle-check verified-icon"></i>
-            </h2>
-
-            <!-- Email -->
-            <p class="profile-email">johndoe&#64;example.com</p>
-
-            <!-- Followers / Following -->
-            <div class="profile-stats">
-              <div class="stat-item">
-                <span class="stat-value">0</span>
-                <span class="stat-label">Followers</span>
-              </div>
-              <div class="stat-divider"></div>
-              <div class="stat-item">
-                <span class="stat-value">2</span>
-                <span class="stat-label">Following</span>
-              </div>
-            </div>
-
-            <!-- Bio -->
-            <p class="profile-bio">Hey I am a John Doe</p>
-
-            <!-- Nút My Organisation -->
-            <button class="btn-organisation">
-              My Organisation <i class="fa-solid fa-right-left"></i>
-            </button>
-
-            <!-- Mạng xã hội -->
-            <h3 class="social-title">Find me on</h3>
-            <div class="social-links">
-              <button class="social-btn"><i class="fa-brands fa-facebook-f"></i></button>
-              <button class="social-btn"><i class="fa-brands fa-instagram"></i></button>
-              <button class="social-btn"><i class="fa-brands fa-twitter"></i></button>
-              <button class="social-btn"><i class="fa-brands fa-linkedin-in"></i></button>
-              <button class="social-btn"><i class="fa-brands fa-youtube"></i></button>
-              <button class="social-btn"><i class="fa-solid fa-globe"></i></button>
-            </div>
-
-          </div>
-        </aside>
-
-        <!-- === CỘT PHẢI: Nội dung tab === -->
-        <main class="profile-content">
-
-          <!-- Thanh tab chính: Home / About / Setting / My Orders -->
-          <nav class="primary-tabs">
-            <button
-              class="tab-item"
-              [class.active]="activeTab === 'home'"
-              (click)="activeTab = 'home'"
-            >
-              <i class="fa-solid fa-house"></i> Home
-            </button>
-            <button
-              class="tab-item"
-              [class.active]="activeTab === 'about'"
-              (click)="activeTab = 'about'"
-            >
-              <i class="fa-solid fa-circle-info"></i> About
-            </button>
-            <button
-              class="tab-item"
-              [class.active]="activeTab === 'setting'"
-              (click)="activeTab = 'setting'"
-            >
-              <i class="fa-solid fa-gear"></i> Setting
-            </button>
-            <button
-              class="tab-item"
-              [class.active]="activeTab === 'orders'"
-              (click)="activeTab = 'orders'"
-            >
-              <i class="fa-solid fa-box"></i> My Orders
-            </button>
-          </nav>
-
-          <!-- Thanh tab phụ: Saved / Organised / Attending -->
-          <div class="secondary-tabs">
-            <button
-              class="sub-tab"
-              [class.active]="activeSubTab === 'saved'"
-              (click)="activeSubTab = 'saved'"
-            >
-              <span class="tab-badge badge-saved">1</span>
-              <span class="tab-label">Saved Events</span>
-            </button>
-            <button
-              class="sub-tab"
-              [class.active]="activeSubTab === 'organised'"
-              (click)="activeSubTab = 'organised'"
-            >
-              <span class="tab-badge badge-organised">2</span>
-              <span class="tab-label">Organised Events</span>
-            </button>
-            <button
-              class="sub-tab"
-              [class.active]="activeSubTab === 'attending'"
-              (click)="activeSubTab = 'attending'"
-            >
-              <span class="tab-badge badge-attending">1</span>
-              <span class="tab-label">Attending Events</span>
-            </button>
-          </div>
-
-          <!-- Danh sách sự kiện (chỉ hiện khi tab Home + Saved) -->
-          <div
-            *ngIf="activeTab === 'home' && activeSubTab === 'saved'"
-            class="event-list"
-          >
-            <div *ngFor="let event of events" class="event-card">
-              <div class="event-image">
-                <img [src]="event.imageUrl" [alt]="event.title" />
-              </div>
-              <div class="event-body">
-                <h3 class="event-title">{{ event.title }}</h3>
-                <p class="event-date">{{ event.date }}</p>
-                <div class="event-actions">
-                  <button class="btn-save">
-                    <i class="fa-regular fa-bookmark"></i> Save
-                  </button>
-                  <button class="btn-view">
-                    <i class="fa-solid fa-arrow-up-right-from-square"></i> View
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Thông báo khi chưa có dữ liệu (tab Home nhưng không phải Saved) -->
-          <div
-            *ngIf="activeTab === 'home' && activeSubTab !== 'saved'"
-            class="empty-state"
-          >
-            <i class="fa-regular fa-calendar-xmark"></i>
-            <p>Chưa có sự kiện nào trong danh sách này.</p>
-          </div>
-
-          <!-- Thông báo khi tab chưa có tính năng -->
-          <div
-            *ngIf="activeTab !== 'home'"
-            class="empty-state"
-          >
-            <i class="fa-solid fa-wrench"></i>
-            <p>Tính năng đang được phát triển...</p>
-          </div>
-
-        </main>
-      </div>
-    </div>
-
+  </div>
 </div>

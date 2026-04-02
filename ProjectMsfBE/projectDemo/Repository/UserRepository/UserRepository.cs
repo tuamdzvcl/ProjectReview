@@ -1,21 +1,18 @@
-﻿using Dapper;
+using Dapper;
+using EventTick.Model.Enum;
 using EventTick.Model.Models;
 using Microsoft.EntityFrameworkCore;
-using projectDemo.Data;
-using projectDemo.DTO.Request;
-using projectDemo.DTO.Response;
 using projectDemo.Repository.BaseData;
 using projectDemo.Repository.Ipml;
 using projectDemo.UnitOfWorks;
-using System.Data;
 
 namespace projectDemo.Repository
 {
-    public class UserRepository :  RepositoryLinqBase<User>,IUserReposiotry
+    public class UserRepository : RepositoryLinqBase<User>, IUserReposiotry
     {
         private readonly RepositoryProcBase _proc;
 
-        public UserRepository(IUnitOfWork uow): base(uow)
+        public UserRepository(IUnitOfWork uow) : base(uow)
         {
             _proc = new RepositoryProcBase(uow);
         }
@@ -25,41 +22,44 @@ namespace projectDemo.Repository
             await _dbSet.AddAsync(user);
             return user;
         }
-        //xóa mềm 
+
+        //xóa mềm
         public string Delete(User user)
         {
             _dbSet.RemoveRange(user);
             return "Deleted";
         }
-        //get ds event theo userid 
-        public async Task<(List<Event>,int status,string messager)> GetListEventByUserID(Guid userID)
+
+        //get ds event theo userid
+        public async Task<(User? user, List<Event> events, int status, string messager)> GetListEventByUserID(Guid userID)
         {
-            try 
+            try
             {
-                var param = new DynamicParameters();
-                param.Add("@userid", userID);
-                param.Add("@status", dbType: DbType.Int32, direction: ParameterDirection.Output);
-                param.Add("@messges", dbType: DbType.String, size: 250, direction: ParameterDirection.Output);
+                var user = await _dbContext.Set<User>()
+                    .AsNoTracking()
+                    .Include(u => u.UserRoles)
+                    .ThenInclude(ur => ur.Role)
+                    .Include(u => u.Events.Where(e => e.IsDeleted == false && e.Status!=EnumStatusEvent.CANNEL))
+                    .FirstOrDefaultAsync(u => u.Id == userID && u.IsDeleted == false);
 
+                if (user == null)
+                {
+                    return (null, new List<Event>(), 404, "Không tìm thấy user");
+                }
 
-                var listevent = await _uow.connection.QueryAsync<Event>(
-                    "GetListEventByUserID",
-                    param,
-                    commandType:CommandType.StoredProcedure
-                    );
+                var events = user.Events
+                    .OrderByDescending(e => e.CreatedDate)
+                    .ToList();
 
-                    var status = param.Get<int>("@status");
-                     var messager = param.Get<string>("@messges");
-                
-                    return (listevent.ToList(), status, messager);
+                return (user, events, 200, "Lấy danh sách event thành công");
             }
             catch (Exception ex)
             {
                 Console.WriteLine(ex.ToString());
-                return (new List<Event>(), 404, ex.Message);
+                return (null, new List<Event>(), 500, ex.Message);
             }
-            
         }
+
         //get tên role by id
         public async Task<List<string>> GetRoleByUser(Guid Userid)
         {
@@ -74,45 +74,49 @@ namespace projectDemo.Repository
                     param,
                     transaction: _uow.GetTransaction(),
                     commandType: System.Data.CommandType.StoredProcedure
-                    );
-                return result.ToList(); ;
+                );
+                return result.ToList();
             }
-            catch( Exception ex)
+            catch (Exception ex)
             {
                 Console.WriteLine(ex.ToString());
-                return (null);
+                return null;
             }
         }
+
         // thông tin user
         public async Task<User?> GetUserByid(Guid id)
         {
             return await _dbSet.Include(u => u.UserRoles)
-            .ThenInclude(ur => ur.Role)
-        .FirstOrDefaultAsync(u => u.Id == id && u.IsDeleted==false); ;
+                .ThenInclude(ur => ur.Role)
+                .FirstOrDefaultAsync(u => u.Id == id && u.IsDeleted == false);
         }
+
         //update
         public User Update(User user)
         {
             _dbSet.Update(user);
             return user;
         }
+
         //10 bản ghi
-        public async Task<(List<User>,int)> GetAll(int pageIndex, int pageSize, string key, string role)
+        public async Task<(List<User>, int)> GetAll(int pageIndex, int pageSize, string key, string role)
         {
             var query = _dbSet
-                .Include(u=>u.UserRoles)
+                .Include(u => u.UserRoles)
                 .ThenInclude(ur => ur.Role)
-                .Where(x => x.IsDeleted==false)
+                .Where(x => x.IsDeleted == false)
                 .AsQueryable();
 
             if (!string.IsNullOrEmpty(key))
             {
-                query = query.Where(x => x.Username.Contains(key) ||x.Email.Contains(key));
+                query = query.Where(x => x.Username.Contains(key) || x.Email.Contains(key));
             }
-            if(!string.IsNullOrEmpty(role))
+
+            if (!string.IsNullOrEmpty(role))
             {
-                query = query.Where(x=>x.UserRoles.Any(ur=>ur.Role.RoleName== role));
-            }    
+                query = query.Where(x => x.UserRoles.Any(ur => ur.Role.RoleName == role));
+            }
 
             var total = await query.CountAsync();
 
@@ -121,9 +125,8 @@ namespace projectDemo.Repository
                 .Skip((pageIndex - 1) * pageSize)
                 .Take(pageSize)
                 .ToListAsync();
+
             return (data, total);
         }
-
-        
     }
 }

@@ -1,0 +1,76 @@
+<aside class="profile-sidebar">
+  <div class="profile-card">
+    <div class="avatar-wrapper">
+      <div class="avatar-circle">
+        <img [src]="profileImageUrl" alt="Ảnh đại diện" />
+      </div>
+
+      <!-- Nút camera nhỏ để đổi ảnh đại diện (chỉ hiện nếu là chủ sở hữu) -->
+      <label class="avatar-edit-btn" for="avatar-upload" *ngIf="isOwner">
+        <i class="fa-solid fa-camera"></i>
+        <input
+          id="avatar-upload"
+          type="file"
+          class="hidden-input"
+          accept="image/*"
+          (change)="onFileSelected($event)"
+        />
+      </label>
+    </div>
+
+    <!-- Tên + tick xanh -->
+    <h2 class="profile-name">
+      {{ user ? user.FirstName + " " + user.LastName : "John Doe" }}
+      <i class="fa-solid fa-circle-check verified-icon"></i>
+    </h2>
+
+    <p class="profile-email">
+      {{ user ? user.Email : "johndoe@example.com" }}
+    </p>
+
+    <div class="profile-stats">
+      <div class="stat-item">
+        <span class="stat-value">0</span>
+        <span class="stat-label">Followers</span>
+      </div>
+      <div class="stat-divider"></div>
+      <div class="stat-item">
+        <span class="stat-value">2</span>
+        <span class="stat-label">Following</span>
+      </div>
+    </div>
+
+    <p class="profile-bio">Hey I am a John Doe</p>
+
+    <!-- Nút hành động (Owner: My Organisation, Visitor: Follow) -->
+    <button class="btn-organisation" *ngIf="isOwner">
+      My Organisation <i class="fa-solid fa-right-left"></i>
+    </button>
+    
+    <button class="btn-follow" *ngIf="!isOwner" (click)="onFollow()">
+      Follow <i class="fa-solid fa-user-plus"></i>
+    </button>
+
+    <h3 class="social-title">Find me on</h3>
+    <div class="social-links">
+      <button class="social-btn">
+        <i class="fa-brands fa-facebook-f"></i>
+      </button>
+      <button class="social-btn">
+        <i class="fa-brands fa-instagram"></i>
+      </button>
+      <button class="social-btn">
+        <i class="fa-brands fa-twitter"></i>
+      </button>
+      <button class="social-btn">
+        <i class="fa-brands fa-linkedin-in"></i>
+      </button>
+      <button class="social-btn">
+        <i class="fa-brands fa-youtube"></i>
+      </button>
+      <button class="social-btn">
+        <i class="fa-solid fa-globe"></i>
+      </button>
+    </div>
+  </div>
+</aside>

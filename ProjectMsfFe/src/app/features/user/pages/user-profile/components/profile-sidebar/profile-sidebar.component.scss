@@ -1,0 +1,227 @@
+@import "../../_variables.scss";
+
+:host {
+    width: 300px;
+    flex-shrink: 0;
+}
+
+
+/* ======================================================
+   CỘT TRÁI - SIDEBAR (thẻ thông tin cá nhân)
+   ====================================================== */
+
+.profile-sidebar {
+    width: 300px;
+    flex-shrink: 0;
+    /* không co lại khi thiếu chỗ */
+}
+
+@media (max-width: 768px) {
+    .profile-sidebar {
+        width: 100%;
+    }
+}
+
+.profile-card {
+    background: $color-white;
+    border-radius: 10px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+    padding: 72px 20px 28px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    position: relative;
+}
+
+.avatar-wrapper {
+    position: absolute;
+    top: -60px;
+    display: flex;
+    justify-content: center;
+}
+
+.avatar-circle {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    border: 4px solid $color-primary;
+    overflow: hidden;
+    background: $color-white;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.avatar-circle img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+/* Nút camera nhỏ để đổi ảnh đại diện */
+.avatar-edit-btn {
+    position: absolute;
+    bottom: 4px;
+    right: -4px;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background: $color-white;
+    border: 1px solid $color-border;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: $color-text-muted;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+    z-index: 5;
+}
+
+.avatar-edit-btn i {
+    font-size: 11px;
+}
+
+.avatar-edit-btn:hover {
+    color: $color-primary;
+    background: #f0faf0;
+}
+
+/* Tên người dùng */
+.profile-name {
+    font-size: 17px;
+    font-weight: 700;
+    color: $color-text-dark;
+    margin: 12px 0 4px;
+}
+
+/* Icon tick xanh cạnh tên */
+.verified-icon {
+    color: $color-primary;
+    font-size: 14px;
+    margin-left: 4px;
+}
+
+/* Email */
+.profile-email {
+    font-size: 12.5px;
+    color: $color-text-muted;
+    margin: 0 0 16px;
+}
+
+/* Vùng hiển thị số Followers / Following */
+.profile-stats {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    padding: 16px 0;
+    border-top: 1px solid $color-border;
+    border-bottom: 1px solid $color-border;
+}
+
+/* Mỗi ô thống kê (Followers hoặc Following) */
+.stat-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    flex: 1;
+    gap: 2px;
+}
+
+.stat-item .stat-value {
+    font-size: 17px;
+    font-weight: 700;
+    color: $color-text-dark;
+}
+
+.stat-item .stat-label {
+    font-size: 11px;
+    color: $color-text-muted;
+}
+
+/* Đường kẻ dọc ngăn cách giữa 2 ô */
+.stat-divider {
+    width: 1px;
+    height: 36px;
+    background: $color-border;
+}
+
+/* Mô tả ngắn (bio) */
+.profile-bio {
+    font-size: 12.5px;
+    color: $color-text-muted;
+    font-style: italic;
+    margin: 18px 0 16px;
+}
+
+/* Nút "My Organisation" & "Follow" */
+.btn-organisation, .btn-follow {
+    width: 100%;
+    border: 1px solid $color-border;
+    border-radius: 6px;
+    background: transparent;
+    color: $color-text-medium;
+    font-size: 13px;
+    font-weight: 500;
+    padding: 9px 16px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    margin-bottom: 20px;
+}
+
+.btn-organisation:hover {
+    background: #f9fafb;
+    border-color: #d1d5db;
+}
+
+.btn-follow {
+    background: $color-primary;
+    color: $color-white;
+    border: none;
+}
+
+.btn-follow:hover {
+    background: $color-primary-dark;
+}
+
+/* Tiêu đề "Find me on" */
+.social-title {
+    font-size: 13px;
+    font-weight: 700;
+    color: $color-primary;
+    margin: 0 0 12px;
+}
+
+/* Hàng chứa các icon mạng xã hội */
+.social-links {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+/* Mỗi nút icon mạng xã hội */
+.social-btn {
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    border: 1.5px solid $color-primary;
+    background: transparent;
+    color: $color-primary;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 12px;
+}
+
+.social-btn:hover {
+    background: $color-primary-light;
+}
+
+.hidden-input {
+    display: none;
+}

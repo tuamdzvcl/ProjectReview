@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using projectDemo.DTO.Request;
@@ -24,6 +24,13 @@ namespace projectDemo.Controllers
         {
             var userId = Guid.Parse(User.FindFirst("id").Value);
 
+            var result = await _userService.GetListEventByUserID(userId);
+            return Ok(result);
+        }
+
+        [HttpGet("events/{userId}")]
+        public async Task<IActionResult> GetEventByUserId(Guid userId)
+        {
             var result = await _userService.GetListEventByUserID(userId);
             return Ok(result);
         }

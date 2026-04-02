@@ -1,0 +1,53 @@
+{
+  "Files": [
+    {
+      "Id": "D:\\Msf\\ProjectMsfBE\\projectDemo\\wwwroot\\images\\0d70c0be-6f88-4fad-8ef7-62ffced56c51.jpg",
+      "PackagePath": "staticwebassets\\images\\0d70c0be-6f88-4fad-8ef7-62ffced56c51.jpg"
+    },
+    {
+      "Id": "D:\\Msf\\ProjectMsfBE\\projectDemo\\wwwroot\\images\\2d9e83d9-6732-4bfb-8263-3679af80d5c1.png",
+      "PackagePath": "staticwebassets\\images\\2d9e83d9-6732-4bfb-8263-3679af80d5c1.png"
+    },
+    {
+      "Id": "D:\\Msf\\ProjectMsfBE\\projectDemo\\wwwroot\\images\\5438a07b-ca8e-4111-954f-11e00a2f6863.jpg",
+      "PackagePath": "staticwebassets\\images\\5438a07b-ca8e-4111-954f-11e00a2f6863.jpg"
+    },
+    {
+      "Id": "D:\\Msf\\ProjectMsfBE\\projectDemo\\wwwroot\\images\\857e9a51-66e2-415e-9d65-e742386a8831.jpg",
+      "PackagePath": "staticwebassets\\images\\857e9a51-66e2-415e-9d65-e742386a8831.jpg"
+    },
+    {
+      "Id": "D:\\Msf\\ProjectMsfBE\\projectDemo\\wwwroot\\images\\a046d52c-ba9f-499c-a2c1-1b3dc80ab827.png",
+      "PackagePath": "staticwebassets\\images\\a046d52c-ba9f-499c-a2c1-1b3dc80ab827.png"
+    },
+    {
+      "Id": "D:\\Msf\\ProjectMsfBE\\projectDemo\\wwwroot\\images\\bc0d46e7-82fd-4911-834c-438882b3e254.jpg",
+      "PackagePath": "staticwebassets\\images\\bc0d46e7-82fd-4911-834c-438882b3e254.jpg"
+    },
+    {
+      "Id": "D:\\Msf\\ProjectMsfBE\\projectDemo\\wwwroot\\images\\e7136a1b-9ce1-4878-bc93-0ef1ad6c64c7.jpg",
+      "PackagePath": "staticwebassets\\images\\e7136a1b-9ce1-4878-bc93-0ef1ad6c64c7.jpg"
+    },
+    {
+      "Id": "D:\\Msf\\ProjectMsfBE\\projectDemo\\wwwroot\\images\\fb9c44af-0921-4523-b65b-a55e1f1faac2.png",
+      "PackagePath": "staticwebassets\\images\\fb9c44af-0921-4523-b65b-a55e1f1faac2.png"
+    },
+    {
+      "Id": "obj\\Debug\\net7.0\\staticwebassets\\msbuild.build.projectDemo.props",
+      "PackagePath": "build\\projectDemo.props"
+    },
+    {
+      "Id": "obj\\Debug\\net7.0\\staticwebassets\\msbuild.buildMultiTargeting.projectDemo.props",
+      "PackagePath": "buildMultiTargeting\\projectDemo.props"
+    },
+    {
+      "Id": "obj\\Debug\\net7.0\\staticwebassets\\msbuild.buildTransitive.projectDemo.props",
+      "PackagePath": "buildTransitive\\projectDemo.props"
+    },
+    {
+      "Id": "obj\\Debug\\net7.0\\staticwebassets\\msbuild.projectDemo.Microsoft.AspNetCore.StaticWebAssets.props",
+      "PackagePath": "build\\Microsoft.AspNetCore.StaticWebAssets.props"
+    }
+  ],
+  "ElementsToRemove": []
+}

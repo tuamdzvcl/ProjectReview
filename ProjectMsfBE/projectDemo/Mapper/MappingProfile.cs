@@ -22,6 +22,10 @@ namespace projectDemo.Mapper
                     opt => opt.MapFrom(src => src.Id))
                 .ForMember(dest => dest.Status,
                     opt => opt.MapFrom(src => src.Status.ToString()));
+            CreateMap<User, UserResponse>()
+                .ForMember(dest => dest.ID, opt => opt.MapFrom(src => src.Id))
+                .ForMember(dest => dest.RoleName,
+                    opt => opt.MapFrom(src => src.UserRoles.Select(ur => ur.Role.RoleName.ToLower()).ToList()));
             CreateMap<EventUpdateRequest, Event>();
             CreateMap<Order, OrderResponse>();
             CreateMap<CreateOrderRequest, OrderDetail>();
