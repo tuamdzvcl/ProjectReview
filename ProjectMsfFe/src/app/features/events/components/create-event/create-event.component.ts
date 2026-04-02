@@ -8,7 +8,7 @@ import {
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Router, ActivatedRoute } from '@angular/router';
+import { ActivatedRoute } from '@angular/router';
 
 // PrimeNG UI components
 import { StepsModule } from 'primeng/steps';
@@ -21,16 +21,16 @@ import { ToastModule } from 'primeng/toast';
 import { EditorModule } from 'primeng/editor';
 import { DatePickerModule } from 'primeng/datepicker';
 import { SelectModule } from 'primeng/select';
-import { MessageService } from 'primeng/api';
+
 
 // Services của app
 import { CatetoryService } from '../../../../core/services/catetory.service';
-import { EventService } from '../../../../core/services/event.service';
+
 import { EventDraftService } from '../../../../core/services/event-draft.service';
 
 // Biến môi trường (chứa apiBaseUrl)
 import { environment } from '../../../../../environments/environment';
-import { ImageUrlPipe } from '../../../../shared/pipes/image-url.pipe';
+
 
 @Component({
   selector: 'app-create-venue-event',
@@ -54,10 +54,7 @@ import { ImageUrlPipe } from '../../../../shared/pipes/image-url.pipe';
 })
 export class CreateEventComponent implements OnInit, OnDestroy {
   private route = inject(ActivatedRoute);
-  private router = inject(Router);
-  private messageService = inject(MessageService);
   private categoryService = inject(CatetoryService);
-  private eventService = inject(EventService);
   private draftService = inject(EventDraftService);
 
   @ViewChild('fileInput') fileInput!: ElementRef<HTMLInputElement>;
@@ -80,7 +77,6 @@ export class CreateEventComponent implements OnInit, OnDestroy {
     { label: '2 giờ', value: 2 },
   ];
   private eventId: string | null = null;
-  private eventData: any = null;
   isEdit: boolean = false;
 
   ngOnInit(): void {
@@ -144,11 +140,6 @@ export class CreateEventComponent implements OnInit, OnDestroy {
 
 
 
-  private calcDurationHours(startDate: string, endDate: string): number {
-    const diffMs = new Date(endDate).getTime() - new Date(startDate).getTime();
-    return Math.floor(diffMs / (1000 * 60 * 60));
-  }
-
   // XỬ LÝ ẢNH
   triggerFileInput(): void {
     this.fileInput.nativeElement.click();
@@ -164,8 +155,5 @@ export class CreateEventComponent implements OnInit, OnDestroy {
       this.previewUrl = e.target?.result as string;
     };
     reader.readAsDataURL(this.selectedFile);
-  }
-  private showToast(severity: string, summary: string, detail: string): void {
-    this.messageService.add({ severity, summary, detail });
   }
 }

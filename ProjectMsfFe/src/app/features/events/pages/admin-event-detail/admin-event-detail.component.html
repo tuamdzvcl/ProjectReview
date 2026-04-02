@@ -1,0 +1,119 @@
+<app-shell>
+  <div class="box" *ngIf="!loading && event">
+    <div class="topbar__left">
+      <h1 class="topbar__title">Chi tiết sự kiện</h1>
+    </div>
+
+    <!-- Event Detail Card -->
+    <div class="detail-card card">
+      <div class="detail-header">
+        <div class="detail-header__image">
+          <img [src]="event.PosterUrl | imageUrl" [alt]="event.Title" />
+        </div>
+        <div class="detail-header__info">
+          <span class="status-badge" [ngClass]="event.Status === 'draft' ? 'draft' : 'online'">
+            {{ event.Status || "Draft" | uppercase }}
+          </span>
+          <h2 class="event-title">
+            {{ event.Title || "Sự kiện chưa có tên" }}
+          </h2>
+          <p class="event-location">
+            <i class="fa-solid fa-location-dot"></i>
+            {{ event.Location || "Chưa cập nhật địa điểm" }}
+          </p>
+          <p class="event-category">
+            <i class="fa-solid fa-list"></i>
+            {{ event.CatetoryName || "Chưa có danh mục" }}
+          </p>
+        </div>
+      </div>
+
+      <div class="detail-body">
+        <h3>Mô tả</h3>
+        <div class="event-description" [innerHTML]="
+            event.Description || 'Bầu không gian sự kiện đang được trống...'
+          "></div>
+
+        <div class="info-grid">
+          <div class="info-item">
+            <span class="info-label"><i class="fa-regular fa-calendar-days"></i> Thời gian bắt
+              đầu:</span>
+            <span class="info-value">{{ event.StartDate | formatDate }}</span>
+          </div>
+          <div class="info-item">
+            <span class="info-label"><i class="fa-regular fa-calendar-xmark"></i> Thời gian kết
+              thúc:</span>
+            <span class="info-value">{{ event.EndDate | formatDate }}</span>
+          </div>
+          <div class="info-item">
+            <span class="info-label"><i class="fa-solid fa-ticket"></i> Bắt đầu bán vé:</span>
+            <span class="info-value">{{
+              event.SaleStartDate
+              ? (event.SaleStartDate | formatDate)
+              : "Chưa thiết lập"
+              }}</span>
+          </div>
+          <div class="info-item">
+            <span class="info-label"><i class="fa-solid fa-clock-rotate-left"></i> Kết thúc bán
+              vé:</span>
+            <span class="info-value">{{
+              event.SaleEndDate
+              ? (event.SaleEndDate | formatDate)
+              : "Chưa thiết lập"
+              }}</span>
+          </div>
+        </div>
+
+        <h3 class="mt-4">Các loại vé</h3>
+        <table class="tickets-table">
+          <thead>
+            <tr>
+              <th>Loại vé</th>
+              <th>Giá vé</th>
+              <th>Tổng số vé</th>
+              <th>Đã bán</th>
+              <th>Trạng thái</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let ticket of event.ListTypeTick">
+              <td>{{ ticket.Name }}</td>
+              <td>{{ ticket.Price | vndCurrency }}</td>
+              <td>{{ ticket.TotalQuantity }}</td>
+              <td>{{ ticket.SoldQuantity || 0 }}</td>
+              <td>
+                <span class="ticket-status" [class.active]="ticket.Status === 'active'">
+                  {{ ticket.Status || "ACTIVE" }}
+                </span>
+              </td>
+            </tr>
+            <tr *ngIf="!event.ListTypeTick || event.ListTypeTick.length === 0">
+              <td colspan="5" class="text-center">Chưa có loại vé nào.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="detail-actions">
+        <button class="btn btn-light" style="background-color: white; color: #333; border: 1px solid #ddd;"
+          (click)="backToEventList()">
+          <i class="fa-solid fa-arrow-left"></i> Quay lại
+        </button>
+        <button class="btn btn-primary" (click)="editEvent()">
+          <i class="fa-solid fa-pen"></i> Sửa sự kiện
+        </button>
+        <button class="btn btn-success" (click)="publishEvent()" *ngIf="event.Status !== 'online'">
+          <i class="fa-solid fa-globe"></i> Công khai
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="loading-state" *ngIf="loading">
+    <i class="fa-solid fa-spinner fa-spin fa-2x"></i>
+    <p>Đang tải thông tin...</p>
+  </div>
+
+  <p-toast />
+  <p-confirmDialog />
+</app-shell>

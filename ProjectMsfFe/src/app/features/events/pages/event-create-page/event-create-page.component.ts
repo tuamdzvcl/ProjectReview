@@ -33,15 +33,15 @@ export class EventCreatePageComponent {
   eventId: string | null = null;
 
   ngOnInit() {
-    this.item = [
-      { label: 'Home' },
-      { label: 'Create' },
-      { label: 'Create Event' },
-    ];
-
     this.setActiveIndexFromRoute();
 
     this.eventId = this.route.snapshot.paramMap.get('id');
+
+    this.item = [
+      { label: 'Home' },
+      { label: this.eventId ? 'Edit' : 'Create' },
+      { label: this.eventId ? 'Update Event' : 'Create Event' },
+    ];
 
     if (this.eventId) {
       forkJoin({
@@ -57,6 +57,7 @@ export class EventCreatePageComponent {
         },
       });
     } else {
+      this.draftService.clear();
       this.isDataLoaded = true;
     }
   }
@@ -66,8 +67,6 @@ export class EventCreatePageComponent {
       ? new Date(eventData.SaleStartDate)
       : null;
     const sEnd = eventData.SaleEndDate ? new Date(eventData.SaleEndDate) : null;
-    const now = new Date();
-
     const matched = categories.find((c) => c.Name === eventData.CatetoryName);
 
     const mappedTickets = (eventData.ListTypeTick || []).map((t: any) => ({
@@ -103,7 +102,6 @@ export class EventCreatePageComponent {
       duration: this.calcDurationHours(eventData.StartDate, eventData.EndDate),
       previewUrl: finalPreviewUrl,
       tickets: mappedTickets,
-      // Khi bấm Update, buộc tắt nút gạt (false) để hiện input thủ công kèm dữ liệu cũ
       isImmediateStart: false,
       saleStartDate: sStart ? sStart.toISOString().split('T')[0] : '',
       saleStartTime: sStart ? sStart.toTimeString().substring(0, 5) : '00:00',
@@ -115,7 +113,6 @@ export class EventCreatePageComponent {
 
   private calcDurationHours(startDate: string, endDate: string): number {
     const diffMs = new Date(endDate).getTime() - new Date(startDate).getTime();
-    console.log(diffMs);
     return Math.floor(diffMs / (1000 * 60 * 60));
   }
 
@@ -160,7 +157,6 @@ export class EventCreatePageComponent {
   }
 
   private saveEvent() {
-    debugger;
     const draft = this.draftService.load();
     const file = this.draftService.selectedFile;
 
@@ -209,7 +205,6 @@ export class EventCreatePageComponent {
 
   //tính thời gian
   private calculateEventDates(draft: any) {
-    debugger;
     const startDate = new Date(draft.eventDate);
     if (draft.eventTime) {
       const time = new Date(draft.eventTime);
@@ -267,6 +262,9 @@ export class EventCreatePageComponent {
       formData.append('PosterUrl', file);
     }
     this.appendTicketsToFormData(formData, draft.tickets || []);
+    formData.forEach((value, key) => {
+      console.log(key, value);
+    });
     return formData;
   }
 

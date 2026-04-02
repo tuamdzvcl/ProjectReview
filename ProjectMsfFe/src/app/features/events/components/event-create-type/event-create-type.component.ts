@@ -22,7 +22,6 @@ import { EventDraftService } from '../../../../core/services/event-draft.service
     InputTextModule,
     InputNumberModule,
     MenuModule,
-    Calendar,
     VndCurrencyPipe
   ],
   templateUrl: './event-create-type.component.html',

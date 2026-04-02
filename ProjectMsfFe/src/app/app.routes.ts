@@ -16,6 +16,8 @@ import { EventCreatePageComponent } from './features/events/pages/event-create-p
 import { UserComponent } from './features/user/pages/admin-user/user.component';
 import { EventDetailPageComponent } from './features/events/pages/event-detail-page/event-detail-page.component';
 import { NotFoundComponent } from './shared/components/not-found/not-found.component';
+import { AdminEventDetailComponent } from './features/events/pages/admin-event-detail/admin-event-detail.component';
+import { UserProfileComponent } from './features/user/pages/user-profile/user-profile.component';
 
 export const routes: Routes = [
   { path: 'header', component: HeaderComponent },
@@ -78,6 +80,10 @@ export const routes: Routes = [
         path: 'event/:id',
         component: EventDetailPageComponent,
       },
+      {
+        path: 'profile',
+        component: UserProfileComponent,
+      },
     ],
   },
   {
@@ -98,6 +104,7 @@ export const routes: Routes = [
     children: [
       { path: 'dashboard', component: DashboardComponent },
       { path: 'events', component: EventsComponent },
+      { path: 'events/:id', component: AdminEventDetailComponent },
       { path: 'user', component: UserComponent },
       {
         path: 'UserForm',

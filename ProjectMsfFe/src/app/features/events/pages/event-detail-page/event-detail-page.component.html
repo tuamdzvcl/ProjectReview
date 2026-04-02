@@ -81,7 +81,7 @@
             <div class="text">
               <label>Được tổ chức bởi</label>
               <strong>{{ event.UserName }}</strong>
-              <a href="#" class="view-link">Xem hồ sơ</a>
+              <a routerLink="/profile" class="view-link">Xem hồ sơ</a>
             </div>
           </div>
 
@@ -89,9 +89,7 @@
             <div class="icon"><i class="material-icons">calendar_today</i></div>
             <div class="text">
               <label>Ngày và Giờ</label>
-              <strong>{{
-                event.StartDate |formatDate
-                }}</strong>
+              <strong>{{ event.StartDate | formatDate }}</strong>
               <button class="add-calendar">
                 <i class="material-icons">event</i> Thêm vào lịch
               </button>
@@ -115,7 +113,7 @@
       <div class="sidebar-card ticket-card">
         <h3>Chọn vé</h3>
         <div class="ticket-list">
-          <div class="ticket-item" *ngFor="let ticket of activeTickets">
+          <div class="ticket-item" *ngFor="let ticket of event.ListTypeTick">
             <div class="ticket-header">
               <span class="ticket-price">{{ ticket.Price | vndCurrency }}</span>
               <div class="quantity-selector">

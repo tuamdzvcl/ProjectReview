@@ -2,14 +2,13 @@ import { CommonModule } from '@angular/common';
 import {
   ChangeDetectionStrategy,
   Component,
-  Inject,
   OnInit,
 } from '@angular/core';
 import { AppShellComponent } from '../../../../layouts/app-shell/app-shell.component';
 import { EventService } from '../../../../core/services/event.service';
 import { ImageUrlPipe } from '../../../../shared/pipes/image-url.pipe';
 import { FormatDatePipe } from '../../../../shared/pipes/format-date.pipe';
-import { ChangeDetectorRef } from '@angular/core';
+
 import { VndCurrencyPipe } from '../../../../shared/pipes/vnd-currency.pipe';
 import { Router } from '@angular/router';
 import { ConfirmationService, MessageService } from 'primeng/api';
@@ -35,7 +34,6 @@ import { Toast } from 'primeng/toast';
 export class EventsComponent implements OnInit {
   constructor(
     private eventService: EventService,
-    private cdr: ChangeDetectorRef,
     private router: Router,
     private confirmationService: ConfirmationService,
     private messageService: MessageService
@@ -126,7 +124,6 @@ export class EventsComponent implements OnInit {
   }
 
   viewDetails(event: any) {
-    this.router.navigate(['/event-detail-page', event.Id]);
-
+    this.router.navigate(['/admin/events', event.Id]);
   }
 }

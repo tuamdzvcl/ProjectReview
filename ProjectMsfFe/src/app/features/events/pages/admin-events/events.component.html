@@ -21,10 +21,10 @@
             All Event ({{ totalRecords }})
           </button>
           <button class="btn btn--tab" type="button" (click)="onTabChange('online')">
-            Online Event (0)
+            PUBLISHED (0)
           </button>
           <button class="btn btn--tab" type="button" (click)="onTabChange('venue')">
-            Venue Event ({{ totalRecords }})
+            DRAFT ({{ totalRecords }})
           </button>
         </div>
       </div>
@@ -84,7 +84,7 @@
               Delete
             </button>
             <button class="dropdown-item" (click)="viewDetails(event)">
-              <i class="fa-regular fa-trash-can"></i>
+              <i class="fa-solid fa-circle-info"></i>
               View Details
             </button>
 
