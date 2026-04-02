@@ -61,11 +61,6 @@ namespace projectDemo.Data
                 .WithOne(tt => tt.Event)
                 .HasForeignKey(tt => tt.EventID);
 
-            modelBuilder.Entity<Event>()
-                .Property(e => e.Status)
-                .HasConversion(new EnumToStringConverter<EnumStatusEvent>())
-                .HasMaxLength(50);
-
             modelBuilder.Entity<TicketType>()
                 .HasMany(tt => tt.OrderDetails)
                 .WithOne(od => od.TicketTypes)

@@ -1,4 +1,4 @@
-﻿
+
 using projectDemo.Entity.Models;
 using projectDemo.DTO.Respone;
 using projectDemo.DTO.Response;
@@ -14,6 +14,7 @@ using projectDemo.UnitOfWorks;
 using projectDemo.Repository.CatetoryRepository;
 using projectDemo.Repository.TickTypeRepository;
 using projectDemo.Common.PageRequest;
+using System.Linq;
 
 namespace projectDemo.Service.EventService
 {
@@ -41,7 +42,17 @@ namespace projectDemo.Service.EventService
         //check date
         public bool checkVadidate(EventRequest request)
         {
-            DateTime now = DateTime.Now;
+            // Lấy thời gian hiện tại theo múi giờ Việt Nam (GMT+7)
+            TimeZoneInfo vnTimeZone;
+            try
+            {
+                vnTimeZone = TimeZoneInfo.FindSystemTimeZoneById("SE Asia Standard Time");
+            }
+            catch (TimeZoneNotFoundException)
+            {
+                vnTimeZone = TimeZoneInfo.FindSystemTimeZoneById("Asia/Ho_Chi_Minh");
+            }
+            DateTime now = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, vnTimeZone);
 
             if (request.StartDate <= now)
             {
@@ -51,9 +62,7 @@ namespace projectDemo.Service.EventService
                 return false;
             if (request.SaleStartDate >= request.SaleEndDate)
                 return false;
-            if (request.SaleEndDate >= request.StartDate)
-                return false;
-            if (request.EndDate - request.StartDate > TimeSpan.FromDays(3))
+            if (request.SaleEndDate > request.StartDate)
                 return false;
             return true;
         }
@@ -83,34 +92,47 @@ namespace projectDemo.Service.EventService
         {
             return ticketTypes.Any(ticket =>
                 ticket.TotalQuantity <= 0 ||
-                ticket.SoldQuantity < 0 ||
-                ticket.SoldQuantity > ticket.TotalQuantity ||
                 ticket.Price <= 0);
         }
+        private static bool IsTicketTypeUpdateInvalid(UpdateEventTicketTypeItemRequest ticket)
+        {
+            if (ticket.Name == null)
+                return true;
+
+            if (!ticket.TotalQuantity.HasValue)
+                return true;
+
+            if (!ticket.Price.HasValue)
+                return true;
+
+            if (ticket.Status == null)
+                return true;
+
+            int totalQuantity = ticket.TotalQuantity.Value;
+            decimal price = ticket.Price.Value;
+
+            if (totalQuantity <= 0)
+                return true;
+
+            if (price <= 0)
+                return true;
+
+            return false;
+        }
+
 
         private static bool HasInvalidTicketTypeUpdates(IEnumerable<UpdateEventTicketTypeItemRequest> ticketTypes)
         {
-            return ticketTypes.Any(ticket =>
+            foreach (var ticket in ticketTypes)
             {
-                if (ticket.Name==null ||
-                    !ticket.TotalQuantity.HasValue ||
-                    !ticket.Price.HasValue ||
-                    !ticket.SoldQuantity.HasValue ||
-                    ticket.Status==null)
-                {
+                if (IsTicketTypeUpdateInvalid(ticket))
                     return true;
-                }
+            }
 
-                var totalQuantity = ticket.TotalQuantity.Value;
-                var soldQuantity = ticket.SoldQuantity.Value;
-                var price = ticket.Price.Value;
-
-                return totalQuantity <= 0 ||
-                       soldQuantity < 0 ||
-                       soldQuantity > totalQuantity ||
-                       price <= 0;
-            });
+            return false;
         }
+
+
 
         //lấy userName
         public async Task<List<string>> rederNameByUserID(Guid UserID)
@@ -229,9 +251,11 @@ namespace projectDemo.Service.EventService
                     return ApiResponse<CreateEventWithTicketTypesResponse>.FailResponse(Entity.Enum.EnumStatusCode.NOT_FOUND, "Không tìm thấy thể loại");
                 }
 
-                imageUrl = await _imageService.UploadAsync(request.PosterUrl);
+               
 
                 await _uow.BeginTransactionAsync();
+
+                imageUrl = await _imageService.UploadAsync(request.PosterUrl);
                 transactionStarted = true;
 
                 var eventEntity = new Event
@@ -257,7 +281,6 @@ namespace projectDemo.Service.EventService
                     Name = ticket.Name,
                     Price = ticket.Price,
                     TotalQuantity = ticket.TotalQuantity,
-                    SoldQuantity = ticket.SoldQuantity,
                     Status = ticket.Status,
                     EventID = eventEntity.Id,
                     IsDeleted = false,
@@ -317,9 +340,19 @@ namespace projectDemo.Service.EventService
         {
             try
             {
-                Event events = await _eventRepository.GetEventById(EventID)
-                 ?? throw new DllNotFoundException();
+                Event events = await _eventRepository.GetEventById(EventID);
+
+                if (events == null)
+                {
+                    return ApiResponse<string>.FailResponse(Entity.Enum.EnumStatusCode.EVENTNOTFOUD, "Không tìm thấy event");
+                }
+                if (events.Status == EnumStatusEvent.PUBLIC)
+                {
+                    return ApiResponse<string>.FailResponse(Entity.Enum.EnumStatusCode.UNAUTHORIZED, "Sự kiện đã được công bố không thu hồi được");
+
+                }
                 events.Status = EnumStatusEvent.CANNEL;
+                events.IsDeleted = true;
                 await _uow.SaveChangesAsync();
                 return ApiResponse<string>.SuccessResponse(Entity.Enum.EnumStatusCode.SUCCESS, "Xóa thành công");
             }
@@ -446,8 +479,9 @@ namespace projectDemo.Service.EventService
                     var existingTicketsById = existingTickets.ToDictionary(x => x.Id, x => x);
                     var requestIds = resquest.TicketTypes
                         .Where(x => x.Id.HasValue)
-                        .Select(x => x.Id!.Value)
+                        .Select(x => x.Id.Value)
                         .ToHashSet();
+                    
 
                     foreach (var ticketRequest in resquest.TicketTypes)
                     {
@@ -461,7 +495,6 @@ namespace projectDemo.Service.EventService
                             ticketEntity.Name = ticketRequest.Name!.Value;
                             ticketEntity.TotalQuantity = ticketRequest.TotalQuantity!.Value;
                             ticketEntity.Price = ticketRequest.Price!.Value;
-                            ticketEntity.SoldQuantity = ticketRequest.SoldQuantity!.Value;
                             ticketEntity.Status = ticketRequest.Status!.Value;
                             ticketEntity.UpdatedDate = DateTime.Now;
                             ticketEntity.IsDeleted = false;
@@ -473,7 +506,6 @@ namespace projectDemo.Service.EventService
                                 Name = ticketRequest.Name!.Value,
                                 TotalQuantity = ticketRequest.TotalQuantity!.Value,
                                 Price = ticketRequest.Price!.Value,
-                                SoldQuantity = ticketRequest.SoldQuantity!.Value,
                                 Status = ticketRequest.Status!.Value,
                                 EventID = EventID,
                                 IsDeleted = false,
@@ -523,7 +555,7 @@ namespace projectDemo.Service.EventService
                 return ApiResponse<string>.FailResponse(Entity.Enum.EnumStatusCode.SERVER, "lỗi", ex.Message);
             }
         }
-
+        //update status
         public async Task<ApiResponse<string>> UpdateEventStatus(Guid eventId, EventStatusUpdateRequest request)
         {
             try

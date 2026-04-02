@@ -13,14 +13,11 @@ namespace projectDemo.DTO.Request
         [Range(0.01, double.MaxValue)]
         public decimal Price { get; set; }
 
-        [Required]
-        [Range(1, int.MaxValue)]
-        public int TotalQuantity { get; set; }
-
-        [Range(0, int.MaxValue)]
         public int SoldQuantity { get; set; } = 0;
 
         [Required]
+        [Range(1, int.MaxValue)]
+        public int TotalQuantity { get; set; }
         public EnumStatusTickType Status { get; set; } = EnumStatusTickType.ACTIVE;
     }
 }

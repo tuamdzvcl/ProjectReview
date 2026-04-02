@@ -54,7 +54,7 @@ namespace projectDemo.Repository
             {
                 var query = _dbSet
                     .AsNoTracking()
-                    .Where(e => e.IsDeleted == false );
+                    .Where(e => e.IsDeleted == false  && e.Status!=EnumStatusEvent.CANNEL);
                 if (!string.IsNullOrWhiteSpace(request.key))
                 {
                     var key = request.key.Trim();
@@ -82,6 +82,7 @@ namespace projectDemo.Repository
                SaleEndDate = e.SaleEndDate,
                PosterUrl = e.PosterUrl,
                Status = e.Status.ToString(),
+               UserID = e.UserID,
                UserName = e.User.Username,
                CatetoryName = e.Catetory.Name,
                ListTypeTick = e.TicketTypes.Select(t => new TypeTickResponse

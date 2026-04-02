@@ -65,10 +65,8 @@ namespace projectDemo.Migrations
                     b.Property<DateTime>("StartDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("Status")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
 
                     b.Property<string>("Title")
                         .IsRequired()
@@ -257,21 +255,21 @@ namespace projectDemo.Migrations
                         new
                         {
                             Id = 1,
-                            CreatedDate = new DateTime(2026, 3, 30, 12, 52, 44, 819, DateTimeKind.Utc).AddTicks(7256),
+                            CreatedDate = new DateTime(2026, 3, 30, 13, 11, 52, 941, DateTimeKind.Utc).AddTicks(7757),
                             IsDeleted = false,
                             RoleName = "ADMIN"
                         },
                         new
                         {
                             Id = 2,
-                            CreatedDate = new DateTime(2026, 3, 30, 12, 52, 44, 819, DateTimeKind.Utc).AddTicks(7263),
+                            CreatedDate = new DateTime(2026, 3, 30, 13, 11, 52, 941, DateTimeKind.Utc).AddTicks(7769),
                             IsDeleted = false,
                             RoleName = "ORGANIZER"
                         },
                         new
                         {
                             Id = 3,
-                            CreatedDate = new DateTime(2026, 3, 30, 12, 52, 44, 819, DateTimeKind.Utc).AddTicks(7265),
+                            CreatedDate = new DateTime(2026, 3, 30, 13, 11, 52, 941, DateTimeKind.Utc).AddTicks(7772),
                             IsDeleted = false,
                             RoleName = "CUSTOMER"
                         });
@@ -455,7 +453,7 @@ namespace projectDemo.Migrations
                             IsDeleted = false,
                             IsLock = false,
                             LastName = "admin",
-                            PasswordHash = "$2a$11$OCtH8gbI5ebkVWnC8XxwH.wFpdLbn4Hk3sb4z6ooswp/Nh/HUHLvi",
+                            PasswordHash = "$2a$11$yyKRokLh/Cav17fb08W40u4MUHJZlH/eDQvP/bS3uYqGjkPi5VFBm",
                             Username = "admin"
                         });
                 });

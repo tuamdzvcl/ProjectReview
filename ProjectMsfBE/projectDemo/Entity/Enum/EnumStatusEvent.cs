@@ -10,6 +10,7 @@ namespace EventTick.Model.Enum
     {
         DRAFT=1,
         PUBLISHED =2,
-        CANNEL= 3
+        CANNEL= 3,
+        PUBLIC=4
     }
 }
