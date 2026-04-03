@@ -145,4 +145,12 @@ export class CheckoutPageComponent implements OnInit {
       }
     });
   }
+
+  onBackToEvent(): void {
+    if (this.bookingData?.event?.Id) {
+      this.router.navigate(['/event', this.bookingData.event.Id]);
+    } else {
+      this.router.navigate(['/events']);
+    }
+  }
 }
