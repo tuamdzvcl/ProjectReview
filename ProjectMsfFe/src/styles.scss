@@ -1,9 +1,4 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
-
-/* You can add global styles to this file, and also import other style files */html
-{
+html {
   height: 100%;
   font-size: 12px;
 }
@@ -20,10 +15,12 @@ body {
 * {
   box-sizing: border-box;
 }
+
 .container {
   width: 1200px;
   margin: auto;
 }
+
 @media(max-width:1024px) {
 
   .events-grid {
@@ -47,5 +44,13 @@ body {
   }
 
 }
-html, body { height: 100%; }
-body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  font-family: Roboto, "Helvetica Neue", sans-serif;
+}

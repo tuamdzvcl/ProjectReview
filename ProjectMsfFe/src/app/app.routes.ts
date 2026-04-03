@@ -18,6 +18,7 @@ import { EventDetailPageComponent } from './features/events/pages/event-detail-p
 import { NotFoundComponent } from './shared/components/not-found/not-found.component';
 import { AdminEventDetailComponent } from './features/events/pages/admin-event-detail/admin-event-detail.component';
 import { UserProfileComponent } from './features/user/pages/user-profile/user-profile.component';
+import { CheckoutPageComponent } from './features/events/pages/checkout-page/checkout-page.component';
 
 export const routes: Routes = [
   { path: 'header', component: HeaderComponent },
@@ -87,6 +88,10 @@ export const routes: Routes = [
       {
         path: 'profile/:id',
         component: UserProfileComponent,
+      },
+      {
+        path: 'checkout',
+        component: CheckoutPageComponent,
       },
     ],
   },

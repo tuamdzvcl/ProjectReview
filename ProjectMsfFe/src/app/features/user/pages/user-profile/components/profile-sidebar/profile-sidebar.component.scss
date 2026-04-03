@@ -6,14 +6,12 @@
 }
 
 
-/* ======================================================
-   CỘT TRÁI - SIDEBAR (thẻ thông tin cá nhân)
-   ====================================================== */
+
 
 .profile-sidebar {
     width: 300px;
     flex-shrink: 0;
-    /* không co lại khi thiếu chỗ */
+    
 }
 
 @media (max-width: 768px) {
@@ -58,7 +56,7 @@
     display: block;
 }
 
-/* Nút camera nhỏ để đổi ảnh đại diện */
+
 .avatar-edit-btn {
     position: absolute;
     bottom: 4px;
@@ -86,7 +84,7 @@
     background: #f0faf0;
 }
 
-/* Tên người dùng */
+
 .profile-name {
     font-size: 17px;
     font-weight: 700;
@@ -94,21 +92,21 @@
     margin: 12px 0 4px;
 }
 
-/* Icon tick xanh cạnh tên */
+
 .verified-icon {
     color: $color-primary;
     font-size: 14px;
     margin-left: 4px;
 }
 
-/* Email */
+
 .profile-email {
     font-size: 12.5px;
     color: $color-text-muted;
     margin: 0 0 16px;
 }
 
-/* Vùng hiển thị số Followers / Following */
+
 .profile-stats {
     display: flex;
     justify-content: center;
@@ -119,7 +117,7 @@
     border-bottom: 1px solid $color-border;
 }
 
-/* Mỗi ô thống kê (Followers hoặc Following) */
+
 .stat-item {
     display: flex;
     flex-direction: column;
@@ -139,14 +137,14 @@
     color: $color-text-muted;
 }
 
-/* Đường kẻ dọc ngăn cách giữa 2 ô */
+
 .stat-divider {
     width: 1px;
     height: 36px;
     background: $color-border;
 }
 
-/* Mô tả ngắn (bio) */
+
 .profile-bio {
     font-size: 12.5px;
     color: $color-text-muted;
@@ -154,7 +152,7 @@
     margin: 18px 0 16px;
 }
 
-/* Nút "My Organisation" & "Follow" */
+
 .btn-organisation, .btn-follow {
     width: 100%;
     border: 1px solid $color-border;
@@ -187,7 +185,7 @@
     background: $color-primary-dark;
 }
 
-/* Tiêu đề "Find me on" */
+
 .social-title {
     font-size: 13px;
     font-weight: 700;
@@ -195,7 +193,7 @@
     margin: 0 0 12px;
 }
 
-/* Hàng chứa các icon mạng xã hội */
+
 .social-links {
     display: flex;
     gap: 8px;
@@ -203,7 +201,7 @@
     justify-content: center;
 }
 
-/* Mỗi nút icon mạng xã hội */
+
 .social-btn {
     width: 34px;
     height: 34px;

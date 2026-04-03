@@ -50,7 +50,7 @@ export class UserProfileComponent implements OnInit {
   determineOwnership(urlId: string | null) {
     const currentUserId = this.tokenService.getUserId();
     if (!urlId) {
-      this.isOwner = true; // Viewing own profile via /profile
+      this.isOwner = true; 
     } else {
       this.isOwner = currentUserId === urlId;
     }
@@ -61,19 +61,19 @@ export class UserProfileComponent implements OnInit {
       next: (res: UserEventsResponse) => {
         this.user = res.User;
         this.events = res.Events;
-        // logic to set image previews if URLs are present in user data
+    
       },
     });
   }
 
   onCoverChange(file: File) {
     this.coverImageUrl = URL.createObjectURL(file);
-    // TODO: Implement actual API upload in UserService
+    
   }
 
   onAvatarChange(file: File) {
     this.profileImageUrl = URL.createObjectURL(file);
-    // TODO: Implement actual API upload in UserService
+    
   }
 
   onFollow() {

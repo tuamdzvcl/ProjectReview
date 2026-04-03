@@ -13,24 +13,19 @@ export const authGuard: CanActivateFn = (route, state) => {
 
   const accessToken = tokenService.getAccessToken();
   if (accessToken && !authService.checkTokenExpired()) {
-    // Danh sách các URL cần kiểm tra role và role được phép
+    
     const protectedRoutes = [
       {
+        urls: ['/admin/user', '/admin/UserForm'],
+        allowedRoles: ['ADMIN'],
+      },
+      {
+        urls: ['/admin/'],
+        allowedRoles: ['ADMIN', 'ORGANIZER'],
+      },
+      {
         urls: ['/event-create-page'],
-        allowedRoles: ['admin'.toUpperCase(), 'organizer'.toUpperCase()],
-      },
-      {
-        urls: ['/user-management'],
-        allowedRoles: ['admin'.toUpperCase()],
-      },
-      {
-        urls: ['/settings'],
-        allowedRoles: ['admin'.toUpperCase(), 'organizer'.toUpperCase()],
-      },
-      // Thêm các URL khác tại đây
-      {
-        urls: ['/reports'],
-        allowedRoles: ['admin'.toUpperCase()],
+        allowedRoles: ['ADMIN', 'ORGANIZER'],
       },
     ];
 
@@ -39,18 +34,12 @@ export const authGuard: CanActivateFn = (route, state) => {
     );
 
     if (currentRoute) {
-      try {
-        const tokenPayload = JSON.parse(atob(accessToken.split('.')[1]));
-        const userRole = tokenPayload.role || tokenPayload.Role;
+      const userRole = tokenService.getRole();
 
-        if (currentRoute.allowedRoles.includes(userRole)) {
-          return true;
-        } else {
-          alert('làm gì có quyền mà vào vậy?');
-          return router.createUrlTree(['/']);
-        }
-      } catch (error) {
-        alert('có gì đó sai sai');
+      if (userRole && currentRoute.allowedRoles.includes(userRole)) {
+        return true;
+      } else {
+        alert('Làm gì có quyền mà vào vậy?');
         return router.createUrlTree(['/']);
       }
     }

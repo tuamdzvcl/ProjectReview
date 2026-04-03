@@ -19,9 +19,9 @@ ngOnInit(): void {
   const token = params.get('token');
 
   if (token) {
-    // If backend returns only one token in URL, treat it as access_token.
+    
     localStorage.setItem('access_token', token);
-    // Xóa token khỏi URL
+    
     window.history.replaceState({}, document.title, '/');
   }
 }

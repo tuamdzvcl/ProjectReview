@@ -21,11 +21,11 @@ export class DashboardComponent implements OnInit {
     this.fetchRevenueStats('Monthly');
   }
 
-  /** Giả lập gọi API lấy dữ liệu doanh thu */
+  
   fetchRevenueStats(type: string) {
     this.selectedTab = type;
 
-    // Giả lập dữ liệu trả về từ API tùy theo loại (Tháng/Tuần/Ngày)
+    
     const mockApiResponse = this.getMockData(type);
 
     this.chartData = {
@@ -95,7 +95,7 @@ export class DashboardComponent implements OnInit {
         labels: ['Tuần 1', 'Tuần 2', 'Tuần 3', 'Tuần 4'],
         data: [12000000, 21000000, 18000000, 35000000]
       };
-    } else { // Monthly
+    } else { 
       return {
         labels: ['Tháng 1', 'Tháng 2', 'Tháng 3', 'Tháng 4', 'Tháng 5', 'Tháng 6', 'Tháng 7', 'Tháng 8', 'Tháng 9', 'Tháng 10', 'Tháng 11', 'Tháng 12'],
         data: [50000000, 70000000, 45000000, 80000000, 60000000, 95000000, 70000000, 110000000, 85000000, 120000000, 100000000, 150000000]

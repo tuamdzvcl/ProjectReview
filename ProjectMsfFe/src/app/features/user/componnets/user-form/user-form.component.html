@@ -1,22 +1,14 @@
-<p-dialog
-  [(visible)]="visible"
-  (onHide)="close()"
-  [modal]="true"
-  [style]="{ width: '450px', height: '40vh' }"
-  [header]="data ? 'Update User' : 'Add User'"
->
+<p-dialog [(visible)]="visible" (onHide)="close()" [modal]="true" [style]="{ width: '450px', height: '40vh' }"
+  [header]="data ? 'Update User' : 'Add User'">
   <form [formGroup]="form" (ngSubmit)="onSubmit()" class="p-fluid">
-    <!-- First + Last Name -->
+    
     <div class="grid">
       <div class="col-6 field">
         <label>First Name</label>
         <input pInputText formControlName="firstName" />
-        <small
-          *ngIf="
+        <small *ngIf="
             form.get('firstName')?.invalid && form.get('firstName')?.touched
-          "
-          class="p-error"
-        >
+          " class="p-error">
           Required
         </small>
       </div>
@@ -24,57 +16,34 @@
       <div class="col-6 field">
         <label>Last Name</label>
         <input pInputText formControlName="lastName" />
-        <small
-          *ngIf="form.get('lastName')?.invalid && form.get('lastName')?.touched"
-          class="p-error"
-        >
+        <small *ngIf="form.get('lastName')?.invalid && form.get('lastName')?.touched" class="p-error">
           Required
         </small>
       </div>
     </div>
 
-    <!-- Email -->
+    
     <div class="field">
       <label>Email</label>
       <input pInputText formControlName="email" />
-      <small
-        *ngIf="form.get('email')?.invalid && form.get('email')?.touched"
-        class="p-error"
-      >
+      <small *ngIf="form.get('email')?.invalid && form.get('email')?.touched" class="p-error">
         Email không hợp lệ
       </small>
     </div>
 
-    <!-- Role -->
+    
     <div class="field">
       <label>Role</label>
-      <p-dropdown
-        [options]="roles"
-        formControlName="role"
-        placeholder="Chọn role"
-        optionLabel="label"
-        optionValue="value"
-      >
+      <p-dropdown [options]="roles" formControlName="role" placeholder="Chọn role" optionLabel="label"
+        optionValue="value">
       </p-dropdown>
     </div>
 
-    <!-- Actions -->
+    
     <div class="form-footer">
-      <button
-        pButton
-        type="button"
-        label="Cancel"
-        severity="secondary"
-        (click)="close()"
-      ></button>
+      <button pButton type="button" label="Cancel" severity="secondary" (click)="close()"></button>
 
-      <button
-        pButton
-        type="submit"
-        label="Save"
-        icon="pi pi-check"
-        [disabled]="form.invalid"
-      ></button>
+      <button pButton type="submit" label="Save" icon="pi pi-check" [disabled]="form.invalid"></button>
     </div>
   </form>
 </p-dialog>

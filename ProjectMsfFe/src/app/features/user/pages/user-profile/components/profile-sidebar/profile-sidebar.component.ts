@@ -20,6 +20,10 @@ export class ProfileSidebarComponent {
   @Output() avatarChange = new EventEmitter<File>();
   @Output() followClick = new EventEmitter<void>();
 
+  get isCustomer(): boolean {
+    return this.user?.RoleName?.includes('customer') ?? false;
+  }
+
   onFileSelected(event: Event) {
     const input = event.target as HTMLInputElement;
     const file = input.files?.[0];

@@ -13,7 +13,7 @@ export class AuthService extends BaseApiService {
     super(http);
   }
 
-  // LOGIN
+  
   login(data: { email: string; password: string }) {
     return this.post<AuthData>('auth/login', data).pipe(
       tap((res) => {
@@ -21,7 +21,7 @@ export class AuthService extends BaseApiService {
       })
     );
   }
-  // REGISTER
+  
   register(data: any) {
     return this.post<any>('auth/register', data);
   }

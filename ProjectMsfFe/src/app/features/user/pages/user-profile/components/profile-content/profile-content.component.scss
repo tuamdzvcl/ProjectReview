@@ -6,9 +6,7 @@
 }
 
 
-/* ======================================================
-   CỘT PHẢI - NỘI DUNG CHÍNH
-   ====================================================== */
+
 
 .profile-content {
     flex: 1;
@@ -19,9 +17,7 @@
 }
 
 
-/* ======================================================
-   THANH TAB CHÍNH (Home / About / Setting / My Orders)
-   ====================================================== */
+
 
 .primary-tabs {
     background: $color-white;
@@ -31,10 +27,10 @@
     padding: 6px;
     gap: 2px;
     overflow-x: auto;
-    /* cuộn ngang nếu màn hình nhỏ */
+    
 }
 
-/* Mỗi mục tab */
+
 .primary-tabs .tab-item {
     flex: 1;
     padding: 9px 16px;
@@ -58,16 +54,14 @@
     color: $color-text-medium;
 }
 
-/* Tab đang được chọn */
+
 .primary-tabs .tab-item.active {
     background: $color-primary;
     color: $color-white;
 }
 
 
-/* ======================================================
-   THANH TAB PHỤ (Saved / Organised / Attending)
-   ====================================================== */
+
 
 .secondary-tabs {
     background: $color-white;
@@ -77,13 +71,13 @@
     overflow-x: auto;
 }
 
-/* Mỗi mục tab phụ */
+
 .secondary-tabs .sub-tab {
     flex: 1;
     padding: 16px 12px;
     border: none;
     border-bottom: 2px solid transparent;
-    /* gạch dưới ẩn */
+    
     background: transparent;
     color: $color-text-muted;
     cursor: pointer;
@@ -99,13 +93,13 @@
     color: $color-text-dark;
 }
 
-/* Tab phụ đang được chọn (gạch xanh bên dưới) */
+
 .secondary-tabs .sub-tab.active {
     border-bottom-color: $color-primary;
     color: $color-primary;
 }
 
-/* Badge số (hình tròn chứa số lượng sự kiện) */
+
 .tab-badge {
     width: 32px;
     height: 32px;
@@ -117,7 +111,7 @@
     font-weight: 700;
 }
 
-/* Màu badge cho từng loại tab */
+
 .tab-badge.badge-saved {
     background: $color-primary-light;
     color: $color-primary;
@@ -133,22 +127,20 @@
     color: #5cb1d9;
 }
 
-/* Khi tab đang active, badge đổi sang màu xanh đặc */
+
 .secondary-tabs .sub-tab.active .tab-badge {
     background: $color-primary;
     color: $color-white;
 }
 
-/* Tên tab phụ */
+
 .tab-label {
     font-size: 12px;
     font-weight: 500;
 }
 
 
-/* ======================================================
-   DANH SÁCH SỰ KIỆN
-   ====================================================== */
+
 
 .event-list {
     display: flex;
@@ -156,7 +148,7 @@
     gap: 12px;
 }
 
-/* Mỗi thẻ sự kiện */
+
 .event-card {
     background: $color-white;
     border-radius: 10px;
@@ -171,10 +163,10 @@
 .event-card:hover {
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
     transform: translateY(-1px);
-    /* nhấc lên nhẹ khi hover */
+    
 }
 
-/* Khu vực ảnh sự kiện */
+
 .event-card .event-image {
     width: 200px;
     min-height: 130px;
@@ -188,7 +180,7 @@
     display: block;
 }
 
-/* Khu vực nội dung (tên, ngày, nút) */
+
 .event-card .event-body {
     padding: 16px 20px;
     display: flex;
@@ -197,7 +189,7 @@
     flex: 1;
 }
 
-/* Tên sự kiện */
+
 .event-card .event-title {
     font-size: 15px;
     font-weight: 700;
@@ -205,7 +197,7 @@
     margin: 0 0 4px;
 }
 
-/* Ngày giờ sự kiện */
+
 .event-card .event-date {
     font-size: 12px;
     color: $color-text-muted;
@@ -213,13 +205,13 @@
     margin: 0 0 14px;
 }
 
-/* Hàng chứa các nút */
+
 .event-card .event-actions {
     display: flex;
     gap: 10px;
 }
 
-/* Màn hình nhỏ: ảnh nằm trên, nội dung nằm dưới */
+
 @media (max-width: 600px) {
     .event-card {
         flex-direction: column;
@@ -231,7 +223,7 @@
     }
 }
 
-/* Nút "Save" (nền xanh) */
+
 .btn-save {
     background: $color-primary;
     color: $color-white;
@@ -250,7 +242,7 @@
     background: $color-primary-dark;
 }
 
-/* Nút "View" (viền xám) */
+
 .btn-view {
     background: transparent;
     border: 1px solid $color-border;
@@ -271,9 +263,7 @@
 }
 
 
-/* ======================================================
-   TRANG TRỐNG (khi chưa có dữ liệu)
-   ====================================================== */
+
 
 .empty-state {
     background: $color-white;

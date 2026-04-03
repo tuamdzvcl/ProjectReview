@@ -1,11 +1,11 @@
 <div class="event-detail-container" *ngIf="event; else stateTemplate">
-  <!-- Breadcrumbs -->
+  
   <nav class="breadcrumbs">
-    <a href="/">Trang chủ</a> / <a href="/events">Khám phá sự kiện</a> /
+    <a href="/">Trang chủ</a> / <a href="/">Khám phá sự kiện</a> /
     <span>Thông tin chi tiết sự kiện</span>
   </nav>
 
-  <!-- Event Header Section -->
+  
   <header class="event-header">
     <div class="date-badge">
       <div class="month">{{ event.StartDate | date : "MMM" | uppercase }}</div>
@@ -30,7 +30,7 @@
   </header>
 
   <div class="layout-grid">
-    <!-- Main Content Column -->
+    
     <main class="main-content">
       <div class="poster-image">
         <img [src]="event.PosterUrl | imageUrl" [alt]="event.Title" />
@@ -51,9 +51,9 @@
       </section>
     </main>
 
-    <!-- Sidebar Column -->
+    
     <aside class="sidebar">
-      <!-- Countdown Widget -->
+      
       <div class="sidebar-card countdown-card">
         <h3>Thông tin chi tiết</h3>
         <div class="countdown-grid">
@@ -109,28 +109,38 @@
         </div>
       </div>
 
-      <!-- Ticket Selection Widget -->
+      
       <div class="sidebar-card ticket-card">
         <h3>Chọn vé</h3>
         <div class="ticket-list">
           <div class="ticket-item" *ngFor="let ticket of event.ListTypeTick">
-            <div class="ticket-header">
-              <span class="ticket-price">{{ ticket.Price | vndCurrency }}</span>
-              <div class="quantity-selector">
-                <button (click)="updateTicketQuantity(ticket.Id, -1)" [disabled]="selectedTickets[ticket.Id] === 0">
-                  -
-                </button>
-                <span class="qty">{{ selectedTickets[ticket.Id] || 0 }}</span>
-                <button (click)="updateTicketQuantity(ticket.Id, 1)" [disabled]="
-                    selectedTickets[ticket.Id] >=
-                    ticket.TotalQuantity - ticket.SoldQuantity
-                  ">
-                  +
-                </button>
+            <div class="ticket-main-info">
+              <div class="ticket-header">
+                <span class="ticket-price">
+                  {{ ticket.Name }} - {{ ticket.Price | vndCurrency }}</span>
+              </div>
+              <div class="ticket-actions">
+                <div class="quantity-selector" *ngIf="ticket.TotalQuantity > ticket.SoldQuantity">
+                  <button (click)="updateTicketQuantity(ticket.Id, -1)" [disabled]="selectedTickets[ticket.Id] <= 0">
+                    -
+                  </button>
+                  <input type="number" class="qty-input" [class.error]="ticketErrors[ticket.Id]"
+                    [value]="selectedTickets[ticket.Id] || 0" (input)="onQuantityChange(ticket.Id, $event)" min="0"
+                    [max]="ticket.TotalQuantity - ticket.SoldQuantity" />
+                  <button (click)="updateTicketQuantity(ticket.Id, 1)" [disabled]="
+                      selectedTickets[ticket.Id] >=
+                      ticket.TotalQuantity - ticket.SoldQuantity
+                    ">
+                    +
+                  </button>
+                </div>
+                <div class="sold-out-badge" *ngIf="ticket.TotalQuantity <= ticket.SoldQuantity">
+                  HẾT VÉ
+                </div>
               </div>
             </div>
             <div class="ticket-desc">
-              {{ ticket.Name }} - Còn lại
+              Còn lại
               {{ ticket.TotalQuantity - ticket.SoldQuantity }} vé
             </div>
           </div>
@@ -141,7 +151,7 @@
             <span>{{ totalTicketCount }} Vé</span>
             <strong>{{ totalPrice | vndCurrency }}</strong>
           </div>
-          <button class="btn-primary btn-book" (click)="onBookNow()" [disabled]="totalTicketCount === 0">
+          <button class="btn-primary btn-book" (click)="onBookNow()" [disabled]="totalTicketCount === 0 || hasErrors">
             Đặt vé ngay
           </button>
         </div>
@@ -156,7 +166,7 @@
     <app-events-grid></app-events-grid>
   </section>
 </div>
-<!-- More Events Section -->
+
 
 <ng-template #stateTemplate>
   <div class="loading-state" *ngIf="loading">

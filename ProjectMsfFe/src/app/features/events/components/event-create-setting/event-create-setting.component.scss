@@ -6,7 +6,7 @@
     font-family: Arial, sans-serif;
 }
 
-/* Title */
+
 .box h2 {
     font-size: 18px;
     font-weight: 600;
@@ -16,7 +16,7 @@
     gap: 8px;
 }
 
-/* Description */
+
 .des h3 {
     font-size: 15px;
     font-weight: 600;
@@ -29,13 +29,13 @@
     margin-bottom: 20px;
 }
 
-/* Setting item */
+
 .setting-item {
     border-top: 1px solid #e5e7eb;
     padding: 16px 0;
 }
 
-/* Layout */
+
 .setting-item {
     display: flex;
     flex-direction: column;
@@ -53,7 +53,7 @@
     color: #6b7280;
 }
 
-/* Model box */
+
 .model {
     background: #f9fafb;
     border: 1px solid #e5e7eb;
@@ -61,7 +61,7 @@
     padding: 16px;
 }
 
-/* Detail */
+
 .detail-setting h3 {
     font-size: 14px;
     font-weight: 600;
@@ -73,7 +73,7 @@
     margin-bottom: 12px;
 }
 
-/* Inputs */
+
 .model input[type="date"],
 .model input[type="time"] {
     width: 48%;
@@ -95,14 +95,14 @@
     height: 24px;
 }
 
-/* Ẩn checkbox */
+
 .switch input {
     opacity: 0;
     width: 0;
     height: 0;
 }
 
-/* Thanh nền */
+
 .slider {
     position: absolute;
     cursor: pointer;
@@ -112,7 +112,7 @@
     transition: 0.3s;
 }
 
-/* Nút tròn */
+
 .slider::before {
     content: "";
     position: absolute;
@@ -126,12 +126,12 @@
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
 }
 
-/* Khi bật */
+
 .switch input:checked+.slider {
     background: linear-gradient(135deg, #00c6ff, #00e676);
 }
 
-/* Nút trượt qua */
+
 .switch input:checked+.slider::before {
     transform: translateX(22px);
 }

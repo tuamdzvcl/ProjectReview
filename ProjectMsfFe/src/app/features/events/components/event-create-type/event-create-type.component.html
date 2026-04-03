@@ -24,7 +24,7 @@
             <h3>{{ t.name }} - {{ t.price | vndCurrency }}</h3>
             <p>{{ t.date }}</p>
 
-            <!-- Summary Row cho từng vé (Giống ảnh mẫu) -->
+            
             <div class="summary-details mt-3">
               <div class="summary-item">
                 <div class="icon-box"><i class="fa-solid fa-ticket"></i></div>
@@ -66,7 +66,7 @@
               class="p-button-text p-button-secondary border-none bg-transparent"
               (click)="selectedTicketIndex = i; menu.toggle($event)"
             ></button>
-            <!-- Menu ẩn hiện khi click -->
+            
             <p-menu
               #menu
               [model]="ticketMenuItems"

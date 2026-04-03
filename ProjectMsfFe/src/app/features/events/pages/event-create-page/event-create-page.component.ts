@@ -203,7 +203,7 @@ export class EventCreatePageComponent {
     return !!(draft.title && draft.eventDate);
   }
 
-  //tính thời gian
+  
   private calculateEventDates(draft: any) {
     const startDate = new Date(draft.eventDate);
     if (draft.eventTime) {

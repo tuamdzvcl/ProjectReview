@@ -1,5 +1,5 @@
 <div class="profile-page">
-  <!-- ====== ẢNH BÌA ====== -->
+  
   <app-profile-cover
     [coverImageUrl]="coverImageUrl"
     [isOwner]="isOwner"
@@ -8,7 +8,7 @@
 
   <div class="profile-container">
     <div class="profile-layout">
-      <!-- ====== CỘT TRÁI - SIDEBAR ====== -->
+      
       <app-profile-sidebar
         [user]="user"
         [profileImageUrl]="profileImageUrl"
@@ -17,7 +17,7 @@
         (followClick)="onFollow()"
       ></app-profile-sidebar>
 
-      <!-- ====== CỘT PHẢI - NỘI DUNG CHÍNH ====== -->
+      
       <app-profile-content
         [isOwner]="isOwner"
         [events]="events"

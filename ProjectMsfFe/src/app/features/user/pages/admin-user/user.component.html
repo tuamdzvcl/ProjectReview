@@ -85,7 +85,7 @@
             </td>
 
             <td>
-              <div class="p-button-group">
+              <div class="p-button-group" *ngIf="user.ID !== currentUserId">
                 <p-button
                   label="Edit"
                   icon="fa-regular fa-pen-to-square"

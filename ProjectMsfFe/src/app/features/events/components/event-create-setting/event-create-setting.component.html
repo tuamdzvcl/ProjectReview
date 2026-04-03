@@ -9,7 +9,7 @@
   </div>
 
   <div class="list-setting">
-    <!-- CÀI ĐẶT 1: THỜI GIAN BẮT ĐẦU BÁN VÉ -->
+    
     <div class="setting-item">
       <label class="switch" for="isImmediateStart">
         <input type="checkbox" id="isImmediateStart" [(ngModel)]="isImmediateStart" (ngModelChange)="saveToDraft()" />
@@ -22,7 +22,7 @@
         </p>
       </div>
 
-      <!-- Hiển thị khi không muốn bắt đầu ngay lập tức -->
+      
       <div class="model" *ngIf="!isImmediateStart">
         <div class="detail-setting">
           <h3>Việc đặt chỗ bắt đầu vào...</h3>
@@ -48,7 +48,7 @@
         </p>
       </div>
 
-      <!-- Hiển thị khi TẮT tùy chọn tự động đóng (nhập thời gian cụ thể) -->
+      
       <div class="model" *ngIf="!isAutoEnd">
         <div class="detail-setting">
           <h3>Việc bán vé kết thúc vào...</h3>

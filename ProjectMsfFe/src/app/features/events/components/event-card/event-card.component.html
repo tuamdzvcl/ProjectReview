@@ -1,5 +1,5 @@
 <div class="event-card" [routerLink]="['/event', eventmodel.Id]">
-  <!-- IMAGE -->
+  
   <div class="card-image">
     <img [src]="eventmodel.PosterUrl | imageUrl" />
 
@@ -8,7 +8,7 @@
     </button>
   </div>
 
-  <!-- CONTENT -->
+  
   <div class="card-content">
     <h3 class="title">
       {{ eventmodel.Title }}
@@ -19,7 +19,7 @@
     </div>
   </div>
 
-  <!-- FOOTER -->
+  
   <div class="card-footer">
     <div class="date">
       <i class="fa-regular fa-calendar-days"></i>

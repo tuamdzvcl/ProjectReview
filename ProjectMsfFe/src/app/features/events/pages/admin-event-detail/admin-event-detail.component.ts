@@ -80,7 +80,7 @@ export class AdminEventDetailComponent implements OnInit {
       accept: () => {
         if (!this.event) return;
 
-        // EnumStatusEvent PUBLIC = 4
+        
         this.eventService.UpdateEventStatus(this.event.Id.toString(), 2).subscribe({
           next: () => {
             if (this.event) this.event.Status = 'PUBLISHED';

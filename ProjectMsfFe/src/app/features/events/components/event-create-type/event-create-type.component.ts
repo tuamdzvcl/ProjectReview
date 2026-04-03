@@ -46,7 +46,7 @@ export class EventCreateTypeComponent implements OnInit, OnDestroy {
 
   tickets: any[] = [];
 
-  // Menu items cho từng dòng vé
+  
   ticketMenuItems: MenuItem[] = [];
   selectedTicketIndex: number = -1;
 
@@ -107,13 +107,13 @@ export class EventCreateTypeComponent implements OnInit, OnDestroy {
     if (!this.ticket.name) return;
 
     if (this.isEditMode && this.editingIndex !== -1) {
-      // Cập nhật vé cũ
+      
       this.tickets[this.editingIndex] = {
         ...this.tickets[this.editingIndex],
         ...this.ticket
       };
     } else {
-      // Thêm vé mới
+      
       this.tickets.push({
         ...this.ticket,
         date: new Date().toLocaleDateString('vi-VN', { month: 'short', day: 'numeric', year: 'numeric' }),
@@ -122,6 +122,6 @@ export class EventCreateTypeComponent implements OnInit, OnDestroy {
     }
 
     this.showDialog = false;
-    this.saveToDraft(); // Cập nhật draft ngay sau khi lưu vé
+    this.saveToDraft(); 
   }
 }

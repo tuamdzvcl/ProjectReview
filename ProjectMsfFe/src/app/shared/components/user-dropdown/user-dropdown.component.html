@@ -1,10 +1,10 @@
 <div class="user">
-  <!-- Nếu chưa login - Hiển thị nút Login -->
+  
   <div *ngIf="!user" class="login-btn">
     <a routerLink="/auth/login" class="btn-login">Login</a>
   </div>
 
-  <!-- Nếu đã login - Hiển thị avatar và dropdown -->
+  
   <div *ngIf="user">
     <img src="cat.jpg" class="avatar" (click)="toggleDropdown()" />
 
@@ -18,7 +18,7 @@
       </div>
 
       <ul>
-        <li *ngIf="hasRole(['ADMIN', 'ORGANISATION'])">
+        <li *ngIf="hasRole(['ADMIN', 'ORGANIZER'])">
           <a routerLink="/admin/dashboard">My Organisation</a>
         </li>
         <li><a routerLink="/profile">My Profile</a></li>

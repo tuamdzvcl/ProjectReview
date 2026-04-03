@@ -10,7 +10,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 
-// PrimeNG UI components
+
 import { StepsModule } from 'primeng/steps';
 import { InputTextModule } from 'primeng/inputtext';
 import { DropdownModule } from 'primeng/dropdown';
@@ -23,12 +23,12 @@ import { DatePickerModule } from 'primeng/datepicker';
 import { SelectModule } from 'primeng/select';
 
 
-// Services của app
+
 import { CatetoryService } from '../../../../core/services/catetory.service';
 
 import { EventDraftService } from '../../../../core/services/event-draft.service';
 
-// Biến môi trường (chứa apiBaseUrl)
+
 import { environment } from '../../../../../environments/environment';
 
 
@@ -87,7 +87,7 @@ export class CreateEventComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    // Luôn lưu dữ liệu vào draft trước khi rời component (chuyển tab) bất kể là Tạo mới hay Cập nhật
+    
     this.saveFormToDraft();
   }
 
@@ -103,7 +103,7 @@ export class CreateEventComponent implements OnInit, OnDestroy {
   }
 
 
-  // lưu dữ liệu tạo thời vào formDratf
+  
   private saveFormToDraft(): void {
     this.draftService.save(
       {
@@ -121,7 +121,7 @@ export class CreateEventComponent implements OnInit, OnDestroy {
     );
   }
 
-  // khôi phục dữ liệu form từ DraftService (nếu có)
+  
   private restoreFromDraft(): void {
     if (!this.draftService.hasDraft()) return;
 
@@ -140,7 +140,7 @@ export class CreateEventComponent implements OnInit, OnDestroy {
 
 
 
-  // XỬ LÝ ẢNH
+  
   triggerFileInput(): void {
     this.fileInput.nativeElement.click();
   }

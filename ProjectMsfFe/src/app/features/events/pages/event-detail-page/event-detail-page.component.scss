@@ -12,7 +12,7 @@
   padding: 0 1.5rem;
 }
 
-/* Breadcrumbs */
+
 .breadcrumbs {
   padding: 2rem 0;
   color: #6b7280;
@@ -33,7 +33,7 @@
   }
 }
 
-/* Header Section */
+
 .event-header {
   display: flex;
   align-items: flex-start;
@@ -100,14 +100,14 @@
   }
 }
 
-/* Layout Grid */
+
 .layout-grid {
   display: grid;
   grid-template-columns: 1fr 400px;
   gap: 3rem;
 }
 
-/* Main Content */
+
 .main-content {
   .poster-image {
     width: 100%;
@@ -174,7 +174,7 @@
   }
 }
 
-/* Sidebar */
+
 .sidebar {
   display: flex;
   flex-direction: column;
@@ -196,7 +196,7 @@
   }
 }
 
-/* Countdown */
+
 .countdown-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
@@ -227,7 +227,7 @@
   }
 }
 
-/* Info Items */
+
 .info-list {
   display: flex;
   flex-direction: column;
@@ -301,7 +301,7 @@
   }
 }
 
-/* Tickets Selection */
+
 .ticket-list {
   display: flex;
   flex-direction: column;
@@ -311,17 +311,30 @@
   border-bottom: 1px solid #f3f4f6;
 
   .ticket-item {
-    .ticket-header {
+    .ticket-main-info {
       display: flex;
       justify-content: space-between;
       align-items: center;
+      gap: 1.5rem;
       margin-bottom: 0.8rem;
+    }
+
+    .ticket-header {
+      margin-bottom: 0.5rem;
 
       .ticket-price {
         font-size: 1.4rem;
         font-weight: 800;
         color: #111827;
       }
+    }
+
+    .ticket-actions {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 0.5rem;
+      margin-bottom: 1rem;
 
       .quantity-selector {
         display: flex;
@@ -354,12 +367,49 @@
           }
         }
 
-        .qty {
-          font-weight: 700;
-          min-width: 20px;
+        .qty-input {
+          width: 50px;
+          border: none;
+          background: transparent;
           text-align: center;
+          font-weight: 700;
           font-size: 1.2rem;
+          color: #111827;
+          border-bottom: 2px solid transparent;
+          padding: 2px 0;
+          transition: all 0.2s;
+
+          &:focus {
+            outline: none;
+            border-bottom-color: #72bf44;
+          }
+
+          &.error {
+            border-bottom-color: #ef4444;
+          }
+
+          &::-webkit-outer-spin-button,
+          &::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            appearance: none;
+            margin: 0;
+          }
+
+          &[type=number] {
+            -moz-appearance: textfield;
+            appearance: textfield;
+          }
         }
+      }
+
+      .sold-out-badge {
+        color: #ef4444;
+        font-weight: 800;
+        font-size: 1.1rem;
+        border: 1.5px solid #fee2e2;
+        padding: 0.4rem 1rem;
+        border-radius: 6px;
+        background: #fef2f2;
       }
     }
 
@@ -422,7 +472,7 @@
   }
 }
 
-/* Loading/Error States */
+
 .loading-state,
 .error-state {
   display: flex;
@@ -475,7 +525,7 @@
   }
 }
 
-/* More Events Section */
+
 .more-events-section {
   margin-top: 5rem;
   padding-top: 4rem;

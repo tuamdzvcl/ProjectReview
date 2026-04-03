@@ -1,21 +1,17 @@
 @import "_variables.scss";
 
-/* ======================================================
-   TOÀN TRANG (khung bao ngoài)
-   ====================================================== */
+
 
 .profile-page {
     min-height: 100vh;
-    /* chiều cao ít nhất = 100% màn hình */
+    
     background-color: $color-bg;
     padding-bottom: 48px;
     font-family: 'Inter', 'Roboto', sans-serif;
 }
 
 
-/* ======================================================
-   VÙNG CHỨA NỘI DUNG CHÍNH (giữa trang)
-   ====================================================== */
+
 
 .profile-container {
     max-width: 1200px;
@@ -30,7 +26,7 @@
     width: 100%;
 }
 
-/* Màn hình nhỏ (<768px): chuyển sang 1 cột */
+
 @media (max-width: 768px) {
     .profile-layout {
         flex-direction: column;

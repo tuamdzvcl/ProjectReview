@@ -7,7 +7,7 @@
       <i class="fa-solid fa-circle-info"></i> About
     </button>
 
-    <!-- Các tab chỉ dành cho chủ sở hữu -->
+    
     <ng-container *ngIf="isOwner">
       <button class="tab-item" [class.active]="activeTab === 'setting'" (click)="activeTab = 'setting'">
         <i class="fa-solid fa-gear"></i> Setting
@@ -18,7 +18,7 @@
     </ng-container>
   </nav>
 
-  <!-- Thanh tab phụ: Saved / Organised / Attending (Chỉ hiện khi ở Home) -->
+  
   <div class="secondary-tabs" *ngIf="activeTab === 'home'">
     <button *ngIf="isOwner" class="sub-tab" [class.active]="activeSubTab === 'saved'" (click)="activeSubTab = 'saved'">
       <span class="tab-badge badge-saved">1</span>
@@ -34,7 +34,7 @@
     </button>
   </div>
 
-  <!-- Nội dung danh sách sự kiện (Saved Events) -->
+  
   <div *ngIf="activeTab === 'home' && activeSubTab === 'organised'" class="event-list">
     <div *ngFor="let event of events" class="event-card">
       <div class="event-image">
@@ -55,13 +55,13 @@
     </div>
   </div>
 
-  <!-- Trạng thái trống cho các tab phụ khác -->
+  
   <div *ngIf="activeTab === 'home' && activeSubTab !== 'organised'" class="empty-state"> <i
       class="fa-regular fa-calendar-xmark"></i>
     <p>Chưa có sự kiện nào trong danh sách này.</p>
   </div>
 
-  <!-- Trạng thái trống cho các tab chính khác -->
+  
   <div *ngIf="activeTab !== 'home'" class="empty-state">
     <i class="fa-solid fa-wrench"></i>
     <p>Tính năng đang được phát triển...</p>

@@ -5,7 +5,7 @@
         <img [src]="profileImageUrl" alt="Ảnh đại diện" />
       </div>
 
-      <!-- Nút camera nhỏ để đổi ảnh đại diện (chỉ hiện nếu là chủ sở hữu) -->
+      
       <label class="avatar-edit-btn" for="avatar-upload" *ngIf="isOwner">
         <i class="fa-solid fa-camera"></i>
         <input
@@ -18,14 +18,13 @@
       </label>
     </div>
 
-    <!-- Tên + tick xanh -->
     <h2 class="profile-name">
-      {{ user ? user.FirstName + " " + user.LastName : "John Doe" }}
+      {{ user ? user.FirstName + " " + user.LastName : "không có" }}
       <i class="fa-solid fa-circle-check verified-icon"></i>
     </h2>
 
     <p class="profile-email">
-      {{ user ? user.Email : "johndoe@example.com" }}
+      {{ user ? user.Email : "không có" }}
     </p>
 
     <div class="profile-stats">
@@ -42,11 +41,10 @@
 
     <p class="profile-bio">Hey I am a John Doe</p>
 
-    <!-- Nút hành động (Owner: My Organisation, Visitor: Follow) -->
-    <button class="btn-organisation" *ngIf="isOwner">
+    <button class="btn-organisation" *ngIf="isOwner && !isCustomer">
       My Organisation <i class="fa-solid fa-right-left"></i>
     </button>
-    
+
     <button class="btn-follow" *ngIf="!isOwner" (click)="onFollow()">
       Follow <i class="fa-solid fa-user-plus"></i>
     </button>

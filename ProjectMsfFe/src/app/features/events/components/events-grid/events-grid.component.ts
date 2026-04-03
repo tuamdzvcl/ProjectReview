@@ -33,7 +33,7 @@ export class EventsGridComponent {
         next: (res) => {
           console.log('DATA-update:', res);
 
-          // Filter events with Status = 2
+          
           const filteredEvents = res.items.filter(
             (event: any) => event.Status === 'PUBLISHED'
           );

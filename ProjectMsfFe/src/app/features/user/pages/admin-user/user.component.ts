@@ -9,6 +9,7 @@ import Swal from 'sweetalert2';
 import { AppShellComponent } from '../../../../layouts/app-shell/app-shell.component';
 import { UserFormComponent } from '../../componnets/user-form/user-form.component';
 import { UserService } from '../../../../core/services/user.service';
+import { TokenService } from '../../../../core/services/token.service';
 import { UserResponse } from '../../../../core/model/user.model';
 import { UserUpdata } from '../../../../core/model/update/userupdate.model';
 import { UserRequest } from '../../../../core/model/request/userRequest.model';
@@ -30,6 +31,7 @@ import { UserRequest } from '../../../../core/model/request/userRequest.model';
 })
 export class UserComponent {
   private userService = inject(UserService);
+  private tokenService = inject(TokenService);
 
   count = 4;
   users: UserResponse[] = [];
@@ -40,12 +42,15 @@ export class UserComponent {
   keyword = '';
   selectedRole = '';
 
+  currentUserId: string | null = null;
+
   totalAll = 0;
   totalOrganizer = 0;
   totalCustomer = 0;
 
-  //luôn load
+  
   ngOnInit(): void {
+    this.currentUserId = this.tokenService.getUserId();
     this.loadUsers();
     this.setTotals;
   }
@@ -113,6 +118,7 @@ export class UserComponent {
     this.loadUsers();
   }
   onEdit(users: any) {
+    if (users.ID === this.currentUserId) return;
     this.selectedUser = {
       id: users?.ID ?? users?.ID ?? null,
       firstName: users?.FirstName ?? users?.firstName ?? '',
@@ -125,6 +131,7 @@ export class UserComponent {
     this.display = true;
   }
   onDelete(users: any) {
+    if (users.ID === this.currentUserId) return;
     Swal.fire({
       title: 'Are you sure?',
       text: "You won't be able to revert this!",
@@ -215,7 +222,7 @@ export class UserComponent {
       AvataUrl: data.avataUrl ?? '',
       RoleName: data.role,
       UpdateAt: new Date().toISOString(),
-      UpdateBy: 'admin',
+      UpdateBy: data.firstName + "" + data.lastName,
     };
   }
 
@@ -229,4 +236,6 @@ export class UserComponent {
       AvataUrl: data.avataUrl ?? '',
     };
   }
+
+
 }

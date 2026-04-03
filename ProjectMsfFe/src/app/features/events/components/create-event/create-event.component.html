@@ -5,7 +5,7 @@
   </h2>
   <div class="border"></div>
 
-  <!-- Event Name -->
+  
   <div class="field">
     <label>Hãy đặt tên cho sự kiện của bạn *</label>
     <small class="desc">
@@ -16,7 +16,7 @@
     <input pInputText class="w-full" placeholder="Nhập tên sự kiện tại đây" [(ngModel)]="title" />
   </div>
 
-  <!-- Category -->
+  
   <div class="field">
     <label>Hãy chọn một danh mục cho sự kiện của bạn *</label>
     <small class="desc">
@@ -27,7 +27,7 @@
       class="w-full" [(ngModel)]="selectedCategory"></p-dropdown>
   </div>
 
-  <!-- Date -->
+  
   <div class="field">
     <label>Sự kiện của bạn diễn ra khi nào? *</label>
     <small class="desc"> Hãy cho mọi người biết ngày diễn ra sự kiện. </small>
@@ -51,7 +51,7 @@
     </div>
   </div>
 
-  <!-- Banner -->
+  
   <div class="field">
     <small class="desc">Tải lên những hình ảnh đầy màu sắc và sống động làm banner cho sự kiện
       của bạn! Xem cách những hình ảnh đẹp mắt giúp trang chi tiết sự kiện của
@@ -62,7 +62,7 @@
 
 
       <p-toast />
-      <!-- Image preview area -->
+      
       <div class="image-upload-area" (click)="triggerFileInput()">
         <img *ngIf="previewUrl" [src]="previewUrl" alt="Banner preview" class="banner-preview" />
         <div *ngIf="!previewUrl" class="upload-placeholder">
@@ -79,7 +79,7 @@
       </div>
     </div>
 
-    <!-- Description -->
+    
     <div class="field m-2">
       <small class="desc">Vui lòng mô tả sự kiện của bạn</small>
       <p-editor [(ngModel)]="description" [style]="{ height: '320px' }" />

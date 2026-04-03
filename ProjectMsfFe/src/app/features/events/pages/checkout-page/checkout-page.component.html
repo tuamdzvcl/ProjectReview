@@ -1,0 +1,151 @@
+<div class="checkout-container" *ngIf="bookingData && bookingData.event">
+  
+  <nav class="breadcrumbs">
+    <div class="header-inner">
+      <a routerLink="/">Trang chủ</a> /
+      <a routerLink="/events">Khám phá sự kiện</a> /
+      <a [routerLink]="['/event', bookingData.event.Id]"
+        >Thông tin chi tiết sự kiện</a
+      >
+      /
+      <span>checkout</span>
+    </div>
+  </nav>
+
+  <div class="layout-grid container">
+    
+    <div class="form-column">
+      <section class="checkout-section">
+        <div class="section-title">
+          <i class="material-icons">person_outline</i>
+          <h2>Thông tin người nhận vé</h2>
+        </div>
+
+        <div class="form-grid">
+          <div class="form-group">
+            <label>Họ và Tên</label>
+            <input
+              type="text"
+              [value]="customerName"
+              readonly
+              class="input-readonly"
+            />
+            <small class="hint">Thông tin từ tài khoản hiện tại</small>
+          </div>
+
+          <div class="form-group">
+            <label>Email</label>
+            <input
+              type="email"
+              [value]="customerEmail"
+              readonly
+              class="input-readonly"
+            />
+            <small class="hint">Vé sẽ được gửi về địa chỉ này</small>
+          </div>
+
+          <div class="form-group full-width">
+            <label>Số điện thoại <span class="required">*</span></label>
+            <input
+              type="tel"
+              [(ngModel)]="phoneNumber"
+              placeholder="Nhập số điện thoại của bạn"
+            />
+          </div>
+
+          <div class="form-group full-width">
+            <label>Địa chỉ nhận vé/Nơi ở <span class="required">*</span></label>
+            <textarea
+              [(ngModel)]="address"
+              rows="3"
+              placeholder="Số nhà, tên đường, phường/xã..."
+            ></textarea>
+          </div>
+        </div>
+      </section>
+
+      <section class="checkout-section">
+        <div class="section-title">
+          <i class="material-icons">credit_card</i>
+          <h2>Phương thức thanh toán</h2>
+        </div>
+
+        <div class="payment-methods">
+          <div
+            class="payment-option"
+            *ngFor="let method of paymentMethods"
+            [class.active]="selectedPaymentMethod === method.id"
+            (click)="selectedPaymentMethod = method.id"
+          >
+            <div class="option-icon">
+              <i class="material-icons">{{ method.icon }}</i>
+            </div>
+            <div class="option-content">
+              <h3>{{ method.name }}</h3>
+              <p>{{ method.description }}</p>
+            </div>
+            <div class="option-radio">
+              <div class="radio-circle"></div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    
+    <aside class="summary-column">
+      <div class="summary-card">
+        <div class="event-mini-info">
+          <img
+            [src]="bookingData.event.PosterUrl | imageUrl"
+            [alt]="bookingData.event.Title"
+          />
+          <div class="mini-content">
+            <h3>{{ bookingData.event.Title }}</h3>
+            <p>
+              <i class="material-icons">calendar_today</i>
+              {{ bookingData.event.StartDate | formatDate }}
+            </p>
+            <p>
+              <i class="material-icons">location_on</i>
+              {{ bookingData.event.Location }}
+            </p>
+          </div>
+        </div>
+
+        <div class="order-details">
+          <h3>Chi tiết đơn hàng</h3>
+          <div class="ticket-row" *ngFor="let ticket of selectedTicketsList">
+            <div class="ticket-info">
+              <span class="ticket-name">{{ ticket.Name }}</span>
+              <span class="ticket-qty"
+                >x{{ bookingData.selectedTickets[ticket.Id] }}</span
+              >
+            </div>
+            <div class="ticket-price">
+              {{
+                ticket.Price * bookingData.selectedTickets[ticket.Id]
+                  | vndCurrency
+              }}
+            </div>
+          </div>
+
+          <div class="total-line">
+            <span>Tổng cộng</span>
+            <strong>{{ bookingData.totalPrice | vndCurrency }}</strong>
+          </div>
+        </div>
+
+        <button class="confirm-btn" (click)="onConfirmBooking()">
+          Xác nhận đặt vé
+        </button>
+
+        <p class="terms">
+          Bằng việc nhấn xác nhận, bạn đồng ý với các
+          <a href="#">Điều khoản sử dụng</a> và
+          <a href="#">Chính sách bảo mật</a> của chúng tôi.
+        </p>
+      </div>
+    </aside>
+  </div>
+</div>

@@ -1,46 +1,44 @@
 @import "../../_variables.scss";
 
-/* ======================================================
-   ẢNH BÌA (cover image phía trên cùng)
-   ====================================================== */
 
-/* Khung chứa ảnh bìa */
+
+
 .profile-cover {
     position: relative;
-    /* để đặt nút "Change Image" bên trong */
+    
     width: 100%;
     height: 280px;
     overflow: hidden;
-    /* cắt phần ảnh tràn ra ngoài */
+    
 }
 
-/* Ảnh bìa */
+
 .profile-cover img {
     width: 100%;
     height: 100%;
     object-fit: cover;
-    /* ảnh tự co để lấp đầy khung */
+    
     display: block;
     transition: transform 0.4s;
-    /* hiệu ứng khi hover */
+    
 }
 
 .profile-cover img:hover {
     transform: scale(1.01);
-    /* phóng to nhẹ khi hover */
+    
 }
 
-/* Vùng chứa nút "Change Image" (góc trên bên phải) */
+
 .profile-cover__actions {
     position: absolute;
-    /* nằm đè lên ảnh bìa */
+    
     top: 16px;
     right: 24px;
     z-index: 10;
-    /* nằm trên cùng */
+    
 }
 
-/* Nút "Change Image" */
+
 .btn-change-image {
     display: inline-flex;
     align-items: center;

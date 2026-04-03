@@ -1,6 +1,8 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
-import { ActivatedRoute, RouterLink } from '@angular/router';
+import { FormsModule } from '@angular/forms';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { EventService } from '../../../../core/services/event.service';
+import { BookingService } from '../../../../core/services/booking.service';
 import { EventModel } from '../../../../core/model/event.model';
 import { CommonModule } from '@angular/common';
 import { Subscription, interval } from 'rxjs';
@@ -8,6 +10,7 @@ import { ImageUrlPipe } from '../../../../shared/pipes/image-url.pipe';
 import { VndCurrencyPipe } from '../../../../shared/pipes/vnd-currency.pipe';
 import { EventsGridComponent } from '../../components/events-grid/events-grid.component';
 import { FormatDatePipe } from '../../../../shared/pipes/format-date.pipe';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-event-detail-page',
@@ -18,7 +21,8 @@ import { FormatDatePipe } from '../../../../shared/pipes/format-date.pipe';
     VndCurrencyPipe,
     EventsGridComponent,
     RouterLink,
-    FormatDatePipe
+    FormatDatePipe,
+    FormsModule
   ],
   templateUrl: './event-detail-page.component.html',
   styleUrls: ['./event-detail-page.component.scss']
@@ -28,20 +32,23 @@ export class EventDetailPageComponent implements OnInit, OnDestroy {
   loading = true;
   error: string | null = null;
 
-  // Countdown properties
+  
   days = 0;
   hours = 0;
   minutes = 0;
   seconds = 0;
   private timerSubscription: Subscription | null = null;
 
-  // Ticket selection
+  
   selectedTickets: { [key: number]: number } = {};
+  ticketErrors: { [key: number]: string | null } = {};
   totalPrice = 0;
 
   constructor(
     private route: ActivatedRoute,
-    private eventService: EventService
+    private router: Router,
+    private eventService: EventService,
+    private bookingService: BookingService
   ) { }
 
   ngOnInit(): void {
@@ -130,28 +137,97 @@ export class EventDetailPageComponent implements OnInit, OnDestroy {
     const newQty = Math.max(0, currentQty + delta);
 
     const ticket = this.event?.ListTypeTick.find((t: any) => t.Id === ticketId);
-    if (ticket && newQty <= (ticket.TotalQuantity - ticket.SoldQuantity)) {
-      this.selectedTickets[ticketId] = newQty;
-      this.calculateTotal();
+    if (ticket) {
+      const maxAvailable = ticket.TotalQuantity - ticket.SoldQuantity;
+      if (newQty <= maxAvailable) {
+        this.selectedTickets[ticketId] = newQty;
+        this.ticketErrors[ticketId] = null;
+        this.calculateTotal();
+      }
     }
+  }
+
+  onQuantityChange(ticketId: number, event: any): void {
+    let inputVal = event.target.value;
+    let newQty = parseInt(inputVal, 10);
+
+    if (inputVal === '') {
+      newQty = 0;
+    }
+
+    if (isNaN(newQty) || newQty < 0) {
+      newQty = 0;
+    }
+
+    const ticket = this.event?.ListTypeTick.find((t: any) => t.Id === ticketId);
+    if (ticket) {
+      const maxAvailable = ticket.TotalQuantity - ticket.SoldQuantity;
+      if (newQty > maxAvailable) {
+        
+        newQty = maxAvailable;
+        event.target.value = newQty; 
+        this.ticketErrors[ticketId] = 'error';
+
+        
+        Swal.fire({
+          toast: true,
+          position: 'top-end',
+          icon: 'warning',
+          title: `Quá số lượng cho phép!`,
+          text: `Chỉ còn lại ${maxAvailable} vé cho loại này.`,
+          showConfirmButton: false,
+          timer: 3000,
+          timerProgressBar: true,
+          background: '#fff',
+          color: '#111827',
+          iconColor: '#f59e0b'
+        });
+      } else {
+        this.ticketErrors[ticketId] = null;
+      }
+    }
+
+    this.selectedTickets[ticketId] = newQty;
+    this.calculateTotal();
   }
 
   calculateTotal(): void {
     if (!this.event?.ListTypeTick) return;
 
     this.totalPrice = this.event.ListTypeTick.reduce((acc: number, ticket: any) => {
-      return acc + (ticket.Price * (this.selectedTickets[ticket.Id] || 0));
+      const qty = this.selectedTickets[ticket.Id] || 0;
+      const maxAvailable = ticket.TotalQuantity - ticket.SoldQuantity;
+      const validQty = Math.min(qty, maxAvailable);
+      return acc + (ticket.Price * validQty);
     }, 0);
   }
 
-  onBookNow(): void {
-    console.log('Booking tickets:', this.selectedTickets);
-    alert('Chức năng đặt vé đang được phát triển!');
-  }
+
   get totalTicketCount(): number {
-    return Object.values(this.selectedTickets).reduce((a, b) => a + b, 0);
+    if (!this.event?.ListTypeTick) return 0;
+    return this.event.ListTypeTick.reduce((acc: number, ticket: any) => {
+      const qty = this.selectedTickets[ticket.Id] || 0;
+      const maxAvailable = Math.max(0, ticket.TotalQuantity - ticket.SoldQuantity);
+      return acc + Math.min(qty, maxAvailable);
+    }, 0);
   }
+
+  get hasErrors(): boolean {
+    return Object.values(this.ticketErrors).some(error => error !== null);
+  }
+
   get activeTickets(): any[] {
     return this.event?.ListTypeTick.filter((t: any) => t.Status?.toLowerCase() === 'active') || [];
+  }
+  onBookNow(): void {
+    if (this.totalTicketCount === 0 || this.hasErrors) return;
+
+    this.bookingService.setBooking({
+      event: this.event,
+      selectedTickets: this.selectedTickets,
+      totalPrice: this.totalPrice
+    });
+
+    this.router.navigate(['/checkout']);
   }
 }

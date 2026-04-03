@@ -33,6 +33,18 @@ export class TokenService {
     }
   }
 
+  getRole(): string | null {
+    const token = this.getAccessToken();
+    if (!token) return null;
+    try {
+      const decoded: any = jwtDecode(token);
+      const role = decoded.role || decoded.Role || decoded['http://schemas.microsoft.com/ws/2008/06/identity/claims/role'];
+      return role ? role.toString().toUpperCase() : null;
+    } catch (e) {
+      return null;
+    }
+  }
+
   clear() {
     localStorage.clear();
   }
