@@ -1,7 +1,7 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { UserResponse } from '../../../../../../core/model/user.model';
-import { EventModel } from '../../../../../../core/model/event.model';
+import { UserResponse } from '../../../../../../core/model/response/user.model';
+import { EventModel } from '../../../../../../core/model/response/event.model';
 import { FormatDatePipe } from '../../../../../../shared/pipes/format-date.pipe';
 import { ImageUrlPipe } from '../../../../../../shared/pipes/image-url.pipe';
 

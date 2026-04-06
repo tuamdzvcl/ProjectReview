@@ -13,6 +13,15 @@ import { TokenService } from '../../../core/services/token.service';
 })
 export class HeaderComponent {
   userRole: string = '';
+  isMenuOpen: boolean = false;
+
+  toggleMenu() {
+    this.isMenuOpen = !this.isMenuOpen;
+  }
+
+  closeMenu() {
+    this.isMenuOpen = false;
+  }
 
   constructor(private tokenService: TokenService) {
     this.getUserRole();

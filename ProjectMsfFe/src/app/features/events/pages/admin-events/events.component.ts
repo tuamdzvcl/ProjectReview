@@ -78,7 +78,7 @@ export class EventsComponent implements OnInit {
     this.loadEvents();
   }
 
-  
+
   toggleDropdown(eventId: string) {
     this.showDropdown = this.showDropdown === eventId ? null : eventId;
   }

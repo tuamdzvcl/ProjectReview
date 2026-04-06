@@ -1,6 +1,5 @@
 ﻿using EventTick.Model.Models;
 using projectDemo.DTO.Projection;
-using projectDemo.DTO.Response;
 
 namespace projectDemo.Repository.OrderRepository
 {
@@ -12,7 +11,7 @@ namespace projectDemo.Repository.OrderRepository
         int DeleteOrder(Order order);
         Task<Order> GetOrderbyID(Guid orderID);
 
-        Task<(List<Guid> Orders, int TotalCount)> GetListOrderByUserId(Guid userId, int pageNumber, int pageSize);
+        Task<bool> HasOrderByUserId(Guid userId);
 
         Task<(OrderProjection?, int statuss, string messager)> GetOrderListOrderDetail(Guid orderID);
 

@@ -39,7 +39,7 @@ namespace projectDemo.Controllers
         }
 
        
-        [HttpGet("user/{userId}")]
+        [HttpGet("user")]
 
         public async Task<IActionResult> GetListOrderByUser(
             [FromQuery] int pageIndex ,

@@ -10,6 +10,7 @@ using projectDemo.DTO.Response;
 using projectDemo.DTO.UpdateRequest;
 using projectDemo.Entity.Enum;
 using projectDemo.Repository.Ipml;
+using projectDemo.Repository.OrderQuery;
 using projectDemo.Repository.OrderRepository;
 using projectDemo.Repository.TickTypeRepository;
 using projectDemo.UnitOfWorks;
@@ -25,16 +26,18 @@ namespace projectDemo.Service.OrderService
         private readonly IEventRepository _eventRepository;
         private readonly IMapper _mapper;
         private readonly IOrderRepository _orderRepository;
+        private readonly IOrderQuery _orderQuery;
         private readonly IOrderDetailRepository _orderDetailRepository;
         private readonly IUnitOfWork _uow;
        
 
-        public OrderService(IUserReposiotry userReposiotry,IUnitOfWork uow, IOrderDetailRepository orderDetailRepository, ITypeTicketRepositorys ticketRepositorys, IEventRepository eventRepository, IMapper mapper, IOrderRepository order)
+        public OrderService(IUserReposiotry userReposiotry,IUnitOfWork uow, IOrderDetailRepository orderDetailRepository, ITypeTicketRepositorys ticketRepositorys, IEventRepository eventRepository, IMapper mapper, IOrderRepository order, IOrderQuery orderQuery)
         {
             _ticketRepositorys = ticketRepositorys;
             _eventRepository = eventRepository;
             _mapper = mapper;
             _orderRepository = order;
+            _orderQuery = orderQuery;
             _orderDetailRepository = orderDetailRepository;
             _uow = uow;
             _userReposiotry = userReposiotry;
@@ -89,12 +92,12 @@ namespace projectDemo.Service.OrderService
                     var typeTicket =  _ticketRepositorys.GetTicketTypebyId(item.TicketTypeId);
                     if(typeTicket == null) 
                     {
-                        return ApiResponse<OrderResponseCreate>.FailResponse(Entity.Enum.EnumStatusCode.TYPETICKET, "Không tìm thấy loại vé ");
+                        return ApiResponse<OrderResponseCreate>.FailResponse(EnumStatusCode.TYPETICKET, "Không tìm thấy loại vé ");
                     }
                     var available = typeTicket.TotalQuantity - typeTicket.SoldQuantity;
                     if(available < item.Quantity)
                     {
-                        return ApiResponse<OrderResponseCreate>.FailResponse(Entity.Enum.EnumStatusCode.Tick, "Không tìm thấy loại vé ");
+                        return ApiResponse<OrderResponseCreate>.FailResponse(EnumStatusCode.Tick, "xin lỗi không còn vé cho bạn rồi");
                     }
                     typeTicket.SoldQuantity += item.Quantity;
                     var detail = new OrderDetail
@@ -149,7 +152,7 @@ namespace projectDemo.Service.OrderService
         }
 
         //lấy list danh sách order của user
-        public async Task<PageResponse<Guid>> GetListOrderbyIdUser(Guid UserID,int pageindex,int pagesize)
+        public async Task<PageResponse<OrderEventResponse>> GetListOrderbyIdUser(Guid UserID,int pageindex,int pagesize)
         {
             if (pageindex <= 0)
                 pageindex = 1;
@@ -157,12 +160,66 @@ namespace projectDemo.Service.OrderService
             if (pagesize <= 0)
                 pagesize = 10;
 
-            var (orders, total) = await _orderRepository.GetListOrderByUserId(UserID,pageindex,pagesize);
-            var response = new PageResponse<Guid>
+            var user = await _userReposiotry.GetUserByid(UserID);
+
+            if(user == null)
             {
-                Message = "List OrderID",
+                return new PageResponse<OrderEventResponse>
+                {
+                    Items= null,
+                    Message= "Không tìm thấy user",
+                    Success= false,
+                };
+            }    
+
+            var (rows, total) = await _orderQuery.GetListOrderByUserId(UserID, pageindex, pagesize);
+            var orders = rows
+                .GroupBy(x => x.OrderId)
+                .Select(g =>
+                {
+                    var first = g.First();
+                    var eventRow = g.FirstOrDefault(x => x.EventId.HasValue);
+
+                    return new OrderEventResponse
+                    {
+                        OrderId = first.OrderId,
+                        OrderCode = first.OrderCode,
+                        TotalAmount = first.TotalAmount,
+                        CreatedDate = first.CreatedDate,
+                        Status = ((EnumStatusOrder)first.Status).ToString(),
+                        Event = eventRow?.EventId == null
+                            ? null
+                            : new EventOrder
+                            {
+                                EventID = eventRow.EventId.Value,
+                                EventName = eventRow.EventTitle ?? string.Empty,
+                                EventDescription = eventRow.EventDescription ?? string.Empty,
+                                EventLocation = eventRow.EventLocation ?? string.Empty,
+                                EventStartDate = eventRow.EventStartDate ?? DateTime.MinValue,
+                                EventEndDate = eventRow.EventEndDate ?? DateTime.MinValue,
+                                EventPosterUrl = eventRow.EventPosterUrl ?? string.Empty,
+                                ListTypeTicket=g
+                                .Where(x => x.OrderDetailId.HasValue && x.TicketTypeId.HasValue)
+                                .Select(x=>new TypeTickOrder
+                                {
+                                    TicketTypeId=x.TicketTypeId ?? 0,
+                                    TicketTypeName= x.TicketTypeName ?? string.Empty,
+                                    TicketPrice= x.TicketPrice,
+                                    TicketQuantity= x.TicketQuantity ?? 0,
+                                })
+                                .ToList()
+                                
+                            }
+                    };
+                })
+                .ToList();
+
+            var response = new PageResponse<OrderEventResponse>
+            {
+                Message = "List order by user",
                 TotalRecords = total,
                 Items= orders,
+                Success=true,
                 PageIndex=pageindex,
                 PageSize=pagesize,
                 TotalPages = (int)Math.Ceiling((double)total / pagesize)

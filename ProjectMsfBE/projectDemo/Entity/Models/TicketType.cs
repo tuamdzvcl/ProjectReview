@@ -18,7 +18,7 @@ namespace EventTick.Model.Models
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
         
-        public EnumNameTickType Name { get; set; } 
+        public string Name { get; set; } 
 
         [Required]
         [Column(TypeName = "decimal(18,2)")]

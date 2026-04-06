@@ -3,9 +3,9 @@
 <section class="events-section">
   <h2>All Events</h2>
 
-  <app-filter-tabs></app-filter-tabs>
+  <app-filter-tabs (categoryChange)="onCategoryChange($event)"></app-filter-tabs>
 
-  <app-events-grid></app-events-grid>
+  <app-events-grid [categoryId]="selectedCategoryId"></app-events-grid>
 
-  
+
 </section>

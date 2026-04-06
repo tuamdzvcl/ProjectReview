@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
-import { EventModel } from '../model/event.model';
+import { EventModel } from '../model/response/event.model';
 
 export interface BookingState {
   event: EventModel | null;
@@ -12,15 +12,23 @@ export interface BookingState {
   providedIn: 'root'
 })
 export class BookingService {
-  private bookingState = new BehaviorSubject<BookingState>({
-    event: null,
-    selectedTickets: {},
-    totalPrice: 0
-  });
+  private readonly STORAGE_KEY = 'msf_booking_data';
+  private bookingState: BehaviorSubject<BookingState>;
 
-  bookingState$ = this.bookingState.asObservable();
+  bookingState$;
+
+  constructor() {
+    const savedData = localStorage.getItem(this.STORAGE_KEY);
+    const initialState: BookingState = savedData
+      ? JSON.parse(savedData)
+      : { event: null, selectedTickets: {}, totalPrice: 0 };
+
+    this.bookingState = new BehaviorSubject<BookingState>(initialState);
+    this.bookingState$ = this.bookingState.asObservable();
+  }
 
   setBooking(state: BookingState): void {
+    localStorage.setItem(this.STORAGE_KEY, JSON.stringify(state));
     this.bookingState.next(state);
   }
 
@@ -29,6 +37,7 @@ export class BookingService {
   }
 
   clearBooking(): void {
+    localStorage.removeItem(this.STORAGE_KEY);
     this.bookingState.next({
       event: null,
       selectedTickets: {},

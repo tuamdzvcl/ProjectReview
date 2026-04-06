@@ -255,21 +255,21 @@ namespace projectDemo.Migrations
                         new
                         {
                             Id = 1,
-                            CreatedDate = new DateTime(2026, 3, 30, 13, 11, 52, 941, DateTimeKind.Utc).AddTicks(7757),
+                            CreatedDate = new DateTime(2026, 4, 6, 3, 50, 9, 770, DateTimeKind.Utc).AddTicks(3049),
                             IsDeleted = false,
                             RoleName = "ADMIN"
                         },
                         new
                         {
                             Id = 2,
-                            CreatedDate = new DateTime(2026, 3, 30, 13, 11, 52, 941, DateTimeKind.Utc).AddTicks(7769),
+                            CreatedDate = new DateTime(2026, 4, 6, 3, 50, 9, 770, DateTimeKind.Utc).AddTicks(3055),
                             IsDeleted = false,
                             RoleName = "ORGANIZER"
                         },
                         new
                         {
                             Id = 3,
-                            CreatedDate = new DateTime(2026, 3, 30, 13, 11, 52, 941, DateTimeKind.Utc).AddTicks(7772),
+                            CreatedDate = new DateTime(2026, 4, 6, 3, 50, 9, 770, DateTimeKind.Utc).AddTicks(3061),
                             IsDeleted = false,
                             RoleName = "CUSTOMER"
                         });
@@ -347,8 +347,9 @@ namespace projectDemo.Migrations
                     b.Property<bool?>("IsDeleted")
                         .HasColumnType("bit");
 
-                    b.Property<int>("Name")
-                        .HasColumnType("int");
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<decimal>("Price")
                         .HasColumnType("decimal(18,2)");
@@ -453,7 +454,7 @@ namespace projectDemo.Migrations
                             IsDeleted = false,
                             IsLock = false,
                             LastName = "admin",
-                            PasswordHash = "$2a$11$yyKRokLh/Cav17fb08W40u4MUHJZlH/eDQvP/bS3uYqGjkPi5VFBm",
+                            PasswordHash = "$2a$11$Z1uKu6EmMoMp1xIv/7gvm.E2om0jlVTm.NFVXsTKGk5PfH.7IuWm.",
                             Username = "admin"
                         });
                 });

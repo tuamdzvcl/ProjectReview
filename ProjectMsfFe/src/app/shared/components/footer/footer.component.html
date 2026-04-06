@@ -1,1 +1,65 @@
-<p>footer works!</p>
+<footer class="footer">
+  <div class="footer-container container">
+    <div class="footer-grid">
+      <!-- Brand Section -->
+      <div class="footer-col brand-col">
+        <div class="logo">
+          <span class="logo-circle">B</span>
+          <span class="logo-text">Barren</span>
+        </div>
+        <p class="brand-desc">
+          Nền tảng tìm kiếm và đặt vé sự kiện hàng đầu. Khám phá những trải
+          nghiệm không thể quên cùng chúng tôi!
+        </p>
+        <div class="social-links">
+          <a href="#"><i class="fa-brands fa-facebook-f"></i></a>
+          <a href="#"><i class="fa-brands fa-instagram"></i></a>
+          <a href="#"><i class="fa-brands fa-twitter"></i></a>
+          <a href="#"><i class="fa-brands fa-youtube"></i></a>
+        </div>
+      </div>
+
+      <!-- Links Section -->
+      <div class="footer-col">
+        <h3>Điều hướng</h3>
+        <ul>
+          <li><a routerLink="/">Trang chủ</a></li>
+          <li><a routerLink="/discover">Khám phá</a></li>
+          <li><a routerLink="/event-create-page">Tạo sự kiện</a></li>
+          <li><a href="#">Về chúng tôi</a></li>
+        </ul>
+      </div>
+
+      <!-- Support Section -->
+      <div class="footer-col">
+        <h3>Hỗ trợ</h3>
+        <ul>
+          <li><a href="#">Trung tâm trợ giúp</a></li>
+          <li><a href="#">Điều khoản sử dụng</a></li>
+          <li><a href="#">Bảo mật thông tin</a></li>
+          <li><a href="#">Liên hệ</a></li>
+        </ul>
+      </div>
+
+      <!-- Contact / Newsletter -->
+      <div class="footer-col">
+        <h3>Đăng ký nhận tin</h3>
+        <p class="newsletter-desc">
+          Nhận thông tin mới nhất về các sự kiện hot nhất khu vực của bạn.
+        </p>
+        <form class="newsletter-form">
+          <input type="email" placeholder="Email của bạn..." required />
+          <button type="submit"><i class="fa-solid fa-paper-plane"></i></button>
+        </form>
+      </div>
+    </div>
+
+    <!-- Copyright -->
+    <div class="footer-bottom">
+      <p>
+        &copy; {{ currentYear }} Barren / ProjectMsf. Mọi bản quyền được bảo
+        lưu.
+      </p>
+    </div>
+  </div>
+</footer>

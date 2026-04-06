@@ -1,0 +1,86 @@
+<div class="landing-page">
+  <!-- Hero Section -->
+  <section class="hero-section">
+    <div class="hero-overlay"></div>
+    <div class="hero-content container">
+      <h1 class="hero-title">
+        Khám Phá <br />
+        <span class="highlight">Sự Kiện Đỉnh Cao</span>
+      </h1>
+      <p class="hero-subtitle">
+        Tham gia các sự kiện, workshop và show âm nhạc tuyệt vời nhất quanh bạn.
+      </p>
+
+      <div class="search-bar-glass">
+        <div class="search-input-group">
+          <i class="fa-solid fa-magnifying-glass"></i>
+          <input
+            type="text"
+            placeholder="Tìm kiếm sự kiện, địa điểm hoặc chủ đề..."
+          />
+        </div>
+        <button class="btn-search" routerLink="/discover">Tìm kiếm</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Categories Section -->
+  <section class="categories-section container">
+    <div class="category-grid">
+      <a
+        *ngFor="let cat of categories"
+        routerLink="/discover"
+        class="category-card"
+      >
+        <div class="icon-circle" [style.color]="cat.color">
+          <i [class]="cat.icon"></i>
+        </div>
+        <h3>{{ cat.name }}</h3>
+      </a>
+    </div>
+  </section>
+
+  <!-- Upcoming Events Section -->
+  <section class="featured-events-section container">
+    <div class="section-header">
+      <h2>Sự Kiện Nổi Bật</h2>
+      <a routerLink="/discover" class="view-all-link"
+        >Xem Tất Cả <i class="fa-solid fa-arrow-right"></i
+      ></a>
+    </div>
+
+    <!-- Tận dụng component có sẵn -->
+    <app-events-grid></app-events-grid>
+  </section>
+
+  <!-- How It Works -->
+  <section class="how-it-works-section">
+    <div class="container">
+      <h2 class="text-center">Cách Hoạt Động</h2>
+      <div class="steps-grid">
+        <div class="step-card" *ngFor="let step of howItWorks; let i = index">
+          <div class="step-number">{{ i + 1 }}</div>
+          <div class="step-icon">
+            <i [class]="step.icon"></i>
+          </div>
+          <h3>{{ step.title }}</h3>
+          <p>{{ step.desc }}</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA Section -->
+  <section class="cta-section" *ngIf="canCreateEvent()">
+    <div class="cta-overlay"></div>
+    <div class="cta-content container">
+      <h2>Tạo Sự Kiện Của Riêng Bạn</h2>
+      <p>
+        Quản lý và tổ chức các sự kiện chuyên nghiệp với hệ thống của chúng tôi.
+      </p>
+      <button class="btn-primary-large" routerLink="/event-create-page">
+        Tạo Sự Kiện Ngay
+      </button>
+    </div>
+  </section>
+</div>

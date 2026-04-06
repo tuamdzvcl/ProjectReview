@@ -52,24 +52,34 @@ namespace projectDemo.Repository
         {
             try
             {
+                var pageIndex = request.PageIndex;
+                var pageSize =  request.PageSize;
+
                 var query = _dbSet
                     .AsNoTracking()
                     .Where(e => e.IsDeleted == false  && e.Status!=EnumStatusEvent.CANNEL);
+
+                if (request.categoryId != Guid.Empty)
+                {
+                    query = query.Where(e => e.CatetoryID == request.categoryId);
+                }
+
                 if (!string.IsNullOrWhiteSpace(request.key))
                 {
                     var key = request.key.Trim();
                     query = query
                         .Where(e =>
                         e.Title.Contains(key) ||
-                        e.Location.Contains(key));
+                        e.Location.Contains(key) ||
+                        e.Catetory.Name.Contains(key));
 
                 }
                 var totolRecords = await query.CountAsync();
 
                 var items = await query
            .OrderByDescending(e => e.CreatedDate)
-           .Skip((request.PageIndex - 1) * request.PageSize)
-           .Take(request.PageSize)
+           .Skip((pageIndex - 1) * pageSize)
+           .Take(pageSize)
            .Select(e => new EventTypeTickResponses
            {
                Id = e.Id,
@@ -85,6 +95,7 @@ namespace projectDemo.Repository
                UserID = e.UserID,
                UserName = e.User.Username,
                CatetoryName = e.Catetory.Name,
+               CatetoryID= e.CatetoryID,
                ListTypeTick = e.TicketTypes.Select(t => new TypeTickResponse
                {
                    Id = t.Id,
@@ -100,10 +111,10 @@ namespace projectDemo.Repository
                 return new PageResponse<EventTypeTickResponses>
                 {
                     Items = items,
-                    PageIndex = request.PageIndex,
-                    PageSize = request.PageSize,
+                    PageIndex = pageIndex,
+                    PageSize = pageSize,
                     TotalRecords = totolRecords,
-                    TotalPages = (int)Math.Ceiling((double)totolRecords / request.PageSize),
+                    TotalPages = (int)Math.Ceiling((double)totolRecords / pageSize),
                     Success = true,
                     Message = "Lấy danh sách event thành công"
                 };
@@ -152,6 +163,8 @@ namespace projectDemo.Repository
              PosterUrl = e.PosterUrl,
              Status = e.Status.ToString(),
              UserName = e.User.Username,
+             CatetoryID = e.CatetoryID,
+             UserID = e.UserID,
              CatetoryName = e.Catetory.Name,
              ListTypeTick = e.TicketTypes.Select(t => new TypeTickResponse
              {

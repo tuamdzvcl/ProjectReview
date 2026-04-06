@@ -1,5 +1,4 @@
 <div class="checkout-container" *ngIf="bookingData && bookingData.event">
-  
   <nav class="breadcrumbs">
     <div class="header-inner">
       <a routerLink="/">Trang chủ</a> /
@@ -11,19 +10,7 @@
       <span>checkout</span>
     </div>
   </nav>
-
-  <header class="checkout-header">
-    <div class="header-inner">
-      <button class="back-link" (click)="onBackToEvent()">
-        <i class="material-icons">arrow_back</i>
-        Quay lại
-      </button>
-      <h1>Hoàn tất đơn hàng</h1>
-    </div>
-  </header>
-
   <div class="layout-grid container">
-    
     <div class="form-column">
       <section class="checkout-section">
         <div class="section-title">
@@ -102,7 +89,6 @@
       </section>
     </div>
 
-    
     <aside class="summary-column">
       <div class="summary-card">
         <div class="event-mini-info">

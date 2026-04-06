@@ -1,17 +1,11 @@
 @import "_variables.scss";
 
-
-
 .profile-page {
     min-height: 100vh;
-    
     background-color: $color-bg;
     padding-bottom: 48px;
     font-family: 'Inter', 'Roboto', sans-serif;
 }
-
-
-
 
 .profile-container {
     max-width: 1200px;
@@ -25,7 +19,6 @@
     align-items: flex-start;
     width: 100%;
 }
-
 
 @media (max-width: 768px) {
     .profile-layout {

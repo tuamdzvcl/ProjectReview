@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
-import { Component, Input } from '@angular/core';
+import { Component, Input, OnChanges, OnInit, SimpleChanges } from '@angular/core';
 import { EventService } from '../../../../core/services/event.service';
-import { EventModel } from '../../../../core/model/event.model';
+import { EventModel } from '../../../../core/model/response/event.model';
 import { EventCardComponent } from '../event-card/event-card.component';
 
 @Component({
@@ -11,36 +11,51 @@ import { EventCardComponent } from '../event-card/event-card.component';
   templateUrl: './events-grid.component.html',
   styleUrl: './events-grid.component.scss',
 })
-export class EventsGridComponent {
+export class EventsGridComponent implements OnInit, OnChanges {
+  @Input() categoryId: number | null = null;
+
   events: EventModel[] = [];
   pageIndex: number = 1;
   pageSize: number = 10;
   key: string = '';
   isLoading: boolean = false;
   hasMore: boolean = true;
-  constructor(private eventService: EventService) {}
+
+  constructor(private eventService: EventService) { }
 
   ngOnInit(): void {
     this.loadEvents();
   }
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['categoryId'] && !changes['categoryId'].firstChange) {
+      this.resetAndLoad();
+    }
+  }
+
+  resetAndLoad() {
+    this.events = [];
+    this.pageIndex = 1;
+    this.hasMore = true;
+    this.loadEvents();
+  }
+
   loadEvents() {
     if (this.isLoading || !this.hasMore) return;
     this.isLoading = true;
 
     this.eventService
-      .GetEventswithTypeticket(this.pageIndex, this.pageSize, this.key)
+      .GetEventswithTypeticket(this.pageIndex, this.pageSize, this.key, this.categoryId)
       .subscribe({
         next: (res) => {
-          console.log('DATA-update:', res);
 
-          
           const filteredEvents = res.items.filter(
             (event: any) => event.Status === 'PUBLISHED'
           );
-          console.log(filteredEvents);
+
           this.events = [...this.events, ...filteredEvents];
 
-          if (filteredEvents.length < this.pageSize) {
+          if (res.items.length < this.pageSize) {
             this.hasMore = false;
           }
         },
@@ -54,7 +69,6 @@ export class EventsGridComponent {
   }
 
   loadMore() {
-    console.log('vào rồi nhé');
     this.pageIndex++;
     this.loadEvents();
   }

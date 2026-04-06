@@ -11,8 +11,10 @@ import { TokenService } from '../../../../core/services/token.service';
 import { VndCurrencyPipe } from '../../../../shared/pipes/vnd-currency.pipe';
 import { ImageUrlPipe } from '../../../../shared/pipes/image-url.pipe';
 import { FormatDatePipe } from '../../../../shared/pipes/format-date.pipe';
-import { UserResponse } from '../../../../core/model/user.model';
+import { UserResponse } from '../../../../core/model/response/user.model';
 import Swal from 'sweetalert2';
+import { OrderService } from '../../../../core/services/order.service';
+import { CreateOrderRequest } from '../../../../core/model/request/orderRequest.model';
 
 @Component({
   selector: 'app-checkout-page',
@@ -64,8 +66,9 @@ export class CheckoutPageComponent implements OnInit {
     private bookingService: BookingService,
     private userService: UserService,
     private tokenService: TokenService,
+    private orderService: OrderService,
     public router: Router
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     this.bookingData = this.bookingService.getBooking();
@@ -92,9 +95,8 @@ export class CheckoutPageComponent implements OnInit {
         this.userProfile = res.User;
 
         if (this.userProfile) {
-          this.customerName = `${this.userProfile.FirstName || ''} ${
-            this.userProfile.LastName || ''
-          }`.trim();
+          this.customerName = `${this.userProfile.FirstName || ''} ${this.userProfile.LastName || ''
+            }`.trim();
           this.customerEmail = this.userProfile.Email || '';
         }
       },
@@ -121,6 +123,25 @@ export class CheckoutPageComponent implements OnInit {
       return;
     }
 
+    // Lấy danh sách các vé đã chọn (OrderItemRequest)
+    const orderItems = Object.keys(this.bookingData?.selectedTickets || {})
+      .filter(id => this.bookingData!.selectedTickets[Number(id)] > 0)
+      .map(id => ({
+        TicketTypeId: Number(id),
+        Quantity: this.bookingData!.selectedTickets[Number(id)]
+      }));
+
+    // Tạo đối tượng CreateOrderRequest khớp với Backend
+    const orderData: CreateOrderRequest = {
+      User: {
+        fullName: this.customerName,
+        Address: this.address,
+        Phone: this.phoneNumber,
+        Email: this.customerEmail
+      },
+      Items: orderItems
+    };
+
     Swal.fire({
       title: 'Xác nhận đặt vé?',
       text: 'Hệ thống sẽ tiến hành khởi tạo đơn hàng của bạn.',
@@ -132,15 +153,42 @@ export class CheckoutPageComponent implements OnInit {
       cancelButtonText: 'Hủy',
     }).then((result) => {
       if (result.isConfirmed) {
+        // Log dữ liệu trước khi gửi và hiển thị loading
+        console.log('[DEBUG] Đang gửi dữ liệu đặt vé tới API api/order:', orderData);
+
         Swal.fire({
-          title: 'Thành công!',
-          text: 'Vui lòng kiểm tra email để hoàn tất thanh toán.',
-          icon: 'success',
-          timer: 2000,
-          showConfirmButton: false,
-        }).then(() => {
-          this.bookingService.clearBooking();
-          this.router.navigate(['/']);
+          title: 'Đang xử lý...',
+          text: 'Vui lòng chờ trong giây lát.',
+          allowOutsideClick: false,
+          didOpen: () => {
+            Swal.showLoading();
+          }
+        });
+
+        this.orderService.createOrder(orderData).subscribe({
+          next: (response) => {
+            console.log('[DEBUG] Kết quả từ Backend:', response);
+
+            Swal.fire({
+              title: 'Thành công!',
+              text: 'Đơn hàng của bạn đã được khởi tạo thành công.',
+              icon: 'success',
+              timer: 2000,
+              showConfirmButton: false,
+            }).then(() => {
+              this.bookingService.clearBooking();
+              this.router.navigate(['/']);
+            });
+          },
+          error: (err) => {
+            console.error('[DEBUG] Lỗi khi gọi API CreateOrder:', err);
+
+            Swal.fire({
+              icon: 'error',
+              title: 'Đặt vé thất bại',
+              text: err.message || 'Có lỗi xảy ra trong quá trình đặt vé. Vui lòng thử lại sau.'
+            });
+          }
         });
       }
     });

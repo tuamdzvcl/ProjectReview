@@ -7,7 +7,7 @@ namespace projectDemo.DTO.Request
     public class CreateEventTicketTypeItemRequest
     {
         [Required]
-        public EnumNameTickType Name { get; set; }
+        public string Name { get; set; }
 
         [Required]
         [Range(0.01, double.MaxValue)]

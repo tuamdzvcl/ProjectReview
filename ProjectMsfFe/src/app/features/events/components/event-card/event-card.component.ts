@@ -3,7 +3,7 @@ import { DurationPipe } from '../../../../shared/pipes/duration.pipe';
 import { FormatDatePipe } from '../../../../shared/pipes/format-date.pipe';
 import { ImageUrlPipe } from '../../../../shared/pipes/image-url.pipe';
 import { VndCurrencyPipe } from '../../../../shared/pipes/vnd-currency.pipe';
-import { EventModel } from '../../../../core/model/event.model';
+import { EventModel } from '../../../../core/model/response/event.model';
 import { RouterLink } from '@angular/router';
 
 @Component({

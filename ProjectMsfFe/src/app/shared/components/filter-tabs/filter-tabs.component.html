@@ -1,12 +1,14 @@
 <div class="filter-tabs">
-  <button class="active">All</button>
-  <button>Today</button>
-  <button>Tomorrow</button>
-  <button>This Week</button>
-  <button>This Weekend</button>
-  <button>Next Weekend</button>
-  <button>This Month</button>
-  <button>Next Month</button>
-  <button>This Year</button>
-  <button>Next Year</button>
+  <button 
+    [class.active]="selectedCategoryId === null" 
+    (click)="selectCategory(null)">
+    Tất cả
+  </button>
+  
+  <button 
+    *ngFor="let cat of categories" 
+    [class.active]="selectedCategoryId === cat.CatetoryId" 
+    (click)="selectCategory(cat.CatetoryId)">
+    {{ cat.Name }}
+  </button>
 </div>

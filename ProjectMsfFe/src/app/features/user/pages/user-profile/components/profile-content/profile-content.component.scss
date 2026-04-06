@@ -5,9 +5,6 @@
     min-width: 0;
 }
 
-
-
-
 .profile-content {
     flex: 1;
     display: flex;
@@ -15,9 +12,6 @@
     gap: 12px;
     min-width: 0;
 }
-
-
-
 
 .primary-tabs {
     background: $color-white;
@@ -27,10 +21,10 @@
     padding: 6px;
     gap: 2px;
     overflow-x: auto;
-    
+    /* cuộn ngang nếu màn hình nhỏ */
 }
 
-
+/* Mỗi mục tab */
 .primary-tabs .tab-item {
     flex: 1;
     padding: 9px 16px;
@@ -54,14 +48,16 @@
     color: $color-text-medium;
 }
 
-
+/* Tab đang được chọn */
 .primary-tabs .tab-item.active {
     background: $color-primary;
     color: $color-white;
 }
 
 
-
+/* ======================================================
+   THANH TAB PHỤ (Saved / Organised / Attending)
+   ====================================================== */
 
 .secondary-tabs {
     background: $color-white;
@@ -71,13 +67,13 @@
     overflow-x: auto;
 }
 
-
+/* Mỗi mục tab phụ */
 .secondary-tabs .sub-tab {
     flex: 1;
     padding: 16px 12px;
     border: none;
     border-bottom: 2px solid transparent;
-    
+    /* gạch dưới ẩn */
     background: transparent;
     color: $color-text-muted;
     cursor: pointer;
@@ -93,13 +89,13 @@
     color: $color-text-dark;
 }
 
-
+/* Tab phụ đang được chọn (gạch xanh bên dưới) */
 .secondary-tabs .sub-tab.active {
     border-bottom-color: $color-primary;
     color: $color-primary;
 }
 
-
+/* Badge số (hình tròn chứa số lượng sự kiện) */
 .tab-badge {
     width: 32px;
     height: 32px;
@@ -111,7 +107,7 @@
     font-weight: 700;
 }
 
-
+/* Màu badge cho từng loại tab */
 .tab-badge.badge-saved {
     background: $color-primary-light;
     color: $color-primary;
@@ -127,20 +123,22 @@
     color: #5cb1d9;
 }
 
-
+/* Khi tab đang active, badge đổi sang màu xanh đặc */
 .secondary-tabs .sub-tab.active .tab-badge {
     background: $color-primary;
     color: $color-white;
 }
 
-
+/* Tên tab phụ */
 .tab-label {
     font-size: 12px;
     font-weight: 500;
 }
 
 
-
+/* ======================================================
+   DANH SÁCH SỰ KIỆN
+   ====================================================== */
 
 .event-list {
     display: flex;
@@ -148,7 +146,7 @@
     gap: 12px;
 }
 
-
+/* Mỗi thẻ sự kiện */
 .event-card {
     background: $color-white;
     border-radius: 10px;
@@ -163,10 +161,10 @@
 .event-card:hover {
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
     transform: translateY(-1px);
-    
+    /* nhấc lên nhẹ khi hover */
 }
 
-
+/* Khu vực ảnh sự kiện */
 .event-card .event-image {
     width: 200px;
     min-height: 130px;
@@ -180,7 +178,7 @@
     display: block;
 }
 
-
+/* Khu vực nội dung (tên, ngày, nút) */
 .event-card .event-body {
     padding: 16px 20px;
     display: flex;
@@ -189,7 +187,7 @@
     flex: 1;
 }
 
-
+/* Tên sự kiện */
 .event-card .event-title {
     font-size: 15px;
     font-weight: 700;
@@ -197,7 +195,7 @@
     margin: 0 0 4px;
 }
 
-
+/* Ngày giờ sự kiện */
 .event-card .event-date {
     font-size: 12px;
     color: $color-text-muted;
@@ -205,13 +203,13 @@
     margin: 0 0 14px;
 }
 
-
+/* Hàng chứa các nút */
 .event-card .event-actions {
     display: flex;
     gap: 10px;
 }
 
-
+/* Màn hình nhỏ: ảnh nằm trên, nội dung nằm dưới */
 @media (max-width: 600px) {
     .event-card {
         flex-direction: column;
@@ -223,7 +221,7 @@
     }
 }
 
-
+/* Nút "Save" (nền xanh) */
 .btn-save {
     background: $color-primary;
     color: $color-white;
@@ -242,7 +240,7 @@
     background: $color-primary-dark;
 }
 
-
+/* Nút "View" (viền xám) */
 .btn-view {
     background: transparent;
     border: 1px solid $color-border;
@@ -263,7 +261,9 @@
 }
 
 
-
+/* ======================================================
+   TRANG TRỐNG (khi chưa có dữ liệu)
+   ====================================================== */
 
 .empty-state {
     background: $color-white;
@@ -286,4 +286,296 @@
 .empty-state p {
     font-size: 14px;
     margin: 0;
+}
+
+/* ======================================================
+   DANH SÁCH ĐƠN HÀNG (Orders)
+   ====================================================== */
+
+.order-list {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    margin-top: 8px;
+}
+
+.order-card {
+    background: $color-white;
+    border-radius: 12px;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.07);
+    border: 1px solid $color-border;
+    overflow: hidden;
+    transition: all 0.25s ease;
+
+    &:hover {
+        border-color: $color-primary;
+        box-shadow: 0 6px 20px rgba(105, 192, 67, 0.12);
+        transform: translateY(-2px);
+    }
+}
+
+/* --- Header: mã đơn + trạng thái --- */
+.order-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    padding: 16px 20px;
+    border-bottom: 1px solid #f3f4f6;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.order-header-left {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    min-width: 0;
+
+    .order-code {
+        font-size: 15px;
+        font-weight: 700;
+        color: $color-text-dark;
+        margin: 0;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        word-break: break-all;
+
+        i {
+            color: $color-primary;
+            font-size: 14px;
+            flex-shrink: 0;
+        }
+    }
+
+    .order-date {
+        font-size: 13px;
+        color: $color-text-muted;
+        margin: 0;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+
+        i {
+            font-size: 12px;
+            flex-shrink: 0;
+        }
+    }
+}
+
+.order-header-right {
+    flex-shrink: 0;
+}
+
+.order-status {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 4px 12px;
+    border-radius: 20px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    white-space: nowrap;
+    background: #f3f4f6;
+    color: $color-text-muted;
+
+    &[data-status="PENDING"] {
+        background: #fff8e1;
+        color: #f57c00;
+    }
+
+    &[data-status="PAID"],
+    &[data-status="SUCCESS"] {
+        background: #e8f5e9;
+        color: #2e7d32;
+    }
+
+    &[data-status="CANCELLED"],
+    &[data-status="FAILED"] {
+        background: #ffebee;
+        color: #c62828;
+    }
+}
+
+/* --- Event info --- */
+.order-event {
+    display: flex;
+    align-items: stretch;
+    padding: 14px 20px;
+    gap: 14px;
+    border-bottom: 1px solid #f3f4f6;
+    min-width: 0;
+}
+
+.order-event-poster {
+    width: 90px;
+    height: 64px;
+    border-radius: 8px;
+    overflow: hidden;
+    flex-shrink: 0;
+
+    img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+    }
+}
+
+.order-event-details {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 4px;
+    min-width: 0;
+
+    .event-name {
+        font-size: 14px;
+        font-weight: 600;
+        color: $color-text-dark;
+        margin: 0;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .event-location,
+    .event-time {
+        font-size: 12px;
+        color: $color-text-muted;
+        margin: 0;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+
+        i {
+            font-size: 11px;
+            flex-shrink: 0;
+            color: $color-text-muted;
+        }
+    }
+}
+
+/* --- Ticket rows --- */
+.order-tickets {
+    padding: 10px 20px;
+    border-bottom: 1px solid #f3f4f6;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.ticket-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 13px;
+    padding: 6px 10px;
+    background: #fafbfc;
+    border-radius: 6px;
+}
+
+.ticket-name {
+    flex: 1;
+    min-width: 0;
+    color: $color-text-medium;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+
+    i {
+        color: $color-primary;
+        font-size: 12px;
+        flex-shrink: 0;
+    }
+}
+
+.ticket-qty {
+    flex-shrink: 0;
+    font-weight: 600;
+    color: $color-text-muted;
+    font-size: 12px;
+    background: $color-bg;
+    padding: 2px 8px;
+    border-radius: 4px;
+}
+
+.ticket-price {
+    flex-shrink: 0;
+    font-weight: 600;
+    color: $color-text-dark;
+    min-width: 80px;
+    text-align: right;
+}
+
+/* --- Footer: tổng tiền --- */
+.order-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 14px 20px;
+    background: linear-gradient(135deg, #f9fef6 0%, #f3f4f6 100%);
+}
+
+.order-total-label {
+    font-size: 13px;
+    font-weight: 500;
+    color: $color-text-muted;
+}
+
+.order-total {
+    font-size: 17px;
+    font-weight: 700;
+    color: $color-primary;
+    margin: 0;
+}
+
+/* --- Responsive --- */
+@media (max-width: 600px) {
+    .order-header {
+        padding: 12px 14px;
+    }
+
+    .order-event {
+        flex-direction: column;
+        padding: 12px 14px;
+    }
+
+    .order-event-poster {
+        width: 100%;
+        height: 140px;
+    }
+
+    .order-event-details .event-name {
+        white-space: normal;
+    }
+
+    .order-tickets {
+        padding: 8px 14px;
+    }
+
+    .ticket-row {
+        flex-wrap: wrap;
+        gap: 6px;
+    }
+
+    .ticket-price {
+        min-width: unset;
+        text-align: left;
+    }
+
+    .order-footer {
+        padding: 12px 14px;
+    }
+
+    .order-total {
+        font-size: 15px;
+    }
 }

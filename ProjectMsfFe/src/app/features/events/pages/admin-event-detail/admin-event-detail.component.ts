@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { EventService } from '../../../../core/services/event.service';
-import { EventModel } from '../../../../core/model/event.model';
+import { EventModel } from '../../../../core/model/response/event.model';
 import { FormatDatePipe } from '../../../../shared/pipes/format-date.pipe';
 import { ImageUrlPipe } from '../../../../shared/pipes/image-url.pipe';
 import { VndCurrencyPipe } from '../../../../shared/pipes/vnd-currency.pipe';
@@ -80,7 +80,7 @@ export class AdminEventDetailComponent implements OnInit {
       accept: () => {
         if (!this.event) return;
 
-        
+
         this.eventService.UpdateEventStatus(this.event.Id.toString(), 2).subscribe({
           next: () => {
             if (this.event) this.event.Status = 'PUBLISHED';

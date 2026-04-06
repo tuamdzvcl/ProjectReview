@@ -5,26 +5,21 @@
         <img [src]="profileImageUrl" alt="Ảnh đại diện" />
       </div>
 
-      
+      <!-- Nút camera nhỏ để đổi ảnh đại diện (chỉ hiện nếu là chủ sở hữu) -->
       <label class="avatar-edit-btn" for="avatar-upload" *ngIf="isOwner">
         <i class="fa-solid fa-camera"></i>
-        <input
-          id="avatar-upload"
-          type="file"
-          class="hidden-input"
-          accept="image/*"
-          (change)="onFileSelected($event)"
-        />
+        <input id="avatar-upload" type="file" class="hidden-input" accept="image/*" (change)="onFileSelected($event)" />
       </label>
     </div>
 
+    <!-- Tên + tick xanh -->
     <h2 class="profile-name">
-      {{ user ? user.FirstName + " " + user.LastName : "không có" }}
+      {{ (user?.FirstName || '') + " " + (user?.LastName || '') }}
       <i class="fa-solid fa-circle-check verified-icon"></i>
     </h2>
 
     <p class="profile-email">
-      {{ user ? user.Email : "không có" }}
+      {{ user?.Email }}
     </p>
 
     <div class="profile-stats">
@@ -41,6 +36,7 @@
 
     <p class="profile-bio">Hey I am a John Doe</p>
 
+    <!-- Nút My Organisation: Chỉ hiện cho chủ sở hữu VÀ không phải là Customer -->
     <button class="btn-organisation" *ngIf="isOwner && !isCustomer">
       My Organisation <i class="fa-solid fa-right-left"></i>
     </button>

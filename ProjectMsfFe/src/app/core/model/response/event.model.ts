@@ -13,6 +13,8 @@ export interface EventModel {
   SaleStartDate: Date;
   SaleEndDate: Date;
   UserName: string;
+  UserID: string;
+  CatetoryId: number;
   CatetoryName: string;
   ListTypeTick: Array<TypeTickResponse>;
 }

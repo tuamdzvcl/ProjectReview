@@ -3,11 +3,14 @@ import { RouterOutlet } from '@angular/router';
 import { HeaderComponent } from '../../shared/components/header/header.component';
 import { TokenService } from '../../core/services/token.service';
 
+import { FooterComponent } from '../../shared/components/footer/footer.component';
+
 @Component({
   selector: 'app-main-layout',
   standalone: true,
   imports: [RouterOutlet,
-  HeaderComponent],
+  HeaderComponent,
+  FooterComponent],
   templateUrl: './main-layout.component.html',
   styleUrl: './main-layout.component.scss'
 })

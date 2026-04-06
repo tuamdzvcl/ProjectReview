@@ -1,9 +1,9 @@
 ﻿using Dapper;
+using EventTick.Model.Enum;
 using EventTick.Model.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using projectDemo.DTO.Projection;
-using projectDemo.DTO.Response;
 using projectDemo.Repository.BaseData;
 using projectDemo.UnitOfWorks;
 using System.Data;
@@ -41,21 +41,12 @@ namespace projectDemo.Repository.OrderRepository
             return order;
         }
 
-        public async Task<(List<Guid> Orders, int TotalCount)> GetListOrderByUserId(Guid userId, int pageNumber, int pageSize)
+        public async Task<bool> HasOrderByUserId(Guid userId)
         {
-            var query = Find(x => x.UserID == userId).AsNoTracking();
-
-            var total = await query.CountAsync();
-
-            var orders = await query
-                .OrderByDescending(x => x.CreatedDate)
-                .Where(x=>x.IsDeleted == false)
-                .Select(x => x.Id)
-                .Skip((pageNumber - 1) * pageSize)
-                .Take(pageSize)
-                .ToListAsync();
-
-            return (orders, total);
+            return await _dbSet
+                .AsNoTracking()
+                .Where(o => o.UserID == userId && o.IsDeleted == false)
+                .AnyAsync();
         }
         public async Task<Order?> GetOrderbyID(Guid orderID)
         {

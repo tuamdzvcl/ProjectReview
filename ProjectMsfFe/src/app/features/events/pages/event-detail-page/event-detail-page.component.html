@@ -1,11 +1,11 @@
 <div class="event-detail-container" *ngIf="event; else stateTemplate">
-  
+
   <nav class="breadcrumbs">
     <a href="/">Trang chủ</a> / <a href="/">Khám phá sự kiện</a> /
     <span>Thông tin chi tiết sự kiện</span>
   </nav>
 
-  
+
   <header class="event-header">
     <div class="date-badge">
       <div class="month">{{ event.StartDate | date : "MMM" | uppercase }}</div>
@@ -30,7 +30,7 @@
   </header>
 
   <div class="layout-grid">
-    
+
     <main class="main-content">
       <div class="poster-image">
         <img [src]="event.PosterUrl | imageUrl" [alt]="event.Title" />
@@ -51,9 +51,9 @@
       </section>
     </main>
 
-    
+
     <aside class="sidebar">
-      
+
       <div class="sidebar-card countdown-card">
         <h3>Thông tin chi tiết</h3>
         <div class="countdown-grid">
@@ -81,7 +81,7 @@
             <div class="text">
               <label>Được tổ chức bởi</label>
               <strong>{{ event.UserName }}</strong>
-              <a routerLink="/profile" class="view-link">Xem hồ sơ</a>
+              <a [routerLink]="['/profile', event.UserID]" class="view-link">Xem hồ sơ</a>
             </div>
           </div>
 
@@ -109,7 +109,7 @@
         </div>
       </div>
 
-      
+
       <div class="sidebar-card ticket-card">
         <h3>Chọn vé</h3>
         <div class="ticket-list">

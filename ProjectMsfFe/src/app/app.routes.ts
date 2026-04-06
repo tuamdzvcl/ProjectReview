@@ -20,6 +20,8 @@ import { AdminEventDetailComponent } from './features/events/pages/admin-event-d
 import { UserProfileComponent } from './features/user/pages/user-profile/user-profile.component';
 import { CheckoutPageComponent } from './features/events/pages/checkout-page/checkout-page.component';
 
+import { LandingPageComponent } from './features/home/pages/landing-page/landing-page.component';
+
 export const routes: Routes = [
   { path: 'header', component: HeaderComponent },
 
@@ -29,6 +31,10 @@ export const routes: Routes = [
     children: [
       {
         path: '',
+        component: LandingPageComponent,
+      },
+      {
+        path: 'discover',
         component: EventsPageComponent,
       },
       {

@@ -5,7 +5,7 @@ namespace projectDemo.DTO.UpdateRequest
 {
     public class TypeTicketUpdate
     {
-        public EnumNameTickType? Name { get; set; }
+        public string? Name { get; set; }
         public int? TotalQuantity { get; set; }
         public decimal? Price { get; set; }
 

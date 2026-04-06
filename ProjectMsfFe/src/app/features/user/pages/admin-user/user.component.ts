@@ -10,7 +10,7 @@ import { AppShellComponent } from '../../../../layouts/app-shell/app-shell.compo
 import { UserFormComponent } from '../../componnets/user-form/user-form.component';
 import { UserService } from '../../../../core/services/user.service';
 import { TokenService } from '../../../../core/services/token.service';
-import { UserResponse } from '../../../../core/model/user.model';
+import { UserResponse } from '../../../../core/model/response/user.model';
 import { UserUpdata } from '../../../../core/model/update/userupdate.model';
 import { UserRequest } from '../../../../core/model/request/userRequest.model';
 @Component({
@@ -48,7 +48,7 @@ export class UserComponent {
   totalOrganizer = 0;
   totalCustomer = 0;
 
-  
+
   ngOnInit(): void {
     this.currentUserId = this.tokenService.getUserId();
     this.loadUsers();

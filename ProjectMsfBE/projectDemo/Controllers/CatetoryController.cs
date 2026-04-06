@@ -25,7 +25,6 @@ namespace projectDemo.Controllers
             return Ok(result);
         }
 
-        // ✅ Update
         [HttpPut("{id}")]
         public async Task<IActionResult> Update(Guid id, [FromBody] CatetoryResquest request)
         {
@@ -33,7 +32,6 @@ namespace projectDemo.Controllers
             return Ok(result);
         }
 
-        // ✅ Delete
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(Guid id)
         {
@@ -41,7 +39,6 @@ namespace projectDemo.Controllers
             return Ok(result);
         }
 
-        // ✅ Get by Id
         [HttpGet("{id}")]
         public async Task<IActionResult> GetById(Guid id)
         {
@@ -49,7 +46,6 @@ namespace projectDemo.Controllers
             return Ok(result);
         }
 
-        // ✅ Get list category + event (paging)
         [HttpGet("list-event")]
         public async Task<IActionResult> GetCatetoryListEvent(
             [FromQuery] int pageSize ,
@@ -60,7 +56,6 @@ namespace projectDemo.Controllers
             return Ok(result);
         }
 
-        // ✅ Get category (paging)
         [HttpGet]
         public async Task<IActionResult> GetCatetory()
           {

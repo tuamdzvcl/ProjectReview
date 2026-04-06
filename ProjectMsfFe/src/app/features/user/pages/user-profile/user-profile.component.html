@@ -1,27 +1,14 @@
 <div class="profile-page">
-  
-  <app-profile-cover
-    [coverImageUrl]="coverImageUrl"
-    [isOwner]="isOwner"
-    (coverChange)="onCoverChange($event)"
-  ></app-profile-cover>
+  <!-- ====== ẢNH BÌA ====== -->
+  <app-profile-cover [coverImageUrl]="coverImageUrl" [isOwner]="isOwner"
+    (coverChange)="onCoverChange($event)"></app-profile-cover>
 
   <div class="profile-container">
     <div class="profile-layout">
-      
-      <app-profile-sidebar
-        [user]="user"
-        [profileImageUrl]="profileImageUrl"
-        [isOwner]="isOwner"
-        (avatarChange)="onAvatarChange($event)"
-        (followClick)="onFollow()"
-      ></app-profile-sidebar>
+      <app-profile-sidebar [user]="user" [profileImageUrl]="profileImageUrl" [isOwner]="isOwner"
+        (avatarChange)="onAvatarChange($event)" (followClick)="onFollow()"></app-profile-sidebar>
 
-      
-      <app-profile-content
-        [isOwner]="isOwner"
-        [events]="events"
-      ></app-profile-content>
+      <app-profile-content [isOwner]="isOwner" [events]="events"></app-profile-content>
     </div>
   </div>
 </div>

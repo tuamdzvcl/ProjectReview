@@ -14,6 +14,7 @@ using projectDemo.UnitOfWorks;
 using projectDemo.Repository.CatetoryRepository;
 using projectDemo.Repository.TickTypeRepository;
 using projectDemo.Common.PageRequest;
+using Microsoft.EntityFrameworkCore;
 using System.Linq;
 
 namespace projectDemo.Service.EventService
@@ -38,6 +39,64 @@ namespace projectDemo.Service.EventService
             _uow = uow;
             _catrtoeyRepository = catetoryReposioty;
             _typeTicketRepository = typeTicketRepository;
+        }
+
+        private static TimeZoneInfo GetVietnamTimeZone()
+        {
+            try
+            {
+                return TimeZoneInfo.FindSystemTimeZoneById("SE Asia Standard Time");
+            }
+            catch (TimeZoneNotFoundException)
+            {
+                return TimeZoneInfo.FindSystemTimeZoneById("Asia/Ho_Chi_Minh");
+            }
+        }
+
+        private static DateTime GetVietnamNow()
+        {
+            return TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, GetVietnamTimeZone());
+        }
+
+        private static bool IsEventEnded(Event events, DateTime now)
+        {
+            return events.EndDate <= now;
+        }
+
+        private async Task SyncEndedEventsAsync()
+        {
+            var now = GetVietnamNow();
+            var expiredEvents = await _uow.context.Set<Event>()
+                .Where(e => e.IsDeleted == false
+                    && e.Status != EnumStatusEvent.CANNEL
+                    && e.Status != EnumStatusEvent.ENDED
+                    && e.EndDate <= now)
+                .ToListAsync();
+
+            if (!expiredEvents.Any())
+                return;
+
+            foreach (var item in expiredEvents)
+            {
+                item.Status = EnumStatusEvent.ENDED;
+                item.UpdatedDate = now;
+            }
+
+            await _uow.SaveChangesAsync();
+        }
+
+        private async Task EnsureEventEndedStatusAsync(Event events)
+        {
+            var now = GetVietnamNow();
+            if (!IsEventEnded(events, now))
+                return;
+
+            if (events.Status == EnumStatusEvent.CANNEL || events.Status == EnumStatusEvent.ENDED)
+                return;
+
+            events.Status = EnumStatusEvent.ENDED;
+            events.UpdatedDate = now;
+            await _uow.SaveChangesAsync();
         }
         //check date
         public bool checkVadidate(EventRequest request)
@@ -340,14 +399,19 @@ namespace projectDemo.Service.EventService
         {
             try
             {
+                await SyncEndedEventsAsync();
                 Event events = await _eventRepository.GetEventById(EventID);
 
                 if (events == null)
                 {
                     return ApiResponse<string>.FailResponse(Entity.Enum.EnumStatusCode.EVENTNOTFOUD, "Không tìm thấy event");
                 }
-                if (events.Status == EnumStatusEvent.PUBLIC)
+                await EnsureEventEndedStatusAsync(events);
+                if (events.Status == EnumStatusEvent.ENDED)
                 {
+                    return ApiResponse<string>.FailResponse(Entity.Enum.EnumStatusCode.BAD_REQUEST, "Sự kiện đã kết thúc, không thể chỉnh sửa nữa");
+                }
+                if (events.Status == EnumStatusEvent.PUBLIC)                {
                     return ApiResponse<string>.FailResponse(Entity.Enum.EnumStatusCode.UNAUTHORIZED, "Sự kiện đã được công bố không thu hồi được");
 
                 }
@@ -366,6 +430,7 @@ namespace projectDemo.Service.EventService
         // lấy tất cả các event
         public async Task<List<EventResponse>> GetEventAll()
         {
+            await SyncEndedEventsAsync();
             List<Event> listEvents = await _eventRepository.GetAllEvent();
 
             var result = listEvents.Select(e => new EventResponse
@@ -389,6 +454,7 @@ namespace projectDemo.Service.EventService
         {
             try
             {
+                await SyncEndedEventsAsync();
                 var response = await _eventRepository.GetEventDetailById(EventID);
                 return ApiResponse<EventTypeTickResponses>.SuccessResponse(Entity.Enum.EnumStatusCode.SUCCESS, response);
             }
@@ -405,6 +471,7 @@ namespace projectDemo.Service.EventService
         {
             try
             {
+                await SyncEndedEventsAsync();
                 if (pageIndex < 1)
                     pageIndex = 1;
                 if (pageSize <= 0)
@@ -427,9 +494,16 @@ namespace projectDemo.Service.EventService
             var transactionStarted = false;
             try
             {
+                await SyncEndedEventsAsync();
                 var events = await _eventRepository.GetEventById(EventID);
                 if (IsEventNotFound(events))
                     return ApiResponse<string>.FailResponse(Entity.Enum.EnumStatusCode.EVENTNOTFOUD, "even không tồn tại ");
+
+                await EnsureEventEndedStatusAsync(events);
+                if (events.Status == EnumStatusEvent.ENDED)
+                {
+                    return ApiResponse<string>.FailResponse(Entity.Enum.EnumStatusCode.BAD_REQUEST, "Sự kiện đã kết thúc, không thể chỉnh sửa");
+                }
 
                 var validationRequest = BuildEventValidationRequest(events, resquest);
                 if (!checkVadidate(validationRequest))
@@ -492,7 +566,7 @@ namespace projectDemo.Service.EventService
                                 return ApiResponse<string>.FailResponse(Entity.Enum.EnumStatusCode.TYPETICKET, $"Không tìm thấy loại vé với id {ticketRequest.Id.Value}");
                             }
 
-                            ticketEntity.Name = ticketRequest.Name!.Value;
+                            ticketEntity.Name = ticketRequest.Name;
                             ticketEntity.TotalQuantity = ticketRequest.TotalQuantity!.Value;
                             ticketEntity.Price = ticketRequest.Price!.Value;
                             ticketEntity.Status = ticketRequest.Status!.Value;
@@ -503,7 +577,7 @@ namespace projectDemo.Service.EventService
                         {
                             var newTicket = new TicketType
                             {
-                                Name = ticketRequest.Name!.Value,
+                                Name = ticketRequest.Name,
                                 TotalQuantity = ticketRequest.TotalQuantity!.Value,
                                 Price = ticketRequest.Price!.Value,
                                 Status = ticketRequest.Status!.Value,
@@ -560,6 +634,7 @@ namespace projectDemo.Service.EventService
         {
             try
             {
+                await SyncEndedEventsAsync();
                 if (request == null || !request.Status.HasValue)
                 {
                     return ApiResponse<string>.FailResponse(Entity.Enum.EnumStatusCode.BAD_REQUEST, "Status không hợp lệ");
@@ -569,6 +644,12 @@ namespace projectDemo.Service.EventService
                 if (IsEventNotFound(events))
                 {
                     return ApiResponse<string>.FailResponse(Entity.Enum.EnumStatusCode.EVENTNOTFOUD, "event không tồn tại");
+                }
+
+                await EnsureEventEndedStatusAsync(events);
+                if (events.Status == EnumStatusEvent.ENDED)
+                {
+                    return ApiResponse<string>.FailResponse(Entity.Enum.EnumStatusCode.BAD_REQUEST, "Sự kiện đã kết thúc, không thể cập nhật trạng thái");
                 }
 
                 events.Status = request.Status.Value;
@@ -587,12 +668,9 @@ namespace projectDemo.Service.EventService
 
         public async Task<PageResponse<EventTypeTickResponses>> GetPageWithTicketTypes(PageRequest query)
         {
-            var key = query.key;
-            var index = query.PageIndex;
-            var size = query.PageSize;
-
-            if(index == 0) index = 1;
-            if(size == 0) size = 10;
+            await SyncEndedEventsAsync();
+            if (query.PageIndex <= 0) query.PageIndex = 1;
+            if (query.PageSize <= 0) query.PageSize = 10;
 
            return await _eventRepository.GetAllWithTicketTypesAsync(query);
 

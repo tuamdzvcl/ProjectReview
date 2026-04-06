@@ -65,17 +65,12 @@ namespace projectDemo.Repository
         {
             try
             {
-                //gọi connection
-                var param = new DynamicParameters();
-                param.Add("@UserID", Userid);
-                // gọi lệnh quey
-                var result = await _uow.connection.QueryAsync<string>(
-                    "GetRoleNameByUserID",
-                    param,
-                    transaction: _uow.GetTransaction(),
-                    commandType: System.Data.CommandType.StoredProcedure
-                );
-                return result.ToList();
+                return await _dbSet
+                    .AsNoTracking()
+                    .Where(u => u.Id == Userid && u.IsDeleted == false)
+            .SelectMany(u => u.UserRoles)
+            .Select(ur => ur.Role.RoleName.ToUpper())
+            .ToListAsync();
             }
             catch (Exception ex)
             {

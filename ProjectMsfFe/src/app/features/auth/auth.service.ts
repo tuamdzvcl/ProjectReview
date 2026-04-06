@@ -3,7 +3,7 @@ import { tap } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
 import { BaseApiService } from '../../core/services/base-api.service';
 import { TokenService } from '../../core/services/token.service';
-import { AuthData } from '../../core/model/auth-data.model';
+import { AuthData } from '../../core/model/response/auth-data.model';
 import { jwtDecode } from 'jwt-decode';
 
 
@@ -13,7 +13,7 @@ export class AuthService extends BaseApiService {
     super(http);
   }
 
-  
+
   login(data: { email: string; password: string }) {
     return this.post<AuthData>('auth/login', data).pipe(
       tap((res) => {
@@ -21,7 +21,7 @@ export class AuthService extends BaseApiService {
       })
     );
   }
-  
+
   register(data: any) {
     return this.post<any>('auth/register', data);
   }

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -11,6 +11,7 @@ namespace EventTick.Model.Enum
         DRAFT=1,
         PUBLISHED =2,
         CANNEL= 3,
-        PUBLIC=4
+        PUBLIC=4,
+        ENDED = 5
     }
 }

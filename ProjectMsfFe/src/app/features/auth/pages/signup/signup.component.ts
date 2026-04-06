@@ -1,5 +1,5 @@
-import { AuthData } from '../../../../core/model/auth-data.model';
-import { ApiResponse } from '../../../../core/model/api-response.model';
+import { AuthData } from '../../../../core/model/response/auth-data.model';
+import { ApiResponse } from '../../../../core/model/base/api-response.model';
 import { AuthService } from '../../auth.service';
 import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, signal } from '@angular/core';

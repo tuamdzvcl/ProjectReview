@@ -3,7 +3,7 @@ import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { EventService } from '../../../../core/services/event.service';
 import { BookingService } from '../../../../core/services/booking.service';
-import { EventModel } from '../../../../core/model/event.model';
+import { EventModel } from '../../../../core/model/response/event.model';
 import { CommonModule } from '@angular/common';
 import { Subscription, interval } from 'rxjs';
 import { ImageUrlPipe } from '../../../../shared/pipes/image-url.pipe';
@@ -32,14 +32,14 @@ export class EventDetailPageComponent implements OnInit, OnDestroy {
   loading = true;
   error: string | null = null;
 
-  
+
   days = 0;
   hours = 0;
   minutes = 0;
   seconds = 0;
   private timerSubscription: Subscription | null = null;
 
-  
+
   selectedTickets: { [key: number]: number } = {};
   ticketErrors: { [key: number]: string | null } = {};
   totalPrice = 0;
@@ -163,12 +163,12 @@ export class EventDetailPageComponent implements OnInit, OnDestroy {
     if (ticket) {
       const maxAvailable = ticket.TotalQuantity - ticket.SoldQuantity;
       if (newQty > maxAvailable) {
-        
+
         newQty = maxAvailable;
-        event.target.value = newQty; 
+        event.target.value = newQty;
         this.ticketErrors[ticketId] = 'error';
 
-        
+
         Swal.fire({
           toast: true,
           position: 'top-end',

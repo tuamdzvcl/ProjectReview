@@ -5,7 +5,7 @@ namespace projectDemo.DTO.Request
 {
     public class TypeTicketRequest
     {
-        public EnumNameTickType Name { get; set; }
+        public string Name { get; set; }
         public int TotalQuantity { get; set; }
         public int SoldQuantity { get; set; }
         public EnumStatusTickType Status { get; set; }

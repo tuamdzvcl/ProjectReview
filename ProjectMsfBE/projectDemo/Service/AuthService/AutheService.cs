@@ -86,7 +86,7 @@ namespace projectDemo.Service.Auth
                 List<string> roles = new List<string>();
                 foreach (var roleName in roleNames)
                 {
-                    roles.Add(roleName.ToString());
+                    roles.Add(roleName.ToString().ToUpper());
                 }
 
                 var token = GenerateToken(user, permission);

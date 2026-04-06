@@ -29,9 +29,10 @@ namespace projectDemo.Controllers
         }
 
         [HttpGet("events/{userId}")]
+        [AllowAnonymous]
         public async Task<IActionResult> GetEventByUserId(Guid userId)
         {
-            var result = await _userService.GetListEventByUserID(userId);
+            var result = await _userService.GetListEventByUserIDCreate(userId);
             return Ok(result);
         }
 

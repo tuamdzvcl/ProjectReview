@@ -18,9 +18,9 @@
   display: flex;
   align-items: center;
   gap: 20px;
- 
+
   border-bottom: 1px solid rgba(255, 255, 255, 0.06);
-  
+
 }
 
 .brand__mark {
@@ -61,18 +61,22 @@
 }
 
 .nav-item:hover {
-  background: #47cb1359;}
+  background: #47cb1359;
+}
 
 .nav-item--active {
   background: #47cb1359;
-  color: #6cc04a;;
+  color: #6cc04a;
+  ;
 }
-.btn-justify{
+
+.btn-justify {
   background-color: #6cc04a;
   color: #ffffff;
   border: 0px;
   padding: 21px 27px;
 }
+
 .nav-item__icon {
   width: 20px;
   text-align: center;
@@ -89,6 +93,7 @@
 .shell--collapsed .brand__name {
   display: none;
 }
+
 .main {
   display: flex;
   flex-direction: column;
@@ -98,7 +103,7 @@
 
 .topbar {
   height: 56px;
-  
+
   border-bottom: 1px solid #e5e7eb;
   background: #ffffff;
   display: flex;
@@ -186,4 +191,3 @@
     display: none;
   }
 }
-

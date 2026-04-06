@@ -1,11 +1,11 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable, map, of } from 'rxjs';
-import { EventModel } from '../model/event.model';
-import { PageResult } from '../model/api-page-response.model';
+import { EventModel } from '../model/response/event.model';
+import { PageResult } from '../model/base/api-page-response.model';
 import { BaseApiService } from './base-api.service';
 import { EventRequest } from '../model/request/eventRequest.model';
-import { ApiResponse } from '../model/api-response.model';
+import { ApiResponse } from '../model/base/api-response.model';
 
 @Injectable({
   providedIn: 'root',
@@ -40,7 +40,12 @@ export class EventService extends BaseApiService {
     return this.post<ApiResponse<EventModel>>('event', data);
   }
 
-  GetEventswithTypeticket(pageIndex: number, pageSize: number, key: string) {
+  GetEventswithTypeticket(
+    pageIndex: number,
+    pageSize: number,
+    key: string,
+    categoryId: number | null = null
+  ) {
     const params: any = {
       pageIndex: pageIndex,
       pageSize: pageSize,
@@ -48,11 +53,12 @@ export class EventService extends BaseApiService {
     if (key) {
       params.key = key;
     }
-    return this.getpage<EventModel>(
-      'event/page-with-ticket-types',
-      params
-    ).pipe(
+    if (categoryId !== null) {
+      params.categoryId = categoryId;
+    }
+    return this.getpage<EventModel>('event/page-with-ticket-types', params).pipe(
       map((res: PageResult<EventModel>) => {
+        console.log(params)
         return {
           items: res.Items,
           pageIndex: res.PageIndex,
