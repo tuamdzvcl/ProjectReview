@@ -38,32 +38,23 @@
       </button>
 
       <ng-container *ngIf="userRole() === 'ADMIN' || userRole() === 'ORGANIZER'">
-        <button class="nav-item" type="button" routerLinkActive="nav-item--active">
+        <button class="nav-item" type="button" routerLink="/admin/promotions" routerLinkActive="nav-item--active">
           <span class="nav-item__icon"><i class="fa-solid fa-tag"></i></span>
           <span class="nav-item__label">Khuyễn mãi</span>
         </button>
 
-        <button class="nav-item" type="button" routerLinkActive="nav-item--active">
+        <button class="nav-item" type="button" routerLink="/admin/payments" routerLinkActive="nav-item--active">
           <span class="nav-item__icon"><i class="fa-regular fa-credit-card"></i></span>
           <span class="nav-item__label">Thanh toán</span>
         </button>
-        <button class="nav-item" type="button" routerLinkActive="nav-item--active">
+        <button class="nav-item" type="button" routerLink="/admin/audit-log" routerLinkActive="nav-item--active">
           <span class="nav-item__icon"><i class="fa-solid fa-chart-pie"></i></span>
-          <span class="nav-item__label">Báo cáo</span>
+          <span class="nav-item__label">AudiLog</span>
         </button>
       </ng-container>
-
-      <button *ngIf="userRole() === 'ADMIN'" class="nav-item" type="button" routerLinkActive="nav-item--active">
-        <span class="nav-item__icon">🔁</span>
-        <span class="nav-item__label">Đăng ký</span>
-      </button>
-      <button *ngIf="userRole() === 'ADMIN'" class="nav-item" type="button" routerLinkActive="nav-item--active">
-        <span class="nav-item__icon">⚙️</span>
-        <span class="nav-item__label">Thiết lập chuyển đổi</span>
-      </button>
-      <button class="nav-item" type="button" routerLinkActive="nav-item--active">
+      <button class="nav-item" type="button" routerLink="/admin/membership" routerLinkActive="nav-item--active">
         <span class="nav-item__icon"><i class="fa-solid fa-user-group"></i></span>
-        <span class="nav-item__label">Đội của tôi</span>
+        <span class="nav-item__label">Quản lý gói thành viên</span>
       </button>
     </nav>
   </aside>

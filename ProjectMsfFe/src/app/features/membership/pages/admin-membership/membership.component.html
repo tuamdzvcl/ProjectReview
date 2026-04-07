@@ -1,0 +1,49 @@
+<app-shell>
+  <div class="box">
+
+    <div class="dashboard-page">
+      <div class="page-header">
+        <h2>Quản lý Gói Thành Viên</h2>
+        <button class="btn btn-primary" (click)="addPackage()"><i class="fa-solid fa-plus"></i> Tạo gói mới</button>
+      </div>
+
+      <div class="membership-grid">
+        @for (pkg of packages(); track pkg.id) {
+        <div class="membership-card" [class.highlight]="pkg.highlight">
+          <div class="tier-header">
+            <h3>{{ pkg.name }}</h3>
+            <div class="tier-price">{{ pkg.price | number:'1.0-0' }} <span>VNĐ/tháng</span></div>
+            @if (pkg.highlight) {
+            <span class="popular-badge">Phổ biến nhất</span>
+            }
+          </div>
+
+          <div class="card-body">
+            <ul class="feature-list">
+              @for (feature of pkg.features; track $index) {
+              <li>{{ feature.text }}</li>
+              }
+            </ul>
+          </div>
+
+          <div class="tier-stats">
+            <div class="stat"><span>Người dùng hiện tại:</span> <strong>{{ pkg.activeUsers | number }}</strong></div>
+            <div class="stat">
+              <span>Trạng thái:</span>
+              <strong [style.color]="pkg.status === 'active' ? '#3ca233' : '#e74c3c'">
+                {{ pkg.status === 'active' ? 'Đang hoạt động' : 'Ngừng hoạt động' }}
+              </strong>
+            </div>
+          </div>
+
+          <div class="tier-actions">
+            <button class="btn btn-outline" (click)="editPackage(pkg)"><i class="fa-solid fa-pen"></i> Sửa</button>
+            <button class="btn btn-danger" (click)="deletePackage(pkg.id)"><i class="fa-solid fa-trash"></i>
+              Xóa</button>
+          </div>
+        </div>
+        }
+      </div>
+    </div>
+  </div>
+</app-shell>

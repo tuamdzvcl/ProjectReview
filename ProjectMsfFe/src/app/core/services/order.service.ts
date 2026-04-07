@@ -5,9 +5,10 @@ import { CreateOrderRequest } from '../model/request/orderRequest.model';
 import { Observable } from 'rxjs';
 
 @Injectable({
-  providedIn: 'root',
+  providedIn: 'root'
 })
 export class OrderService extends BaseApiService {
+
   constructor(http: HttpClient) {
     super(http);
   }
@@ -19,8 +20,8 @@ export class OrderService extends BaseApiService {
   getUserOrders(pageIndex: number = 1, pageSize: number = 10): Observable<any> {
     const params = {
       pageIndex: pageIndex,
-      pageSize: pageSize,
+      pageSize: pageSize
     };
-    return this.getpage<any>(`order/user`, params);
+    return this.getpage<any>('order/user', params);
   }
 }

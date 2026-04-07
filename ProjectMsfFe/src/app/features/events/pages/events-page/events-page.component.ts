@@ -16,8 +16,6 @@ export class EventsPageComponent {
   selectedCategoryId: number | null = null;
 
   onCategoryChange(categoryId: number | null) {
-    debugger
-    console.log(categoryId)
     this.selectedCategoryId = categoryId;
   }
 }

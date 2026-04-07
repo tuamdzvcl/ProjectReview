@@ -62,7 +62,6 @@ export class UserProfileComponent implements OnInit {
       // Viewing another user's profile
       this.userService.getUserProfile(id).subscribe({
         next: (res: UserProfile) => {
-          console.log(res)
           this.user = {
             Id: id,
             Email: '',

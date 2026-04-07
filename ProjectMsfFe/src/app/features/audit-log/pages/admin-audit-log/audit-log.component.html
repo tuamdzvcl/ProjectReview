@@ -1,0 +1,56 @@
+<app-shell>
+  <div class="box">
+    <div class="dashboard-page">
+      <div class="page-header">
+        <h2>AudiLog (Nhật ký Hệ thống)</h2>
+        <div class="filter-actions">
+          <input type="text" placeholder="Tìm kiếm log..." class="search-input" />
+          <button class="btn btn-secondary">
+            <i class="fa-solid fa-filter"></i> Lọc
+          </button>
+          <button class="btn btn-primary">
+            <i class="fa-solid fa-download"></i> Xuất File
+          </button>
+        </div>
+      </div>
+
+      <div class="table-container">
+        <table class="audit-table">
+          <thead>
+            <tr>
+              <th>Thời gian</th>
+              <th>Người dùng</th>
+              <th>Hành động</th>
+              <th>Đối tượng</th>
+              <th>Trạng thái</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>06/04/2026 14:30:12</td>
+              <td>nguyenvana&#64;gmail.com</td>
+              <td><span class="action-badge create">Tạo mới</span></td>
+              <td>Sự kiện (ID: 1023)</td>
+              <td><span class="status-badge success">Thành công</span></td>
+            </tr>
+            <tr>
+              <td>06/04/2026 13:15:05</td>
+              <td>admin&#64;barren.com</td>
+              <td><span class="action-badge update">Cập nhật</span></td>
+              <td>Khuyến mãi (SUMMER2026)</td>
+              <td><span class="status-badge success">Thành công</span></td>
+            </tr>
+            <tr>
+              <td>06/04/2026 10:05:42</td>
+              <td>unknown_user</td>
+              <td><span class="action-badge delete">Cảnh báo</span></td>
+              <td>Hệ thống</td>
+              <td><span class="status-badge error">Thất bại</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+</app-shell>

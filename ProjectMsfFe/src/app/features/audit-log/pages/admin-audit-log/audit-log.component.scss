@@ -1,0 +1,147 @@
+.box {
+  width: 100%;
+  height: 88vh;
+}
+
+.dashboard-page {
+  padding: 2rem;
+  font-family: 'Inter', sans-serif;
+  color: #333;
+}
+
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+
+  h2 {
+    font-size: 1.8rem;
+    color: #2c3e50;
+    margin: 0;
+  }
+}
+
+.filter-actions {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+
+  .search-input {
+    padding: 0.6rem 1rem;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    outline: none;
+
+    &:focus {
+      border-color: #81E979;
+      box-shadow: 0 0 0 3px rgba(129, 233, 121, 0.2);
+    }
+  }
+}
+
+.btn {
+  padding: 0.6rem 1.2rem;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  border: none;
+  transition: all 0.3s;
+}
+
+.btn-primary {
+  background-color: #81E979;
+  color: white;
+
+  &:hover {
+    background-color: #6bd063;
+    box-shadow: 0 4px 10px rgba(129, 233, 121, 0.3);
+  }
+}
+
+.btn-secondary {
+  background-color: #f1f1f1;
+  color: #555;
+
+  &:hover {
+    background-color: #e5e5e5;
+  }
+}
+
+.table-container {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+  overflow: hidden;
+  border: 1px solid #eee;
+}
+
+.audit-table {
+  width: 100%;
+  border-collapse: collapse;
+
+  th,
+  td {
+    padding: 1.2rem;
+    text-align: left;
+    border-bottom: 1px solid #eee;
+  }
+
+  th {
+    background-color: #f9fbf9;
+    color: #2c3e50;
+    font-weight: 600;
+  }
+
+  tr {
+    &:last-child td {
+      border-bottom: none;
+    }
+
+    &:hover {
+      background-color: #fcfdfc;
+    }
+  }
+}
+
+.action-badge {
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  font-weight: 500;
+
+  &.create {
+    background: #e8f5e9;
+    color: #2e7d32;
+  }
+
+  &.update {
+    background: #e3f2fd;
+    color: #1565c0;
+  }
+
+  &.delete {
+    background: #ffebee;
+    color: #c62828;
+  }
+}
+
+.status-badge {
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-size: 0.85rem;
+  font-weight: 600;
+
+  &.success {
+    background: #e8f5e9;
+    color: #3ca233;
+  }
+
+  &.error {
+    background: #ffebee;
+    color: #e74c3c;
+  }
+}

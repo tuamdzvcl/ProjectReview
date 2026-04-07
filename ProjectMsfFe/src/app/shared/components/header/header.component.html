@@ -1,15 +1,15 @@
 <header class="header">
-  <div class="logo">
+  <a routerLink="/" class="logo">
     <span class="logo-circle">B</span>
     <span class="logo-text">Barren</span>
-  </div>
+  </a>
 
   <nav class="nav" [class.active]="isMenuOpen">
     <a routerLink="/" (click)="closeMenu()">Trang chủ</a>
     <a routerLink="/discover" (click)="closeMenu()">Khám phá</a>
-    <a (click)="closeMenu()">Bảng giá</a>
-    <a (click)="closeMenu()">Bài viết</a>
-    <a (click)="closeMenu()">Hỗ trợ</a>
+    <a routerLink="/pricing" (click)="closeMenu()">Bảng giá</a>
+    <a routerLink="/blog" (click)="closeMenu()">Bài viết</a>
+    <a routerLink="/support" (click)="closeMenu()">Hỗ trợ</a>
     
     <!-- Move create button here for mobile, display controlled by SCSS -->
     <button *ngIf="canCreateEvent()" class="create-btn create-btn-mobile" routerLink="/event-create-page" (click)="closeMenu()">

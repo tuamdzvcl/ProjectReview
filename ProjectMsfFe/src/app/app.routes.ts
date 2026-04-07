@@ -21,6 +21,14 @@ import { UserProfileComponent } from './features/user/pages/user-profile/user-pr
 import { CheckoutPageComponent } from './features/events/pages/checkout-page/checkout-page.component';
 
 import { LandingPageComponent } from './features/home/pages/landing-page/landing-page.component';
+import { PricingComponent } from './features/home/pages/pricing/pricing.component';
+import { BlogComponent } from './features/home/pages/blog/blog.component';
+import { SupportComponent } from './features/home/pages/support/support.component';
+
+import { PromotionsComponent } from './features/promotions/pages/admin-promotions/promotions.component';
+import { PaymentsComponent } from './features/payments/pages/admin-payments/payments.component';
+import { AuditLogComponent } from './features/audit-log/pages/admin-audit-log/audit-log.component';
+import { MembershipComponent } from './features/membership/pages/admin-membership/membership.component';
 
 export const routes: Routes = [
   { path: 'header', component: HeaderComponent },
@@ -96,6 +104,18 @@ export const routes: Routes = [
         component: UserProfileComponent,
       },
       {
+        path: 'pricing',
+        component: PricingComponent,
+      },
+      {
+        path: 'blog',
+        component: BlogComponent,
+      },
+      {
+        path: 'support',
+        component: SupportComponent,
+      },
+      {
         path: 'checkout',
         component: CheckoutPageComponent,
       },
@@ -127,6 +147,10 @@ export const routes: Routes = [
         canActivate: [authGuard],
         data: { requiresAuth: true },
       },
+      { path: 'promotions', component: PromotionsComponent },
+      { path: 'payments', component: PaymentsComponent },
+      { path: 'audit-log', component: AuditLogComponent },
+      { path: 'membership', component: MembershipComponent },
     ],
   },
   {

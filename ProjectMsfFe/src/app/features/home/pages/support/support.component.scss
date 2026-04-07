@@ -1,0 +1,136 @@
+.box {
+  width: 100%;
+  height: 88vh;
+}
+
+.support-container {
+  padding: 4rem 5%;
+  background-color: #fff;
+  min-height: 100vh;
+  font-family: 'Inter', sans-serif;
+}
+
+.support-header {
+  text-align: center;
+  margin-bottom: 4rem;
+
+  h1 {
+    font-size: 2.5rem;
+    color: #2c3e50;
+    margin-bottom: 1rem;
+    color: #81E979;
+  }
+
+  p {
+    font-size: 1.1rem;
+    color: #666;
+  }
+}
+
+.support-content {
+  display: flex;
+  gap: 4rem;
+  max-width: 1200px;
+  margin: 0 auto;
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+  }
+}
+
+.faq-section {
+  flex: 1;
+
+  h2 {
+    font-size: 1.8rem;
+    color: #2c3e50;
+    margin-bottom: 2rem;
+  }
+
+  .faq-item {
+    margin-bottom: 2rem;
+
+    h3 {
+      font-size: 1.2rem;
+      color: #333;
+      margin-bottom: 0.8rem;
+      display: flex;
+      align-items: flex-start;
+
+      &:before {
+        content: 'Q.';
+        color: #81E979;
+        font-weight: bold;
+        margin-right: 10px;
+      }
+    }
+
+    p {
+      color: #666;
+      line-height: 1.6;
+      padding-left: 28px;
+    }
+  }
+}
+
+.contact-form {
+  flex: 1;
+  background: #f9f9f9;
+  padding: 2.5rem;
+  border-radius: 12px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.03);
+  border-top: 4px solid #81E979;
+
+  h2 {
+    font-size: 1.8rem;
+    color: #2c3e50;
+    margin-bottom: 2rem;
+  }
+
+  .form-group {
+    margin-bottom: 1.5rem;
+
+    label {
+      display: block;
+      margin-bottom: 0.5rem;
+      font-weight: 500;
+      color: #444;
+    }
+
+    input,
+    textarea {
+      width: 100%;
+      padding: 12px 15px;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      font-family: inherit;
+      font-size: 1rem;
+      transition: border-color 0.3s, box-shadow 0.3s;
+
+      &:focus {
+        outline: none;
+        border-color: #81E979;
+        box-shadow: 0 0 0 3px rgba(129, 233, 121, 0.2);
+      }
+    }
+  }
+
+  .btn-primary {
+    width: 100%;
+    padding: 14px;
+    border: none;
+    border-radius: 8px;
+    background-color: #81E979;
+    color: #fff;
+    font-size: 1.1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+    margin-top: 1rem;
+
+    &:hover {
+      background-color: #6cd964;
+      box-shadow: 0 4px 10px rgba(129, 233, 121, 0.4);
+    }
+  }
+}

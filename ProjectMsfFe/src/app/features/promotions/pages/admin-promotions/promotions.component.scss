@@ -1,0 +1,158 @@
+.box {
+  width: 100%;
+  height: 88vh;
+}
+.dashboard-page {
+  padding: 2rem;
+  font-family: 'Inter', sans-serif;
+  color: #333;
+}
+
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+  
+  h2 {
+    font-size: 1.8rem;
+    color: #2c3e50;
+    margin: 0;
+  }
+}
+
+.btn-primary {
+  background-color: #81E979;
+  color: white;
+  border: none;
+  padding: 0.6rem 1.2rem;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: all 0.3s;
+  
+  &:hover {
+    background-color: #6bd063;
+    box-shadow: 0 4px 10px rgba(129, 233, 121, 0.3);
+  }
+}
+
+.cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 1.5rem;
+}
+
+.promo-card {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+  border: 1px solid #eee;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.3s;
+
+  &:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 20px rgba(129, 233, 121, 0.15);
+    border-color: #81E979;
+  }
+}
+
+.promo-header {
+  padding: 1.5rem;
+  border-bottom: 1px solid #eee;
+  position: relative;
+  
+  h3 {
+    margin: 0;
+    font-size: 1.4rem;
+    color: #2c3e50;
+  }
+  
+  .badge {
+    position: absolute;
+    top: 1rem;
+    right: 1.5rem;
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    
+    &.active {
+      background-color: rgba(129, 233, 121, 0.15);
+      color: #3ca233;
+    }
+    
+    &.inactive {
+      background-color: rgba(243, 156, 18, 0.15);
+      color: #f39c12;
+    }
+  }
+}
+
+.promo-body {
+  padding: 1.5rem;
+  flex-grow: 1;
+  
+  .info-row {
+    display: flex;
+    align-items: center;
+    margin-bottom: 0.8rem;
+    
+    i {
+      width: 20px;
+      color: #81E979;
+      margin-right: 10px;
+    }
+    
+    strong {
+      color: #555;
+      margin-right: 5px;
+    }
+    
+    span {
+      color: #2c3e50;
+    }
+  }
+}
+
+.promo-actions {
+  display: flex;
+  border-top: 1px solid #eee;
+  
+  .btn-icon {
+    flex: 1;
+    padding: 1rem;
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-weight: 600;
+    transition: background-color 0.3s;
+    
+    i {
+      margin-right: 5px;
+    }
+    
+    &.edit {
+      color: #3498db;
+      border-right: 1px solid #eee;
+      
+      &:hover {
+        background-color: rgba(52, 152, 219, 0.05);
+      }
+    }
+    
+    &.delete {
+      color: #e74c3c;
+      
+      &:hover {
+        background-color: rgba(231, 76, 60, 0.05);
+      }
+    }
+  }
+}
