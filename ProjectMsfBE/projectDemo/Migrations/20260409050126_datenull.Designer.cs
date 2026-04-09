@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using projectDemo.Data;
 
@@ -11,9 +12,11 @@ using projectDemo.Data;
 namespace projectDemo.Migrations
 {
     [DbContext(typeof(EventTickDbContext))]
-    partial class EventTickDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260409050126_datenull")]
+    partial class datenull
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -42,6 +45,7 @@ namespace projectDemo.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime?>("EndDate")
+                        .IsRequired()
                         .HasColumnType("datetime2");
 
                     b.Property<bool?>("IsDeleted")
@@ -57,12 +61,15 @@ namespace projectDemo.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime?>("SaleEndDate")
+                        .IsRequired()
                         .HasColumnType("datetime2");
 
                     b.Property<DateTime?>("SaleStartDate")
+                        .IsRequired()
                         .HasColumnType("datetime2");
 
                     b.Property<DateTime?>("StartDate")
+                        .IsRequired()
                         .HasColumnType("datetime2");
 
                     b.Property<int>("Status")
@@ -259,21 +266,21 @@ namespace projectDemo.Migrations
                         new
                         {
                             Id = 1,
-                            CreatedDate = new DateTime(2026, 4, 9, 6, 52, 45, 647, DateTimeKind.Utc).AddTicks(8517),
+                            CreatedDate = new DateTime(2026, 4, 9, 5, 1, 26, 55, DateTimeKind.Utc).AddTicks(33),
                             IsDeleted = false,
                             RoleName = "ADMIN"
                         },
                         new
                         {
                             Id = 2,
-                            CreatedDate = new DateTime(2026, 4, 9, 6, 52, 45, 647, DateTimeKind.Utc).AddTicks(8524),
+                            CreatedDate = new DateTime(2026, 4, 9, 5, 1, 26, 55, DateTimeKind.Utc).AddTicks(41),
                             IsDeleted = false,
                             RoleName = "ORGANIZER"
                         },
                         new
                         {
                             Id = 3,
-                            CreatedDate = new DateTime(2026, 4, 9, 6, 52, 45, 647, DateTimeKind.Utc).AddTicks(8526),
+                            CreatedDate = new DateTime(2026, 4, 9, 5, 1, 26, 55, DateTimeKind.Utc).AddTicks(43),
                             IsDeleted = false,
                             RoleName = "CUSTOMER"
                         });
@@ -461,7 +468,7 @@ namespace projectDemo.Migrations
                             IsDeleted = false,
                             IsLock = false,
                             LastName = "admin",
-                            PasswordHash = "$2a$11$Ufk9X6TyRCLH03wPvf6stOUVzrWr.dKQFdNrRxhwZu244mudK6dj.",
+                            PasswordHash = "$2a$11$2IB6Vp75kl0qMlPr9hiT8.DVGJH587Cy1ex5RquVhk55/z2mvnJs6",
                             Username = "admin"
                         });
                 });

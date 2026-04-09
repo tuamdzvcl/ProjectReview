@@ -4,48 +4,53 @@
       <h1 class="topbar__title">Dashboard</h1>
     </div>
 
-    <section class="card profile">
-      <div style="display: flex; gap: 10px">
-        <div class="profile__avatar">JD</div>
-        <div class="profile__info">
-          <div class="profile__name">John Doe</div>
-          <div class="profile__org">My Organisation</div>
-        </div>
-      </div>
-      <button class="btn btn--ghost btn--small" type="button">
-        <span><i class="fa-solid fa-plus"></i></span>
-        Add Organisation
-      </button>
-    </section>
-
     <section class="summary">
       <div class="summary__row">
-        <div class="summary__date">01/04/2026 - 30/04/2026</div>
+        <div class="date-picker-container">
+          <span class="date-label"><i class="fa-regular fa-calendar-days"></i> Khoảng thời gian:</span>
+          <p-datepicker 
+            [(ngModel)]="rangeDates" 
+            selectionMode="range" 
+            [readonlyInput]="true" 
+            dateFormat="dd/mm/yy"
+            placeholder="Chọn ngày bắt đầu - ngày kết thúc"
+            (onSelect)="onDateChange()"
+            [showIcon]="true">
+          </p-datepicker>
+        </div>
       </div>
 
       <div class="summary__cards">
         <article class="stat stat--purple">
           <div class="stat__label">DOANH THU (VNĐ)</div>
-          <div class="stat__value">15.500.000đ</div>
-          <div class="stat__meta">0.00% So với kỳ trước</div>
+          <div class="stat__value">{{ formatCurrency(totalRevenue) }}</div>
+          <div class="stat__meta" [class.stat__meta--up]="growthRevenue >= 0" [class.stat__meta--down]="growthRevenue < 0">
+            {{ formatGrowth(growthRevenue) }} So với kỳ trước
+          </div>
         </article>
 
         <article class="stat stat--red">
           <div class="stat__label">ĐƠN HÀNG</div>
-          <div class="stat__value">25</div>
-          <div class="stat__meta">0.00% So với kỳ trước</div>
+          <div class="stat__value">{{ totalOrders }}</div>
+          <div class="stat__meta" [class.stat__meta--up]="growthOrders >= 0" [class.stat__meta--down]="growthOrders < 0">
+            {{ formatGrowth(growthOrders) }} So với kỳ trước
+          </div>
         </article>
 
         <article class="stat stat--blue">
           <div class="stat__label">LƯỢT XEM TRANG</div>
-          <div class="stat__value">3.200</div>
-          <div class="stat__meta">0.00% So với kỳ trước</div>
+          <div class="stat__value">{{ totalViews }}</div>
+          <div class="stat__meta" [class.stat__meta--up]="growthViews >= 0" [class.stat__meta--down]="growthViews < 0">
+            {{ formatGrowth(growthViews) }} So với kỳ trước
+          </div>
         </article>
 
         <article class="stat stat--green">
           <div class="stat__label">VÉ ĐÃ BÁN</div>
-          <div class="stat__value">45</div>
-          <div class="stat__meta">0.00% So với kỳ trước</div>
+          <div class="stat__value">{{ totalTickets }}</div>
+          <div class="stat__meta" [class.stat__meta--up]="growthTickets >= 0" [class.stat__meta--down]="growthTickets < 0">
+            {{ formatGrowth(growthTickets) }} So với kỳ trước
+          </div>
         </article>
       </div>
     </section>
@@ -53,16 +58,13 @@
     <section class="chart card">
       <header class="chart__header">
         <select class="chart__title">
-          <option value="Revenue">Revenue</option>
+          <option value="Revenue">Doanh thu</option>
         </select>
         <div class="chart__tabs">
           <button class="chip" [class.chip--active]="selectedTab === 'Monthly'" type="button"
-            (click)="fetchRevenueStats('Monthly')">Monthly</button>
-          <button class="chip" [class.chip--active]="selectedTab === 'Weekly'"
-            [class.chip--active]="selectedTab === 'Weekly'" type="button"
-            (click)="fetchRevenueStats('Weekly')">Weekly</button>
+            (click)="fetchRevenueStats('Monthly')">Theo Tháng</button>
           <button class="chip" [class.chip--active]="selectedTab === 'Daily'" type="button"
-            (click)="fetchRevenueStats('Daily')">Daily</button>
+            (click)="fetchRevenueStats('Daily')">Theo Ngày</button>
         </div>
       </header>
       <div class="chart__body">

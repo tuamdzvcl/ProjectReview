@@ -29,17 +29,14 @@ namespace EventTick.Model.Models
         [MaxLength(255)]
         public string Location { get; set; } = null!;
 
-        [Required]
-        public DateTime StartDate { get; set; }
+        public DateTime? StartDate { get; set; }
 
-        [Required]
-        public DateTime EndDate { get; set; }
+        public DateTime? EndDate { get; set; }
 
-        [Required]
-        public DateTime SaleStartDate { get; set; }
+        public DateTime? SaleStartDate { get; set; }
 
-        [Required]
-        public DateTime SaleEndDate { get; set; }
+        
+        public DateTime? SaleEndDate { get; set; }
 
         [Required]
         public string PosterUrl { get; set; }

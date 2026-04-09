@@ -93,7 +93,6 @@ D:\Msf\ProjectMsfBE\projectDemo\obj\Debug\net7.0\ref\projectDemo.dll
 D:\Msf\ProjectMsfBE\projectDemo\temp_build_verify\appsettings.Development.json
 D:\Msf\ProjectMsfBE\projectDemo\temp_build_verify\appsettings.json
 D:\Msf\ProjectMsfBE\projectDemo\temp_build_verify\projectDemo.staticwebassets.runtime.json
-D:\Msf\ProjectMsfBE\projectDemo\temp_build_verify\projectDemo.exe
 D:\Msf\ProjectMsfBE\projectDemo\temp_build_verify\projectDemo.deps.json
 D:\Msf\ProjectMsfBE\projectDemo\temp_build_verify\projectDemo.runtimeconfig.json
 D:\Msf\ProjectMsfBE\projectDemo\temp_build_verify\projectDemo.dll

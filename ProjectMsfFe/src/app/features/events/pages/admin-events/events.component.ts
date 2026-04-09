@@ -3,6 +3,7 @@ import {
   ChangeDetectionStrategy,
   Component,
   OnInit,
+  HostListener,
 } from '@angular/core';
 import { AppShellComponent } from '../../../../layouts/app-shell/app-shell.component';
 import { EventService } from '../../../../core/services/event.service';
@@ -78,8 +79,19 @@ export class EventsComponent implements OnInit {
     this.loadEvents();
   }
 
+  @HostListener('document:click', ['$event'])
+  onDocumentClick(event: MouseEvent) {
+    const target = event.target as HTMLElement;
+    if (!target.closest('.action-dropdown')) {
+      this.showDropdown = null;
+    }
+  }
 
-  toggleDropdown(eventId: string) {
+  toggleDropdown(eventId: string, event?: Event) {
+    if (event) {
+      event.preventDefault();
+      event.stopPropagation();
+    }
     this.showDropdown = this.showDropdown === eventId ? null : eventId;
   }
 
@@ -91,6 +103,16 @@ export class EventsComponent implements OnInit {
     return (event: any) => {
       return event.Status === 'ENDED' || new Date(event.EndDate) < new Date();
     };
+  }
+
+  getTotalTickets(event: any): number {
+    if (!event.ListTypeTick || !event.ListTypeTick.length) return 0;
+    return event.ListTypeTick.reduce((sum: number, t: any) => sum + (t.TotalQuantity || 0), 0);
+  }
+
+  getTotalSold(event: any): number {
+    if (!event.ListTypeTick || !event.ListTypeTick.length) return 0;
+    return event.ListTypeTick.reduce((sum: number, t: any) => sum + (t.SoldQuantity || 0), 0);
   }
 
   duplicateEvent(event: any) {

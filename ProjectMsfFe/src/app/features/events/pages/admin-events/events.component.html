@@ -30,8 +30,9 @@
       </div>
     </section>
 
-    
-    <section class="event-item card" *ngFor="let event of events; let i = index">
+
+    <section class="event-item card" *ngFor="let event of events; let i = index" style="cursor: pointer;"
+      (click)="viewDetails(event)">
       <div class="event-item__media">
         <div class="event-item__thumbnail">
           <img [src]="event.PosterUrl | imageUrl" [alt]="event.name || 'Event'" />
@@ -45,7 +46,7 @@
           <div class="event-meta">
             <div class="event-meta__label">Status</div>
             <div class="event-meta__value event-meta__value--green">
-              {{ event.Status || "Publish" }}
+              {{ event.Status }}
             </div>
           </div>
 
@@ -57,37 +58,50 @@
           </div>
 
           <div class="event-meta">
-            <div class="event-meta__label">Ticket</div>
+            <div class="event-meta__label">Total Tickets</div>
             <div class="event-meta__value">
-              {{ event.ListTypeTick?.[0]?.TotalQuantity }}
+              {{ getTotalTickets(event) }}
             </div>
           </div>
 
           <div class="event-meta">
-            <div class="event-meta__label">Tickets sold</div>
-            <div class="event-meta__value">
-              {{ event.ListTypeTick[0]?.SoldQuantity || 0 }}
+            <div class="event-meta__label">Total Sold</div>
+            <div class="event-meta__value" style="color: #6cc04a;">
+              {{ getTotalSold(event) }}
             </div>
           </div>
         </div>
+
+        <div class="ticket-chips" *ngIf="event.ListTypeTick?.length"
+          style="display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; padding-top: 12px; ">
+          <div *ngFor="let ticket of event.ListTypeTick"
+            style="font-size: 11px; font-weight: 500; background: #f3f4f6; color: #4b5563; padding: 4px 10px; border-radius: 100px; display: inline-flex; align-items: center; gap: 6px; border: 1px solid #e5e7eb;">
+            <span>{{ ticket.Name }}</span>
+            <span
+              style="display: inline-block; width: 4px; height: 4px; border-radius: 50%; background: #d1d5db;"></span>
+            <span style="color: #16a34a;">{{ ticket.SoldQuantity || 0 }}/{{ ticket.TotalQuantity }} sold</span>
+          </div>
+        </div>
       </div>
-      <div class="event-item__actions">
+      <div class="event-item__actions" (click)="$event.stopPropagation()">
         <div class="action-dropdown" [class.active]="showDropdown === event.Id">
-          <button class="btn btn--icon" type="button" (click)="toggleDropdown(event.Id)">⋮</button>
+          <button class="btn btn--icon" type="button" (click)="toggleDropdown(event.Id, $event)">⋮</button>
           <div class="dropdown-menu">
-            <button class="dropdown-item" *ngIf="!isEventEnded(event)" (click)="editEvent(event)">
+            <button class="dropdown-item" *ngIf="!isEventEnded(event)"
+              (click)="editEvent(event); $event.stopPropagation()">
               <i class="fa-regular fa-edit"></i>
               Edit
             </button>
-            <button class="dropdown-item" *ngIf="isEventEnded(event)" (click)="duplicateEvent(event)">
+            <button class="dropdown-item" *ngIf="isEventEnded(event)"
+              (click)="duplicateEvent(event); $event.stopPropagation()">
               <i class="fa-regular fa-copy"></i>
               Nhân bản
             </button>
-            <button class="dropdown-item" (click)="deleteEvent(event)">
+            <button class="dropdown-item" (click)="deleteEvent(event); $event.stopPropagation()">
               <i class="fa-regular fa-trash-can"></i>
               Delete
             </button>
-            <button class="dropdown-item" (click)="viewDetails(event)">
+            <button class="dropdown-item" (click)="viewDetails(event); $event.stopPropagation()">
               <i class="fa-solid fa-circle-info"></i>
               View Details
             </button>
@@ -97,7 +111,7 @@
       </div>
     </section>
 
-    
+
     <section class="no-events" *ngIf="events.length == 0">
       <div class="no-events__content">
         <div class="no-events__icon">

@@ -60,7 +60,7 @@ namespace projectDemo.Service.EventService
 
         private static bool IsEventEnded(Event events, DateTime now)
         {
-            return events.EndDate <= now;
+            return events.EndDate.HasValue && events.EndDate.Value <= now;
         }
 
         private async Task SyncEndedEventsAsync()
@@ -70,7 +70,8 @@ namespace projectDemo.Service.EventService
                 .Where(e => e.IsDeleted == false
                     && e.Status != EnumStatusEvent.CANNEL
                     && e.Status != EnumStatusEvent.ENDED
-                    && e.EndDate <= now)
+                    && e.EndDate.HasValue
+                    && e.EndDate.Value <= now)
                 .ToListAsync();
 
             if (!expiredEvents.Any())
@@ -102,26 +103,34 @@ namespace projectDemo.Service.EventService
         public bool checkVadidate(EventRequest request)
         {
             // Lấy thời gian hiện tại theo múi giờ Việt Nam (GMT+7)
-            TimeZoneInfo vnTimeZone;
-            try
-            {
-                vnTimeZone = TimeZoneInfo.FindSystemTimeZoneById("SE Asia Standard Time");
-            }
-            catch (TimeZoneNotFoundException)
-            {
-                vnTimeZone = TimeZoneInfo.FindSystemTimeZoneById("Asia/Ho_Chi_Minh");
-            }
-            DateTime now = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, vnTimeZone);
+            var now = GetVietnamNow();
 
-            if (request.StartDate <= now)
+            var hasAnyDate =
+                request.StartDate.HasValue ||
+                request.EndDate.HasValue ||
+                request.SaleStartDate.HasValue ||
+                request.SaleEndDate.HasValue;
+
+            if (!hasAnyDate)
+                return true;
+
+            if (!request.StartDate.HasValue ||
+                !request.EndDate.HasValue ||
+                !request.SaleStartDate.HasValue ||
+                !request.SaleEndDate.HasValue)
             {
                 return false;
             }
-            if (request.EndDate <= request.StartDate)
+
+            if (request.StartDate.Value <= now)
+            {
                 return false;
-            if (request.SaleStartDate >= request.SaleEndDate)
+            }
+            if (request.EndDate.Value <= request.StartDate.Value)
                 return false;
-            if (request.SaleEndDate > request.StartDate)
+            if (request.SaleStartDate.Value >= request.SaleEndDate.Value)
+                return false;
+            if (request.SaleEndDate.Value > request.StartDate.Value)
                 return false;
             return true;
         }
@@ -407,10 +416,7 @@ namespace projectDemo.Service.EventService
                     return ApiResponse<string>.FailResponse(Entity.Enum.EnumStatusCode.EVENTNOTFOUD, "Không tìm thấy event");
                 }
                 await EnsureEventEndedStatusAsync(events);
-                if (events.Status == EnumStatusEvent.ENDED)
-                {
-                    return ApiResponse<string>.FailResponse(Entity.Enum.EnumStatusCode.BAD_REQUEST, "Sự kiện đã kết thúc, không thể chỉnh sửa nữa");
-                }
+                
                 if (events.Status == EnumStatusEvent.PUBLIC)                {
                     return ApiResponse<string>.FailResponse(Entity.Enum.EnumStatusCode.UNAUTHORIZED, "Sự kiện đã được công bố không thu hồi được");
 
@@ -651,10 +657,10 @@ namespace projectDemo.Service.EventService
                     Title = originalEvent.Title + " - nhân bản",
                     Status = EnumStatusEvent.DRAFT,
                     PosterUrl = originalEvent.PosterUrl,
-                    StartDate = originalEvent.StartDate,
-                    EndDate = originalEvent.EndDate,
-                    SaleStartDate = originalEvent.SaleStartDate,
-                    SaleEndDate = originalEvent.SaleEndDate,
+                    StartDate = null,
+                    EndDate = null,
+                    SaleStartDate = null,
+                    SaleEndDate = null,
                     Description = originalEvent.Description,
                     Location = originalEvent.Location,
                     CreatedDate = DateTime.Now,
@@ -698,6 +704,14 @@ namespace projectDemo.Service.EventService
         }
 
         //update status
+        private bool checkeDateNull(Event request)
+        {
+            if (request.StartDate == null | request.EndDate == null)
+                return false;
+            if (request.SaleStartDate == null || request.SaleEndDate == null)
+                return false;
+            return true;
+        }
         public async Task<ApiResponse<string>> UpdateEventStatus(Guid eventId, EventStatusUpdateRequest request)
         {
             try
@@ -720,7 +734,14 @@ namespace projectDemo.Service.EventService
                     return ApiResponse<string>.FailResponse(Entity.Enum.EnumStatusCode.BAD_REQUEST, "Sự kiện đã kết thúc, không thể cập nhật trạng thái");
                 }
 
-                events.Status = request.Status.Value;
+                var check = checkeDateNull(events);
+                if (!check)
+                {
+                    return ApiResponse<string>.FailResponse(Entity.Enum.EnumStatusCode.DATE, "Kiểm tra lại ngày tháng");
+
+                }
+
+                events.Status = EnumStatusEvent.PUBLISHED;
                 events.UpdatedDate = DateTime.Now;
 
                 await _uow.SaveChangesAsync();

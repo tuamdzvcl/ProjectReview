@@ -122,6 +122,12 @@ export class CreateEventComponent implements OnInit, OnDestroy {
   }
 
   
+  private isValidDate(d: any): boolean {
+    if (!d || d === 'null' || d === 'undefined') return false;
+    const date = new Date(d);
+    return !isNaN(date.getTime());
+  }
+
   private restoreFromDraft(): void {
     if (!this.draftService.hasDraft()) return;
 
@@ -131,8 +137,8 @@ export class CreateEventComponent implements OnInit, OnDestroy {
     this.description = draft.description;
     this.location = draft.location;
     this.selectedCategory = draft.selectedCategory;
-    this.eventDate = draft.eventDate ? new Date(draft.eventDate) : undefined;
-    this.eventTime = draft.eventTime ? new Date(draft.eventTime) : undefined;
+    this.eventDate = this.isValidDate(draft.eventDate) ? new Date(draft.eventDate as any) : undefined;
+    this.eventTime = this.isValidDate(draft.eventTime) ? new Date(draft.eventTime as any) : undefined;
     this.duration = draft.duration;
     this.previewUrl = draft.previewUrl;
     this.selectedFile = this.draftService.selectedFile;
