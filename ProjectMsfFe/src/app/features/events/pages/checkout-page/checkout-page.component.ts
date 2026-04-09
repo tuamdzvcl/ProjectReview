@@ -68,7 +68,7 @@ export class CheckoutPageComponent implements OnInit {
     private tokenService: TokenService,
     private orderService: OrderService,
     public router: Router
-  ) { }
+  ) {}
 
   ngOnInit(): void {
     this.bookingData = this.bookingService.getBooking();
@@ -89,14 +89,15 @@ export class CheckoutPageComponent implements OnInit {
       return;
     }
 
-    this.userService.getUserEvents(userId).subscribe({
+    this.userService.getUserEvents().subscribe({
       next: (res) => {
         console.log('user ', res);
         this.userProfile = res.User;
 
         if (this.userProfile) {
-          this.customerName = `${this.userProfile.FirstName || ''} ${this.userProfile.LastName || ''
-            }`.trim();
+          this.customerName = `${this.userProfile.FirstName || ''} ${
+            this.userProfile.LastName || ''
+          }`.trim();
           this.customerEmail = this.userProfile.Email || '';
         }
       },
@@ -125,10 +126,10 @@ export class CheckoutPageComponent implements OnInit {
 
     // Lấy danh sách các vé đã chọn (OrderItemRequest)
     const orderItems = Object.keys(this.bookingData?.selectedTickets || {})
-      .filter(id => this.bookingData!.selectedTickets[Number(id)] > 0)
-      .map(id => ({
+      .filter((id) => this.bookingData!.selectedTickets[Number(id)] > 0)
+      .map((id) => ({
         TicketTypeId: Number(id),
-        Quantity: this.bookingData!.selectedTickets[Number(id)]
+        Quantity: this.bookingData!.selectedTickets[Number(id)],
       }));
 
     // Tạo đối tượng CreateOrderRequest khớp với Backend
@@ -137,9 +138,9 @@ export class CheckoutPageComponent implements OnInit {
         fullName: this.customerName,
         Address: this.address,
         Phone: this.phoneNumber,
-        Email: this.customerEmail
+        Email: this.customerEmail,
       },
-      Items: orderItems
+      Items: orderItems,
     };
 
     Swal.fire({
@@ -153,32 +154,29 @@ export class CheckoutPageComponent implements OnInit {
       cancelButtonText: 'Hủy',
     }).then((result) => {
       if (result.isConfirmed) {
-        // Log dữ liệu trước khi gửi và hiển thị loading
-        console.log('[DEBUG] Đang gửi dữ liệu đặt vé tới API api/order:', orderData);
-
         Swal.fire({
           title: 'Đang xử lý...',
           text: 'Vui lòng chờ trong giây lát.',
           allowOutsideClick: false,
           didOpen: () => {
             Swal.showLoading();
-          }
+          },
         });
 
         this.orderService.createOrder(orderData).subscribe({
           next: (response) => {
-            console.log('[DEBUG] Kết quả từ Backend:', response);
-
-            Swal.fire({
-              title: 'Thành công!',
-              text: 'Đơn hàng của bạn đã được khởi tạo thành công.',
-              icon: 'success',
-              timer: 2000,
-              showConfirmButton: false,
-            }).then(() => {
-              this.bookingService.clearBooking();
-              this.router.navigate(['/']);
-            });
+            console.log(response);
+            window.location.href = response.PayUrl;
+            // Swal.fire({
+            //   title: 'Thành công!',
+            //   text: 'Đơn hàng của bạn đã được khởi tạo thành công.',
+            //   icon: 'success',
+            //   timer: 2000,
+            //   showConfirmButton: false,
+            // }).then(() => {
+            //   this.bookingService.clearBooking();
+            //   this.router.navigate(['/']);
+            // });
           },
           error: (err) => {
             console.error('[DEBUG] Lỗi khi gọi API CreateOrder:', err);
@@ -186,9 +184,11 @@ export class CheckoutPageComponent implements OnInit {
             Swal.fire({
               icon: 'error',
               title: 'Đặt vé thất bại',
-              text: err.message || 'Có lỗi xảy ra trong quá trình đặt vé. Vui lòng thử lại sau.'
+              text:
+                err.message ||
+                'Có lỗi xảy ra trong quá trình đặt vé. Vui lòng thử lại sau.',
             });
-          }
+          },
         });
       }
     });

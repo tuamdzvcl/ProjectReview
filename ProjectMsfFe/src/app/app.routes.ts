@@ -29,6 +29,7 @@ import { PromotionsComponent } from './features/promotions/pages/admin-promotion
 import { PaymentsComponent } from './features/payments/pages/admin-payments/payments.component';
 import { AuditLogComponent } from './features/audit-log/pages/admin-audit-log/audit-log.component';
 import { MembershipComponent } from './features/membership/pages/admin-membership/membership.component';
+import { PaymentResultComponent } from './features/payment/pages/payment-result/payment-result.component';
 
 export const routes: Routes = [
   { path: 'header', component: HeaderComponent },
@@ -118,6 +119,10 @@ export const routes: Routes = [
       {
         path: 'checkout',
         component: CheckoutPageComponent,
+      },
+      {
+        path: 'payment',
+        component: PaymentResultComponent,
       },
     ],
   },

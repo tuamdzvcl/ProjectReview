@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using projectDemo.Common.PageRequest;
 using projectDemo.DTO.Request;
@@ -63,6 +63,13 @@ namespace projectDemo.Controllers
         public async Task<IActionResult> DeleteId(Guid id)
         {
             var result = await _eventService.DeleteEvent(id);
+            return Ok(result);
+        }
+
+        [HttpPost("{id}/duplicate")]
+        public async Task<IActionResult> DuplicateEvent(Guid id)
+        {
+            var result = await _eventService.DuplicateEvent(id);
             return Ok(result);
         }
 

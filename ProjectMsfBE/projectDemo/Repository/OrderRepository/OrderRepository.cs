@@ -30,8 +30,6 @@ namespace projectDemo.Repository.OrderRepository
         public  int DeleteOrder(Order order)
         {
             Remove(order);
-             _uow.SaveChangesAsync();
-
             return 1;
         }
 
@@ -50,7 +48,12 @@ namespace projectDemo.Repository.OrderRepository
         }
         public async Task<Order?> GetOrderbyID(Guid orderID)
         {
-            return await _dbSet.FirstOrDefaultAsync(x => x.Id == orderID && x.IsDeleted == false);
+            return await _dbSet
+                .Include(x => x.OrderDetails)
+                .ThenInclude
+                (x => x.TicketTypes)
+                .Include(x=>x.Payment)
+                .FirstOrDefaultAsync(x => x.Id == orderID && x.IsDeleted == false);
         }
 
         public async Task<(OrderProjection?,int statuss, string messager)> GetOrderListOrderDetail(Guid orderID)
@@ -92,7 +95,6 @@ namespace projectDemo.Repository.OrderRepository
         public int UpdateOrder(Order order)
         {
             Update(order);
-            _uow.SaveChangesAsync();
             return 1;
         }
 

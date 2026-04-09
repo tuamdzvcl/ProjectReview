@@ -1,5 +1,4 @@
 export const environment = {
   production: true,
-  apiBaseUrl: 'https://your-domain.com/api',
+  apiBaseUrl: 'https://fightable-impedible-roy.ngrok-free.dev',
 };
-

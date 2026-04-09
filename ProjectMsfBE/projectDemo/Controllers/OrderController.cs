@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using projectDemo.config;
 using projectDemo.DTO.Request;
@@ -20,7 +19,6 @@ namespace projectDemo.Controllers
             _orderService = orderService;
         }
 
-        
         [HttpPost]
         public async Task<IActionResult> CreateOrder([FromBody] CreateOrderRequest request)
         {
@@ -31,26 +29,23 @@ namespace projectDemo.Controllers
         }
 
         [Permission("USER_CREATE")]
-        [HttpGet()]
+        [HttpGet]
         public async Task<IActionResult> GetOrder()
         {
             var result = await _orderService.GetOrder();
             return Ok(result);
         }
 
-       
         [HttpGet("user")]
-
         public async Task<IActionResult> GetListOrderByUser(
-            [FromQuery] int pageIndex ,
-            [FromQuery] int pageSize )
+            [FromQuery] int pageIndex,
+            [FromQuery] int pageSize)
         {
             var userId = Guid.Parse(User.FindFirst("id").Value);
-            var result = await _orderService.GetListOrderbyIdUser(userId,pageIndex,pageSize);
+            var result = await _orderService.GetListOrderbyIdUser(userId, pageIndex, pageSize);
             return Ok(result);
         }
 
-       
         [HttpGet("{orderId}/detail")]
         [AllowAnonymous]
         public async Task<IActionResult> GetOrderDetail(Guid orderId)
@@ -59,25 +54,20 @@ namespace projectDemo.Controllers
             return Ok(result);
         }
 
-        
         [HttpPut("{orderId}")]
         [AllowAnonymous]
-
         public async Task<IActionResult> UpdateOrder(Guid orderId, [FromBody] OrderUpdate request)
         {
             var result = await _orderService.UpdateOrder(orderId, request);
             return Ok(result);
         }
 
-       
         [HttpDelete("{orderId}")]
         [AllowAnonymous]
-
         public async Task<IActionResult> DeleteOrder(Guid orderId)
         {
             var result = await _orderService.DeleteOrder(orderId);
             return Ok(result);
         }
     }
-
 }

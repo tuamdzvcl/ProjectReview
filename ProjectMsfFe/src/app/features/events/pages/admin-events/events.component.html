@@ -75,9 +75,13 @@
         <div class="action-dropdown" [class.active]="showDropdown === event.Id">
           <button class="btn btn--icon" type="button" (click)="toggleDropdown(event.Id)">⋮</button>
           <div class="dropdown-menu">
-            <button class="dropdown-item" (click)="editEvent(event)">
+            <button class="dropdown-item" *ngIf="!isEventEnded(event)" (click)="editEvent(event)">
               <i class="fa-regular fa-edit"></i>
               Edit
+            </button>
+            <button class="dropdown-item" *ngIf="isEventEnded(event)" (click)="duplicateEvent(event)">
+              <i class="fa-regular fa-copy"></i>
+              Nhân bản
             </button>
             <button class="dropdown-item" (click)="deleteEvent(event)">
               <i class="fa-regular fa-trash-can"></i>

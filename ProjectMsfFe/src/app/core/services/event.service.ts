@@ -88,4 +88,8 @@ export class EventService extends BaseApiService {
   DeleteEvent(id: string) {
     return this.delete<ApiResponse<any>>(`event/${id}`);
   }
+
+  DuplicateEvent(id: string) {
+    return this.post<ApiResponse<any>>(`event/${id}/duplicate`, null);
+  }
 }

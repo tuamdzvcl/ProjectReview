@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
     using Microsoft.IdentityModel.Tokens;
 using projectDemo.config;
 using projectDemo.Data;
+using projectDemo.DTO.Response.Momo;
 using projectDemo.Entity.Models;
 using projectDemo.Mapper;
     using projectDemo.Middlewares;
@@ -13,6 +14,7 @@ using projectDemo.Repository.CatetoryRepository;
 using projectDemo.Repository.Ipml;
 using projectDemo.Repository.OrderQuery;
 using projectDemo.Repository.OrderRepository;
+using projectDemo.Repository.PaymentRepository;
 using projectDemo.Repository.PemisstionRepository;
 using projectDemo.Repository.RolePermissionRepository;
 using projectDemo.Repository.TickTypeRepository;
@@ -21,7 +23,9 @@ using projectDemo.Service.AuthService;
 using projectDemo.Service.CatetoryService;
 using projectDemo.Service.EventService;
 using projectDemo.Service.ImageService;
+using projectDemo.Service.MomoService;
 using projectDemo.Service.OrderService;
+using projectDemo.Service.PaymetService;
 using projectDemo.Service.PermissionService;
 using projectDemo.Service.TicketTypeService;
 using projectDemo.Service.UserService;
@@ -43,8 +47,12 @@ using System.Text.Json.Serialization;
                 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
                 builder.Services.AddEndpointsApiExplorer();
                 builder.Services.AddSwaggerGen();
-                
-                builder.Services.AddDbContext<EventTickDbContext>(options =>
+
+            builder.Services.Configure<MomoOptionModel>(builder.Configuration.GetSection("MomoAPI"));
+            builder.Services.AddScoped<IMomoService, MomoService>();
+
+
+            builder.Services.AddDbContext<EventTickDbContext>(options =>
                 options.UseSqlServer(
                 builder.Configuration.GetConnectionString("DefaultConnection")
                  ));
@@ -250,7 +258,10 @@ using System.Text.Json.Serialization;
                 builder.Services.AddSingleton<IAuthorizationHandler, PermissionHandler>();
                 builder.Services.AddScoped<IRolePermissionRepository, RolePermissionRepository>();
                 builder.Services.AddScoped<ICatetoryReposioty, CatetoryRepository>();
+            builder.Services.AddScoped<IPaymentRepository, PaymentRepository>();
+            builder.Services.AddScoped<IPaymentService, PaymentService>();
             builder.Services.AddScoped<ICatetoryService, CatetoryService>();
+            
 
 
             builder.Services.AddScoped<IImageService, ImageService>();

@@ -5,12 +5,20 @@
       "PackagePath": "staticwebassets\\images\\0d70c0be-6f88-4fad-8ef7-62ffced56c51.jpg"
     },
     {
+      "Id": "D:\\Msf\\ProjectMsfBE\\projectDemo\\wwwroot\\images\\2b62ef00-4a26-41f6-8a47-129684447ed3.jpg",
+      "PackagePath": "staticwebassets\\images\\2b62ef00-4a26-41f6-8a47-129684447ed3.jpg"
+    },
+    {
       "Id": "D:\\Msf\\ProjectMsfBE\\projectDemo\\wwwroot\\images\\2d9e83d9-6732-4bfb-8263-3679af80d5c1.png",
       "PackagePath": "staticwebassets\\images\\2d9e83d9-6732-4bfb-8263-3679af80d5c1.png"
     },
     {
       "Id": "D:\\Msf\\ProjectMsfBE\\projectDemo\\wwwroot\\images\\5438a07b-ca8e-4111-954f-11e00a2f6863.jpg",
       "PackagePath": "staticwebassets\\images\\5438a07b-ca8e-4111-954f-11e00a2f6863.jpg"
+    },
+    {
+      "Id": "D:\\Msf\\ProjectMsfBE\\projectDemo\\wwwroot\\images\\6eed2ec0-973b-491b-9ffc-9be559c43faa.jpg",
+      "PackagePath": "staticwebassets\\images\\6eed2ec0-973b-491b-9ffc-9be559c43faa.jpg"
     },
     {
       "Id": "D:\\Msf\\ProjectMsfBE\\projectDemo\\wwwroot\\images\\857e9a51-66e2-415e-9d65-e742386a8831.jpg",
@@ -23,10 +31,6 @@
     {
       "Id": "D:\\Msf\\ProjectMsfBE\\projectDemo\\wwwroot\\images\\bc0d46e7-82fd-4911-834c-438882b3e254.jpg",
       "PackagePath": "staticwebassets\\images\\bc0d46e7-82fd-4911-834c-438882b3e254.jpg"
-    },
-    {
-      "Id": "D:\\Msf\\ProjectMsfBE\\projectDemo\\wwwroot\\images\\cb0f1739-0135-4224-bc10-6cb1073f55b7.jpg",
-      "PackagePath": "staticwebassets\\images\\cb0f1739-0135-4224-bc10-6cb1073f55b7.jpg"
     },
     {
       "Id": "D:\\Msf\\ProjectMsfBE\\projectDemo\\wwwroot\\images\\e7136a1b-9ce1-4878-bc93-0ef1ad6c64c7.jpg",

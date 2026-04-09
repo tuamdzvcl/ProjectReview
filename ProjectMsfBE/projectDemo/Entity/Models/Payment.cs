@@ -28,6 +28,8 @@ namespace EventTick.Model.Models
         [MaxLength(100)]
         public string TransactionCode { get; set; } = null!;
 
+        public string RequestId { get; set; }
+
         [Required]
         public EnumStatusPayment Status { get; set; }
 

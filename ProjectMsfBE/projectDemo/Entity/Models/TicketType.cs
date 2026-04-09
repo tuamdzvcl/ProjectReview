@@ -30,6 +30,8 @@ namespace EventTick.Model.Models
         [Required]
         public int SoldQuantity { get; set; }
 
+        public int ReservedQuantity { get; set; }
+
         [Required]
         public EnumStatusTickType Status { get; set; }
 

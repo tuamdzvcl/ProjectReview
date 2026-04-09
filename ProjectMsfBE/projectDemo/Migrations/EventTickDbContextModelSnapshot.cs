@@ -195,6 +195,10 @@ namespace projectDemo.Migrations
                         .HasMaxLength(255)
                         .HasColumnType("nvarchar(255)");
 
+                    b.Property<string>("RequestId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<int>("Status")
                         .HasColumnType("int");
 
@@ -255,21 +259,21 @@ namespace projectDemo.Migrations
                         new
                         {
                             Id = 1,
-                            CreatedDate = new DateTime(2026, 4, 6, 3, 50, 9, 770, DateTimeKind.Utc).AddTicks(3049),
+                            CreatedDate = new DateTime(2026, 4, 7, 8, 18, 48, 359, DateTimeKind.Utc).AddTicks(9321),
                             IsDeleted = false,
                             RoleName = "ADMIN"
                         },
                         new
                         {
                             Id = 2,
-                            CreatedDate = new DateTime(2026, 4, 6, 3, 50, 9, 770, DateTimeKind.Utc).AddTicks(3055),
+                            CreatedDate = new DateTime(2026, 4, 7, 8, 18, 48, 359, DateTimeKind.Utc).AddTicks(9330),
                             IsDeleted = false,
                             RoleName = "ORGANIZER"
                         },
                         new
                         {
                             Id = 3,
-                            CreatedDate = new DateTime(2026, 4, 6, 3, 50, 9, 770, DateTimeKind.Utc).AddTicks(3061),
+                            CreatedDate = new DateTime(2026, 4, 7, 8, 18, 48, 359, DateTimeKind.Utc).AddTicks(9332),
                             IsDeleted = false,
                             RoleName = "CUSTOMER"
                         });
@@ -353,6 +357,9 @@ namespace projectDemo.Migrations
 
                     b.Property<decimal>("Price")
                         .HasColumnType("decimal(18,2)");
+
+                    b.Property<int>("ReservedQuantity")
+                        .HasColumnType("int");
 
                     b.Property<int>("SoldQuantity")
                         .HasColumnType("int");
@@ -454,7 +461,7 @@ namespace projectDemo.Migrations
                             IsDeleted = false,
                             IsLock = false,
                             LastName = "admin",
-                            PasswordHash = "$2a$11$Z1uKu6EmMoMp1xIv/7gvm.E2om0jlVTm.NFVXsTKGk5PfH.7IuWm.",
+                            PasswordHash = "$2a$11$RcJMFbXXFOhv5hbo4Ud8nefFW7LBQkJA/7d1nZVR.ImaGiMklfpHa",
                             Username = "admin"
                         });
                 });

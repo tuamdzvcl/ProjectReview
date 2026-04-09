@@ -52,8 +52,8 @@ export class UserService extends BaseApiService {
     return this.post<ApiResponse<UserResponse>>('users', data)
   }
 
-  getUserEvents(id?: string | number) {
-    const url = id ? `users/events/${id}` : 'users/events';
+  getUserEvents() {
+    const url = 'users/events';
     return this.get<UserEventsResponse>(url);
   }
   getUserProfile(id: string | number) {

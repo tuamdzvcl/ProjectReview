@@ -87,8 +87,43 @@ export class EventsComponent implements OnInit {
     this.router.navigate(['/event-create-page', event.Id]);
   }
 
+  get isEventEnded(): (event: any) => boolean {
+    return (event: any) => {
+      return event.Status === 'ENDED' || new Date(event.EndDate) < new Date();
+    };
+  }
+
   duplicateEvent(event: any) {
-    console.log('Duplicate event:', event);
+    this.showDropdown = null;
+    this.confirmationService.confirm({
+      message: `Bạn có chắc chắn muốn nhân bản sự kiện "${event.Title}" không?`,
+      header: 'Xác nhận nhân bản',
+      icon: 'pi pi-copy',
+      acceptLabel: 'Nhân bản',
+      rejectLabel: 'Hủy',
+      acceptButtonStyleClass: 'p-button-success',
+      rejectButtonStyleClass: 'p-button-text',
+      accept: () => {
+        this.eventService.DuplicateEvent(event.Id).subscribe({
+          next: () => {
+            this.messageService.add({
+              severity: 'success',
+              summary: 'Thành công',
+              detail: `Nhân bản sự kiện thành công!`,
+            });
+            this.loadEvents();
+          },
+          error: (err) => {
+            console.error('Lỗi khi nhân bản:', err);
+            this.messageService.add({
+              severity: 'error',
+              summary: 'Lỗi',
+              detail: 'Có lỗi xảy ra khi nhân bản sự kiện!',
+            });
+          }
+        });
+      }
+    });
   }
 
   deleteEvent(event: any) {

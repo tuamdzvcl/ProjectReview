@@ -486,7 +486,7 @@ namespace projectDemo.Service.EventService
                 throw new Exception();
             }
         }
-        //update event done
+        // update event done
         public async Task<ApiResponse<string>> UpdateEvent(Guid EventID, EventUpdateRequest resquest)
         {
             string? oldImageUrl = null;
@@ -629,6 +629,74 @@ namespace projectDemo.Service.EventService
                 return ApiResponse<string>.FailResponse(Entity.Enum.EnumStatusCode.SERVER, "lỗi", ex.Message);
             }
         }
+
+        public async Task<ApiResponse<string>> DuplicateEvent(Guid eventId)
+        {
+            var transactionStarted = false;
+            try
+            {
+                var originalEvent = await _eventRepository.GetEventById(eventId);
+                if (IsEventNotFound(originalEvent))
+                {
+                    return ApiResponse<string>.FailResponse(Entity.Enum.EnumStatusCode.EVENTNOTFOUD, "Event không tồn tại");
+                }
+
+                await _uow.BeginTransactionAsync();
+                transactionStarted = true;
+
+                var newEvent = new Event
+                {
+                    Id = Guid.NewGuid(),
+                    UserID = originalEvent.UserID,
+                    Title = originalEvent.Title + " - nhân bản",
+                    Status = EnumStatusEvent.DRAFT,
+                    PosterUrl = originalEvent.PosterUrl,
+                    StartDate = originalEvent.StartDate,
+                    EndDate = originalEvent.EndDate,
+                    SaleStartDate = originalEvent.SaleStartDate,
+                    SaleEndDate = originalEvent.SaleEndDate,
+                    Description = originalEvent.Description,
+                    Location = originalEvent.Location,
+                    CreatedDate = DateTime.Now,
+                    CatetoryID = originalEvent.CatetoryID,
+                    IsDeleted = false
+                };
+
+                await _eventRepository.CreateEvent(newEvent);
+
+                var existingTickets = await _typeTicketRepository.GetByEventIdAsync(eventId);
+                if (existingTickets != null && existingTickets.Any())
+                {
+                    var newTicketTypes = existingTickets.Select(ticket => new TicketType
+                    {
+                        Name = ticket.Name,
+                        Price = ticket.Price,
+                        TotalQuantity = ticket.TotalQuantity,
+                        Status = EnumStatusTickType.STOP,
+                        EventID = newEvent.Id,
+                        IsDeleted = false,
+                        CreatedDate = DateTime.Now
+                    }).ToList();
+
+                    await _typeTicketRepository.CreateRangeTicketTypes(newTicketTypes);
+                }
+
+                await _uow.SaveChangesAsync();
+                await _uow.CommitAsync();
+
+                return ApiResponse<string>.SuccessResponse(Entity.Enum.EnumStatusCode.SUCCESS, "Nhân bản sự kiện thành công");
+            }
+            catch (Exception ex)
+            {
+                if (transactionStarted)
+                {
+                    await _uow.RollbackAsync();
+                }
+                Console.WriteLine($"System Error: {ex.Message}");
+                return ApiResponse<string>.FailResponse(Entity.Enum.EnumStatusCode.SERVER, "lỗi", ex.Message);
+            }
+        }
+
         //update status
         public async Task<ApiResponse<string>> UpdateEventStatus(Guid eventId, EventStatusUpdateRequest request)
         {

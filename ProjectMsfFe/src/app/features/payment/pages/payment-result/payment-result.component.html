@@ -1,0 +1,87 @@
+<div class="payment-result-page">
+  <!-- Loading State -->
+  <div class="loading-container" *ngIf="isLoading">
+    <div class="loader">
+      <div class="loader-ring"></div>
+      <div class="loader-ring"></div>
+      <div class="loader-ring"></div>
+    </div>
+    <p class="loading-text">Đang xử lý kết quả thanh toán...</p>
+  </div>
+
+  <!-- Result State -->
+  <div class="result-container" *ngIf="!isLoading" [class.fade-in]="!isLoading">
+    <!-- Animated Icon -->
+    <div class="icon-wrapper" [class.success]="isSuccess" [class.failure]="!isSuccess">
+      <div class="icon-circle">
+        <svg *ngIf="isSuccess" class="icon-svg checkmark" viewBox="0 0 52 52">
+          <circle class="checkmark-circle" cx="26" cy="26" r="25" fill="none"/>
+          <path class="checkmark-check" fill="none" d="M14.1 27.2l7.1 7.2 16.7-16.8"/>
+        </svg>
+        <svg *ngIf="!isSuccess" class="icon-svg crossmark" viewBox="0 0 52 52">
+          <circle class="crossmark-circle" cx="26" cy="26" r="25" fill="none"/>
+          <path class="crossmark-x" fill="none" d="M16 16 36 36"/>
+          <path class="crossmark-x" fill="none" d="M36 16 16 36"/>
+        </svg>
+      </div>
+      <!-- Particles -->
+      <div class="particles" *ngIf="isSuccess">
+        <span *ngFor="let i of [1,2,3,4,5,6,7,8]" class="particle" [attr.data-index]="i"></span>
+      </div>
+    </div>
+
+    <!-- Status Text -->
+    <h1 class="status-title" [class.success-text]="isSuccess" [class.failure-text]="!isSuccess">
+      {{ statusTitle }}
+    </h1>
+    <p class="status-message">{{ statusMessage }}</p>
+
+    <!-- Order Info Card -->
+    <div class="order-info-card" *ngIf="orderId">
+      <div class="info-row">
+        <span class="info-label">
+          <span class="material-icons">receipt_long</span>
+          Mã đơn hàng
+        </span>
+        <span class="info-value order-id">{{ orderId }}</span>
+      </div>
+      <div class="info-row">
+        <span class="info-label">
+          <span class="material-icons">info</span>
+          Trạng thái
+        </span>
+        <span class="info-value">
+          <span class="status-badge" [class.badge-success]="isSuccess" [class.badge-failure]="!isSuccess">
+            {{ isSuccess ? 'Thành công' : 'Thất bại' }}
+          </span>
+        </span>
+      </div>
+      <div class="info-row">
+        <span class="info-label">
+          <span class="material-icons">payment</span>
+          Phương thức
+        </span>
+        <span class="info-value">MoMo</span>
+      </div>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="action-buttons">
+      <a routerLink="/" class="btn btn-primary">
+        <span class="material-icons">home</span>
+        Về trang chủ
+      </a>
+      <a routerLink="/profile" class="btn btn-secondary">
+        <span class="material-icons">receipt</span>
+        Xem đơn hàng
+      </a>
+    </div>
+
+    <!-- Help Text -->
+    <p class="help-text" *ngIf="!isSuccess">
+      Nếu bạn cần hỗ trợ, vui lòng liên hệ
+      <a routerLink="/support" class="help-link">bộ phận hỗ trợ</a>
+      hoặc gọi hotline <strong>1900-xxxx</strong>.
+    </p>
+  </div>
+</div>

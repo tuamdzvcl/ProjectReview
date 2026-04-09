@@ -7,12 +7,15 @@ using projectDemo.Data;
 using projectDemo.DTO.Request;
 using projectDemo.DTO.Respone;
 using projectDemo.DTO.Response;
+using projectDemo.DTO.Response.Momo;
 using projectDemo.DTO.UpdateRequest;
 using projectDemo.Entity.Enum;
 using projectDemo.Repository.Ipml;
 using projectDemo.Repository.OrderQuery;
 using projectDemo.Repository.OrderRepository;
+using projectDemo.Repository.PaymentRepository;
 using projectDemo.Repository.TickTypeRepository;
+using projectDemo.Service.MomoService;
 using projectDemo.UnitOfWorks;
 using System.Collections.Generic;
 using System.Net.WebSockets;
@@ -29,10 +32,15 @@ namespace projectDemo.Service.OrderService
         private readonly IOrderQuery _orderQuery;
         private readonly IOrderDetailRepository _orderDetailRepository;
         private readonly IUnitOfWork _uow;
+        private readonly IPaymentRepository _paymentRepository;
+        private readonly IMomoService _momoservice;
+        
        
 
-        public OrderService(IUserReposiotry userReposiotry,IUnitOfWork uow, IOrderDetailRepository orderDetailRepository, ITypeTicketRepositorys ticketRepositorys, IEventRepository eventRepository, IMapper mapper, IOrderRepository order, IOrderQuery orderQuery)
+        public OrderService(IMomoService momoService,IPaymentRepository paymentRepository,IUserReposiotry userReposiotry,IUnitOfWork uow, IOrderDetailRepository orderDetailRepository, ITypeTicketRepositorys ticketRepositorys, IEventRepository eventRepository, IMapper mapper, IOrderRepository order, IOrderQuery orderQuery)
         {
+            _momoservice = momoService;
+            _paymentRepository = paymentRepository;
             _ticketRepositorys = ticketRepositorys;
             _eventRepository = eventRepository;
             _mapper = mapper;
@@ -64,15 +72,15 @@ namespace projectDemo.Service.OrderService
             return TypeTick.Price;
         }
         //tạo order rồi tạo orderdetail
-        public async Task<ApiResponse<OrderResponseCreate>> CreateOrder(CreateOrderRequest request,Guid userid)
+        public async Task<ApiResponse<MomoCreatePaymentResponseModel>> CreateOrder(CreateOrderRequest request,Guid userid)
         {
-            using var transaction =  _uow.BeginTransactionAsync();
+            await  _uow.BeginTransactionAsync();
             try
             {
                 var user = await _userReposiotry.GetUserByid(userid);
                 if (user == null)
                 {
-                    return ApiResponse<OrderResponseCreate>
+                    return ApiResponse<MomoCreatePaymentResponseModel>
                         .FailResponse(EnumStatusCode.USERNOTFOUND, "User không tồn tại");
                 }
                 decimal TotalAmount =0;
@@ -92,12 +100,13 @@ namespace projectDemo.Service.OrderService
                     var typeTicket =  _ticketRepositorys.GetTicketTypebyId(item.TicketTypeId);
                     if(typeTicket == null) 
                     {
-                        return ApiResponse<OrderResponseCreate>.FailResponse(EnumStatusCode.TYPETICKET, "Không tìm thấy loại vé ");
+                        return ApiResponse<MomoCreatePaymentResponseModel>.FailResponse(EnumStatusCode.TYPETICKET, "Không tìm thấy loại vé ");
                     }
-                    var available = typeTicket.TotalQuantity - typeTicket.SoldQuantity;
+                    typeTicket.ReservedQuantity = +item.Quantity;
+                    var available = typeTicket.TotalQuantity - typeTicket.SoldQuantity -typeTicket.ReservedQuantity;
                     if(available < item.Quantity)
                     {
-                        return ApiResponse<OrderResponseCreate>.FailResponse(EnumStatusCode.Tick, "xin lỗi không còn vé cho bạn rồi");
+                        return ApiResponse<MomoCreatePaymentResponseModel>.FailResponse(EnumStatusCode.Tick, "xin lỗi không còn vé cho bạn rồi");
                     }
                     typeTicket.SoldQuantity += item.Quantity;
                     var detail = new OrderDetail
@@ -113,31 +122,41 @@ namespace projectDemo.Service.OrderService
                 }
                 order.TotalAmount = TotalAmount;
                 await _orderRepository.CreateOrder(order);
+
+                var payment = new Payment
+                {
+                    Amount = TotalAmount,
+                    CreatedDate = DateTime.Now,
+                    CreatedBy = user.Username,
+                    OrderID = order.Id,
+                    PaidDate = DateTime.Now,
+                    PaymentMethod = "MOMO",
+                    Status = EnumStatusPayment.PENDING,
+                    TransactionCode = EnumStatusPayment.PENDING.ToString(),
+                    RequestId= EnumStatusPayment.PENDING.ToString()
+                };
+                await _paymentRepository.Create(payment);
                  await _uow.SaveChangesAsync();
                  await _uow.CommitAsync();
-                var response = new OrderResponseCreate
-
+                var momoResponse = await _momoservice.CreatePaymentAsync(new MomoRequest
                 {
-                    OrderId = order.Id,
-                    TotalAmount = order.TotalAmount,
-                    Items = order.OrderDetails.Select(x => new OrderDetailResponse
-                    {
-                        Quantity = x.Quantity,
-                        Price = x.Price
-                    }).ToList()
-                };
+                    OrderId = order.Id.ToString("D"),
+                    Amount = TotalAmount,
+                    FullName = request.User.fullName,
+                    OrderInfor = $"Thanh toan don hang {order.OrderCode}"
+                });
+
+                return ApiResponse<MomoCreatePaymentResponseModel>.SuccessResponse(EnumStatusCode.SUCCESS,momoResponse);
                
-                return ApiResponse<OrderResponseCreate>.SuccessResponse(Entity.Enum.EnumStatusCode.SUCCESS, response);
 
             }
             catch (Exception ex)
             {
                 Console.WriteLine($"lỗi đây này {ex.Message}");
                 await _uow.RollbackAsync();
-                return ApiResponse<OrderResponseCreate>.FailResponse(Entity.Enum.EnumStatusCode.SERVER, "Lỗi ");
-
-
+                return ApiResponse<MomoCreatePaymentResponseModel>.FailResponse(EnumStatusCode.SERVER, "Lỗi ");
             }
+
         }
         //xóa order
         public async Task<ApiResponse<string>> DeleteOrder(Guid OrderID)
