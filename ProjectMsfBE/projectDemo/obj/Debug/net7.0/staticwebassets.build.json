@@ -1,6 +1,6 @@
 {
   "Version": 1,
-  "Hash": "9QBRyd59HhopYo2d0r1NvJUyWvmP2S7/A5IyTrFls5Q=",
+  "Hash": "ZMJCnx05H5J3WBoyAjP/6XwHz6lr2+HsAdLb2Wo4Boc=",
   "Source": "projectDemo",
   "BasePath": "_content/projectDemo",
   "Mode": "Default",
@@ -185,6 +185,23 @@
       "CopyToOutputDirectory": "Never",
       "CopyToPublishDirectory": "PreserveNewest",
       "OriginalItemSpec": "wwwroot\\images\\e7136a1b-9ce1-4878-bc93-0ef1ad6c64c7.jpg"
+    },
+    {
+      "Identity": "D:\\Msf\\ProjectMsfBE\\projectDemo\\wwwroot\\images\\e8980dc0-04dd-47df-960b-4e4a487934bf.jpg",
+      "SourceId": "projectDemo",
+      "SourceType": "Discovered",
+      "ContentRoot": "D:\\Msf\\ProjectMsfBE\\projectDemo\\wwwroot\\",
+      "BasePath": "_content/projectDemo",
+      "RelativePath": "images/e8980dc0-04dd-47df-960b-4e4a487934bf.jpg",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "RelatedAsset": "",
+      "AssetTraitName": "",
+      "AssetTraitValue": "",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "wwwroot\\images\\e8980dc0-04dd-47df-960b-4e4a487934bf.jpg"
     },
     {
       "Identity": "D:\\Msf\\ProjectMsfBE\\projectDemo\\wwwroot\\images\\f6b76045-1674-4d16-a566-29181a2b5908.jpg",

@@ -1,56 +1,75 @@
 <app-shell>
-  <div class="box">
-    <div class="dashboard-page">
-      <div class="page-header">
-        <h2>AudiLog (Nhật ký Hệ thống)</h2>
-        <div class="filter-actions">
-          <input type="text" placeholder="Tìm kiếm log..." class="search-input" />
-          <button class="btn btn-secondary">
-            <i class="fa-solid fa-filter"></i> Lọc
-          </button>
-          <button class="btn btn-primary">
-            <i class="fa-solid fa-download"></i> Xuất File
-          </button>
+  <div class="audit-container p-4">
+    <p-card header="Nhật Ký Hệ Thống (Activity Logs)">
+      <div class="flex justify-content-between mb-4 align-items-center flex-wrap gap-3">
+        <div class="flex gap-2 flex-wrap">
+          <span class="p-input-icon-left">
+            <i class="pi pi-user"></i>
+            <input pInputText type="text" [(ngModel)]="username" (input)="onFilter()" placeholder="Tìm theo username..." class="p-inputtext-sm" />
+          </span>
+          <span class="p-input-icon-left">
+            <i class="pi pi-link"></i>
+            <input pInputText type="text" [(ngModel)]="path" (input)="onFilter()" placeholder="/api/..." class="p-inputtext-sm" />
+          </span>
+          <p-button icon="pi pi-filter-slash" severity="secondary" (onClick)="clearFilter()" label="Xóa lọc" size="small"></p-button>
         </div>
+        <p-button icon="pi pi-refresh" (onClick)="loadLogs()" [loading]="loading" label="Làm mới" size="small"></p-button>
       </div>
 
-      <div class="table-container">
-        <table class="audit-table">
-          <thead>
+      <p-table 
+        [value]="logs" 
+        [lazy]="true" 
+        (onLazyLoad)="loadLogs($event)" 
+        [paginator]="true" 
+        [rows]="rows" 
+        [totalRecords]="totalRecords" 
+        [loading]="loading"
+        [showCurrentPageReport]="true"
+        currentPageReportTemplate="Hiển thị {first} đến {last} của {totalRecords} bản ghi"
+        [rowsPerPageOptions]="[10, 20, 50]"
+        styleClass="p-datatable-striped p-datatable-sm shadow-1"
+        [responsiveLayout]="'scroll'"
+      >
+        <ng-template pTemplate="header">
+          <tr>
+            <th style="width: 15%">Thời gian</th>
+            <th style="width: 15%">Người thực hiện</th>
+            <th style="width: 10%">Method</th>
+            <th style="width: 25%">URL Path</th>
+            <th style="width: 10%">Status</th>
+            <th style="width: 25%">Mô tả</th>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-log>
+          <tr>
+            <td>{{log.Timestamp | date: 'dd/MM/yyyy HH:mm:ss'}}</td>
+            <td>
+              <div class="flex align-items-center gap-2">
+                <i class="pi pi-user text-blue-500"></i>
+                <span class="font-bold">{{log.Username || 'Hệ thống'}}</span>
+              </div>
+            </td>
+            <td>
+              <span class="font-medium text-blue-600">{{log.Method}}</span>
+            </td>
+            <td>
+              <code class="text-secondary">{{log.Path}}</code>
+            </td>
+            <td>
+              <p-tag [value]="log.StatusCode.toString() + ' ' + getStatusLabel(log.StatusCode)" 
+                     [severity]="getSeverity(log.StatusCode)"></p-tag>
+            </td>
+            <td>
+                <span class="text-sm italic text-gray-500">{{log.Note}}</span>
+            </td>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="emptymessage">
             <tr>
-              <th>Thời gian</th>
-              <th>Người dùng</th>
-              <th>Hành động</th>
-              <th>Đối tượng</th>
-              <th>Trạng thái</th>
+                <td colspan="6" class="text-center p-4">Không tìm thấy hoạt động nào.</td>
             </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>06/04/2026 14:30:12</td>
-              <td>nguyenvana&#64;gmail.com</td>
-              <td><span class="action-badge create">Tạo mới</span></td>
-              <td>Sự kiện (ID: 1023)</td>
-              <td><span class="status-badge success">Thành công</span></td>
-            </tr>
-            <tr>
-              <td>06/04/2026 13:15:05</td>
-              <td>admin&#64;barren.com</td>
-              <td><span class="action-badge update">Cập nhật</span></td>
-              <td>Khuyến mãi (SUMMER2026)</td>
-              <td><span class="status-badge success">Thành công</span></td>
-            </tr>
-            <tr>
-              <td>06/04/2026 10:05:42</td>
-              <td>unknown_user</td>
-              <td><span class="action-badge delete">Cảnh báo</span></td>
-              <td>Hệ thống</td>
-              <td><span class="status-badge error">Thất bại</span></td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
+        </ng-template>
+      </p-table>
+    </p-card>
   </div>
-
 </app-shell>
