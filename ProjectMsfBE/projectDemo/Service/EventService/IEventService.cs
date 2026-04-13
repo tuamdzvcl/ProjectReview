@@ -15,12 +15,12 @@ namespace projectDemo.Service.EventService
         Task<ApiResponse<string>> UpdateEvent(Guid EventID, EventUpdateRequest resquest);
         Task<ApiResponse<string>> UpdateEventStatus(Guid eventId, EventStatusUpdateRequest request);
         Task<ApiResponse<string>> DeleteEvent(Guid EventID);
-        Task<ApiResponse<EventResponse>> CreateEvent(EventRequest resquest,Guid Userid);
         Task<ApiResponse<CreateEventWithTicketTypesResponse>> CreateEventWithTicketTypes(CreateEventWithTicketTypesRequest request, Guid userId);
         Task<ApiResponse<string>> DuplicateEvent(Guid eventId);
         bool checkVadidate(EventRequest resquest);
-        Task<PageResponse<EventResponse>> GetListEventPage(int pageSize, int pageIndex, string keyWord);
 
-        Task<PageResponse<EventTypeTickResponses>> GetPageWithTicketTypes(PageRequest query);
+        Task<PageResponse<EventResponse>> GetListEventPage(int pageSize, int pageIndex, string keyWord);
+        Task<PageResponse<EventTypeTickResponses>> GetPageWithTicketTypes(Guid id,PageRequest query);
+        //Task<ApiResponse<EventResponse>> CreateEvent(EventRequest resquest,Guid Userid);
     }
 }

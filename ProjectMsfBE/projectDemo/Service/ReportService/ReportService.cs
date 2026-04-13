@@ -1,10 +1,10 @@
+using System.Globalization;
 using projectDemo.DTO.Query;
 using projectDemo.DTO.Request;
 using projectDemo.DTO.Respone;
 using projectDemo.DTO.Response;
 using projectDemo.Entity.Enum;
 using projectDemo.Repository.ReportQuery;
-using System.Globalization;
 
 namespace projectDemo.Service.ReportService
 {
@@ -19,23 +19,24 @@ namespace projectDemo.Service.ReportService
 
         public async Task<ApiResponse<ReportResponse>> GetRevenueReportAsync(Guid userId, ReportRequest request)
         {
-            var groupBy = NormalizeGroupBy(request.GroupBy);
-            var usesCustomDateRange = string.IsNullOrWhiteSpace(groupBy);
+            string groupBy = (request.GroupBy ?? "monthly").Trim().ToLower();
 
+            // 1. Xác định khoảng thời gian báo cáo
             DateTime fromDate;
             DateTime toDate;
-            DateTime previousFromDate;
-            DateTime previousToDateExclusive;
-            List<RevenueReportFlatRow> currentRows;
-            List<RevenueReportFlatRow> previousRows;
 
-            if (usesCustomDateRange)
+            if (groupBy == "yearly")
+            {
+                // Mặc định lấy cả năm từ 1/1 đến 31/12
+                int year = request.FromDate?.Year ?? DateTime.Today.Year;
+                fromDate = new DateTime(year, 1, 1);
+                toDate = new DateTime(year, 12, 31);
+            }
+            else
             {
                 if (!request.FromDate.HasValue || !request.ToDate.HasValue)
                 {
-                    return ApiResponse<ReportResponse>.FailResponse(
-                        EnumStatusCode.BAD_REQUEST,
-                        "Khi không có GroupBy thì phải truyền FromDate và ToDate");
+                    return ApiResponse<ReportResponse>.FailResponse(EnumStatusCode.BAD_REQUEST, "Vui lòng chọn Ngày bắt đầu và Ngày kết thúc.");
                 }
 
                 fromDate = request.FromDate.Value.Date;
@@ -43,67 +44,32 @@ namespace projectDemo.Service.ReportService
 
                 if (fromDate > toDate)
                 {
-                    return ApiResponse<ReportResponse>.FailResponse(
-                        EnumStatusCode.BAD_REQUEST,
-                        "FromDate không được lớn hơn ToDate");
+                    return ApiResponse<ReportResponse>.FailResponse(EnumStatusCode.BAD_REQUEST, "Ngày bắt đầu không được lớn hơn ngày kết thúc.");
                 }
 
-                var toDateExclusive = toDate.AddDays(1);
-                var totalDays = (toDate - fromDate).Days + 1;
-                previousFromDate = fromDate.AddDays(-totalDays);
-                previousToDateExclusive = fromDate;
-
-                currentRows = await _reportQuery.GetRevenueRowsAsync(userId, fromDate, toDateExclusive);
-                previousRows = await _reportQuery.GetRevenueRowsAsync(userId, previousFromDate, previousToDateExclusive);
-            }
-            else
-            {
-                var allRows = await _reportQuery.GetRevenueRowsAsync(
-                    userId,
-                    new DateTime(1900, 1, 1),
-                    new DateTime(2100, 1, 1));
-
-                currentRows = allRows;
-                previousRows = new List<RevenueReportFlatRow>();
-
-                if (allRows.Any())
+                if (groupBy == "daily" && (toDate - fromDate).TotalDays > 31)
                 {
-                    fromDate = allRows.Min(x => x.PaidDate).Date;
-                    toDate = allRows.Max(x => x.PaidDate).Date;
+                    return ApiResponse<ReportResponse>.FailResponse(EnumStatusCode.BAD_REQUEST, "Báo cáo theo ngày chỉ hỗ trợ tối đa 1 tháng.");
                 }
-                else
-                {
-                    fromDate = DateTime.Today;
-                    toDate = DateTime.Today;
-                }
-
-                previousFromDate = fromDate;
-                previousToDateExclusive = fromDate;
             }
 
-            var currentRevenue = currentRows.Sum(x => x.Revenue);
-            var previousRevenue = previousRows.Sum(x => x.Revenue);
+            // 2. Lấy dữ liệu và tính toán Summary (Kỳ hiện tại và Kỳ trước để tính tăng trưởng)
+            var totalDays = (toDate - fromDate).Days + 1;
+            var previousFromDate = fromDate.AddDays(-totalDays);
+            var previousToDate = fromDate; // Exclusive boundary
 
-            var currentOrders = currentRows.Select(x => x.OrderId).Distinct().Count();
-            var previousOrders = previousRows.Select(x => x.OrderId).Distinct().Count();
+            var currentRows = await _reportQuery.GetRevenueRowsAsync(userId, fromDate, toDate.AddDays(1));
+            var previousRows = await _reportQuery.GetRevenueRowsAsync(userId, previousFromDate, previousToDate);
 
-            var currentTickets = currentRows.Sum(x => x.TicketQuantity);
-            var previousTickets = previousRows.Sum(x => x.TicketQuantity);
+            var summary = CalculateSummary(currentRows, previousRows);
+
+            // 3. Xây dựng dữ liệu biểu đồ (Chart) có bù đắp ngày/tháng trống
+            var chart = BuildChart(currentRows, groupBy, fromDate, toDate);
 
             var response = new ReportResponse
             {
-                Summary = new RevenueSummaryDto
-                {
-                    TotalRevenue = currentRevenue,
-                    TotalOrders = currentOrders,
-                    TotalTickets = currentTickets,
-                    TotalViews = 0,
-                    GrowthRevenue = usesCustomDateRange ? CalculateGrowth(currentRevenue, previousRevenue) : 0,
-                    GrowthOrders = usesCustomDateRange ? CalculateGrowth(currentOrders, previousOrders) : 0,
-                    GrowthTickets = usesCustomDateRange ? CalculateGrowth(currentTickets, previousTickets) : 0,
-                    GrowthViews = 0
-                },
-                Chart = BuildChart(currentRows, groupBy, fromDate, toDate),
+                Summary = summary,
+                Chart = chart,
                 Meta = new RevenueMetaDto
                 {
                     FromDate = fromDate,
@@ -112,190 +78,92 @@ namespace projectDemo.Service.ReportService
                 }
             };
 
-            return ApiResponse<ReportResponse>.SuccessResponse(
-                EnumStatusCode.SUCCESS,
-                response,
-                "Lấy báo cáo doanh thu thành công");
+            return ApiResponse<ReportResponse>.SuccessResponse(EnumStatusCode.SUCCESS, response, "Lấy báo cáo doanh thu thành công");
         }
 
-        private static string NormalizeGroupBy(string? groupBy)
+        private RevenueSummaryDto CalculateSummary(List<RevenueReportFlatRow> current, List<RevenueReportFlatRow> previous)
         {
-            if (string.IsNullOrWhiteSpace(groupBy))
+            var curRevenue = current.Sum(x => x.Revenue);
+            var preRevenue = previous.Sum(x => x.Revenue);
+            var curOrders = current.Select(x => x.OrderId).Distinct().Count();
+            var preOrders = previous.Select(x => x.OrderId).Distinct().Count();
+            var curTickets = current.Sum(x => x.TicketQuantity);
+            var preTickets = previous.Sum(x => x.TicketQuantity);
+
+            return new RevenueSummaryDto
             {
-                return string.Empty;
-            }
-
-            var value = groupBy.Trim().ToLower();
-
-            if (value == "monthly")
-            {
-                return "monthly";
-            }
-
-            if (value == "weekly")
-            {
-                return "weekly";
-            }
-
-            if (value == "daily" || value == "dailly")
-            {
-                return "dailly";
-            }
-
-            return string.Empty;
-        }
-
-        private static List<RevenueChartDto> BuildChart(
-            List<RevenueReportFlatRow> rows,
-            string groupBy,
-            DateTime fromDate,
-            DateTime toDate)
-        {
-            if (groupBy == "monthly")
-            {
-                var startMonth = new DateTime(fromDate.Year, fromDate.Month, 1);
-                var endMonth = new DateTime(toDate.Year, toDate.Month, 1);
-
-                var revenueByMonth = rows
-                    .GroupBy(x => new DateTime(x.PaidDate.Year, x.PaidDate.Month, 1))
-                    .ToDictionary(x => x.Key, x => x.Sum(v => v.Revenue));
-
-                var result = new List<RevenueChartDto>();
-                var currentMonth = startMonth;
-
-                while (currentMonth <= endMonth)
-                {
-                    result.Add(new RevenueChartDto
-                    {
-                        Time = currentMonth,
-                        Label = $"Tháng {currentMonth.Month}/{currentMonth.Year}",
-                        Revenue = revenueByMonth.TryGetValue(currentMonth, out var revenue) ? revenue : 0
-                    });
-
-                    currentMonth = currentMonth.AddMonths(1);
-                }
-
-                return result;
-            }
-
-            if (groupBy == "weekly")
-            {
-                var startWeek = GetStartOfWeek(fromDate);
-                var endWeek = GetStartOfWeek(toDate);
-
-                var revenueByWeek = rows
-                    .GroupBy(x => GetStartOfWeek(x.PaidDate))
-                    .ToDictionary(x => x.Key, x => x.Sum(v => v.Revenue));
-
-                var result = new List<RevenueChartDto>();
-                var currentWeek = startWeek;
-
-                while (currentWeek <= endWeek)
-                {
-                    var weekNumber = CultureInfo.InvariantCulture.Calendar.GetWeekOfYear(
-                        currentWeek,
-                        CalendarWeekRule.FirstFourDayWeek,
-                        DayOfWeek.Monday);
-
-                    result.Add(new RevenueChartDto
-                    {
-                        Time = currentWeek,
-                        Label = $"Tuần {weekNumber}/{currentWeek.Year}",
-                        Revenue = revenueByWeek.TryGetValue(currentWeek, out var revenue) ? revenue : 0
-                    });
-
-                    currentWeek = currentWeek.AddDays(7);
-                }
-
-                return result;
-            }
-
-            if (groupBy == "dailly")
-            {
-                var revenueByWeekday = rows
-                    .GroupBy(x => NormalizeWeekday(x.PaidDate.DayOfWeek))
-                    .ToDictionary(x => x.Key, x => x.Sum(v => v.Revenue));
-
-                var orderedWeekdays = new[]
-                {
-                    DayOfWeek.Monday,
-                    DayOfWeek.Tuesday,
-                    DayOfWeek.Wednesday,
-                    DayOfWeek.Thursday,
-                    DayOfWeek.Friday,
-                    DayOfWeek.Saturday,
-                    DayOfWeek.Sunday
-                };
-
-                return orderedWeekdays
-                    .Select((day, index) => new RevenueChartDto
-                    {
-                        Time = fromDate.Date.AddDays(index),
-                        Label = GetWeekdayLabel(day),
-                        Revenue = revenueByWeekday.TryGetValue(day, out var revenue) ? revenue : 0
-                    })
-                    .ToList();
-            }
-
-            var revenueByDate = rows
-                .GroupBy(x => x.PaidDate.Date)
-                .ToDictionary(x => x.Key, x => x.Sum(v => v.Revenue));
-
-            return Enumerable.Range(0, (toDate.Date - fromDate.Date).Days + 1)
-                .Select(offset => fromDate.Date.AddDays(offset))
-                .Select(day => new RevenueChartDto
-                {
-                    Time = day,
-                    Label = day.ToString("dd/MM/yyyy"),
-                    Revenue = revenueByDate.TryGetValue(day, out var revenue) ? revenue : 0
-                })
-                .ToList();
-        }
-
-        private static DateTime GetStartOfWeek(DateTime date)
-        {
-            var normalized = date.Date;
-            var diff = (7 + (normalized.DayOfWeek - DayOfWeek.Monday)) % 7;
-            return normalized.AddDays(-diff);
-        }
-
-        private static DayOfWeek NormalizeWeekday(DayOfWeek dayOfWeek)
-        {
-            return dayOfWeek == DayOfWeek.Sunday ? DayOfWeek.Sunday : dayOfWeek;
-        }
-
-        private static string GetWeekdayLabel(DayOfWeek dayOfWeek)
-        {
-            return dayOfWeek switch
-            {
-                DayOfWeek.Monday => "Thứ 2",
-                DayOfWeek.Tuesday => "Thứ 3",
-                DayOfWeek.Wednesday => "Thứ 4",
-                DayOfWeek.Thursday => "Thứ 5",
-                DayOfWeek.Friday => "Thứ 6",
-                DayOfWeek.Saturday => "Thứ 7",
-                _ => "Chủ nhật"
+                TotalRevenue = curRevenue,
+                TotalOrders = curOrders,
+                TotalTickets = curTickets,
+                GrowthRevenue = CalculateGrowth(curRevenue, preRevenue),
+                GrowthOrders = CalculateGrowth(curOrders, preOrders),
+                GrowthTickets = CalculateGrowth(curTickets, preTickets)
             };
         }
 
-        private static double CalculateGrowth(decimal current, decimal previous)
+        private List<RevenueChartDto> BuildChart(List<RevenueReportFlatRow> rows, string groupBy, DateTime from, DateTime to)
         {
-            if (previous == 0)
+            var result = new List<RevenueChartDto>();
+
+            if (groupBy == "yearly")
             {
-                return current > 0 ? 100 : 0;
+                var dataDict = rows.GroupBy(x => x.PaidDate.Month).ToDictionary(g => g.Key, g => g.Sum(x => x.Revenue));
+                for (int m = 1; m <= 12; m++)
+                {
+                    result.Add(new RevenueChartDto
+                    {
+                        Time = new DateTime(from.Year, m, 1),
+                        Label = $"Tháng {m}",
+                        Revenue = dataDict.GetValueOrDefault(m, 0)
+                    });
+                }
+            }
+            else if (groupBy == "monthly")
+            {
+                var dataDict = rows.GroupBy(x => new DateTime(x.PaidDate.Year, x.PaidDate.Month, 1))
+                                   .ToDictionary(g => g.Key, g => g.Sum(x => x.Revenue));
+                
+                DateTime current = new DateTime(from.Year, from.Month, 1);
+                DateTime endMonth = new DateTime(to.Year, to.Month, 1);
+
+                while (current <= endMonth)
+                {
+                    result.Add(new RevenueChartDto
+                    {
+                        Time = current,
+                        Label = current.ToString("MM/yyyy"),
+                        Revenue = dataDict.GetValueOrDefault(current, 0)
+                    });
+                    current = current.AddMonths(1);
+                }
+            }
+            else // daily
+            {
+                var dataDict = rows.GroupBy(x => x.PaidDate.Date).ToDictionary(g => g.Key, g => g.Sum(x => x.Revenue));
+                for (DateTime d = from; d <= to; d = d.AddDays(1))
+                {
+                    result.Add(new RevenueChartDto
+                    {
+                        Time = d,
+                        Label = d.ToString("dd/MM"),
+                        Revenue = dataDict.GetValueOrDefault(d, 0)
+                    });
+                }
             }
 
-            return Math.Round((double)((current - previous) / previous * 100), 2);
+            return result;
         }
 
-        private static double CalculateGrowth(int current, int previous)
+        private double CalculateGrowth(decimal current, decimal previous)
         {
-            if (previous == 0)
-            {
-                return current > 0 ? 100 : 0;
-            }
+            if (previous == 0) return current > 0 ? 100 : 0;
+            return (double)Math.Round((current - previous) / previous * 100, 2);
+        }
 
-            return Math.Round(((double)(current - previous) / previous) * 100, 2);
+        private double CalculateGrowth(int current, int previous)
+        {
+            if (previous == 0) return current > 0 ? 100 : 0;
+            return Math.Round((double)(current - previous) / previous * 100, 2);
         }
     }
 }

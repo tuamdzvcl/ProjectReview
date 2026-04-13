@@ -208,77 +208,77 @@ namespace projectDemo.Service.EventService
             return await _userReposiotry.GetRoleByUser(UserID);
         }
         //tạo event ->done
-        public async Task<ApiResponse<EventResponse>> CreateEvent(EventRequest resquest,Guid Userid)
-        {
-            try
-            {
-                var check = checkVadidate(resquest);
+        //public async Task<ApiResponse<EventResponse>> CreateEvent(EventRequest resquest,Guid Userid)
+        //{
+        //    try
+        //    {
+        //        var check = checkVadidate(resquest);
                 
 
-                if (!check)
-                {
-                    return ApiResponse<EventResponse>.FailResponse(Entity.Enum.EnumStatusCode.DATE, "Kiêm tra lại ngày và giờ");
-                }
-                var userid = await _userReposiotry.GetUserByid(Userid);
-                if (userid == null)
-                {
-                    return ApiResponse<EventResponse>.FailResponse(Entity.Enum.EnumStatusCode.USERNOTFOUND, "Không tìm thấy user ");
+        //        if (!check)
+        //        {
+        //            return ApiResponse<EventResponse>.FailResponse(Entity.Enum.EnumStatusCode.DATE, "Kiêm tra lại ngày và giờ");
+        //        }
+        //        var userid = await _userReposiotry.GetUserByid(Userid);
+        //        if (userid == null)
+        //        {
+        //            return ApiResponse<EventResponse>.FailResponse(Entity.Enum.EnumStatusCode.USERNOTFOUND, "Không tìm thấy user ");
 
-                }
-                var catetory =await _catrtoeyRepository.GetByName(resquest.CatetoryName.ToUpper());
-                if (catetory == null)
-                {
-                    return ApiResponse<EventResponse>.FailResponse(Entity.Enum.EnumStatusCode.NOT_FOUND, "Không tìm thấy thể loại ");
-                }
+        //        }
+        //        var catetory =await _catrtoeyRepository.GetByName(resquest.CatetoryName.ToUpper());
+        //        if (catetory == null)
+        //        {
+        //            return ApiResponse<EventResponse>.FailResponse(Entity.Enum.EnumStatusCode.NOT_FOUND, "Không tìm thấy thể loại ");
+        //        }
 
-                var image = await _imageService.UploadAsync(resquest.PosterUrl);
+        //        var image = await _imageService.UploadAsync(resquest.PosterUrl);
 
-                Event events = new Event
-                {
-                    Id = Guid.NewGuid(),
-                    UserID = Userid,
-                    Title = resquest.Title,
-                    Status = EnumStatusEvent.DRAFT,
-                    PosterUrl = image,
-                    StartDate = resquest.StartDate,
-                    EndDate = resquest.EndDate,
-                    SaleStartDate = resquest.SaleStartDate,
-                    SaleEndDate = resquest.SaleEndDate,
-                    Description = resquest.Description,
-                    Location = resquest.Location,
-                    CreatedDate = DateTime.Now,
-                    CatetoryID=catetory.Id,
-                    IsDeleted= false
+        //        Event events = new Event
+        //        {
+        //            Id = Guid.NewGuid(),
+        //            UserID = Userid,
+        //            Title = resquest.Title,
+        //            Status = EnumStatusEvent.DRAFT,
+        //            PosterUrl = image,
+        //            StartDate = resquest.StartDate,
+        //            EndDate = resquest.EndDate,
+        //            SaleStartDate = resquest.SaleStartDate,
+        //            SaleEndDate = resquest.SaleEndDate,
+        //            Description = resquest.Description,
+        //            Location = resquest.Location,
+        //            CreatedDate = DateTime.Now,
+        //            CatetoryID=catetory.Id,
+        //            IsDeleted= false
 
-                };
-                await _eventRepository.CreateEvent(events);
-                await _uow.SaveChangesAsync();
+        //        };
+        //        await _eventRepository.CreateEvent(events);
+        //        await _uow.SaveChangesAsync();
 
-                EventResponse response = new EventResponse
-                {
-                    UserID = events.UserID,
-                    Status = events.Status.ToString(),
-                    PosterUrl = events.PosterUrl,
-                    StartDate = events.StartDate,
-                    EndDate = events.EndDate,
-                    SaleStartDate = events.SaleStartDate,
-                    SaleEndDate = events.SaleEndDate,
-                    Description = events.Description,
-                    Location = events.Location,
-                    EventID = events.Id,
-                    Title = events.Title
-                };
-                return ApiResponse<EventResponse>.SuccessResponse(Entity.Enum.EnumStatusCode.SUCCESS, response);
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"System Error: {ex.Message}");
+        //        EventResponse response = new EventResponse
+        //        {
+        //            UserID = events.UserID,
+        //            Status = events.Status.ToString(),
+        //            PosterUrl = events.PosterUrl,
+        //            StartDate = events.StartDate,
+        //            EndDate = events.EndDate,
+        //            SaleStartDate = events.SaleStartDate,
+        //            SaleEndDate = events.SaleEndDate,
+        //            Description = events.Description,
+        //            Location = events.Location,
+        //            EventID = events.Id,
+        //            Title = events.Title
+        //        };
+        //        return ApiResponse<EventResponse>.SuccessResponse(Entity.Enum.EnumStatusCode.SUCCESS, response);
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        Console.WriteLine($"System Error: {ex.Message}");
 
-                return ApiResponse<EventResponse>.FailResponse(Entity.Enum.EnumStatusCode.SERVER, "lỗi", ex.Message);
-            }
+        //        return ApiResponse<EventResponse>.FailResponse(Entity.Enum.EnumStatusCode.SERVER, "lỗi", ex.Message);
+        //    }
 
 
-        }
+        //}
         //done
         public async Task<ApiResponse<CreateEventWithTicketTypesResponse>> CreateEventWithTicketTypes(CreateEventWithTicketTypesRequest request, Guid userId)
         {
@@ -603,7 +603,6 @@ namespace projectDemo.Service.EventService
                     foreach (var deletedTicket in deletedTickets)
                     {
                         deletedTicket.IsDeleted = true;
-                        deletedTicket.Status = EnumStatusTickType.STOP;
                         deletedTicket.UpdatedDate = DateTime.Now;
                     }
                 }
@@ -755,13 +754,13 @@ namespace projectDemo.Service.EventService
             }
         }
 
-        public async Task<PageResponse<EventTypeTickResponses>> GetPageWithTicketTypes(PageRequest query)
+        public async Task<PageResponse<EventTypeTickResponses>> GetPageWithTicketTypes(Guid UserId,PageRequest query)
         {
             await SyncEndedEventsAsync();
             if (query.PageIndex <= 0) query.PageIndex = 1;
             if (query.PageSize <= 0) query.PageSize = 10;
 
-           return await _eventRepository.GetAllWithTicketTypesAsync(query);
+           return await _eventRepository.GetAllWithTicketTypesAsync(UserId,query);
 
         }
     }

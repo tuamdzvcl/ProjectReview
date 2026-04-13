@@ -15,7 +15,7 @@ namespace projectDemo.Repository.Ipml
         Task<bool> UpdateEvent(Guid EventID, EventUpdateRequest request);
         void  DeleteEvent(Event entity);
         Task<PageResponse<EventResponse>> GetPageEvent(int pageIndex, int pageSize,string key);
-        Task<PageResponse<EventTypeTickResponses>> GetAllWithTicketTypesAsync(PageRequest request);
+        Task<PageResponse<EventTypeTickResponses>> GetAllWithTicketTypesAsync(Guid id,PageRequest request);
         Task<EventTypeTickResponses?> GetEventDetailById(Guid eventId);
 
 

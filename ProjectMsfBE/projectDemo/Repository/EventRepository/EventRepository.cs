@@ -48,7 +48,7 @@ namespace projectDemo.Repository
                 .ToListAsync();
         }
         //get event anh typeticj
-        public async Task<PageResponse<EventTypeTickResponses>> GetAllWithTicketTypesAsync(PageRequest request)
+        public async Task<PageResponse<EventTypeTickResponses>> GetAllWithTicketTypesAsync(Guid Userid,PageRequest request)
         {
             try
             {
@@ -57,7 +57,7 @@ namespace projectDemo.Repository
 
                 var query = _dbSet
                     .AsNoTracking()
-                    .Where(e => e.IsDeleted == false  && e.Status!=EnumStatusEvent.CANNEL);
+                    .Where(e => e.IsDeleted == false  && e.Status!=EnumStatusEvent.CANNEL && e.UserID==Userid);
 
                 if (request.categoryId != Guid.Empty)
                 {
@@ -96,7 +96,9 @@ namespace projectDemo.Repository
                UserName = e.User.Username,
                CatetoryName = e.Catetory.Name,
                CatetoryID= e.CatetoryID,
-               ListTypeTick = e.TicketTypes.Select(t => new TypeTickResponse
+               ListTypeTick = e.TicketTypes
+               .Where(t=>t.IsDeleted==false)
+               .Select(t => new TypeTickResponse
                {
                    Id = t.Id,
                    Name = t.Name.ToString(),
@@ -166,7 +168,9 @@ namespace projectDemo.Repository
              CatetoryID = e.CatetoryID,
              UserID = e.UserID,
              CatetoryName = e.Catetory.Name,
-             ListTypeTick = e.TicketTypes.Select(t => new TypeTickResponse
+             ListTypeTick = e.TicketTypes
+             .Where(t=>t.IsDeleted== false)
+             .Select(t => new TypeTickResponse
              {
                  Id = t.Id,
                  Name = t.Name.ToString(),

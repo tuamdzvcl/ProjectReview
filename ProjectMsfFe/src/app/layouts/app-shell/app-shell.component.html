@@ -47,12 +47,14 @@
           <span class="nav-item__icon"><i class="fa-regular fa-credit-card"></i></span>
           <span class="nav-item__label">Thanh toán</span>
         </button>
-        <button class="nav-item" type="button" routerLink="/admin/audit-log" routerLinkActive="nav-item--active">
+        <button *ngIf="userRole() === 'ADMIN'" class="nav-item" type="button" routerLink="/admin/audit-log"
+          routerLinkActive="nav-item--active">
           <span class="nav-item__icon"><i class="fa-solid fa-chart-pie"></i></span>
           <span class="nav-item__label">AudiLog</span>
         </button>
       </ng-container>
-      <button class="nav-item" type="button" routerLink="/admin/membership" routerLinkActive="nav-item--active">
+      <button *ngIf="userRole() === 'ADMIN'" class="nav-item" type="button" routerLink="/admin/membership"
+        routerLinkActive="nav-item--active">
         <span class="nav-item__icon"><i class="fa-solid fa-user-group"></i></span>
         <span class="nav-item__label">Quản lý gói thành viên</span>
       </button>

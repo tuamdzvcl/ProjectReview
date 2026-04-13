@@ -40,7 +40,7 @@ export class DashboardComponent implements OnInit {
   ngOnInit() {
     this.initChartOptions();
 
-    // Default range: current month
+    // Mặc định chọn tháng hiện tại
     const now = new Date();
     const firstDay = new Date(now.getFullYear(), now.getMonth(), 1);
     const lastDay = new Date(now.getFullYear(), now.getMonth() + 1, 0);
@@ -50,7 +50,7 @@ export class DashboardComponent implements OnInit {
   }
 
   onDateChange() {
-    // Only refresh when both start and end dates are picked
+    // Tự động tải lại dữ liệu khi chọn khoảng ngày mới
     if (this.rangeDates && this.rangeDates[0] && this.rangeDates[1]) {
       this.fetchRevenueStats(this.selectedTab);
     }
@@ -58,19 +58,20 @@ export class DashboardComponent implements OnInit {
 
   fetchRevenueStats(type: string) {
     this.selectedTab = type;
-    const groupBy = type.toLowerCase();
+    const groupBy = type.toLowerCase(); // 'yearly', 'monthly', 'daily'
 
     let fromDate: string | undefined;
     let toDate: string | undefined;
 
     if (this.rangeDates && this.rangeDates[0] && this.rangeDates[1]) {
-      fromDate = this.rangeDates[0].toISOString();
-      toDate = this.rangeDates[1].toISOString();
+      // Sử dụng hàm định dạng local để tránh bị lệch múi giờ (không dùng toISOString)
+      fromDate = this.formatDateToLocalISO(this.rangeDates[0]);
+      toDate = this.formatDateToLocalISO(this.rangeDates[1]);
     }
 
     this.reportService.GetRevenueReport(fromDate, toDate, groupBy).subscribe({
       next: (data: ReportResponse) => {
-        // Safe mapping with defaults to 0
+        // Cập nhật các con số tổng quát
         const summary = data?.Summary || {};
         this.totalRevenue = summary.TotalRevenue ?? 0;
         this.totalOrders = summary.TotalOrders ?? 0;
@@ -81,7 +82,7 @@ export class DashboardComponent implements OnInit {
         this.growthTickets = summary.GrowthTickets ?? 0;
         this.growthViews = summary.GrowthViews ?? 0;
 
-        // Chart data
+        // Cập nhật dữ liệu biểu đồ
         const chartList = data?.Chart || [];
         this.chartData = {
           labels: chartList.map((c) => c.Label || ''),
@@ -89,14 +90,11 @@ export class DashboardComponent implements OnInit {
             {
               label: 'Doanh thu',
               data: chartList.map((c) => c.Revenue ?? 0),
-              fill: true,
+              backgroundColor: '#81E979',
               borderColor: '#6cc04a',
-              tension: 0.4,
-              backgroundColor: 'rgba(108, 192, 74, 0.1)',
-              pointBackgroundColor: '#6cc04a',
-              pointBorderColor: '#fff',
-              pointHoverBackgroundColor: '#fff',
-              pointHoverBorderColor: '#6cc04a'
+              borderWidth: 1,
+              borderRadius: 6,
+              barThickness: 32,
             }
           ]
         };
@@ -104,12 +102,24 @@ export class DashboardComponent implements OnInit {
         this.cdr.markForCheck();
       },
       error: (err) => {
-        console.error('Lỗi khi tải báo cáo doanh thu:', err);
-        // Reset to 0 on error
+        // Hiển thị lỗi từ backend (ví dụ: giới hạn 1 tháng cho báo cáo ngày)
+        let msg = 'Lỗi khi tải dữ liệu báo cáo.';
+        if (err.error?.Message) {
+          msg = err.error.Message;
+        }
+        alert(msg); // Hoặc dùng notification service nếu có
+
         this.resetStats();
         this.cdr.markForCheck();
       }
     });
+  }
+
+  private formatDateToLocalISO(date: Date): string {
+    const y = date.getFullYear();
+    const m = String(date.getMonth() + 1).padStart(2, '0');
+    const d = String(date.getDate()).padStart(2, '0');
+    return `${y}-${m}-${d}`;
   }
 
   private resetStats() {

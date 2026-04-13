@@ -96,7 +96,9 @@ namespace projectDemo.Controllers
 
         public async Task<IActionResult> GetPageWithTicketTypes([FromQuery] PageRequest query)
         {
-            var result = await _eventService.GetPageWithTicketTypes(query);
+            var userId = Guid.Parse(User.FindFirst("id").Value);
+
+            var result = await _eventService.GetPageWithTicketTypes(userId,query);
             return Ok(result);
         }
     }

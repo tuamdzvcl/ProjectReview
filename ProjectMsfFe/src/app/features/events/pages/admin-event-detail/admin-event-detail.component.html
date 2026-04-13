@@ -99,10 +99,10 @@
           (click)="backToEventList()">
           <i class="fa-solid fa-arrow-left"></i> Quay lại
         </button>
-        <button class="btn btn-primary" (click)="editEvent()">
+        <button class="btn btn-primary" (click)="editEvent()" *ngIf="event.Status !== 'PUBLISHED' && event.Status !== 'online'">
           <i class="fa-solid fa-pen"></i> Sửa sự kiện
         </button>
-        <button class="btn btn-success" (click)="publishEvent()" *ngIf="event.Status !== 'online'">
+        <button class="btn btn-success" (click)="publishEvent()" *ngIf="event.Status !== 'online' && event.Status !== 'PUBLISHED'">
           <i class="fa-solid fa-globe"></i> Công khai
         </button>
       </div>

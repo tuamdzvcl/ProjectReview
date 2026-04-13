@@ -4,6 +4,6 @@ namespace projectDemo.DTO.Request
     {
         public DateTime? FromDate { get; set; }
         public DateTime? ToDate { get; set; }
-        public string GroupBy { get; set; } = "monthly";
+        public string GroupBy { get; set; }
     }
 }

@@ -87,7 +87,7 @@
         <div class="action-dropdown" [class.active]="showDropdown === event.Id">
           <button class="btn btn--icon" type="button" (click)="toggleDropdown(event.Id, $event)">⋮</button>
           <div class="dropdown-menu">
-            <button class="dropdown-item" *ngIf="!isEventEnded(event)"
+            <button class="dropdown-item" *ngIf="!isEventEnded(event) && event.Status !== 'PUBLISHED'"
               (click)="editEvent(event); $event.stopPropagation()">
               <i class="fa-regular fa-edit"></i>
               Edit
@@ -97,7 +97,8 @@
               <i class="fa-regular fa-copy"></i>
               Nhân bản
             </button>
-            <button class="dropdown-item" (click)="deleteEvent(event); $event.stopPropagation()">
+            <button class="dropdown-item" *ngIf="event.Status !== 'PUBLISHED'"
+              (click)="deleteEvent(event); $event.stopPropagation()">
               <i class="fa-regular fa-trash-can"></i>
               Delete
             </button>
