@@ -1,6 +1,4 @@
 ﻿namespace projectDemo.Repository.RolePermissionRepository
 {
-    public interface IRolePermissionRepository
-    {
-    }
+    public interface IRolePermissionRepository { }
 }

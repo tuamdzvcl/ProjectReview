@@ -8,8 +8,8 @@ namespace EventTick.Model.Enum
 {
     public enum EnumStatusTick
     {
-        VALID =1,
-        USED =2,
-        CANCELLED=3
+        VALID = 1,
+        USED = 2,
+        CANCELLED = 3,
     }
 }

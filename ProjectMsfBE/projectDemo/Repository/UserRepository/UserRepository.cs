@@ -12,7 +12,8 @@ namespace projectDemo.Repository
     {
         private readonly RepositoryProcBase _proc;
 
-        public UserRepository(IUnitOfWork uow) : base(uow)
+        public UserRepository(IUnitOfWork uow)
+            : base(uow)
         {
             _proc = new RepositoryProcBase(uow);
         }
@@ -31,15 +32,25 @@ namespace projectDemo.Repository
         }
 
         //get ds event theo userid
-        public async Task<(User? user, List<Event> events, int status, string messager)> GetListEventByUserID(Guid userID)
+        public async Task<(
+            User? user,
+            List<Event> events,
+            int status,
+            string messager
+        )> GetListEventByUserID(Guid userID)
         {
             try
             {
-                var user = await _dbContext.Set<User>()
+                var user = await _dbContext
+                    .Set<User>()
                     .AsNoTracking()
                     .Include(u => u.UserRoles)
-                    .ThenInclude(ur => ur.Role)
-                    .Include(u => u.Events.Where(e => e.IsDeleted == false && e.Status!=EnumStatusEvent.CANNEL))
+                        .ThenInclude(ur => ur.Role)
+                    .Include(u =>
+                        u.Events.Where(e =>
+                            e.IsDeleted == false && e.Status != EnumStatusEvent.CANNEL
+                        )
+                    )
                     .FirstOrDefaultAsync(u => u.Id == userID && u.IsDeleted == false);
 
                 if (user == null)
@@ -47,9 +58,7 @@ namespace projectDemo.Repository
                     return (null, new List<Event>(), 404, "Không tìm thấy user");
                 }
 
-                var events = user.Events
-                    .OrderByDescending(e => e.CreatedDate)
-                    .ToList();
+                var events = user.Events.OrderByDescending(e => e.CreatedDate).ToList();
 
                 return (user, events, 200, "Lấy danh sách event thành công");
             }
@@ -68,9 +77,9 @@ namespace projectDemo.Repository
                 return await _dbSet
                     .AsNoTracking()
                     .Where(u => u.Id == Userid && u.IsDeleted == false)
-            .SelectMany(u => u.UserRoles)
-            .Select(ur => ur.Role.RoleName.ToUpper())
-            .ToListAsync();
+                    .SelectMany(u => u.UserRoles)
+                    .Select(ur => ur.Role.RoleName.ToUpper())
+                    .ToListAsync();
             }
             catch (Exception ex)
             {
@@ -82,8 +91,9 @@ namespace projectDemo.Repository
         // thông tin user
         public async Task<User?> GetUserByid(Guid id)
         {
-            return await _dbSet.Include(u => u.UserRoles)
-                .ThenInclude(ur => ur.Role)
+            return await _dbSet
+                .Include(u => u.UserRoles)
+                    .ThenInclude(ur => ur.Role)
                 .FirstOrDefaultAsync(u => u.Id == id && u.IsDeleted == false);
         }
 
@@ -95,11 +105,16 @@ namespace projectDemo.Repository
         }
 
         //10 bản ghi
-        public async Task<(List<User>, int)> GetAll(int pageIndex, int pageSize, string key, string role)
+        public async Task<(List<User>, int)> GetAll(
+            int pageIndex,
+            int pageSize,
+            string key,
+            string role
+        )
         {
             var query = _dbSet
                 .Include(u => u.UserRoles)
-                .ThenInclude(ur => ur.Role)
+                    .ThenInclude(ur => ur.Role)
                 .Where(x => x.IsDeleted == false)
                 .AsQueryable();
 

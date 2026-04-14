@@ -8,7 +8,9 @@ namespace projectDemo.Repository.PaymentRepository
     public class PaymentRepository : RepositoryLinqBase<Payment>, IPaymentRepository
     {
         private readonly RepositoryProcBase _proc;
-        public PaymentRepository(IUnitOfWork uow) : base(uow)
+
+        public PaymentRepository(IUnitOfWork uow)
+            : base(uow)
         {
             _proc = new RepositoryProcBase(_uow);
         }
@@ -21,12 +23,12 @@ namespace projectDemo.Repository.PaymentRepository
 
         public void Delete(Payment entity)
         {
-             _dbSet.Remove(entity);
+            _dbSet.Remove(entity);
         }
 
         public async Task<List<Payment>> FinAll()
         {
-           return await _dbSet.ToListAsync();
+            return await _dbSet.ToListAsync();
         }
 
         public async Task<Payment> FinById(int Id)

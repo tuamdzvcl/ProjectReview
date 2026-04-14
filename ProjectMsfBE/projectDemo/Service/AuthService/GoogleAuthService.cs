@@ -1,4 +1,5 @@
-﻿using EventTick.Model.Enum;
+﻿using System.IdentityModel.Tokens.Jwt;
+using EventTick.Model.Enum;
 using EventTick.Model.Models;
 using Google.Apis.Auth;
 using Microsoft.AspNetCore.WebUtilities;
@@ -10,7 +11,6 @@ using projectDemo.Repository;
 using projectDemo.Repository.Ipml;
 using projectDemo.Service.Auth;
 using projectDemo.UnitOfWorks;
-using System.IdentityModel.Tokens.Jwt;
 
 namespace projectDemo.Service.AuthService
 {
@@ -25,8 +25,16 @@ namespace projectDemo.Service.AuthService
         private readonly IUserRoleRepository _userRole;
         private readonly IUserLoginRepository _loginRepo;
 
-
-        public GoogleAuthService(IUserRoleRepository userRole, IUserLoginRepository login, IUnitOfWork unitOf, IAuthRepository authRepository, IUserReposiotry userRepository, IAuthService authService, IConfiguration config, IHttpClientFactory factory)
+        public GoogleAuthService(
+            IUserRoleRepository userRole,
+            IUserLoginRepository login,
+            IUnitOfWork unitOf,
+            IAuthRepository authRepository,
+            IUserReposiotry userRepository,
+            IAuthService authService,
+            IConfiguration config,
+            IHttpClientFactory factory
+        )
         {
             _config = config;
             _http = factory.CreateClient();
@@ -38,7 +46,7 @@ namespace projectDemo.Service.AuthService
             _userRole = userRole;
         }
 
-        public  ApiResponse<string> GetLoginUrl()
+        public ApiResponse<string> GetLoginUrl()
         {
             var clientId = _config["GoogleAuth:ClientId"];
             var redirectUri = _config["GoogleAuth:RedirectUri"];
@@ -53,7 +61,10 @@ namespace projectDemo.Service.AuthService
                 ["state"] = state,
                 ["access_type"] = "offline",
             };
-            var reponse = QueryHelpers.AddQueryString("https://accounts.google.com/o/oauth2/v2/auth", query);
+            var reponse = QueryHelpers.AddQueryString(
+                "https://accounts.google.com/o/oauth2/v2/auth",
+                query
+            );
 
             return ApiResponse<string>.SuccessResponse(EnumStatusCode.SUCCESS, reponse);
         }
@@ -72,13 +83,16 @@ namespace projectDemo.Service.AuthService
                 ["client_id"] = clientId,
                 ["client_secret"] = clientSecret,
                 ["redirect_uri"] = redirectUri,
-                ["grant_type"] = "authorization_code"
+                ["grant_type"] = "authorization_code",
             };
 
-            var response = await _http.PostAsync("https://oauth2.googleapis.com/token", new FormUrlEncodedContent(tokenRequest));
+            var response = await _http.PostAsync(
+                "https://oauth2.googleapis.com/token",
+                new FormUrlEncodedContent(tokenRequest)
+            );
             Console.WriteLine($"response: {response}");
             response.EnsureSuccessStatusCode();
-           
+
             var json = await response.Content.ReadAsStringAsync();
 
             if (!response.IsSuccessStatusCode)
@@ -86,32 +100,38 @@ namespace projectDemo.Service.AuthService
                 Console.WriteLine("GOOGLE ERROR: " + json);
                 throw new Exception(json);
             }
-            var tokenData = System.Text.Json.JsonSerializer.Deserialize<Dictionary<string, object>>(json);
+            var tokenData = System.Text.Json.JsonSerializer.Deserialize<Dictionary<string, object>>(
+                json
+            );
 
             var idToken = tokenData["id_token"].ToString();
 
             var payload = await GoogleJsonWebSignature.ValidateAsync(idToken);
 
-            if(payload == null)
+            if (payload == null)
             {
-                return ApiResponse<AuthResponse>.FailResponse(EnumStatusCode.NOT_FOUND,"không tìm thấy toke");
+                return ApiResponse<AuthResponse>.FailResponse(
+                    EnumStatusCode.NOT_FOUND,
+                    "không tìm thấy toke"
+                );
             }
 
-             await  _uow.BeginTransactionAsync();
-            var existingLogin = await _loginRepo.GetByProviderUserIdAsync(payload.Subject, EnumProviderName.Google.ToString().ToUpper());
+            await _uow.BeginTransactionAsync();
+            var existingLogin = await _loginRepo.GetByProviderUserIdAsync(
+                payload.Subject,
+                EnumProviderName.Google.ToString().ToUpper()
+            );
             User users;
             try
             {
-
                 var check = existingLogin != null;
                 if (check)
                 {
                     users = await _userReposiotry.GetUserByid(existingLogin.UserId);
-
                 }
                 else
                 {
-                     users = new User
+                    users = new User
                     {
                         Id = Guid.NewGuid(),
                         FirstName = payload.GivenName,
@@ -123,14 +143,13 @@ namespace projectDemo.Service.AuthService
                         CreatedDate = DateTime.UtcNow,
                         CreatedBy = "System",
                         Isfalse = 0,
-                        IsDeleted = false
+                        IsDeleted = false,
                     };
                     var ur = new UserRole
                     {
                         RoleId = (int)EnumRoleName.CUSTOMER,
-                        UserId = users.Id
+                        UserId = users.Id,
                     };
-
 
                     var ul = new UserLogin
                     {
@@ -138,24 +157,24 @@ namespace projectDemo.Service.AuthService
                         UserId = users.Id,
                         ProviderUserId = payload.Subject,
                         IsDeleted = false,
-                        CreatedBy=EnumProviderName.Google.ToString().ToUpper(),
-                        CreatedDate= DateTime.Now,
-
+                        CreatedBy = EnumProviderName.Google.ToString().ToUpper(),
+                        CreatedDate = DateTime.Now,
                     };
 
-
                     var CreataUser = await _userReposiotry.Create(users);
-                    var urole =  _userRole.InsertAsync(ur);
+                    var urole = _userRole.InsertAsync(ur);
                     var provider = _loginRepo.InsertAsync(ul);
-                   
-
-                    
                 }
-                var permission = await _authRepository.GetPermissionsbyRoleName(EnumRoleName.CUSTOMER.ToString());
+                var permission = await _authRepository.GetPermissionsbyRoleName(
+                    EnumRoleName.CUSTOMER.ToString()
+                );
                 var role = await _userReposiotry.GetRoleByUser(users.Id);
                 if (role == null)
                 {
-                    return ApiResponse<AuthResponse>.FailResponse(EnumStatusCode.NOT_FOUND, "không tìm thấy role");
+                    return ApiResponse<AuthResponse>.FailResponse(
+                        EnumStatusCode.NOT_FOUND,
+                        "không tìm thấy role"
+                    );
                 }
 
                 await _uow.SaveChangesAsync();
@@ -175,24 +194,20 @@ namespace projectDemo.Service.AuthService
                         AvatarUrl = users.AvatarUrl,
                         ID = users.Id,
                         RoleName = role,
-                        
                     },
-                    Isnew = !check
-                    
+                    Isnew = !check,
                 };
 
                 return ApiResponse<AuthResponse>.SuccessResponse(EnumStatusCode.SUCCESS, responses);
-
             }
             catch (Exception ex)
             {
                 Console.WriteLine($"loginGG === {ex.Message}");
-                return ApiResponse<AuthResponse>.FailResponse(EnumStatusCode.NOT_FOUND, $"===ERORR=== \n {ex.ToString}");
-
+                return ApiResponse<AuthResponse>.FailResponse(
+                    EnumStatusCode.NOT_FOUND,
+                    $"===ERORR=== \n {ex.ToString}"
+                );
             }
-
-
-
         }
     }
 }

@@ -19,6 +19,6 @@ namespace projectDemo.DTO.Projection
         public string UserName { get; set; }
         public string RoleName { get; set; }
 
-        public List<TicketType> listTypeTick {  get; set; }
+        public List<TicketType> listTypeTick { get; set; }
     }
 }

@@ -9,7 +9,7 @@ namespace projectDemo.Service.MomoService
         Task<MomoCreatePaymentResponseModel> CreatePaymentAsync(MomoRequest request);
         MomoExecuteResponseModel PaymentExecuteAsync(IQueryCollection collection);
 
-        Task<string> MomoCallBack(MomoIpnRequest request);   
+        Task<string> MomoCallBack(MomoIpnRequest request);
         bool IsValidMomoIpnSignature(MomoIpnRequest request);
     }
 }

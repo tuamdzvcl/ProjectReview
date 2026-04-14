@@ -2,8 +2,6 @@
 {
     public class OrderResponseCreate
     {
-        
-
         public Guid OrderId { get; set; }
 
         public decimal TotalAmount { get; set; }

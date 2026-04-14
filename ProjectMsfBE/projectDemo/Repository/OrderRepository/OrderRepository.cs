@@ -1,4 +1,5 @@
-﻿using Dapper;
+﻿using System.Data;
+using Dapper;
 using EventTick.Model.Enum;
 using EventTick.Model.Models;
 using Microsoft.EntityFrameworkCore;
@@ -6,7 +7,6 @@ using Microsoft.Extensions.Logging;
 using projectDemo.DTO.Projection;
 using projectDemo.Repository.BaseData;
 using projectDemo.UnitOfWorks;
-using System.Data;
 
 namespace projectDemo.Repository.OrderRepository
 {
@@ -14,20 +14,19 @@ namespace projectDemo.Repository.OrderRepository
     {
         private readonly RepositoryProcBase _proc;
 
-        public OrderRepository(IUnitOfWork uow) : base(uow)
+        public OrderRepository(IUnitOfWork uow)
+            : base(uow)
         {
             _proc = new RepositoryProcBase(uow);
-
         }
 
         public async Task<Order> CreateOrder(Order order)
         {
-           await AddAsync(order);
+            await AddAsync(order);
             return order;
         }
 
-        
-        public  int DeleteOrder(Order order)
+        public int DeleteOrder(Order order)
         {
             Remove(order);
             return 1;
@@ -35,7 +34,7 @@ namespace projectDemo.Repository.OrderRepository
 
         public async Task<List<Order>> GetALl()
         {
-            var order = await _dbSet.Where(x=>x.IsDeleted==false).ToListAsync();
+            var order = await _dbSet.Where(x => x.IsDeleted == false).ToListAsync();
             return order;
         }
 
@@ -46,34 +45,40 @@ namespace projectDemo.Repository.OrderRepository
                 .Where(o => o.UserID == userId && o.IsDeleted == false)
                 .AnyAsync();
         }
+
         public async Task<Order?> GetOrderbyID(Guid orderID)
         {
             return await _dbSet
                 .Include(x => x.OrderDetails)
-                .ThenInclude
-                (x => x.TicketTypes)
-                .Include(x=>x.Payment)
+                    .ThenInclude(x => x.TicketTypes)
+                .Include(x => x.Payment)
                 .FirstOrDefaultAsync(x => x.Id == orderID && x.IsDeleted == false);
         }
 
-        public async Task<(OrderProjection?,int statuss, string messager)> GetOrderListOrderDetail(Guid orderID)
+        public async Task<(OrderProjection?, int statuss, string messager)> GetOrderListOrderDetail(
+            Guid orderID
+        )
         {
             try
             {
                 var param = new DynamicParameters();
                 param.Add("@orderID", orderID);
                 param.Add("@code", dbType: DbType.Int32, direction: ParameterDirection.Output);
-                param.Add("@messger", dbType: DbType.String, size: 250, direction: ParameterDirection.Output);
+                param.Add(
+                    "@messger",
+                    dbType: DbType.String,
+                    size: 250,
+                    direction: ParameterDirection.Output
+                );
 
                 using var multi = await _uow.connection.QueryMultipleAsync(
-                     "GetListdetaiByOrderID",
-                     param,
-                     commandType: CommandType.StoredProcedure
-                     );
+                    "GetListdetaiByOrderID",
+                    param,
+                    commandType: CommandType.StoredProcedure
+                );
                 var order = await multi.ReadFirstOrDefaultAsync<OrderProjection>();
 
                 var orderDetail = (await multi.ReadAsync<OrderDetialProjection>()).ToList();
-
 
                 if (order != null)
                 {
@@ -97,8 +102,5 @@ namespace projectDemo.Repository.OrderRepository
             Update(order);
             return 1;
         }
-
-
-       
     }
 }

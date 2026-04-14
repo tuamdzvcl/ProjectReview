@@ -7,6 +7,5 @@
         DateTime? UpdatedDate { get; set; }
         string? UpdatedBy { get; set; }
         bool? IsDeleted { get; set; }
-
     }
 }

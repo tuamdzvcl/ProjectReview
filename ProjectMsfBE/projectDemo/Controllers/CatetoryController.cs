@@ -48,9 +48,10 @@ namespace projectDemo.Controllers
 
         [HttpGet("list-event")]
         public async Task<IActionResult> GetCatetoryListEvent(
-            [FromQuery] int pageSize ,
-            [FromQuery] int pageIndex ,
-            [FromQuery] string? key )
+            [FromQuery] int pageSize,
+            [FromQuery] int pageIndex,
+            [FromQuery] string? key
+        )
         {
             var result = await _catetoryService.GetCatetoryListEvent(pageSize, pageIndex, key);
             return Ok(result);
@@ -58,10 +59,9 @@ namespace projectDemo.Controllers
 
         [HttpGet]
         public async Task<IActionResult> GetCatetory()
-          {
+        {
             var result = await _catetoryService.GetCatetory();
             return Ok(result);
         }
     }
 }
-

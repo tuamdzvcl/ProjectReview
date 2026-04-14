@@ -1,4 +1,5 @@
-﻿using Dapper;
+﻿using System.Data;
+using Dapper;
 using EventTick.Model.Models;
 using Microsoft.EntityFrameworkCore;
 using projectDemo.DTO.Respone;
@@ -6,14 +7,15 @@ using projectDemo.DTO.Response;
 using projectDemo.Entity.Models;
 using projectDemo.Repository.BaseData;
 using projectDemo.UnitOfWorks;
-using System.Data;
 
 namespace projectDemo.Repository.CatetoryRepository
 {
     public class CatetoryRepository : RepositoryLinqBase<Catetory>, ICatetoryReposioty
     {
         private readonly RepositoryProcBase _proc;
-        public CatetoryRepository(IUnitOfWork uow) : base(uow)
+
+        public CatetoryRepository(IUnitOfWork uow)
+            : base(uow)
         {
             _proc = new RepositoryProcBase(uow);
         }
@@ -34,8 +36,7 @@ namespace projectDemo.Repository.CatetoryRepository
 
         public async Task<Catetory?> GetbyId(Guid id)
         {
-            return await _dbSet.Include(x => x.Events)
-                .FirstOrDefaultAsync(x => x.Id == id);
+            return await _dbSet.Include(x => x.Events).FirstOrDefaultAsync(x => x.Id == id);
         }
 
         public async Task<Catetory?> GetByName(string name)
@@ -45,14 +46,14 @@ namespace projectDemo.Repository.CatetoryRepository
 
         public async Task<List<Catetory>> GetListCatetory()
         {
-
-            return await _dbSet
-        .AsNoTracking()
-        .OrderBy(x => x.Name)
-        .ToListAsync();
+            return await _dbSet.AsNoTracking().OrderBy(x => x.Name).ToListAsync();
         }
 
-        public async Task<PageResponse<CatetoryResponse>> PageCatetoryEvent(int PageSize, int PageIndex, string? key)
+        public async Task<PageResponse<CatetoryResponse>> PageCatetoryEvent(
+            int PageSize,
+            int PageIndex,
+            string? key
+        )
         {
             var param = new DynamicParameters();
 
@@ -65,28 +66,29 @@ namespace projectDemo.Repository.CatetoryRepository
                 "PageCatetoryEvent",
                 param,
                 transaction: _uow.GetTransaction(),
-                commandType: CommandType.StoredProcedure);
+                commandType: CommandType.StoredProcedure
+            );
 
             var totalRow = param.Get<int>("@totalRow");
 
-            var result = data
-                .GroupBy(x => new { x.CatetoryId, x.CatetoryName })
+            var result = data.GroupBy(x => new { x.CatetoryId, x.CatetoryName })
                 .Select(g => new CatetoryResponse
                 {
                     Name = g.Key.CatetoryName,
                     listEvent = g.Select(e => new EventResponse
-                    {
-                        EventID = e.EventID,
-                        Title = e.Title,
-                        Description = e.Description,
-                        StartDate = e.StartDate,
-                        EndDate = e.EndDate,
-                        Location = e.Location,
-                        PosterUrl = e.PosterUrl,
-                        Status = e.EventStatus.ToString(),
-                    }).ToList()
+                        {
+                            EventID = e.EventID,
+                            Title = e.Title,
+                            Description = e.Description,
+                            StartDate = e.StartDate,
+                            EndDate = e.EndDate,
+                            Location = e.Location,
+                            PosterUrl = e.PosterUrl,
+                            Status = e.EventStatus.ToString(),
+                        })
+                        .ToList(),
                 })
-    .ToList();
+                .ToList();
 
             return new PageResponse<CatetoryResponse>
             {
@@ -94,9 +96,8 @@ namespace projectDemo.Repository.CatetoryRepository
                 TotalRecords = totalRow,
                 PageIndex = PageIndex,
                 PageSize = PageSize,
-                Success = true
-
+                Success = true,
             };
         }
-}
+    }
 }

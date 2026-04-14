@@ -1,5 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace projectDemo.DTO.Response
 {
@@ -13,7 +13,6 @@ namespace projectDemo.DTO.Response
 
         public decimal SubTotal { get; set; }
 
-        public string TicketTypeName  { get; set; }
-
+        public string TicketTypeName { get; set; }
     }
 }

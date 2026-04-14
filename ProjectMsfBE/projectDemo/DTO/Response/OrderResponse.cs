@@ -1,6 +1,6 @@
-﻿using EventTick.Model.Enum;
+﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.ComponentModel.DataAnnotations;
+using EventTick.Model.Enum;
 using EventTick.Model.Models;
 
 namespace projectDemo.DTO.Response
@@ -11,7 +11,7 @@ namespace projectDemo.DTO.Response
         public string OrderCode { get; set; }
         public decimal TotalAmount { get; set; }
         public String Status { get; set; }
-        
+
         public string FullName { get; set; }
         public List<OrderDetailResponse> orderDetails { get; set; }
     }

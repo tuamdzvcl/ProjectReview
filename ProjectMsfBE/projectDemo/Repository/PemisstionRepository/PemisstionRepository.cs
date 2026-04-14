@@ -1,4 +1,6 @@
-﻿using Dapper;
+﻿using System.Data;
+using System.Net.WebSockets;
+using Dapper;
 using Microsoft.EntityFrameworkCore;
 using projectDemo.DTO.Projection;
 using projectDemo.DTO.Request;
@@ -6,15 +8,15 @@ using projectDemo.DTO.UpdateRequest;
 using projectDemo.Entity.Models;
 using projectDemo.Repository.BaseData;
 using projectDemo.UnitOfWorks;
-using System.Data;
-using System.Net.WebSockets;
 
 namespace projectDemo.Repository.PemisstionRepository
 {
     public class PemisstionRepository : RepositoryLinqBase<Permissions>, IPemisstionRepository
     {
         private readonly RepositoryProcBase _proc;
-        public PemisstionRepository(IUnitOfWork uow) : base(uow)
+
+        public PemisstionRepository(IUnitOfWork uow)
+            : base(uow)
         {
             _proc = new RepositoryProcBase(uow);
         }
@@ -25,35 +27,44 @@ namespace projectDemo.Repository.PemisstionRepository
             return entity;
         }
 
-        public  string Delete(int permissionID)
+        public string Delete(int permissionID)
         {
-            var update =  _dbSet.FirstOrDefault(x=>x.Id == permissionID);
-            update.IsDeleted=true;
+            var update = _dbSet.FirstOrDefault(x => x.Id == permissionID);
+            update.IsDeleted = true;
             return "deleted";
         }
 
         public async Task<Permissions?> GetByID(int permissionID)
         {
-            var entity = await _dbSet.FirstOrDefaultAsync(x=> x.Id == permissionID &&x.IsDeleted==false);
+            var entity = await _dbSet.FirstOrDefaultAsync(x =>
+                x.Id == permissionID && x.IsDeleted == false
+            );
             return entity;
         }
 
-        public async Task<(RoleProjecttion, int status, string messger)> GetPermissionByRoleId(int RoleId)
+        public async Task<(RoleProjecttion, int status, string messger)> GetPermissionByRoleId(
+            int RoleId
+        )
         {
             try
             {
                 var param = new DynamicParameters();
                 param.Add("@roleID", RoleId);
                 param.Add("@status", dbType: DbType.Int32, direction: ParameterDirection.Output);
-                param.Add("@messges", dbType: DbType.String, size: 250, direction: ParameterDirection.Output);
+                param.Add(
+                    "@messges",
+                    dbType: DbType.String,
+                    size: 250,
+                    direction: ParameterDirection.Output
+                );
                 using var multi = await _uow.connection.QueryMultipleAsync(
                     "GetListPerssionByRoleID",
                     param,
-                    commandType:CommandType.StoredProcedure
-                    );
+                    commandType: CommandType.StoredProcedure
+                );
                 var role = await multi.ReadFirstOrDefaultAsync<RoleProjecttion>();
                 var per = (await multi.ReadAsync<PermissionProjection>()).ToList();
-                 if(role != null)
+                if (role != null)
                 {
                     role.ListPermissions = per;
                 }
@@ -61,14 +72,12 @@ namespace projectDemo.Repository.PemisstionRepository
                 var message = param.Get<string>("@messges");
 
                 return (role, status, message);
-            
             }
             catch (Exception ex)
             {
-            Console.WriteLine(ex.ToString());
-                return (null,404,ex.Message);
-             }
-}
+                Console.WriteLine(ex.ToString());
+                return (null, 404, ex.Message);
+            }
         }
     }
-
+}

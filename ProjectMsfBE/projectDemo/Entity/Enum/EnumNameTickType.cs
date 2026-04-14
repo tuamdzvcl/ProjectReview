@@ -2,8 +2,7 @@
 {
     public enum EnumNameTickType
     {
-        VIP =1,
-        NORMAL =2
-
+        VIP = 1,
+        NORMAL = 2,
     }
 }

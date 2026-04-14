@@ -28,7 +28,7 @@ namespace projectDemo.Entity.Models
         [MaxLength(50)]
         public string? IpAddress { get; set; }
 
-        public DateTime Timestamp { get; set; } = DateTime.UtcNow;
+        public DateTime Timestamp { get; set; } = DateTime.Now;
 
         [MaxLength(1000)]
         public string? Note { get; set; } // Action description

@@ -34,8 +34,9 @@ export class AuditLogComponent implements OnInit {
   logs: AuditLog[] = [];
   totalRecords: number = 0;
   loading: boolean = true;
+  first: number = 0;
   rows: number = 10;
-
+  
   // Filters
   username: string = '';
   path: string = '';
@@ -43,22 +44,25 @@ export class AuditLogComponent implements OnInit {
   constructor(private auditLogService: AuditLogService) {}
 
   ngOnInit() {
-    this.loadLogs();
+    // onLazyLoad will trigger the initial load
   }
 
-  loadLogs(event: any = { first: 0, rows: 10 }) {
+  loadLogs(event: any = null) {
     this.loading = true;
-    this.rows = event.rows;
-    const pageIndex = event.first / event.rows + 1;
-    const pageSize = event.rows;
+
+    if (event) {
+      this.first = event.first;
+      this.rows = event.rows;
+    }
+
+    const pageIndex = (this.first / this.rows) + 1;
+    const pageSize = this.rows;
 
     this.auditLogService
       .getAuditLogs(pageIndex, pageSize, this.username, this.path)
       .subscribe({
         next: (res) => {
           if (res) {
-            console.log(res.Items);
-
             this.logs = res.Items;
             this.totalRecords = res.TotalRecords;
           }

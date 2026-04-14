@@ -13,30 +13,39 @@ using static Dapper.SqlMapper;
 
 namespace projectDemo.Service.TicketTypeService
 {
-    
-
-    public class TypeTicketService :ITypeTicketService
+    public class TypeTicketService : ITypeTicketService
     {
         private readonly ITypeTicketRepositorys _ticketRepositorys;
         private readonly IEventRepository _eventRepository;
         private readonly IMapper _mapper;
         private readonly IUnitOfWork _uow;
-        public TypeTicketService(IUnitOfWork uow,ITypeTicketRepositorys ticketRepositorys, IMapper mapper,IEventRepository eventRepository)
+
+        public TypeTicketService(
+            IUnitOfWork uow,
+            ITypeTicketRepositorys ticketRepositorys,
+            IMapper mapper,
+            IEventRepository eventRepository
+        )
         {
             _ticketRepositorys = ticketRepositorys;
             _mapper = mapper;
             _eventRepository = eventRepository;
             _uow = uow;
         }
+
         //tạo loại vé
-        public async Task<ApiResponse<TypeTickResponse>> CreateTypeTickect(TypeTicketRequest request)
+        public async Task<ApiResponse<TypeTickResponse>> CreateTypeTickect(
+            TypeTicketRequest request
+        )
         {
             var EventID = _eventRepository.GetEventById(request.EventID);
 
             if (EventID == null)
             {
-                return ApiResponse<TypeTickResponse>.FailResponse(Entity.Enum.EnumStatusCode.EVENTNOTFOUD, "Không tìm thấy Event ID");
-
+                return ApiResponse<TypeTickResponse>.FailResponse(
+                    Entity.Enum.EnumStatusCode.EVENTNOTFOUD,
+                    "Không tìm thấy Event ID"
+                );
             }
 
             var ticket = new TicketType
@@ -46,77 +55,112 @@ namespace projectDemo.Service.TicketTypeService
                 Price = request.Price,
                 Status = request.Status,
                 TotalQuantity = request.TotalQuantity,
-                IsDeleted=false,
-                EventID=request.EventID
-                
-
+                IsDeleted = false,
+                EventID = request.EventID,
             };
-           var entity = await _ticketRepositorys.CreateTicketType(ticket);
+            var entity = await _ticketRepositorys.CreateTicketType(ticket);
             await _uow.SaveChangesAsync();
-           var response = _mapper.Map<TypeTickResponse>(entity);
-            return ApiResponse<TypeTickResponse>.SuccessResponse(Entity.Enum.EnumStatusCode.SUCCESS,response);
-
-
+            var response = _mapper.Map<TypeTickResponse>(entity);
+            return ApiResponse<TypeTickResponse>.SuccessResponse(
+                Entity.Enum.EnumStatusCode.SUCCESS,
+                response
+            );
         }
+
         //xóa loại vé
         public async Task<ApiResponse<string>> DeleteTypeTicket(int TypeTickectID)
         {
             var typeticket = _ticketRepositorys.GetTicketTypebyId(TypeTickectID);
-            if(typeticket == null)
+            if (typeticket == null)
             {
-                return ApiResponse<string>.FailResponse(Entity.Enum.EnumStatusCode.SERVER, "Không tìm thấy typeTicketID");
-            }    
-             var response = _ticketRepositorys.DeleteTicket(typeticket);
+                return ApiResponse<string>.FailResponse(
+                    Entity.Enum.EnumStatusCode.SERVER,
+                    "Không tìm thấy typeTicketID"
+                );
+            }
+            var response = _ticketRepositorys.DeleteTicket(typeticket);
             return ApiResponse<string>.SuccessResponse(Entity.Enum.EnumStatusCode.SERVER, response);
-
         }
+
         //lấy tất cả loại vé theo eventID
-        public async Task<ApiResponse<EventTypeTickResponses>> GetListTypeTickByEventID(Guid eventID)
+        public async Task<ApiResponse<EventTypeTickResponses>> GetListTypeTickByEventID(
+            Guid eventID
+        )
         {
-            var (eventData, status, messger) = await _ticketRepositorys.GetListTypeTickByEventID(eventID);
+            var (eventData, status, messger) = await _ticketRepositorys.GetListTypeTickByEventID(
+                eventID
+            );
             if (status != 200)
             {
-                return ApiResponse<EventTypeTickResponses>.FailResponse(Entity.Enum.EnumStatusCode.EVENTNOTFOUD, messger);
+                return ApiResponse<EventTypeTickResponses>.FailResponse(
+                    Entity.Enum.EnumStatusCode.EVENTNOTFOUD,
+                    messger
+                );
             }
             var ev = _mapper.Map<EventTypeTickResponses>(eventData);
-            return ApiResponse<EventTypeTickResponses>.SuccessResponse(Entity.Enum.EnumStatusCode.SUCCESS, ev);
+            return ApiResponse<EventTypeTickResponses>.SuccessResponse(
+                Entity.Enum.EnumStatusCode.SUCCESS,
+                ev
+            );
         }
-        // lấy vé đầu tiền theo sự kiện 
+
+        // lấy vé đầu tiền theo sự kiện
         public async Task<ApiResponse<TypeTickResponse>> GetTypeTickByEevntID(Guid EventID)
         {
             try
             {
-
                 var events = await _eventRepository.GetEventById(EventID);
                 if (events == null)
                 {
-                    return ApiResponse<TypeTickResponse>.FailResponse(Entity.Enum.EnumStatusCode.EVENTNOTFOUD, "Không tìm thấy Event");
+                    return ApiResponse<TypeTickResponse>.FailResponse(
+                        Entity.Enum.EnumStatusCode.EVENTNOTFOUD,
+                        "Không tìm thấy Event"
+                    );
                 }
                 var typeTick = await _ticketRepositorys.GetTypeTickectByEventID(EventID);
                 if (typeTick == null)
-                    return ApiResponse<TypeTickResponse>.FailResponse(Entity.Enum.EnumStatusCode.TYPETICKET, "Không tìm thấy Vé hợp lệ");
+                    return ApiResponse<TypeTickResponse>.FailResponse(
+                        Entity.Enum.EnumStatusCode.TYPETICKET,
+                        "Không tìm thấy Vé hợp lệ"
+                    );
                 var response = _mapper.Map<TypeTickResponse>(typeTick);
 
-                return ApiResponse<TypeTickResponse>.SuccessResponse(Entity.Enum.EnumStatusCode.SUCCESS, response);
+                return ApiResponse<TypeTickResponse>.SuccessResponse(
+                    Entity.Enum.EnumStatusCode.SUCCESS,
+                    response
+                );
             }
             catch (Exception ex)
             {
                 Console.WriteLine(ex.ToString());
-                return ApiResponse<TypeTickResponse>.FailResponse(Entity.Enum.EnumStatusCode.SERVER, ex.Message);
+                return ApiResponse<TypeTickResponse>.FailResponse(
+                    Entity.Enum.EnumStatusCode.SERVER,
+                    ex.Message
+                );
             }
         }
-        //sửa thông tin vé sự kiện 
-        public async Task<ApiResponse<TypeTickResponse>> UpdateTypeTicket(int TypeTickectID, TypeTicketUpdate request)
+
+        //sửa thông tin vé sự kiện
+        public async Task<ApiResponse<TypeTickResponse>> UpdateTypeTicket(
+            int TypeTickectID,
+            TypeTicketUpdate request
+        )
         {
             if (request == null)
             {
-                return ApiResponse<TypeTickResponse>.FailResponse(Entity.Enum.EnumStatusCode.BAD_REQUEST, "Request không hợp lệ");
+                return ApiResponse<TypeTickResponse>.FailResponse(
+                    Entity.Enum.EnumStatusCode.BAD_REQUEST,
+                    "Request không hợp lệ"
+                );
             }
 
             var typeticket = _ticketRepositorys.GetTicketTypebyId(TypeTickectID);
             if (typeticket == null)
             {
-                return ApiResponse<TypeTickResponse>.FailResponse(Entity.Enum.EnumStatusCode.TYPETICKET, "Không tìm thấy typeTicketID");
+                return ApiResponse<TypeTickResponse>.FailResponse(
+                    Entity.Enum.EnumStatusCode.TYPETICKET,
+                    "Không tìm thấy typeTicketID"
+                );
             }
 
             typeticket.Name = request.Name ?? typeticket.Name;
@@ -129,7 +173,10 @@ namespace projectDemo.Service.TicketTypeService
             await _uow.SaveChangesAsync();
 
             var response = _mapper.Map<TypeTickResponse>(update);
-            return ApiResponse<TypeTickResponse>.SuccessResponse(Entity.Enum.EnumStatusCode.SUCCESS, response);
+            return ApiResponse<TypeTickResponse>.SuccessResponse(
+                Entity.Enum.EnumStatusCode.SUCCESS,
+                response
+            );
         }
     }
 }

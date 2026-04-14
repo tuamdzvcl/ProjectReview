@@ -13,8 +13,10 @@ namespace projectDemo.Repository.CatetoryRepository
         Task<List<Catetory>> GetListCatetory();
 
         Task<Catetory> GetByName(string name);
-        Task<PageResponse<CatetoryResponse>> PageCatetoryEvent(int PageSize, int PageIndex, string key);
-
-
+        Task<PageResponse<CatetoryResponse>> PageCatetoryEvent(
+            int PageSize,
+            int PageIndex,
+            string key
+        );
     }
 }

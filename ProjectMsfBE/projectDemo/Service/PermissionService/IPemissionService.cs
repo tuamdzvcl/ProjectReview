@@ -11,7 +11,5 @@ namespace projectDemo.Service.PermissionService
         Task<ApiResponse<PermissionResponse>> Create(PermisstionRequest request);
         Task<ApiResponse<PermissionResponse>> Update(PermisstionRequest request);
         Task<ApiResponse<string>> Delete(int permissionID);
-        
-
     }
 }

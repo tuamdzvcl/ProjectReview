@@ -9,7 +9,7 @@ namespace EventTick.Model.Enum
     public enum EnumStatusOrder
     {
         PENDING = 1,
-        PAID =2,
-        CANCELLED=3
+        PAID = 2,
+        CANCELLED = 3,
     }
 }

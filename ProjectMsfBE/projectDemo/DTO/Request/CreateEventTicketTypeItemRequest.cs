@@ -1,6 +1,6 @@
+using System.ComponentModel.DataAnnotations;
 using EventTick.Model.Enum;
 using projectDemo.Entity.Enum;
-using System.ComponentModel.DataAnnotations;
 
 namespace projectDemo.DTO.Request
 {

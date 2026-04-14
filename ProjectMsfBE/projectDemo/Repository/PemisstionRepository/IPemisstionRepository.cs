@@ -11,6 +11,5 @@ namespace projectDemo.Repository.PemisstionRepository
         string Delete(int permissionID);
         Task<Permissions> GetByID(int permissionID);
         Task<(RoleProjecttion, int status, string messger)> GetPermissionByRoleId(int RoleId);
-
     }
 }

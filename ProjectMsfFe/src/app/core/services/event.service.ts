@@ -56,9 +56,12 @@ export class EventService extends BaseApiService {
     if (categoryId !== null) {
       params.categoryId = categoryId;
     }
-    return this.getpage<EventModel>('event/page-with-ticket-types', params).pipe(
+    return this.getpage<EventModel>(
+      'event/page-with-ticket-types',
+      params
+    ).pipe(
       map((res: PageResult<EventModel>) => {
-        console.log(params)
+        console.log(params);
         return {
           items: res.Items,
           pageIndex: res.PageIndex,
@@ -69,7 +72,39 @@ export class EventService extends BaseApiService {
       })
     );
   }
-
+  GetEventswithTypeticketbyid(
+    pageIndex: number,
+    pageSize: number,
+    key: string,
+    categoryId: number | null = null
+  ) {
+    const params: any = {
+      pageIndex: pageIndex,
+      pageSize: pageSize,
+    };
+    if (key) {
+      params.key = key;
+    }
+    if (categoryId !== null) {
+      params.categoryId = categoryId;
+    }
+    return this.getpage<EventModel>(
+      'event/page-with-ticket-types-byid',
+      params
+    ).pipe(
+      map((res: PageResult<EventModel>) => {
+        console.log(params);
+        return {
+          items: res.Items,
+          pageIndex: res.PageIndex,
+          pageSize: res.PageSize,
+          totalRecords: res.TotalRecords,
+          totalPages: res.TotalPages,
+        };
+      })
+    );
+  }
+  
   GetEventId(id: string) {
     return this.get<EventModel>(`event/${id}`).pipe(
       map((res: EventModel) => {

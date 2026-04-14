@@ -12,7 +12,9 @@ namespace projectDemo.Service.TicketTypeService
         Task<ApiResponse<EventTypeTickResponses>> GetListTypeTickByEventID(Guid eventID);
         Task<ApiResponse<TypeTickResponse>> CreateTypeTickect(TypeTicketRequest ticketType);
         Task<ApiResponse<string>> DeleteTypeTicket(int TypeTickectID);
-        Task<ApiResponse<TypeTickResponse>> UpdateTypeTicket(int TypeTickectID,TypeTicketUpdate request);
-
+        Task<ApiResponse<TypeTickResponse>> UpdateTypeTicket(
+            int TypeTickectID,
+            TypeTicketUpdate request
+        );
     }
 }

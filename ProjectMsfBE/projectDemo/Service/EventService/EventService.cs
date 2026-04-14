@@ -1,25 +1,23 @@
-
-using projectDemo.Entity.Models;
+using System.Linq;
+using AutoMapper;
+using EventTick.Model.Enum;
+using EventTick.Model.Models;
+using Microsoft.EntityFrameworkCore;
+using projectDemo.Common.PageRequest;
+using projectDemo.DTO.Request;
 using projectDemo.DTO.Respone;
 using projectDemo.DTO.Response;
-using projectDemo.Service.Auth;
-using projectDemo.Repository.Ipml;
-using AutoMapper;
-using projectDemo.DTO.Request;
-using EventTick.Model.Models;
-using EventTick.Model.Enum;
 using projectDemo.DTO.UpdateRequest;
+using projectDemo.Entity.Models;
+using projectDemo.Repository.CatetoryRepository;
+using projectDemo.Repository.Ipml;
+using projectDemo.Repository.TickTypeRepository;
+using projectDemo.Service.Auth;
 using projectDemo.Service.ImageService;
 using projectDemo.UnitOfWorks;
-using projectDemo.Repository.CatetoryRepository;
-using projectDemo.Repository.TickTypeRepository;
-using projectDemo.Common.PageRequest;
-using Microsoft.EntityFrameworkCore;
-using System.Linq;
 
 namespace projectDemo.Service.EventService
 {
-
     public class EventService : IEventService
     {
         private readonly IEventRepository _eventRepository;
@@ -30,7 +28,15 @@ namespace projectDemo.Service.EventService
         private readonly ITypeTicketRepositorys _typeTicketRepository;
         private readonly IMapper _mapper;
 
-        public EventService(ICatetoryReposioty catetoryReposioty,IUnitOfWork uow,IImageService imageService,IEventRepository eventRepository, IMapper mapper, IUserReposiotry userReposiotry, ITypeTicketRepositorys typeTicketRepository)
+        public EventService(
+            ICatetoryReposioty catetoryReposioty,
+            IUnitOfWork uow,
+            IImageService imageService,
+            IEventRepository eventRepository,
+            IMapper mapper,
+            IUserReposiotry userReposiotry,
+            ITypeTicketRepositorys typeTicketRepository
+        )
         {
             _eventRepository = eventRepository;
             _mapper = mapper;
@@ -66,12 +72,15 @@ namespace projectDemo.Service.EventService
         private async Task SyncEndedEventsAsync()
         {
             var now = GetVietnamNow();
-            var expiredEvents = await _uow.context.Set<Event>()
-                .Where(e => e.IsDeleted == false
+            var expiredEvents = await _uow
+                .context.Set<Event>()
+                .Where(e =>
+                    e.IsDeleted == false
                     && e.Status != EnumStatusEvent.CANNEL
                     && e.Status != EnumStatusEvent.ENDED
                     && e.EndDate.HasValue
-                    && e.EndDate.Value <= now)
+                    && e.EndDate.Value <= now
+                )
                 .ToListAsync();
 
             if (!expiredEvents.Any())
@@ -99,6 +108,7 @@ namespace projectDemo.Service.EventService
             events.UpdatedDate = now;
             await _uow.SaveChangesAsync();
         }
+
         //check date
         public bool checkVadidate(EventRequest request)
         {
@@ -106,18 +116,20 @@ namespace projectDemo.Service.EventService
             var now = GetVietnamNow();
 
             var hasAnyDate =
-                request.StartDate.HasValue ||
-                request.EndDate.HasValue ||
-                request.SaleStartDate.HasValue ||
-                request.SaleEndDate.HasValue;
+                request.StartDate.HasValue
+                || request.EndDate.HasValue
+                || request.SaleStartDate.HasValue
+                || request.SaleEndDate.HasValue;
 
             if (!hasAnyDate)
                 return true;
 
-            if (!request.StartDate.HasValue ||
-                !request.EndDate.HasValue ||
-                !request.SaleStartDate.HasValue ||
-                !request.SaleEndDate.HasValue)
+            if (
+                !request.StartDate.HasValue
+                || !request.EndDate.HasValue
+                || !request.SaleStartDate.HasValue
+                || !request.SaleEndDate.HasValue
+            )
             {
                 return false;
             }
@@ -139,8 +151,12 @@ namespace projectDemo.Service.EventService
         {
             return events == null || events.Id == Guid.Empty;
         }
+
         // gắn entity->dto
-        private static EventRequest BuildEventValidationRequest(Event existingEvent, EventUpdateRequest request)
+        private static EventRequest BuildEventValidationRequest(
+            Event existingEvent,
+            EventUpdateRequest request
+        )
         {
             return new EventRequest
             {
@@ -152,16 +168,17 @@ namespace projectDemo.Service.EventService
                 SaleStartDate = request.SaleStartDate ?? existingEvent.SaleStartDate,
                 SaleEndDate = request.SaleEndDate ?? existingEvent.SaleEndDate,
                 CatetoryName = request.CatetoryName ?? existingEvent.Catetory?.Name ?? string.Empty,
-                PosterUrl = request.PosterUrl
+                PosterUrl = request.PosterUrl,
             };
         }
 
-        private static bool HasInvalidTicketTypes(IEnumerable<CreateEventTicketTypeItemRequest> ticketTypes)
+        private static bool HasInvalidTicketTypes(
+            IEnumerable<CreateEventTicketTypeItemRequest> ticketTypes
+        )
         {
-            return ticketTypes.Any(ticket =>
-                ticket.TotalQuantity <= 0 ||
-                ticket.Price <= 0);
+            return ticketTypes.Any(ticket => ticket.TotalQuantity <= 0 || ticket.Price <= 0);
         }
+
         private static bool IsTicketTypeUpdateInvalid(UpdateEventTicketTypeItemRequest ticket)
         {
             if (ticket.Name == null)
@@ -188,8 +205,9 @@ namespace projectDemo.Service.EventService
             return false;
         }
 
-
-        private static bool HasInvalidTicketTypeUpdates(IEnumerable<UpdateEventTicketTypeItemRequest> ticketTypes)
+        private static bool HasInvalidTicketTypeUpdates(
+            IEnumerable<UpdateEventTicketTypeItemRequest> ticketTypes
+        )
         {
             foreach (var ticket in ticketTypes)
             {
@@ -200,20 +218,18 @@ namespace projectDemo.Service.EventService
             return false;
         }
 
-
-
         //lấy userName
         public async Task<List<string>> rederNameByUserID(Guid UserID)
         {
             return await _userReposiotry.GetRoleByUser(UserID);
         }
+
         //tạo event ->done
         //public async Task<ApiResponse<EventResponse>> CreateEvent(EventRequest resquest,Guid Userid)
         //{
         //    try
         //    {
         //        var check = checkVadidate(resquest);
-                
 
         //        if (!check)
         //        {
@@ -277,10 +293,11 @@ namespace projectDemo.Service.EventService
         //        return ApiResponse<EventResponse>.FailResponse(Entity.Enum.EnumStatusCode.SERVER, "lỗi", ex.Message);
         //    }
 
-
         //}
         //done
-        public async Task<ApiResponse<CreateEventWithTicketTypesResponse>> CreateEventWithTicketTypes(CreateEventWithTicketTypesRequest request, Guid userId)
+        public async Task<
+            ApiResponse<CreateEventWithTicketTypesResponse>
+        > CreateEventWithTicketTypes(CreateEventWithTicketTypesRequest request, Guid userId)
         {
             string? imageUrl = null;
             var transactionStarted = false;
@@ -289,37 +306,53 @@ namespace projectDemo.Service.EventService
             {
                 if (!checkVadidate(request))
                 {
-                    return ApiResponse<CreateEventWithTicketTypesResponse>.FailResponse(Entity.Enum.EnumStatusCode.DATE, "Kiểm tra lại ngày giờ của event");
+                    return ApiResponse<CreateEventWithTicketTypesResponse>.FailResponse(
+                        Entity.Enum.EnumStatusCode.DATE,
+                        "Kiểm tra lại ngày giờ của event"
+                    );
                 }
 
                 if (request.TicketTypes == null || !request.TicketTypes.Any())
                 {
-                    return ApiResponse<CreateEventWithTicketTypesResponse>.FailResponse(Entity.Enum.EnumStatusCode.BAD_REQUEST, "Event phải có ít nhất 1 loại vé");
+                    return ApiResponse<CreateEventWithTicketTypesResponse>.FailResponse(
+                        Entity.Enum.EnumStatusCode.BAD_REQUEST,
+                        "Event phải có ít nhất 1 loại vé"
+                    );
                 }
 
                 if (HasInvalidTicketTypes(request.TicketTypes))
                 {
-                    return ApiResponse<CreateEventWithTicketTypesResponse>.FailResponse(Entity.Enum.EnumStatusCode.BAD_REQUEST, "Thông tin loại vé không hợp lệ");
+                    return ApiResponse<CreateEventWithTicketTypesResponse>.FailResponse(
+                        Entity.Enum.EnumStatusCode.BAD_REQUEST,
+                        "Thông tin loại vé không hợp lệ"
+                    );
                 }
 
                 if (request.PosterUrl == null)
                 {
-                    return ApiResponse<CreateEventWithTicketTypesResponse>.FailResponse(Entity.Enum.EnumStatusCode.BAD_REQUEST, "PosterUrl không được để trống");
+                    return ApiResponse<CreateEventWithTicketTypesResponse>.FailResponse(
+                        Entity.Enum.EnumStatusCode.BAD_REQUEST,
+                        "PosterUrl không được để trống"
+                    );
                 }
 
                 var user = await _userReposiotry.GetUserByid(userId);
                 if (user == null)
                 {
-                    return ApiResponse<CreateEventWithTicketTypesResponse>.FailResponse(Entity.Enum.EnumStatusCode.USERNOTFOUND, "Không tìm thấy user");
+                    return ApiResponse<CreateEventWithTicketTypesResponse>.FailResponse(
+                        Entity.Enum.EnumStatusCode.USERNOTFOUND,
+                        "Không tìm thấy user"
+                    );
                 }
 
                 var catetory = await _catrtoeyRepository.GetByName(request.CatetoryName.ToUpper());
                 if (catetory == null)
                 {
-                    return ApiResponse<CreateEventWithTicketTypesResponse>.FailResponse(Entity.Enum.EnumStatusCode.NOT_FOUND, "Không tìm thấy thể loại");
+                    return ApiResponse<CreateEventWithTicketTypesResponse>.FailResponse(
+                        Entity.Enum.EnumStatusCode.NOT_FOUND,
+                        "Không tìm thấy thể loại"
+                    );
                 }
-
-               
 
                 await _uow.BeginTransactionAsync();
 
@@ -341,19 +374,21 @@ namespace projectDemo.Service.EventService
                     Location = request.Location,
                     CreatedDate = DateTime.Now,
                     CatetoryID = catetory.Id,
-                    IsDeleted = false
+                    IsDeleted = false,
                 };
 
-                var ticketTypeEntities = request.TicketTypes.Select(ticket => new TicketType
-                {
-                    Name = ticket.Name,
-                    Price = ticket.Price,
-                    TotalQuantity = ticket.TotalQuantity,
-                    Status = ticket.Status,
-                    EventID = eventEntity.Id,
-                    IsDeleted = false,
-                    CreatedDate = DateTime.Now
-                }).ToList();
+                var ticketTypeEntities = request
+                    .TicketTypes.Select(ticket => new TicketType
+                    {
+                        Name = ticket.Name,
+                        Price = ticket.Price,
+                        TotalQuantity = ticket.TotalQuantity,
+                        Status = ticket.Status,
+                        EventID = eventEntity.Id,
+                        IsDeleted = false,
+                        CreatedDate = DateTime.Now,
+                    })
+                    .ToList();
 
                 await _eventRepository.CreateEvent(eventEntity);
                 await _typeTicketRepository.CreateRangeTicketTypes(ticketTypeEntities);
@@ -374,18 +409,23 @@ namespace projectDemo.Service.EventService
                     PosterUrl = eventEntity.PosterUrl,
                     Status = eventEntity.Status.ToString(),
                     CatetoryName = catetory.Name,
-                    TicketTypes = ticketTypeEntities.Select(ticket => new TypeTickResponse
-                    {
-                        Id = ticket.Id,
-                        Name = ticket.Name.ToString(),
-                        Price = ticket.Price,
-                        TotalQuantity = ticket.TotalQuantity,
-                        SoldQuantity = ticket.SoldQuantity,
-                        Status = ticket.Status.ToString()
-                    }).ToList()
+                    TicketTypes = ticketTypeEntities
+                        .Select(ticket => new TypeTickResponse
+                        {
+                            Id = ticket.Id,
+                            Name = ticket.Name.ToString(),
+                            Price = ticket.Price,
+                            TotalQuantity = ticket.TotalQuantity,
+                            SoldQuantity = ticket.SoldQuantity,
+                            Status = ticket.Status.ToString(),
+                        })
+                        .ToList(),
                 };
 
-                return ApiResponse<CreateEventWithTicketTypesResponse>.SuccessResponse(Entity.Enum.EnumStatusCode.SUCCESS, response);
+                return ApiResponse<CreateEventWithTicketTypesResponse>.SuccessResponse(
+                    Entity.Enum.EnumStatusCode.SUCCESS,
+                    response
+                );
             }
             catch (Exception ex)
             {
@@ -400,9 +440,14 @@ namespace projectDemo.Service.EventService
                     _imageService.Delete(imageUrl);
                 }
 
-                return ApiResponse<CreateEventWithTicketTypesResponse>.FailResponse(Entity.Enum.EnumStatusCode.SERVER, "Lỗi khi tạo event", ex.Message);
+                return ApiResponse<CreateEventWithTicketTypesResponse>.FailResponse(
+                    Entity.Enum.EnumStatusCode.SERVER,
+                    "Lỗi khi tạo event",
+                    ex.Message
+                );
             }
         }
+
         // xóa mềm
         public async Task<ApiResponse<string>> DeleteEvent(Guid EventID)
         {
@@ -413,48 +458,65 @@ namespace projectDemo.Service.EventService
 
                 if (events == null)
                 {
-                    return ApiResponse<string>.FailResponse(Entity.Enum.EnumStatusCode.EVENTNOTFOUD, "Không tìm thấy event");
+                    return ApiResponse<string>.FailResponse(
+                        Entity.Enum.EnumStatusCode.EVENTNOTFOUD,
+                        "Không tìm thấy event"
+                    );
                 }
                 await EnsureEventEndedStatusAsync(events);
-                
-                if (events.Status == EnumStatusEvent.PUBLIC)                {
-                    return ApiResponse<string>.FailResponse(Entity.Enum.EnumStatusCode.UNAUTHORIZED, "Sự kiện đã được công bố không thu hồi được");
 
+                if (events.Status == EnumStatusEvent.PUBLIC)
+                {
+                    return ApiResponse<string>.FailResponse(
+                        Entity.Enum.EnumStatusCode.UNAUTHORIZED,
+                        "Sự kiện đã được công bố không thu hồi được"
+                    );
                 }
                 events.Status = EnumStatusEvent.CANNEL;
                 events.IsDeleted = true;
                 await _uow.SaveChangesAsync();
-                return ApiResponse<string>.SuccessResponse(Entity.Enum.EnumStatusCode.SUCCESS, "Xóa thành công");
+                return ApiResponse<string>.SuccessResponse(
+                    Entity.Enum.EnumStatusCode.SUCCESS,
+                    "Xóa thành công"
+                );
             }
             catch (Exception ex)
             {
                 Console.WriteLine($"System Error: {ex.Message}");
 
-                return ApiResponse<string>.FailResponse(Entity.Enum.EnumStatusCode.SERVER, "lỗi", ex.Message);
+                return ApiResponse<string>.FailResponse(
+                    Entity.Enum.EnumStatusCode.SERVER,
+                    "lỗi",
+                    ex.Message
+                );
             }
         }
+
         // lấy tất cả các event
         public async Task<List<EventResponse>> GetEventAll()
         {
             await SyncEndedEventsAsync();
             List<Event> listEvents = await _eventRepository.GetAllEvent();
 
-            var result = listEvents.Select(e => new EventResponse
-            {
-                EventID = e.Id,
-                Description = e.Description,
-                Location = e.Location,
-                EndDate = e.EndDate,
-                SaleStartDate = e.SaleStartDate,
-                SaleEndDate = e.SaleEndDate,
-                StartDate = e.StartDate,
-                PosterUrl = e.PosterUrl,
-                Status = e.Status.ToString(),
-                Title = e.Title,
-                UserID = e.UserID
-            }).ToList();
+            var result = listEvents
+                .Select(e => new EventResponse
+                {
+                    EventID = e.Id,
+                    Description = e.Description,
+                    Location = e.Location,
+                    EndDate = e.EndDate,
+                    SaleStartDate = e.SaleStartDate,
+                    SaleEndDate = e.SaleEndDate,
+                    StartDate = e.StartDate,
+                    PosterUrl = e.PosterUrl,
+                    Status = e.Status.ToString(),
+                    Title = e.Title,
+                    UserID = e.UserID,
+                })
+                .ToList();
             return result;
         }
+
         //lấy event theo id
         public async Task<ApiResponse<EventTypeTickResponses>> GetEventById(Guid EventID)
         {
@@ -462,18 +524,29 @@ namespace projectDemo.Service.EventService
             {
                 await SyncEndedEventsAsync();
                 var response = await _eventRepository.GetEventDetailById(EventID);
-                return ApiResponse<EventTypeTickResponses>.SuccessResponse(Entity.Enum.EnumStatusCode.SUCCESS, response);
+                return ApiResponse<EventTypeTickResponses>.SuccessResponse(
+                    Entity.Enum.EnumStatusCode.SUCCESS,
+                    response
+                );
             }
             catch (Exception ex)
             {
                 Console.WriteLine($"System Error: {ex.Message}");
 
-                return ApiResponse<EventTypeTickResponses>.FailResponse(Entity.Enum.EnumStatusCode.SERVER, "lỗi", ex.Message);
+                return ApiResponse<EventTypeTickResponses>.FailResponse(
+                    Entity.Enum.EnumStatusCode.SERVER,
+                    "lỗi",
+                    ex.Message
+                );
             }
-
         }
+
         // lấy tất cả các event phân trang
-        public async Task<PageResponse<EventResponse>> GetListEventPage(int pageSize, int pageIndex, string keyWord)
+        public async Task<PageResponse<EventResponse>> GetListEventPage(
+            int pageSize,
+            int pageIndex,
+            string keyWord
+        )
         {
             try
             {
@@ -492,8 +565,12 @@ namespace projectDemo.Service.EventService
                 throw new Exception();
             }
         }
+
         // update event done
-        public async Task<ApiResponse<string>> UpdateEvent(Guid EventID, EventUpdateRequest resquest)
+        public async Task<ApiResponse<string>> UpdateEvent(
+            Guid EventID,
+            EventUpdateRequest resquest
+        )
         {
             string? oldImageUrl = null;
             string? newImageUrl = null;
@@ -503,23 +580,39 @@ namespace projectDemo.Service.EventService
                 await SyncEndedEventsAsync();
                 var events = await _eventRepository.GetEventById(EventID);
                 if (IsEventNotFound(events))
-                    return ApiResponse<string>.FailResponse(Entity.Enum.EnumStatusCode.EVENTNOTFOUD, "even không tồn tại ");
+                    return ApiResponse<string>.FailResponse(
+                        Entity.Enum.EnumStatusCode.EVENTNOTFOUD,
+                        "even không tồn tại "
+                    );
 
                 await EnsureEventEndedStatusAsync(events);
                 if (events.Status == EnumStatusEvent.ENDED)
                 {
-                    return ApiResponse<string>.FailResponse(Entity.Enum.EnumStatusCode.BAD_REQUEST, "Sự kiện đã kết thúc, không thể chỉnh sửa");
+                    return ApiResponse<string>.FailResponse(
+                        Entity.Enum.EnumStatusCode.BAD_REQUEST,
+                        "Sự kiện đã kết thúc, không thể chỉnh sửa"
+                    );
                 }
 
                 var validationRequest = BuildEventValidationRequest(events, resquest);
                 if (!checkVadidate(validationRequest))
                 {
-                    return ApiResponse<string>.FailResponse(Entity.Enum.EnumStatusCode.DATE, "Kiểm tra lại ngày giờ của event");
+                    return ApiResponse<string>.FailResponse(
+                        Entity.Enum.EnumStatusCode.DATE,
+                        "Kiểm tra lại ngày giờ của event"
+                    );
                 }
 
-                if (resquest.TicketTypes != null && resquest.TicketTypes.Any() && HasInvalidTicketTypeUpdates(resquest.TicketTypes))
+                if (
+                    resquest.TicketTypes != null
+                    && resquest.TicketTypes.Any()
+                    && HasInvalidTicketTypeUpdates(resquest.TicketTypes)
+                )
                 {
-                    return ApiResponse<string>.FailResponse(Entity.Enum.EnumStatusCode.BAD_REQUEST, "Thông tin loại vé không hợp lệ");
+                    return ApiResponse<string>.FailResponse(
+                        Entity.Enum.EnumStatusCode.BAD_REQUEST,
+                        "Thông tin loại vé không hợp lệ"
+                    );
                 }
 
                 await _uow.BeginTransactionAsync();
@@ -527,10 +620,15 @@ namespace projectDemo.Service.EventService
 
                 if (!string.IsNullOrWhiteSpace(resquest.CatetoryName))
                 {
-                    var catetory = await _catrtoeyRepository.GetByName(resquest.CatetoryName.ToUpper());
+                    var catetory = await _catrtoeyRepository.GetByName(
+                        resquest.CatetoryName.ToUpper()
+                    );
                     if (catetory == null)
                     {
-                        return ApiResponse<string>.FailResponse(Entity.Enum.EnumStatusCode.NOT_FOUND, "Không tìm thấy thể loại");
+                        return ApiResponse<string>.FailResponse(
+                            Entity.Enum.EnumStatusCode.NOT_FOUND,
+                            "Không tìm thấy thể loại"
+                        );
                     }
 
                     events.CatetoryID = catetory.Id;
@@ -557,19 +655,26 @@ namespace projectDemo.Service.EventService
                 {
                     var existingTickets = await _typeTicketRepository.GetByEventIdAsync(EventID);
                     var existingTicketsById = existingTickets.ToDictionary(x => x.Id, x => x);
-                    var requestIds = resquest.TicketTypes
-                        .Where(x => x.Id.HasValue)
+                    var requestIds = resquest
+                        .TicketTypes.Where(x => x.Id.HasValue)
                         .Select(x => x.Id.Value)
                         .ToHashSet();
-                    
 
                     foreach (var ticketRequest in resquest.TicketTypes)
                     {
                         if (ticketRequest.Id.HasValue)
                         {
-                            if (!existingTicketsById.TryGetValue(ticketRequest.Id.Value, out var ticketEntity))
+                            if (
+                                !existingTicketsById.TryGetValue(
+                                    ticketRequest.Id.Value,
+                                    out var ticketEntity
+                                )
+                            )
                             {
-                                return ApiResponse<string>.FailResponse(Entity.Enum.EnumStatusCode.TYPETICKET, $"Không tìm thấy loại vé với id {ticketRequest.Id.Value}");
+                                return ApiResponse<string>.FailResponse(
+                                    Entity.Enum.EnumStatusCode.TYPETICKET,
+                                    $"Không tìm thấy loại vé với id {ticketRequest.Id.Value}"
+                                );
                             }
 
                             ticketEntity.Name = ticketRequest.Name;
@@ -589,7 +694,7 @@ namespace projectDemo.Service.EventService
                                 Status = ticketRequest.Status!.Value,
                                 EventID = EventID,
                                 IsDeleted = false,
-                                CreatedDate = DateTime.Now
+                                CreatedDate = DateTime.Now,
                             };
 
                             await _typeTicketRepository.CreateTicketType(newTicket);
@@ -610,12 +715,18 @@ namespace projectDemo.Service.EventService
                 await _uow.SaveChangesAsync();
                 await _uow.CommitAsync();
 
-                if (!string.IsNullOrWhiteSpace(oldImageUrl) && !string.Equals(oldImageUrl, newImageUrl, StringComparison.OrdinalIgnoreCase))
+                if (
+                    !string.IsNullOrWhiteSpace(oldImageUrl)
+                    && !string.Equals(oldImageUrl, newImageUrl, StringComparison.OrdinalIgnoreCase)
+                )
                 {
                     _imageService.Delete(oldImageUrl);
                 }
 
-                return ApiResponse<string>.SuccessResponse(Entity.Enum.EnumStatusCode.SUCCESS, "Update Thành công");
+                return ApiResponse<string>.SuccessResponse(
+                    Entity.Enum.EnumStatusCode.SUCCESS,
+                    "Update Thành công"
+                );
             }
             catch (Exception ex)
             {
@@ -631,7 +742,11 @@ namespace projectDemo.Service.EventService
                     _imageService.Delete(newImageUrl);
                 }
 
-                return ApiResponse<string>.FailResponse(Entity.Enum.EnumStatusCode.SERVER, "lỗi", ex.Message);
+                return ApiResponse<string>.FailResponse(
+                    Entity.Enum.EnumStatusCode.SERVER,
+                    "lỗi",
+                    ex.Message
+                );
             }
         }
 
@@ -643,7 +758,10 @@ namespace projectDemo.Service.EventService
                 var originalEvent = await _eventRepository.GetEventById(eventId);
                 if (IsEventNotFound(originalEvent))
                 {
-                    return ApiResponse<string>.FailResponse(Entity.Enum.EnumStatusCode.EVENTNOTFOUD, "Event không tồn tại");
+                    return ApiResponse<string>.FailResponse(
+                        Entity.Enum.EnumStatusCode.EVENTNOTFOUD,
+                        "Event không tồn tại"
+                    );
                 }
 
                 await _uow.BeginTransactionAsync();
@@ -664,7 +782,7 @@ namespace projectDemo.Service.EventService
                     Location = originalEvent.Location,
                     CreatedDate = DateTime.Now,
                     CatetoryID = originalEvent.CatetoryID,
-                    IsDeleted = false
+                    IsDeleted = false,
                 };
 
                 await _eventRepository.CreateEvent(newEvent);
@@ -672,16 +790,18 @@ namespace projectDemo.Service.EventService
                 var existingTickets = await _typeTicketRepository.GetByEventIdAsync(eventId);
                 if (existingTickets != null && existingTickets.Any())
                 {
-                    var newTicketTypes = existingTickets.Select(ticket => new TicketType
-                    {
-                        Name = ticket.Name,
-                        Price = ticket.Price,
-                        TotalQuantity = ticket.TotalQuantity,
-                        Status = EnumStatusTickType.STOP,
-                        EventID = newEvent.Id,
-                        IsDeleted = false,
-                        CreatedDate = DateTime.Now
-                    }).ToList();
+                    var newTicketTypes = existingTickets
+                        .Select(ticket => new TicketType
+                        {
+                            Name = ticket.Name,
+                            Price = ticket.Price,
+                            TotalQuantity = ticket.TotalQuantity,
+                            Status = EnumStatusTickType.STOP,
+                            EventID = newEvent.Id,
+                            IsDeleted = false,
+                            CreatedDate = DateTime.Now,
+                        })
+                        .ToList();
 
                     await _typeTicketRepository.CreateRangeTicketTypes(newTicketTypes);
                 }
@@ -689,7 +809,10 @@ namespace projectDemo.Service.EventService
                 await _uow.SaveChangesAsync();
                 await _uow.CommitAsync();
 
-                return ApiResponse<string>.SuccessResponse(Entity.Enum.EnumStatusCode.SUCCESS, "Nhân bản sự kiện thành công");
+                return ApiResponse<string>.SuccessResponse(
+                    Entity.Enum.EnumStatusCode.SUCCESS,
+                    "Nhân bản sự kiện thành công"
+                );
             }
             catch (Exception ex)
             {
@@ -698,7 +821,11 @@ namespace projectDemo.Service.EventService
                     await _uow.RollbackAsync();
                 }
                 Console.WriteLine($"System Error: {ex.Message}");
-                return ApiResponse<string>.FailResponse(Entity.Enum.EnumStatusCode.SERVER, "lỗi", ex.Message);
+                return ApiResponse<string>.FailResponse(
+                    Entity.Enum.EnumStatusCode.SERVER,
+                    "lỗi",
+                    ex.Message
+                );
             }
         }
 
@@ -711,33 +838,48 @@ namespace projectDemo.Service.EventService
                 return false;
             return true;
         }
-        public async Task<ApiResponse<string>> UpdateEventStatus(Guid eventId, EventStatusUpdateRequest request)
+
+        public async Task<ApiResponse<string>> UpdateEventStatus(
+            Guid eventId,
+            EventStatusUpdateRequest request
+        )
         {
             try
             {
                 await SyncEndedEventsAsync();
                 if (request == null || !request.Status.HasValue)
                 {
-                    return ApiResponse<string>.FailResponse(Entity.Enum.EnumStatusCode.BAD_REQUEST, "Status không hợp lệ");
+                    return ApiResponse<string>.FailResponse(
+                        Entity.Enum.EnumStatusCode.BAD_REQUEST,
+                        "Status không hợp lệ"
+                    );
                 }
 
                 var events = await _eventRepository.GetEventById(eventId);
                 if (IsEventNotFound(events))
                 {
-                    return ApiResponse<string>.FailResponse(Entity.Enum.EnumStatusCode.EVENTNOTFOUD, "event không tồn tại");
+                    return ApiResponse<string>.FailResponse(
+                        Entity.Enum.EnumStatusCode.EVENTNOTFOUD,
+                        "event không tồn tại"
+                    );
                 }
 
                 await EnsureEventEndedStatusAsync(events);
                 if (events.Status == EnumStatusEvent.ENDED)
                 {
-                    return ApiResponse<string>.FailResponse(Entity.Enum.EnumStatusCode.BAD_REQUEST, "Sự kiện đã kết thúc, không thể cập nhật trạng thái");
+                    return ApiResponse<string>.FailResponse(
+                        Entity.Enum.EnumStatusCode.BAD_REQUEST,
+                        "Sự kiện đã kết thúc, không thể cập nhật trạng thái"
+                    );
                 }
 
                 var check = checkeDateNull(events);
                 if (!check)
                 {
-                    return ApiResponse<string>.FailResponse(Entity.Enum.EnumStatusCode.DATE, "Kiểm tra lại ngày tháng");
-
+                    return ApiResponse<string>.FailResponse(
+                        Entity.Enum.EnumStatusCode.DATE,
+                        "Kiểm tra lại ngày tháng"
+                    );
                 }
 
                 events.Status = EnumStatusEvent.PUBLISHED;
@@ -745,23 +887,47 @@ namespace projectDemo.Service.EventService
 
                 await _uow.SaveChangesAsync();
 
-                return ApiResponse<string>.SuccessResponse(Entity.Enum.EnumStatusCode.SUCCESS, "Cập nhật status event thành công");
+                return ApiResponse<string>.SuccessResponse(
+                    Entity.Enum.EnumStatusCode.SUCCESS,
+                    "Cập nhật status event thành công"
+                );
             }
             catch (Exception ex)
             {
                 Console.WriteLine($"System Error: {ex.Message}");
-                return ApiResponse<string>.FailResponse(Entity.Enum.EnumStatusCode.SERVER, "lỗi", ex.Message);
+                return ApiResponse<string>.FailResponse(
+                    Entity.Enum.EnumStatusCode.SERVER,
+                    "lỗi",
+                    ex.Message
+                );
             }
         }
 
-        public async Task<PageResponse<EventTypeTickResponses>> GetPageWithTicketTypes(Guid UserId,PageRequest query)
+        public async Task<PageResponse<EventTypeTickResponses>> GetPageWithTicketTypes(
+            PageRequest query
+        )
         {
             await SyncEndedEventsAsync();
-            if (query.PageIndex <= 0) query.PageIndex = 1;
-            if (query.PageSize <= 0) query.PageSize = 10;
+            if (query.PageIndex <= 0)
+                query.PageIndex = 1;
+            if (query.PageSize <= 0)
+                query.PageSize = 10;
 
-           return await _eventRepository.GetAllWithTicketTypesAsync(UserId,query);
+            return await _eventRepository.GetAllWithTicketTypesAsync(query);
+        }
 
+        public async Task<PageResponse<EventTypeTickResponses>> GetPageWithTicketTypesbyId(
+            Guid id,
+            PageRequest query
+        )
+        {
+            await SyncEndedEventsAsync();
+            if (query.PageIndex <= 0)
+                query.PageIndex = 1;
+            if (query.PageSize <= 0)
+                query.PageSize = 10;
+
+            return await _eventRepository.GetAllWithTicketTypesAsyncbyid(id, query);
         }
     }
 }

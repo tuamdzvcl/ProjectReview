@@ -10,7 +10,9 @@ namespace projectDemo.Repository
     public class UserRoleRepository : RepositoryLinqBase<UserRole>, IUserRoleRepository
     {
         private readonly RepositoryProcBase _proc;
-        public UserRoleRepository(IUnitOfWork uow) : base(uow)
+
+        public UserRoleRepository(IUnitOfWork uow)
+            : base(uow)
         {
             _proc = new RepositoryProcBase(uow);
         }
@@ -19,17 +21,16 @@ namespace projectDemo.Repository
         {
             _dbSet.Remove(role);
             return "Deleted";
-            
         }
 
         public async Task<UserRole?> GetByIdAsync(int id)
         {
-           return await _dbSet.FirstOrDefaultAsync(x=>x.Id == id);
+            return await _dbSet.FirstOrDefaultAsync(x => x.Id == id);
         }
 
         public async Task InserList(List<UserRole> users)
         {
-           await _dbSet.AddRangeAsync(users);
+            await _dbSet.AddRangeAsync(users);
         }
 
         public async Task InsertAsync(UserRole userRole)
@@ -39,7 +40,7 @@ namespace projectDemo.Repository
 
         public UserRole Update(UserRole user)
         {
-             _dbSet.Update(user);
+            _dbSet.Update(user);
             return user;
         }
     }

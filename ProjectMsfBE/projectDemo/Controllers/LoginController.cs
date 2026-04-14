@@ -1,66 +1,72 @@
-﻿    using Microsoft.AspNetCore.Authorization;
-    using Microsoft.AspNetCore.Mvc;
-    using projectDemo.DTO.Request;
-    using projectDemo.DTO.Respone;
-    using projectDemo.DTO.Response;
-    using projectDemo.Service.Auth;
-    using projectDemo.Service.AuthService;
-    using Microsoft.Extensions.Caching.Memory;
-    using System.Net;
+﻿using System.Net;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Caching.Memory;
+using projectDemo.DTO.Request;
+using projectDemo.DTO.Respone;
+using projectDemo.DTO.Response;
+using projectDemo.Service.Auth;
+using projectDemo.Service.AuthService;
 
-    namespace projectDemo.Controllers
+namespace projectDemo.Controllers
+{
+    [ApiController]
+    [Route("api/auth")]
+    public class AuthController : ControllerBase
     {
-        [ApiController]
-        [Route("api/auth")]
-        public class AuthController : ControllerBase
+        private readonly IAuthService _authService;
+        private readonly GoogleAuthService _googleAuthService;
+        private readonly IMemoryCache _cache;
+
+        public AuthController(
+            IAuthService authService,
+            GoogleAuthService googleAuthService,
+            IMemoryCache cache
+        )
         {
-            private readonly IAuthService _authService;
-            private readonly GoogleAuthService _googleAuthService;
-            private readonly IMemoryCache _cache;
+            _authService = authService;
+            _googleAuthService = googleAuthService;
+            _cache = cache;
+        }
 
-        public AuthController( IAuthService authService, GoogleAuthService googleAuthService, IMemoryCache cache)
-            {
-                _authService = authService;
-                _googleAuthService = googleAuthService;
-                _cache = cache;
-            }
+        [HttpPost("login")]
+        [AllowAnonymous]
+        public async Task<IActionResult> Login([FromBody] LoginRequest request)
+        {
+            var result = await _authService.AuthenCase(request);
 
-            [HttpPost("login")]
-            [AllowAnonymous]
-            public async Task<IActionResult> Login([FromBody] LoginRequest request)
-            {
-                var result = await _authService.AuthenCase(request);
+            return Ok(result);
+        }
 
-                return Ok(result);
-            }
-            [HttpPost("register")]
-            [AllowAnonymous]
-            public async Task<IActionResult> Register([FromBody] RegisterRequest resquest)
-            {
-                var result = await _authService.Regiter(resquest);
+        [HttpPost("register")]
+        [AllowAnonymous]
+        public async Task<IActionResult> Register([FromBody] RegisterRequest resquest)
+        {
+            var result = await _authService.Regiter(resquest);
 
-                return Ok(result);
-            }
-            [HttpGet("google-login-url")]
-            public IActionResult GetGoogleLoginUrl()
-            {
-                var url = _googleAuthService.GetLoginUrl();
-                return Ok(url);
-            }
+            return Ok(result);
+        }
 
-            [HttpGet("google-callback")]
-            public async Task<IActionResult> GoogleCallback([FromQuery] string code)
-            {
-                var result = await _googleAuthService.HandleGoogleCallback(code);
+        [HttpGet("google-login-url")]
+        public IActionResult GetGoogleLoginUrl()
+        {
+            var url = _googleAuthService.GetLoginUrl();
+            return Ok(url);
+        }
 
-                var key = Guid.NewGuid().ToString();
+        [HttpGet("google-callback")]
+        public async Task<IActionResult> GoogleCallback([FromQuery] string code)
+        {
+            var result = await _googleAuthService.HandleGoogleCallback(code);
 
-                _cache.Set(key, result, TimeSpan.FromMinutes(5));
-                
+            var key = Guid.NewGuid().ToString();
 
-                var frontendUrl = $"http://localhost:4200/login-success?key={key}";
-                return Redirect(frontendUrl);
-            }
+            _cache.Set(key, result, TimeSpan.FromMinutes(5));
+
+            var frontendUrl = $"http://localhost:4200/login-success?key={key}";
+            return Redirect(frontendUrl);
+        }
+
         [HttpPost("google-result")]
         [AllowAnonymous]
         public IActionResult GetGoogleResult([FromBody] KeyResquest resquest)
@@ -76,7 +82,5 @@
 
             return Ok(data);
         }
-
-
     }
-    }
+}

@@ -12,6 +12,6 @@ namespace projectDemo.DTO.Response
 
         public int TotalQuantity { get; set; }
         public int SoldQuantity { get; set; }
-        public string  Status { get; set; }
+        public string Status { get; set; }
     }
 }

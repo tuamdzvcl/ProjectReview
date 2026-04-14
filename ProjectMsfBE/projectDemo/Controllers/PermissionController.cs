@@ -34,15 +34,16 @@ namespace projectDemo.Controllers
         public async Task<IActionResult> GetByID(int permissionID)
         {
             var result = await _permissionService.GetByID(permissionID);
-            return Ok(result); ;
+            return Ok(result);
+            ;
         }
 
         [HttpGet("role/{roleId}")]
         public async Task<IActionResult> GetByRole(int roleId)
         {
             var result = await _permissionService.GetByrole(roleId);
-            return Ok(result); ;
+            return Ok(result);
+            ;
         }
     }
 }
-

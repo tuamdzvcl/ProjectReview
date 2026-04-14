@@ -10,6 +10,5 @@ namespace projectDemo.Repository.PaymentRepository
         Task<List<Payment>> FinAll();
         Task<Payment> FinById(int Id);
         Task<Payment?> FindByOrderId(Guid orderId);
-        
     }
 }

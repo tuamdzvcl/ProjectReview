@@ -6,11 +6,10 @@ using System.Threading.Tasks;
 
 namespace EventTick.Model.Enum
 {
-
     public enum EnumStatusPayment
     {
-        PENDING =1,
-        SUCCESS =2, 
-        FAILED =3,
+        PENDING = 1,
+        SUCCESS = 2,
+        FAILED = 3,
     }
 }

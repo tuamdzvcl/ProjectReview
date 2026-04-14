@@ -1,17 +1,17 @@
-﻿using EventTick.Model.asbtract;
-using Microsoft.EntityFrameworkCore.Metadata.Internal;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using EventTick.Model.asbtract;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 
 namespace EventTick.Model.Models
 {
     [Table("OrderDetail")]
-    public class OrderDetail 
+    public class OrderDetail
     {
         [Key]
         public Guid Id { get; set; }
@@ -28,9 +28,11 @@ namespace EventTick.Model.Models
         //public decimal SubTotal { get; set; }
 
         public Guid OrderID { get; set; }
+
         [ForeignKey("OrderID")]
         public virtual Order Order { get; set; }
         public int TicketTypeId { get; set; }
+
         [ForeignKey("TicketTypeId")]
         public virtual TicketType TicketTypes { get; set; }
 

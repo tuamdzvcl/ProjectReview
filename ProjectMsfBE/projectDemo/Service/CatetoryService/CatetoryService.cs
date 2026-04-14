@@ -15,7 +15,11 @@ namespace projectDemo.Service.CatetoryService
         private readonly IEventRepository _eventRepository;
         private readonly IUnitOfWork _uow;
 
-        public CatetoryService(IUnitOfWork uow,ICatetoryReposioty catetoryReposioty, IEventRepository eventRepository)
+        public CatetoryService(
+            IUnitOfWork uow,
+            ICatetoryReposioty catetoryReposioty,
+            IEventRepository eventRepository
+        )
         {
             _catetoryReposioty = catetoryReposioty;
             _eventRepository = eventRepository;
@@ -24,115 +28,127 @@ namespace projectDemo.Service.CatetoryService
 
         public async Task<ApiResponse<CatetoryResponse>> Create(CatetoryResquest resquest)
         {
-            Catetory catetory = new Catetory
-            {
-                Id = Guid.NewGuid(),
-                Name = resquest.Name
-            };
+            Catetory catetory = new Catetory { Id = Guid.NewGuid(), Name = resquest.Name };
 
             await _catetoryReposioty.Create(catetory);
-           await _uow.SaveChangesAsync();
+            await _uow.SaveChangesAsync();
 
-            CatetoryResponse response = new CatetoryResponse
-            {
-                Name = catetory.Name
-            };
+            CatetoryResponse response = new CatetoryResponse { Name = catetory.Name };
 
-
-            return ApiResponse<CatetoryResponse>.SuccessResponse(Entity.Enum.EnumStatusCode.SUCCESS, response);
+            return ApiResponse<CatetoryResponse>.SuccessResponse(
+                Entity.Enum.EnumStatusCode.SUCCESS,
+                response
+            );
         }
 
         public async Task<ApiResponse<string>> Delete(Guid id)
         {
-           try
+            try
             {
                 await _catetoryReposioty.delete(id);
                 await _uow.SaveChangesAsync();
-                return ApiResponse<string>.SuccessResponse(Entity.Enum.EnumStatusCode.SUCCESS, "Xóa thành công");
+                return ApiResponse<string>.SuccessResponse(
+                    Entity.Enum.EnumStatusCode.SUCCESS,
+                    "Xóa thành công"
+                );
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 Console.WriteLine(ex.ToString());
 
-                return ApiResponse<string>.FailResponse(Entity.Enum.EnumStatusCode.SUCCESS,$"đọc lỗi đi {ex.ToString()}");
-
+                return ApiResponse<string>.FailResponse(
+                    Entity.Enum.EnumStatusCode.SUCCESS,
+                    $"đọc lỗi đi {ex.ToString()}"
+                );
             }
         }
 
         public async Task<ApiResponse<CatetoryResponse>> Getbyid(Guid id)
         {
-            var catetory =  await _catetoryReposioty.GetbyId(id);
+            var catetory = await _catetoryReposioty.GetbyId(id);
             var response = new CatetoryResponse
             {
                 Name = catetory.Name,
-                listEvent = catetory.Events.Select(c => new EventResponse
-                {
-                    Description = c.Description,
-                    EndDate = c.EndDate,
-                    EventID = c.Id,
-                    Location = c.Location,
-                    PosterUrl = c.PosterUrl,
-                    SaleEndDate = c.SaleEndDate,
+                listEvent = catetory
+                    .Events.Select(c => new EventResponse
+                    {
+                        Description = c.Description,
+                        EndDate = c.EndDate,
+                        EventID = c.Id,
+                        Location = c.Location,
+                        PosterUrl = c.PosterUrl,
+                        SaleEndDate = c.SaleEndDate,
 
-                    SaleStartDate = c.SaleStartDate,
-                    StartDate = c.StartDate,
-                    Status = c.Status.ToString(),
-                    Title = c.Title,
-                    UserID = c.UserID
-                }).ToList()
-
+                        SaleStartDate = c.SaleStartDate,
+                        StartDate = c.StartDate,
+                        Status = c.Status.ToString(),
+                        Title = c.Title,
+                        UserID = c.UserID,
+                    })
+                    .ToList(),
             };
-            return ApiResponse<CatetoryResponse>.SuccessResponse(Entity.Enum.EnumStatusCode.SUCCESS, response);
+            return ApiResponse<CatetoryResponse>.SuccessResponse(
+                Entity.Enum.EnumStatusCode.SUCCESS,
+                response
+            );
         }
 
         public async Task<ApiResponse<List<CatetoryResponse>>> GetCatetory()
         {
             var items = await _catetoryReposioty.GetListCatetory();
 
-            var response = items.Select(x => new CatetoryResponse
-            {
-                CatetoryId = x.Id,
-                Name = x.Name
-            }).ToList();
+            var response = items
+                .Select(x => new CatetoryResponse { CatetoryId = x.Id, Name = x.Name })
+                .ToList();
 
-            return ApiResponse<List<CatetoryResponse>>
-                .SuccessResponse(Entity.Enum.EnumStatusCode.SUCCESS, response);
+            return ApiResponse<List<CatetoryResponse>>.SuccessResponse(
+                Entity.Enum.EnumStatusCode.SUCCESS,
+                response
+            );
         }
 
-        public async Task<PageResponse<CatetoryResponse>> GetCatetoryListEvent(int pageSize, int pageIndex, string key)
+        public async Task<PageResponse<CatetoryResponse>> GetCatetoryListEvent(
+            int pageSize,
+            int pageIndex,
+            string key
+        )
         {
-            if(pageSize <=0) pageSize = 10;
-            if (pageIndex <= 0) pageIndex = 1;
-           return await _catetoryReposioty.PageCatetoryEvent(pageSize, pageIndex, key);
-
+            if (pageSize <= 0)
+                pageSize = 10;
+            if (pageIndex <= 0)
+                pageIndex = 1;
+            return await _catetoryReposioty.PageCatetoryEvent(pageSize, pageIndex, key);
         }
 
         public async Task<ApiResponse<CatetoryResponse>> Update(Guid id, CatetoryResquest resquest)
-        { 
- 
-        var catetory =await _catetoryReposioty.GetbyId(id);
-            catetory.Name = resquest.Name?? catetory.Name;
+        {
+            var catetory = await _catetoryReposioty.GetbyId(id);
+            catetory.Name = resquest.Name ?? catetory.Name;
             var response = new CatetoryResponse
             {
                 Name = catetory.Name,
-                listEvent = catetory.Events.Select(c => new EventResponse
-                {
-                    Description = c.Description,
-                    EndDate = c.EndDate,
-                    EventID = c.Id,
-                    Location = c.Location,
-                    PosterUrl = c.PosterUrl,
-                    SaleEndDate = c.SaleEndDate,
+                listEvent = catetory
+                    .Events.Select(c => new EventResponse
+                    {
+                        Description = c.Description,
+                        EndDate = c.EndDate,
+                        EventID = c.Id,
+                        Location = c.Location,
+                        PosterUrl = c.PosterUrl,
+                        SaleEndDate = c.SaleEndDate,
 
-                    SaleStartDate = c.SaleStartDate,
-                    StartDate = c.StartDate,
-                    Status = c.Status.ToString(),
-                    Title = c.Title,
-                    UserID = c.UserID
-                }).ToList()
-
+                        SaleStartDate = c.SaleStartDate,
+                        StartDate = c.StartDate,
+                        Status = c.Status.ToString(),
+                        Title = c.Title,
+                        UserID = c.UserID,
+                    })
+                    .ToList(),
             };
-            return ApiResponse<CatetoryResponse>.SuccessResponse(Entity.Enum.EnumStatusCode.SUCCESS, response);
+            return ApiResponse<CatetoryResponse>.SuccessResponse(
+                Entity.Enum.EnumStatusCode.SUCCESS,
+                response
+            );
         }
     }
 }

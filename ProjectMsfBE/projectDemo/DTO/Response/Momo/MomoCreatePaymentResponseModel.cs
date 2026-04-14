@@ -13,6 +13,5 @@
         public string QrCodeUrl { get; set; }
         public string Deeplink { get; set; }
         public string DeeplinkWebInApp { get; set; }
-
     }
 }

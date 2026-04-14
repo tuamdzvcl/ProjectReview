@@ -21,4 +21,3 @@ namespace projectDemo.DTO.Query
         public int? TicketQuantity { get; set; }
     }
 }
-

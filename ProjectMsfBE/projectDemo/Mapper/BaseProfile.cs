@@ -2,8 +2,5 @@
 
 namespace projectDemo.Mapper
 {
-    public class BaseProfile: Profile
-    {
-
-    }
+    public class BaseProfile : Profile { }
 }

@@ -2,7 +2,6 @@
 {
     public class OrderDetailCreateResponse
     {
-
         public string TicketTypeName { get; set; }
 
         public int Quantity { get; set; }

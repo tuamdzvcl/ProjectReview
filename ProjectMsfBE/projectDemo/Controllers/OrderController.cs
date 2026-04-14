@@ -39,7 +39,8 @@ namespace projectDemo.Controllers
         [HttpGet("user")]
         public async Task<IActionResult> GetListOrderByUser(
             [FromQuery] int pageIndex,
-            [FromQuery] int pageSize)
+            [FromQuery] int pageSize
+        )
         {
             var userId = Guid.Parse(User.FindFirst("id").Value);
             var result = await _orderService.GetListOrderbyIdUser(userId, pageIndex, pageSize);

@@ -1,6 +1,6 @@
-﻿using Dapper;
+﻿using System.Data;
+using Dapper;
 using projectDemo.UnitOfWorks;
-using System.Data;
 
 namespace projectDemo.Repository.BaseData
 {
@@ -25,6 +25,7 @@ namespace projectDemo.Repository.BaseData
                 commandType: CommandType.StoredProcedure
             );
         }
+
         // trả về 1 đối tượng
         protected async Task<T?> QueryFirstAsync<T>(string proc, object param = null)
         {
@@ -35,7 +36,8 @@ namespace projectDemo.Repository.BaseData
                 commandType: CommandType.StoredProcedure
             );
         }
-        //thực hiện câu truy vấn 
+
+        //thực hiện câu truy vấn
         protected async Task<int> ExecuteAsync(string proc, object param = null)
         {
             return await _connection.ExecuteAsync(
@@ -47,4 +49,3 @@ namespace projectDemo.Repository.BaseData
         }
     }
 }
-

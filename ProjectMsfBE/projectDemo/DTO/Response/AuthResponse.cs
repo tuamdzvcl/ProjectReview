@@ -8,6 +8,5 @@
         public bool Isnew { get; set; }
 
         public UserResponse User { get; set; }
-
     }
 }

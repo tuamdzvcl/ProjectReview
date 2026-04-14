@@ -15,6 +15,5 @@ namespace projectDemo.DTO.UpdateRequest
         public EnumStatusEvent? Status { get; set; }
         public string? CatetoryName { get; set; }
         public List<UpdateEventTicketTypeItemRequest>? TicketTypes { get; set; }
-
     }
 }

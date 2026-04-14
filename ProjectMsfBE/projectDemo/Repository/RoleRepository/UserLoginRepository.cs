@@ -8,11 +8,12 @@ using projectDemo.UnitOfWorks;
 
 namespace projectDemo.Repository
 {
-    public class UserLoginRepository :RepositoryLinqBase<UserLogin>,IUserLoginRepository
+    public class UserLoginRepository : RepositoryLinqBase<UserLogin>, IUserLoginRepository
     {
         private readonly RepositoryProcBase _proc;
 
-        public UserLoginRepository(IUnitOfWork uow) : base(uow)
+        public UserLoginRepository(IUnitOfWork uow)
+            : base(uow)
         {
             _proc = new RepositoryProcBase(uow);
         }
@@ -25,24 +26,28 @@ namespace projectDemo.Repository
 
         public async Task<UserLogin?> getbyid(int user)
         {
-          return  await _dbSet.FirstOrDefaultAsync(x => x.Id == user && x.IsDeleted == false);
+            return await _dbSet.FirstOrDefaultAsync(x => x.Id == user && x.IsDeleted == false);
         }
 
         public async Task InsertAsync(UserLogin userLogin)
         {
-           await _dbSet.AddAsync(userLogin);
+            await _dbSet.AddAsync(userLogin);
         }
 
         public UserLogin Update(UserLogin userLogin)
         {
-             _dbSet.Update(userLogin);
+            _dbSet.Update(userLogin);
             return userLogin;
         }
-        public async Task<UserLogin?> GetByProviderUserIdAsync(string providerUserId, string Provider)
+
+        public async Task<UserLogin?> GetByProviderUserIdAsync(
+            string providerUserId,
+            string Provider
+        )
         {
-            return  await _dbSet.Where(x=>x.ProviderUserId==providerUserId && x.Provider==Provider).FirstOrDefaultAsync();
-
-
+            return await _dbSet
+                .Where(x => x.ProviderUserId == providerUserId && x.Provider == Provider)
+                .FirstOrDefaultAsync();
         }
     }
 }

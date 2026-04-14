@@ -1,5 +1,5 @@
-﻿using Microsoft.Data.SqlClient;
-using System.Data;
+﻿using System.Data;
+using Microsoft.Data.SqlClient;
 
 namespace projectDemo.Data
 {
@@ -14,8 +14,7 @@ namespace projectDemo.Data
 
         public IDbConnection CreateConnection()
         {
-            return new SqlConnection(
-                _configuration.GetConnectionString("DefaultConnection"));
+            return new SqlConnection(_configuration.GetConnectionString("DefaultConnection"));
         }
     }
 }

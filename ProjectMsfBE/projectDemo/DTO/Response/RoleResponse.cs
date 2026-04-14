@@ -6,6 +6,5 @@ namespace projectDemo.DTO.Response
     {
         public string RoleName { get; set; } = null;
         public List<PermissionResponse> permissions { get; set; } = new List<PermissionResponse>();
-
     }
 }

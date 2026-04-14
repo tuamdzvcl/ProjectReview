@@ -1,3 +1,5 @@
+using System.Security.Cryptography;
+using System.Text;
 using EventTick.Model.Enum;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
@@ -9,8 +11,6 @@ using projectDemo.Repository.OrderRepository;
 using projectDemo.Repository.PaymentRepository;
 using projectDemo.Service.PaymetService;
 using projectDemo.UnitOfWorks;
-using System.Security.Cryptography;
-using System.Text;
 
 namespace projectDemo.Service.MomoService
 {
@@ -22,7 +22,13 @@ namespace projectDemo.Service.MomoService
         private readonly IUnitOfWork _uow;
         private readonly IPaymentRepository _paymentRepository;
 
-        public MomoService(IPaymentRepository paymentRepository,IUnitOfWork uow,IOrderRepository orderRepository,IOptions<MomoOptionModel> options, HttpClient httpClient)
+        public MomoService(
+            IPaymentRepository paymentRepository,
+            IUnitOfWork uow,
+            IOrderRepository orderRepository,
+            IOptions<MomoOptionModel> options,
+            HttpClient httpClient
+        )
         {
             _paymentRepository = paymentRepository;
             _uow = uow;
@@ -41,16 +47,16 @@ namespace projectDemo.Service.MomoService
             var amount = decimal.ToInt64(req.Amount);
 
             var rawData =
-                $"accessKey={_options.Value.AccessKey}" +
-                $"&amount={amount}" +
-                $"&extraData={extraData}" +
-                $"&ipnUrl={_options.Value.IpnUrl}" +
-                $"&orderId={orderId}" +
-                $"&orderInfo={orderInfo}" +
-                $"&partnerCode={_options.Value.PartnerCode}" +
-                $"&redirectUrl={_options.Value.ReturnUrl}" +
-                $"&requestId={requestId}" +
-                $"&requestType={requestType}";
+                $"accessKey={_options.Value.AccessKey}"
+                + $"&amount={amount}"
+                + $"&extraData={extraData}"
+                + $"&ipnUrl={_options.Value.IpnUrl}"
+                + $"&orderId={orderId}"
+                + $"&orderInfo={orderInfo}"
+                + $"&partnerCode={_options.Value.PartnerCode}"
+                + $"&redirectUrl={_options.Value.ReturnUrl}"
+                + $"&requestId={requestId}"
+                + $"&requestType={requestType}";
 
             var signature = ComputeHmacSha256(rawData, _options.Value.SecretKey);
 
@@ -66,7 +72,7 @@ namespace projectDemo.Service.MomoService
                 lang = "vi",
                 extraData = extraData,
                 requestType = requestType,
-                signature = signature
+                signature = signature,
             };
 
             var json = JsonConvert.SerializeObject(requestData);
@@ -77,10 +83,14 @@ namespace projectDemo.Service.MomoService
 
             if (!response.IsSuccessStatusCode)
             {
-                throw new Exception($"MoMo API error: {(int)response.StatusCode} - {responseContent}");
+                throw new Exception(
+                    $"MoMo API error: {(int)response.StatusCode} - {responseContent}"
+                );
             }
 
-            var momoResponse = JsonConvert.DeserializeObject<MomoCreatePaymentResponseModel>(responseContent);
+            var momoResponse = JsonConvert.DeserializeObject<MomoCreatePaymentResponseModel>(
+                responseContent
+            );
 
             if (momoResponse == null)
             {
@@ -97,28 +107,28 @@ namespace projectDemo.Service.MomoService
 
         public bool IsValidMomoIpnSignature(MomoIpnRequest request)
         {
-
             var rawData =
-                $"accessKey={_options.Value.AccessKey}" +
-                $"&amount={request.Amount}" +
-                $"&extraData={request.ExtraData}" +
-                $"&message={request.Message}" +
-                $"&orderId={request.OrderId}" +
-                $"&orderInfo={request.OrderInfo}" +
-                $"&orderType={request.OrderType}" +
-                $"&partnerCode={request.PartnerCode}" +
-                $"&payType={request.PayType}" +
-                $"&requestId={request.RequestId}" +
-                $"&responseTime={request.ResponseTime}" +
-                $"&resultCode={request.ResultCode}" +
-                $"&transId={request.TransId}";
+                $"accessKey={_options.Value.AccessKey}"
+                + $"&amount={request.Amount}"
+                + $"&extraData={request.ExtraData}"
+                + $"&message={request.Message}"
+                + $"&orderId={request.OrderId}"
+                + $"&orderInfo={request.OrderInfo}"
+                + $"&orderType={request.OrderType}"
+                + $"&partnerCode={request.PartnerCode}"
+                + $"&payType={request.PayType}"
+                + $"&requestId={request.RequestId}"
+                + $"&responseTime={request.ResponseTime}"
+                + $"&resultCode={request.ResultCode}"
+                + $"&transId={request.TransId}";
 
             var expectedSignature = ComputeHmacSha256(rawData, _options.Value.SecretKey);
 
             return string.Equals(
                 expectedSignature,
                 request.Signature,
-                StringComparison.OrdinalIgnoreCase);
+                StringComparison.OrdinalIgnoreCase
+            );
         }
 
         private string ComputeHmacSha256(string message, string secretKey)
@@ -132,7 +142,6 @@ namespace projectDemo.Service.MomoService
             return BitConverter.ToString(hashBytes).Replace("-", "").ToLower();
         }
 
-        
         public async Task<string> MomoCallBack(MomoIpnRequest request)
         {
             var status = request.ResultCode;
@@ -145,7 +154,7 @@ namespace projectDemo.Service.MomoService
                 return "Không tìm thấy order";
 
             if (payment == null)
-                return  "Không tìm thấy Payment";
+                return "Không tìm thấy Payment";
 
             // tránh bị gọi lại nhiều lần
             if (payment.Status == EnumStatusPayment.SUCCESS)
@@ -185,18 +194,18 @@ namespace projectDemo.Service.MomoService
                 throw;
             }
 
-            return 
-                $"http://localhost:4200/payment?resultCode={status}&orderId={orderId}";
+            return $"http://localhost:4200/payment?resultCode={status}&orderId={orderId}";
         }
+
         // loại bỏ vé tạm trong db
         private int TotalReservedQuantity(int ReservedQuantity, int quantity)
         {
             return ReservedQuantity - quantity;
         }
+
         private int TotalSoldQuantity(int SoldQuantity, int quantity)
         {
             return SoldQuantity + quantity;
         }
     }
-    
 }

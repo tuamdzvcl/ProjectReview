@@ -1,12 +1,12 @@
-﻿using EventTick.Model.asbtract;
-using projectDemo.Entity.Models;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using EventTick.Model.asbtract;
+using projectDemo.Entity.Models;
 
 namespace EventTick.Model.Models
 {
@@ -15,6 +15,7 @@ namespace EventTick.Model.Models
     {
         [Key]
         public Guid Id { get; set; } // Dùng Guid thì kiểu dữ liệu này dổi đi
+
         [Required]
         [EmailAddress]
         [MaxLength(255)]
@@ -23,6 +24,7 @@ namespace EventTick.Model.Models
         [Required]
         [MaxLength(255)]
         public string Username { get; set; }
+
         [MaxLength(500)]
         public string? PasswordHash { get; set; } = null!;
 

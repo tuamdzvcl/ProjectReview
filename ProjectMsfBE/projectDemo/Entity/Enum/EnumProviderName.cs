@@ -4,6 +4,6 @@
     {
         FaceBook = 1,
         Google = 2,
-        Email = 3
+        Email = 3,
     }
 }

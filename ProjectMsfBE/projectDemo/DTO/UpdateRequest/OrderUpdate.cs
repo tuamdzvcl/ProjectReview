@@ -4,6 +4,5 @@
     {
         public decimal TotalAmount { get; set; }
         public String Status { get; set; }
-
     }
 }

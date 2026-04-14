@@ -26,7 +26,7 @@ import { Toast } from 'primeng/toast';
     FormatDatePipe,
     VndCurrencyPipe,
     ConfirmDialog,
-    Toast
+    Toast,
   ],
   templateUrl: './events.component.html',
   styleUrls: ['./events.component.scss'],
@@ -38,7 +38,7 @@ export class EventsComponent implements OnInit {
     private router: Router,
     private confirmationService: ConfirmationService,
     private messageService: MessageService
-  ) { }
+  ) {}
 
   events: any[] = [];
   totalRecords = 0;
@@ -53,7 +53,7 @@ export class EventsComponent implements OnInit {
 
   loadEvents() {
     this.eventService
-      .GetEventswithTypeticket(this.pageIndex, this.pageSize, this.key)
+      .GetEventswithTypeticketbyid(this.pageIndex, this.pageSize, this.key)
       .subscribe({
         next: (res) => {
           console.log('DATA:', res);
@@ -107,12 +107,18 @@ export class EventsComponent implements OnInit {
 
   getTotalTickets(event: any): number {
     if (!event.ListTypeTick || !event.ListTypeTick.length) return 0;
-    return event.ListTypeTick.reduce((sum: number, t: any) => sum + (t.TotalQuantity || 0), 0);
+    return event.ListTypeTick.reduce(
+      (sum: number, t: any) => sum + (t.TotalQuantity || 0),
+      0
+    );
   }
 
   getTotalSold(event: any): number {
     if (!event.ListTypeTick || !event.ListTypeTick.length) return 0;
-    return event.ListTypeTick.reduce((sum: number, t: any) => sum + (t.SoldQuantity || 0), 0);
+    return event.ListTypeTick.reduce(
+      (sum: number, t: any) => sum + (t.SoldQuantity || 0),
+      0
+    );
   }
 
   duplicateEvent(event: any) {
@@ -142,9 +148,9 @@ export class EventsComponent implements OnInit {
               summary: 'Lỗi',
               detail: 'Có lỗi xảy ra khi nhân bản sự kiện!',
             });
-          }
+          },
         });
-      }
+      },
     });
   }
 
@@ -174,9 +180,9 @@ export class EventsComponent implements OnInit {
               summary: 'Lỗi',
               detail: 'Có lỗi xảy ra khi xóa sự kiện. Vui lòng thử lại!',
             });
-          }
+          },
         });
-      }
+      },
     });
   }
 

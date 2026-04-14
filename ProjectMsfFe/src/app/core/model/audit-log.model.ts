@@ -10,9 +10,3 @@ export interface AuditLog {
     Note: string | null;
 }
 
-export interface AuditLogResponse {
-    TotalRecords: number;
-    PageIndex: number;
-    PageSize: number;
-    Items: AuditLog[];
-}

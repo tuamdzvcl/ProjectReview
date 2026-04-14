@@ -1,9 +1,9 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using System.Net;
+using System.Text.Json;
+using Microsoft.Extensions.Logging;
 using projectDemo.DTO.Respone;
 using projectDemo.Entity.Enum;
 using projectDemo.Exceptions;
-using System.Net;
-using System.Text.Json;
 
 namespace projectDemo.Middlewares
 {
@@ -30,7 +30,11 @@ namespace projectDemo.Middlewares
             }
         }
 
-        private static Task HandleException(HttpContext context, Exception exception, ILogger logger)
+        private static Task HandleException(
+            HttpContext context,
+            Exception exception,
+            ILogger logger
+        )
         {
             HttpStatusCode statusCode;
             string message;
@@ -77,18 +81,15 @@ namespace projectDemo.Middlewares
             Console.WriteLine(exception);
             Console.ResetColor();
 
-            var response = ApiResponse<object>.FailResponse(
-                errorCode,
-                message: message
-            );
+            var response = ApiResponse<object>.FailResponse(errorCode, message: message);
 
             context.Response.ContentType = "application/json";
             context.Response.StatusCode = (int)statusCode;
 
-            var json = JsonSerializer.Serialize(response, new JsonSerializerOptions
-            {
-                PropertyNamingPolicy = JsonNamingPolicy.CamelCase
-            });
+            var json = JsonSerializer.Serialize(
+                response,
+                new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase }
+            );
 
             return context.Response.WriteAsync(json);
         }

@@ -8,6 +8,5 @@ namespace projectDemo.Repository.OrderRepository
         Task<OrderDetail> Createorderdetail(OrderDetail orderDetail);
         int UpdateOrderdetail(OrderDetail orderDetail);
         int DeleteOrderdetail(OrderDetail orderDetail);
-       
     }
 }

@@ -1,5 +1,5 @@
-﻿using projectDemo.Entity.Enum;
-using System.Net;
+﻿using System.Net;
+using projectDemo.Entity.Enum;
 
 namespace projectDemo.DTO.Respone
 {
@@ -17,27 +17,34 @@ namespace projectDemo.DTO.Respone
 
         public DateTime Timestamp { get; set; } = DateTime.UtcNow;
 
-
-        public static ApiResponse<T> SuccessResponse(EnumStatusCode statuscode, T data, string message = "Success")
+        public static ApiResponse<T> SuccessResponse(
+            EnumStatusCode statuscode,
+            T data,
+            string message = "Success"
+        )
         {
             return new ApiResponse<T>
             {
                 StatusCode = statuscode,
                 Success = true,
                 Message = message,
-                Data = data
+                Data = data,
             };
         }
 
-        public static ApiResponse<T> FailResponse(EnumStatusCode statuscode, string message, object? errors = null)
+        public static ApiResponse<T> FailResponse(
+            EnumStatusCode statuscode,
+            string message,
+            object? errors = null
+        )
         {
             return new ApiResponse<T>
             {
                 StatusCode = statuscode,
                 Success = false,
                 Message = message,
-                Errors = errors
+                Errors = errors,
             };
         }
     }
-    }
+}

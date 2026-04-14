@@ -13,7 +13,11 @@ namespace projectDemo.Repository.OrderQuery
             _uow = uow;
         }
 
-        public async Task<(List<OrderEventFlatRow> Items, int TotalCount)> GetListOrderByUserId(Guid userId, int pageNumber, int pageSize)
+        public async Task<(List<OrderEventFlatRow> Items, int TotalCount)> GetListOrderByUserId(
+            Guid userId,
+            int pageNumber,
+            int pageSize
+        )
         {
             if (pageNumber <= 0)
                 pageNumber = 1;
@@ -23,7 +27,8 @@ namespace projectDemo.Repository.OrderQuery
 
             var skip = (pageNumber - 1) * pageSize;
 
-            const string sql = @"
+            const string sql =
+                @"
 SELECT COUNT(1)
 FROM Orders o
 WHERE o.UserID = @userId
@@ -62,12 +67,15 @@ LEFT JOIN TicketType tt ON tt.Id = od.TicketTypeId AND tt.IsDeleted = 0
 LEFT JOIN Event e ON e.Id = tt.EventID
 ORDER BY po.CreatedDate DESC;";
 
-            using var multi = await _uow.connection.QueryMultipleAsync(sql, new
-            {
-                userId,
-                skip,
-                pageSize
-            });
+            using var multi = await _uow.connection.QueryMultipleAsync(
+                sql,
+                new
+                {
+                    userId,
+                    skip,
+                    pageSize,
+                }
+            );
 
             var totalCount = await multi.ReadFirstAsync<int>();
             var items = (await multi.ReadAsync<OrderEventFlatRow>()).ToList();

@@ -1,22 +1,20 @@
-﻿using EventTick.Model.asbtract;
-using EventTick.Model.Enum;
-using projectDemo.Entity.Models;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using EventTick.Model.asbtract;
+using EventTick.Model.Enum;
+using projectDemo.Entity.Models;
 
 namespace EventTick.Model.Models
 {
-    [Table("Event")]   
-    
+    [Table("Event")]
     public class Event : Auditable
     {
         [Key]
-        
         public Guid Id { get; set; }
 
         [Required]
@@ -35,7 +33,6 @@ namespace EventTick.Model.Models
 
         public DateTime? SaleStartDate { get; set; }
 
-        
         public DateTime? SaleEndDate { get; set; }
 
         [Required]
@@ -43,11 +40,14 @@ namespace EventTick.Model.Models
 
         [Required]
         public EnumStatusEvent Status { get; set; }
+
         [Required]
         public Guid UserID { get; set; }
+
         [ForeignKey("UserID")]
         public virtual User User { get; set; }
         public Guid CatetoryID { get; set; }
+
         [ForeignKey("CatetoryID")]
         public virtual Catetory Catetory { get; set; }
 

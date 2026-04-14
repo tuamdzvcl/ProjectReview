@@ -10,9 +10,8 @@ namespace projectDemo.Service.UserService
         Task<ApiResponse<UserEventsResponse>> GetListEventByUserID(Guid guid);
         Task<ApiResponse<UserProfile>> GetListEventByUserIDCreate(Guid guid);
         Task<ApiResponse<UserResponse>> Create(UserRequest request, Guid userid);
-        Task<ApiResponse<UserResponse>> Update(Guid id,UserUpdateRequest request);
+        Task<ApiResponse<UserResponse>> Update(Guid id, UserUpdateRequest request);
         Task<ApiResponse<string>> Delete(Guid id);
         Task<PageResponse<UserResponse>> GetAll(UserQuery param);
-
     }
 }

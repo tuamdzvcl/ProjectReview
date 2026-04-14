@@ -6,10 +6,9 @@ using System.Threading.Tasks;
 
 namespace EventTick.Model.Enum
 {
-   public enum EnumStatusTickType
+    public enum EnumStatusTickType
     {
-        ACTIVE =1,
-        STOP =2
-
+        ACTIVE = 1,
+        STOP = 2,
     }
 }

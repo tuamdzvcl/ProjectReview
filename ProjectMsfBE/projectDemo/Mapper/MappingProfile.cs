@@ -10,22 +10,24 @@ namespace projectDemo.Mapper
 {
     public class MappingProfile : Profile
     {
-        public MappingProfile() {
+        public MappingProfile()
+        {
             CreateMap<EventRequest, Event>()
-           .ForMember(dest => dest.Id,
-            opt => opt.MapFrom(_ => Guid.NewGuid())
-            );
+                .ForMember(dest => dest.Id, opt => opt.MapFrom(_ => Guid.NewGuid()));
 
             // Entity -> Response
             CreateMap<Event, EventResponse>()
-                .ForMember(dest => dest.EventID,
-                    opt => opt.MapFrom(src => src.Id))
-                .ForMember(dest => dest.Status,
-                    opt => opt.MapFrom(src => src.Status.ToString()));
+                .ForMember(dest => dest.EventID, opt => opt.MapFrom(src => src.Id))
+                .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.Status.ToString()));
             CreateMap<User, UserResponse>()
                 .ForMember(dest => dest.ID, opt => opt.MapFrom(src => src.Id))
-                .ForMember(dest => dest.RoleName,
-                    opt => opt.MapFrom(src => src.UserRoles.Select(ur => ur.Role.RoleName.ToLower()).ToList()));
+                .ForMember(
+                    dest => dest.RoleName,
+                    opt =>
+                        opt.MapFrom(src =>
+                            src.UserRoles.Select(ur => ur.Role.RoleName.ToLower()).ToList()
+                        )
+                );
             CreateMap<EventUpdateRequest, Event>();
             CreateMap<Order, OrderResponse>();
             CreateMap<CreateOrderRequest, OrderDetail>();
@@ -34,15 +36,15 @@ namespace projectDemo.Mapper
             CreateMap<Permissions, PermissionResponse>();
 
             CreateMap<TicketType, TypeTickResponse>()
-           .ForMember(d => d.Name, opt => opt.MapFrom(s => s.Name.ToString()))
-           .ForMember(d => d.Status, opt => opt.MapFrom(s => s.Status.ToString()))
-           .ForMember(d => d.Price, opt => opt.MapFrom(s => s.Price));
+                .ForMember(d => d.Name, opt => opt.MapFrom(s => s.Name.ToString()))
+                .ForMember(d => d.Status, opt => opt.MapFrom(s => s.Status.ToString()))
+                .ForMember(d => d.Price, opt => opt.MapFrom(s => s.Price));
 
             CreateMap<Event, EventTypeTickResponses>()
-           .ForMember(d => d.Id, opt => opt.MapFrom(s => s.Id))
-           .ForMember(d => d.Status, opt => opt.MapFrom(s => s.Status.ToString()))
-           .ForMember(d => d.ListTypeTick, opt => opt.MapFrom(s => s.TicketTypes))
-           .ForMember(d => d.CatetoryName, opt => opt.MapFrom(s => s.Catetory.Name));
+                .ForMember(d => d.Id, opt => opt.MapFrom(s => s.Id))
+                .ForMember(d => d.Status, opt => opt.MapFrom(s => s.Status.ToString()))
+                .ForMember(d => d.ListTypeTick, opt => opt.MapFrom(s => s.TicketTypes))
+                .ForMember(d => d.CatetoryName, opt => opt.MapFrom(s => s.Catetory.Name));
         }
     }
 }

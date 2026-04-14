@@ -2,6 +2,6 @@
 {
     public class KeyResquest
     {
-        public string key {  get; set; }
+        public string key { get; set; }
     }
 }

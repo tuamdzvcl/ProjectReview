@@ -8,11 +8,18 @@ namespace projectDemo.Service.OrderService
 {
     public interface IOrderService
     {
-        Task<ApiResponse<MomoCreatePaymentResponseModel>> CreateOrder(CreateOrderRequest request, Guid userid);
+        Task<ApiResponse<MomoCreatePaymentResponseModel>> CreateOrder(
+            CreateOrderRequest request,
+            Guid userid
+        );
         Task<ApiResponse<string>> UpdateOrder(Guid orderID, OrderUpdate request);
         Task<ApiResponse<string>> DeleteOrder(Guid OrderID);
         Task<ApiResponse<List<OrderResponse>>> GetOrder();
-        Task<PageResponse<OrderEventResponse>> GetListOrderbyIdUser(Guid UserID, int pageindex, int pagesize);
+        Task<PageResponse<OrderEventResponse>> GetListOrderbyIdUser(
+            Guid UserID,
+            int pageindex,
+            int pagesize
+        );
         Task<ApiResponse<OrderResponse>> GetListOrderDetail(Guid OrderID);
     }
 }

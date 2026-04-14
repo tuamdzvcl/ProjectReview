@@ -1,10 +1,11 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using System.Linq.Expressions;
+using Microsoft.EntityFrameworkCore;
 using projectDemo.UnitOfWorks;
-using System.Linq.Expressions;
 
 namespace projectDemo.Repository.BaseData
 {
-    public class RepositoryLinqBase<TEntity> where TEntity : class
+    public class RepositoryLinqBase<TEntity>
+        where TEntity : class
     {
         protected readonly DbContext _dbContext;
         protected readonly DbSet<TEntity> _dbSet;
@@ -16,6 +17,7 @@ namespace projectDemo.Repository.BaseData
             _dbSet = _dbContext.Set<TEntity>();
             _uow = uow;
         }
+
         public virtual async Task<TEntity?> GetByIdAsync(Guid id)
         {
             return await _dbSet.FindAsync(id);
@@ -55,10 +57,5 @@ namespace projectDemo.Repository.BaseData
         {
             _dbSet.RemoveRange(entities);
         }
-
-       
-
-       
     }
 }
-

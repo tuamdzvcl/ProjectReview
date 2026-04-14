@@ -1,7 +1,4 @@
 ﻿namespace projectDemo.Service.PaymetService
 {
-    public interface IPaymentService
-    {
-
-    }
+    public interface IPaymentService { }
 }

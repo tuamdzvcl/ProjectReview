@@ -37,9 +37,8 @@ namespace projectDemo.Controllers
         }
 
         [HttpGet("page/user")]
-        public async Task<IActionResult> GetallUser(
-            [FromQuery] UserQuery query)
-       {
+        public async Task<IActionResult> GetallUser([FromQuery] UserQuery query)
+        {
             var result = await _userService.GetAll(query);
             return Ok(result);
         }
@@ -50,6 +49,7 @@ namespace projectDemo.Controllers
             var result = await _userService.Delete(id);
             return Ok(result);
         }
+
         [HttpPost()]
         public async Task<IActionResult> Add(UserRequest request)
         {
@@ -58,12 +58,12 @@ namespace projectDemo.Controllers
             var result = await _userService.Create(request, userId);
             return Ok(result);
         }
+
         [HttpPut("{id}")]
-        public async Task<IActionResult> Update(Guid id,UserUpdateRequest request)
+        public async Task<IActionResult> Update(Guid id, UserUpdateRequest request)
         {
-            var result = await _userService.Update(id,request);
+            var result = await _userService.Update(id, request);
             return Ok(result);
         }
-
     }
 }

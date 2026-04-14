@@ -7,9 +7,8 @@ public interface IRoleRepository
 {
     Task<int> GetOrCreateAsync(Role roleName);
     Role Update(Role role);
-    string   DeleteAsync(Role role);
+    string DeleteAsync(Role role);
     Task<Role> GetRole(string roleName);
 
     Task<Role> GetByid(int roleid);
-    
 }

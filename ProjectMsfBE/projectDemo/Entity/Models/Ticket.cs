@@ -1,12 +1,12 @@
-﻿using EventTick.Model.asbtract;
-using EventTick.Model.Enum;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using EventTick.Model.asbtract;
+using EventTick.Model.Enum;
 
 namespace EventTick.Model.Models
 {
@@ -15,8 +15,7 @@ namespace EventTick.Model.Models
     {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public int Id {  get; set; }
-        
+        public int Id { get; set; }
 
         [Required]
         [MaxLength(100)]
@@ -32,6 +31,7 @@ namespace EventTick.Model.Models
         public DateTime? CheckInDate { get; set; }
 
         public Guid OrderDetailID { get; set; }
+
         [ForeignKey("OrderDetailID")]
         public virtual OrderDetail OrderDetail { get; set; }
     }

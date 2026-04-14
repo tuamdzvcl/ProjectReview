@@ -4,6 +4,10 @@ namespace projectDemo.Repository.ReportQuery
 {
     public interface IReportQuery
     {
-        Task<List<RevenueReportFlatRow>> GetRevenueRowsAsync(Guid userId, DateTime fromDate, DateTime toDateExclusive);
+        Task<List<RevenueReportFlatRow>> GetRevenueRowsAsync(
+            Guid userId,
+            DateTime fromDate,
+            DateTime toDateExclusive
+        );
     }
 }

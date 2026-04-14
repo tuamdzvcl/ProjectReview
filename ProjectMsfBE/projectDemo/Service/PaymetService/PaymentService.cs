@@ -1,6 +1,4 @@
 ﻿namespace projectDemo.Service.PaymetService
 {
-    public class PaymentService:IPaymentService
-    {
-    }
+    public class PaymentService : IPaymentService { }
 }

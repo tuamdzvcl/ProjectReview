@@ -13,9 +13,14 @@ namespace projectDemo.Repository.ReportQuery
             _uow = uow;
         }
 
-        public async Task<List<RevenueReportFlatRow>> GetRevenueRowsAsync(Guid userId, DateTime fromDate, DateTime toDateExclusive)
+        public async Task<List<RevenueReportFlatRow>> GetRevenueRowsAsync(
+            Guid userId,
+            DateTime fromDate,
+            DateTime toDateExclusive
+        )
         {
-            const string sql = @"
+            const string sql =
+                @"
 SELECT
     o.Id AS OrderId,
     p.PaidDate AS PaidDate,
@@ -36,14 +41,17 @@ WHERE e.UserID = @userId
   AND p.PaidDate < @toDateExclusive
 ORDER BY p.PaidDate ASC;";
 
-            var rows = await _uow.connection.QueryAsync<RevenueReportFlatRow>(sql, new
-            {
-                userId,
-                fromDate,
-                toDateExclusive,
-                paidOrderStatus = 2,
-                successPaymentStatus = 2
-            });
+            var rows = await _uow.connection.QueryAsync<RevenueReportFlatRow>(
+                sql,
+                new
+                {
+                    userId,
+                    fromDate,
+                    toDateExclusive,
+                    paidOrderStatus = 2,
+                    successPaymentStatus = 2,
+                }
+            );
 
             return rows.ToList();
         }

@@ -1,18 +1,18 @@
+using System;
+using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using projectDemo.Data;
 using projectDemo.DTO.Respone;
 using projectDemo.Entity.Models;
-using System;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace projectDemo.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/AuditLog")]
     [ApiController]
-    [Authorize] // Chỉ ADMIN mới nên xem được (có thể thêm phân quyền chi tiết sau)
+    [Authorize] 
     public class AuditLogController : ControllerBase
     {
         private readonly EventTickDbContext _context;
@@ -24,10 +24,11 @@ namespace projectDemo.Controllers
 
         [HttpGet]
         public async Task<IActionResult> GetAuditLogs(
-            [FromQuery] int pageIndex = 1, 
-            [FromQuery] int pageSize = 10, 
+            [FromQuery] int pageIndex = 1,
+            [FromQuery] int pageSize = 10,
             [FromQuery] string? username = null,
-            [FromQuery] string? path = null)
+            [FromQuery] string? path = null
+        )
         {
             try
             {
@@ -52,17 +53,26 @@ namespace projectDemo.Controllers
 
                 var response = new
                 {
+                    Success = true,                    
                     TotalRecords = totalRecords,
                     PageIndex = pageIndex,
                     PageSize = pageSize,
-                    Items = logs
+                    Items = logs,
                 };
 
-                return Ok(ApiResponse<object>.SuccessResponse(projectDemo.Entity.Enum.EnumStatusCode.SUCCESS, response));
+                return Ok(
+                    response
+                    
+                );
             }
             catch (Exception ex)
             {
-                return Ok(ApiResponse<object>.FailResponse(projectDemo.Entity.Enum.EnumStatusCode.SERVER, "Lỗi khi lấy nhật ký: " + ex.Message));
+                return Ok(
+                    ApiResponse<object>.FailResponse(
+                        projectDemo.Entity.Enum.EnumStatusCode.SERVER,
+                        "Lỗi khi lấy nhật ký: " + ex.Message
+                    )
+                );
             }
         }
     }

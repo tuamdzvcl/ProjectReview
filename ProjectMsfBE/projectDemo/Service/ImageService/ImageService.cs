@@ -8,9 +8,11 @@
         {
             _env = env;
         }
+
         public void Delete(string imageUrl)
         {
-            if (string.IsNullOrEmpty(imageUrl)) return;
+            if (string.IsNullOrEmpty(imageUrl))
+                return;
 
             var fileName = Path.GetFileName(imageUrl);
             var path = Path.Combine(_env.WebRootPath, "images", fileName);

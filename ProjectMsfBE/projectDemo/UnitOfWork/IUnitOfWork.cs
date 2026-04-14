@@ -1,11 +1,11 @@
-﻿using Microsoft.EntityFrameworkCore;
-using System.Data;
+﻿using System.Data;
+using Microsoft.EntityFrameworkCore;
 
 namespace projectDemo.UnitOfWorks
 {
-    public interface IUnitOfWork 
+    public interface IUnitOfWork
     {
-        DbContext context {  get; }
+        DbContext context { get; }
         IDbConnection connection { get; }
 
         Task BeginTransactionAsync();

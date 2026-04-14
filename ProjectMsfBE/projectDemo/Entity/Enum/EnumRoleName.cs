@@ -10,6 +10,6 @@ namespace EventTick.Model.Enum
     {
         ADMIN = 1,
         ORGANIZER = 2,
-        CUSTOMER = 3
+        CUSTOMER = 3,
     }
 }

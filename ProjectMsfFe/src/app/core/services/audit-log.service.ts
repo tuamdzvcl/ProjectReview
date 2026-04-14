@@ -1,32 +1,22 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpParams } from '@angular/common/http';
-import { Observable, map } from 'rxjs';
-import { environment } from '../../../environments/environment';
-import { AuditLogResponse } from '../model/audit-log.model';
+import { Observable } from 'rxjs';
+import { BaseApiService } from './base-api.service';
+import { PageResult } from '../model/base/api-page-response.model';
+import { AuditLog } from '../model/audit-log.model';
 
 @Injectable({
-  providedIn: 'root',
+  providedIn: 'root'
 })
-export class AuditLogService {
-  private apiUrl = `${environment.apiBaseUrl}/AuditLog`;
+export class AuditLogService extends BaseApiService {
+  getAuditLogs(pageIndex: number, pageSize: number, username?: string, path?: string): Observable<PageResult<AuditLog>> {
+    const params: any = {
+      pageIndex: pageIndex,
+      pageSize: pageSize
+    };
 
-  constructor(private http: HttpClient) {}
+    if (username) params.username = username;
+    if (path) params.path = path;
 
-  getAuditLogs(
-    pageIndex: number,
-    pageSize: number,
-    username?: string,
-    path?: string
-  ): Observable<AuditLogResponse> {
-    let params = new HttpParams()
-      .set('pageIndex', pageIndex.toString())
-      .set('pageSize', pageSize.toString());
-
-    if (username) params = params.set('username', username);
-    if (path) params = params.set('path', path);
-
-    return this.http
-      .get<any>(this.apiUrl, { params })
-      .pipe(map((res) => res.Data));
+    return this.getpage<AuditLog>('AuditLog', params);
   }
 }

@@ -1,10 +1,9 @@
-﻿
+﻿using System;
+using System.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
 using projectDemo.Data;
 using projectDemo.UnitOfWorks;
-using System;
-using System.Data;
 
 namespace projectDemo.UnitOfWork
 {
@@ -29,12 +28,12 @@ namespace projectDemo.UnitOfWork
 
         public async Task CommitAsync()
         {
-           await _transaction.CommitAsync();
+            await _transaction.CommitAsync();
         }
 
-        public   IDbTransaction GetTransaction()
+        public IDbTransaction GetTransaction()
         {
-            return  _transaction?.GetDbTransaction();
+            return _transaction?.GetDbTransaction();
         }
 
         public async Task RollbackAsync()
