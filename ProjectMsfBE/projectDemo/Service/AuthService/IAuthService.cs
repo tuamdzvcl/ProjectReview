@@ -1,4 +1,4 @@
-﻿using EventTick.Model.Models;
+using EventTick.Model.Models;
 using projectDemo.DTO.Request;
 using projectDemo.DTO.Respone;
 using projectDemo.DTO.Response;
@@ -12,5 +12,7 @@ namespace projectDemo.Service.Auth
         Task<ApiResponse<UserResponse>> Regiter(RegisterRequest resquest);
 
         string GenerateToken(User user, List<PermissionResponse> perResponse);
+        Task<ApiResponse<string>> ForgotPasswordAsync(string email);
+        Task<ApiResponse<string>> ResetPasswordAsync(ResetPasswordRequest request);
     }
 }

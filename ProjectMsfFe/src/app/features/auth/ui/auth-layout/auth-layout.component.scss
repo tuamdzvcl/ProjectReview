@@ -271,10 +271,13 @@
   font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
   font-weight: 900;
 }
-.auth__social{
+
+.auth__social {
+  margin-top: 1.5rem;
   display: grid;
   gap: 14px;
 }
+
 .muted {
   font-size: 11px;
   line-height: 1.4;
@@ -325,4 +328,3 @@
     grid-template-columns: 1fr;
   }
 }
-

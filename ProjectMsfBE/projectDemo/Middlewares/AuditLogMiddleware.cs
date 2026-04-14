@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
@@ -26,11 +26,16 @@ namespace projectDemo.Middlewares
                 await _next(context);
                 return;
             }
+            if (request.Method == HttpMethods.Get)
+            {
+                await _next(context);
+                return;
+            }
 
-            var path = request.Path.ToString();
+            var path = request.Path + request.QueryString;
             var method = request.Method;
             var ipAddress = context.Connection.RemoteIpAddress?.ToString();
-            var startTime = DateTime.UtcNow;
+            var startTime = DateTime.Now;
 
             await _next(context);
 
@@ -58,7 +63,7 @@ namespace projectDemo.Middlewares
                     StatusCode = context.Response.StatusCode,
                     IpAddress = ipAddress,
                     Timestamp = startTime,
-                    Note = $"User {username ?? "Anonymous"} executed {method} {path}",
+                    Note = $"User {username ?? "Anonymous"} đã  thực hiện  {method} {path}",
                 };
 
                 dbContext.AuditLogs.Add(auditLog);

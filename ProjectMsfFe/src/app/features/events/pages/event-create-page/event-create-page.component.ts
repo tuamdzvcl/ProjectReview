@@ -246,7 +246,6 @@ export class EventCreatePageComponent {
       saleEndDate,
       categoryName,
     } = data;
-    console.log('data :', data);
     const formData = new FormData();
     formData.append('Title', draft.title);
     formData.append('Description', draft.description);

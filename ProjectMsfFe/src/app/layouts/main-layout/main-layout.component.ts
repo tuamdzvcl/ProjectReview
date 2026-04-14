@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { HeaderComponent } from '../../shared/components/header/header.component';
 import { TokenService } from '../../core/services/token.service';
+import { jwtDecode } from 'jwt-decode';
 
 import { FooterComponent } from '../../shared/components/footer/footer.component';
 
@@ -22,10 +23,16 @@ ngOnInit(): void {
   const token = params.get('token');
 
   if (token) {
-    
-    localStorage.setItem('access_token', token);
-    
-    window.history.replaceState({}, document.title, '/');
+    try {
+      const decoded: any = jwtDecode(token);
+      const now = Math.floor(Date.now() / 1000);
+      if (decoded.exp && decoded.exp > now) {
+        this.tokenService.setToken(token, '');
+        window.history.replaceState({}, document.title, '/');
+      }
+    } catch (e) {
+      // Token không hợp lệ, bỏ qua
+    }
   }
 }
 }

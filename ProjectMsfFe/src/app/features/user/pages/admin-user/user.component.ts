@@ -48,35 +48,34 @@ export class UserComponent {
   totalOrganizer = 0;
   totalCustomer = 0;
 
-
   ngOnInit(): void {
     this.currentUserId = this.tokenService.getUserId();
     this.loadUsers();
-    this.setTotals;
+    console.log('Userid =', this.users);
   }
   loadUsers() {
     this.userService
       .GetUsers(this.pageIndex, this.rows, '', this.selectedRole)
       .subscribe({
         next: (res) => {
-          console.log(res);
-          this.setTotals(res.items);
-          console.log('User');
+          console.log(res.items);
+
           this.users = res.items;
           this.totalRecords = res.totalRecords;
+          this.setTotals(res.items, res.totalRecords);
         },
       });
   }
 
-  setTotals(users: any[]) {
-    this.totalAll = users.length;
+  setTotals(users: any[], totalRecords: number) {
+    this.totalAll = totalRecords;
 
     this.totalOrganizer = users.filter(
-      (u) => (u.role || u.RoleName[0]) === 'organizer'
+      (u) => (u.role || u.RoleName?.[0]) === 'organizer'
     ).length;
 
     this.totalCustomer = users.filter(
-      (u) => (u.role || u.RoleName[0]) === 'customer'
+      (u) => (u.role || u.RoleName?.[0]) === 'customer'
     ).length;
   }
 
@@ -118,9 +117,9 @@ export class UserComponent {
     this.loadUsers();
   }
   onEdit(users: any) {
-    if (users.ID === this.currentUserId) return;
+    if (users.Id === this.currentUserId) return;
     this.selectedUser = {
-      id: users?.ID ?? users?.ID ?? null,
+      id: users?.ID ?? null,
       firstName: users?.FirstName ?? users?.firstName ?? '',
       lastName: users?.LastName ?? users?.lastName ?? '',
       email: users?.Email ?? users?.email ?? '',
@@ -216,26 +215,29 @@ export class UserComponent {
     }
   }
   private mapToUpdatePayload(data: any): UserUpdata {
+    console.log('update');
+
     return {
       FirstName: data.firstName,
       LastName: data.lastName,
       AvataUrl: data.avataUrl ?? '',
       RoleName: data.role,
       UpdateAt: new Date().toISOString(),
-      UpdateBy: data.firstName + "" + data.lastName,
+      UpdateBy: `${data.firstName} ${data.lastName}`,
     };
   }
 
   private mapToCreatePayload(data: any): UserRequest {
+    console.log('create');
+
     return {
       Email: data.email,
-      Username: data.firstName + ' ' + data.lastName,
+      Username:
+        data.email?.split('@')[0] || `${data.firstName} ${data.lastName}`,
       FirstName: data.firstName,
       LastName: data.lastName,
       RoleName: [data.role],
       AvataUrl: data.avataUrl ?? '',
     };
   }
-
-
 }

@@ -31,7 +31,7 @@ export class SignupComponent {
       lastName: ['', [Validators.required]],
       email: ['', [Validators.required, Validators.email]],
       password: ['', [Validators.required, Validators.minLength(6)]],
-      username: ['string'],
+      username: [''],
     });
   }
 
@@ -57,6 +57,7 @@ export class SignupComponent {
 
     this.authservice.register(payload).subscribe({
       next: (res) => {
+        this.isSubmitting.set(false);
         alert('đăng kí thành công chuyển sang Login');
         this.router.navigate(['auth/login']);
       },

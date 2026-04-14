@@ -1,4 +1,5 @@
 import { Pipe, PipeTransform } from '@angular/core';
+import { environment } from '../../../environments/environment';
 
 @Pipe({
   name: 'imageUrl',
@@ -6,7 +7,7 @@ import { Pipe, PipeTransform } from '@angular/core';
 })
 export class ImageUrlPipe implements PipeTransform {
 
-  private baseUrl = 'http://localhost:5083';
+  private baseUrl = environment.api;
 
   transform(path: string | null | undefined): string {
     if (!path) {

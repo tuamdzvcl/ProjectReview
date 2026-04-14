@@ -1,15 +1,12 @@
 import { Router, RouterLink } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { Component, HostListener } from '@angular/core';
-import { DashboardComponent } from '../../../features/dashboard/pages/dashboard/dashboard.component';
 import { AuthService } from '../../../features/auth/auth.service';
-import { MessageService } from 'primeng/api';
 
 @Component({
   selector: 'app-user-dropdown',
   standalone: true,
-  imports: [CommonModule,
-    DashboardComponent, RouterLink],
+  imports: [CommonModule, RouterLink],
   templateUrl: './user-dropdown.component.html',
   styleUrl: './user-dropdown.component.scss',
 })
@@ -18,8 +15,7 @@ export class UserDropdownComponent {
   constructor(private authService: AuthService, private router: Router) { }
 
   toggleDropdown() {
-    console.log("test")
-    this.isOpen = !this.isOpen
+    this.isOpen = !this.isOpen;
   }
 
   @HostListener('document:click', ['$event'])
@@ -38,11 +34,9 @@ export class UserDropdownComponent {
   }
   ngOnInit(): void {
     this.user = this.authService.getUser();
-    console.log(this.user)
   }
   hasRole(roles: string[]): boolean {
-    console.log(this.user.RoleName)
-    return this.user?.RoleName?.some((r: string) => roles.includes(r));
+    return this.user?.RoleName?.some((r: string) => roles.includes(r)) ?? false;
   }
 
   signOut() {

@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Observable, map } from 'rxjs';
+import { Observable } from 'rxjs';
 import { BaseApiService } from './base-api.service';
 import { ReportResponse } from '../model/response/report.model';
 
@@ -13,14 +13,10 @@ export class ReportService extends BaseApiService {
   }
 
   GetRevenueReport(fromDate?: string, toDate?: string, groupBy: string = 'monthly'): Observable<ReportResponse> {
-    const params: any = { groupBy };
-    if (fromDate) params.fromDate = fromDate;
-    if (toDate) params.toDate = toDate;
+    let queryString = `report/revenue?groupBy=${groupBy}`;
+    if (fromDate) queryString += `&fromDate=${fromDate}`;
+    if (toDate) queryString += `&toDate=${toDate}`;
 
-    return this.http.get<any>(`${this.baseUrl}/report/revenue`, { params }).pipe(
-      map((res: any) => {
-        return res.Data;
-      })
-    );
+    return this.get<ReportResponse>(queryString);
   }
 }

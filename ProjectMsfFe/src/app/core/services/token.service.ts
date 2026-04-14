@@ -46,6 +46,8 @@ export class TokenService {
   }
 
   clear() {
-    localStorage.clear();
+    localStorage.removeItem(this.ACCESS_TOKEN);
+    localStorage.removeItem(this.REFRESH_TOKEN);
+    localStorage.removeItem('user');
   }
 }

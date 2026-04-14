@@ -85,13 +85,12 @@ export class CheckoutPageComponent implements OnInit {
     const userId = this.tokenService.getUserId();
 
     if (!userId) {
-      this.router.navigate(['/login']);
+      this.router.navigate(['/auth/login']);
       return;
     }
 
     this.userService.getUserEvents().subscribe({
       next: (res) => {
-        console.log('user ', res);
         this.userProfile = res.User;
 
         if (this.userProfile) {
@@ -165,21 +164,10 @@ export class CheckoutPageComponent implements OnInit {
 
         this.orderService.createOrder(orderData).subscribe({
           next: (response) => {
-            console.log(response);
+            this.bookingService.clearBooking();
             window.location.href = response.PayUrl;
-            // Swal.fire({
-            //   title: 'Thành công!',
-            //   text: 'Đơn hàng của bạn đã được khởi tạo thành công.',
-            //   icon: 'success',
-            //   timer: 2000,
-            //   showConfirmButton: false,
-            // }).then(() => {
-            //   this.bookingService.clearBooking();
-            //   this.router.navigate(['/']);
-            // });
           },
           error: (err) => {
-            console.error('[DEBUG] Lỗi khi gọi API CreateOrder:', err);
 
             Swal.fire({
               icon: 'error',
@@ -198,7 +186,7 @@ export class CheckoutPageComponent implements OnInit {
     if (this.bookingData?.event?.Id) {
       this.router.navigate(['/event', this.bookingData.event.Id]);
     } else {
-      this.router.navigate(['/events']);
+      this.router.navigate(['/discover']);
     }
   }
 }

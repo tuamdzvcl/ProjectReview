@@ -1,50 +1,33 @@
-<app-auth-layout
-  topText="New to Barren?"
-  topLinkText="Sign up"
-  [topLinkTo]="['/auth/signup']"
-  title="Sign in to Barren"
->
+<app-auth-layout topText="Bạn mới sử dụng hệ thống?" topLinkText="Đăng ký" [topLinkTo]="['/auth/signup']"
+  title="Đăng nhập tài khoản">
   <form class="form" [formGroup]="form" (ngSubmit)="submit()">
-    <label class="field">
-      <span class="field__label">Your Email*</span>
-      <input
-        class="field__control"
-        type="email"
-        inputmode="email"
-        autocomplete="email"
-        placeholder="Enter your email"
-        formControlName="email"
-      />
+    <div class="field">
+      <label class="field__label" for="login-email">Email*</label>
+      <input id="login-email" class="field__control" type="email" inputmode="email" autocomplete="email"
+        placeholder="Nhập email của bạn" formControlName="email" />
       @if (form.controls.email.touched && form.controls.email.invalid) {
-      <span class="field__error">Please enter a valid email.</span>
+      <span class="field__error">Vui lòng nhập email hợp lệ.</span>
       }
-    </label>
+    </div>
 
-    <label class="field">
-      <div class="field__row">
-        <span class="field__label">Password*</span>
-        <a class="link link--muted" href="#" (click)="$event.preventDefault()"
-          >Forgot Password?</a
-        >
+    <div class="field">
+      <div class="field__row" style="display: flex; justify-content: space-between; align-items: center;">
+        <label class="field__label" for="login-password">Mật khẩu*</label>
+        <a class="link link--muted" routerLink="/auth/forgot-password" style="font-size: 0.875rem;">Quên mật khẩu?</a>
       </div>
-      <input
-        class="field__control"
-        type="password"
-        autocomplete="current-password"
-        placeholder="Enter your password"
-        formControlName="password"
-      />
+      <input id="login-password" class="field__control" type="password" autocomplete="current-password"
+        placeholder="Nhập mật khẩu" formControlName="password" />
       @if (form.controls.password.touched && form.controls.password.invalid) {
-      <span class="field__error">Password must be at least 6 characters.</span>
+      <span class="field__error">Mật khẩu phải có ít nhất 6 ký tự.</span>
       }
-    </label>
+    </div>
 
-    <button class="btn btn--primary" type="submit" [disabled]="isSubmitting()">
-      @if (isSubmitting()) { Signing in... } @else { Sign In }
+    <button class="btn btn--primary" type="submit" [disabled]="isSubmitting()" style="margin-top: 1rem;">
+      @if (isSubmitting()) { Đang đăng nhập... } @else { Đăng nhập }
     </button>
 
-    <div class="divider">
-      <span>or</span>
+    <div class="divider" style="margin: 1.5rem 0; text-align: center; position: relative;">
+      <span style="background: white; padding: 0 10px;">hoặc</span>
     </div>
   </form>
 </app-auth-layout>

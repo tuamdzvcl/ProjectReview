@@ -58,10 +58,10 @@ namespace projectDemo.Repository
             {
                 var pageIndex = request.PageIndex;
                 var pageSize = request.PageSize;
-
+                var now = DateTime.Now;
                 var query = _dbSet
                     .AsNoTracking()
-                    .Where(e => e.IsDeleted == false && e.Status != EnumStatusEvent.CANNEL);
+                    .Where(e => e.IsDeleted == false && e.Status != EnumStatusEvent.CANNEL && e.SaleStartDate<now || e.SaleEndDate> now);
 
                 if (request.categoryId != Guid.Empty)
                 {

@@ -16,6 +16,6 @@ import { RouterLink } from '@angular/router';
 export class EventCardComponent {
   @Input() eventmodel!: EventModel;
   firstPrice(): number {
-    return this.eventmodel.ListTypeTick[0]?.Price || 0;
+    return this.eventmodel?.ListTypeTick?.[0]?.Price || 0;
   }
 }

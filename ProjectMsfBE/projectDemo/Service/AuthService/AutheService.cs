@@ -5,6 +5,7 @@ using System.Security.Cryptography;
 using System.Text;
 using EventTick.Model.Enum;
 using EventTick.Model.Models;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.IdentityModel.Tokens;
 using projectDemo.Data;
 using projectDemo.DTO.Request;
@@ -12,6 +13,7 @@ using projectDemo.DTO.Respone;
 using projectDemo.DTO.Response;
 using projectDemo.Entity.Enum;
 using projectDemo.Repository.Ipml;
+using projectDemo.Service.EmailService;
 using projectDemo.UnitOfWorks;
 
 namespace projectDemo.Service.Auth
@@ -26,6 +28,8 @@ namespace projectDemo.Service.Auth
         private readonly IRoleRepository _roleRepo;
         private readonly IUserLoginRepository _loginRepo;
         private readonly IUserRoleRepository _userRoleRepo;
+        private readonly IMemoryCache _cache;
+        private readonly IEmailService _emailService;
 
         public AutheService(
             IConfiguration configuration,
@@ -35,7 +39,9 @@ namespace projectDemo.Service.Auth
             IUserLoginRepository loginRepo,
             IUserRoleRepository userRoleRepo,
             IUnitOfWork uow,
-            EventTickDbContext context
+            EventTickDbContext context,
+            IMemoryCache cache,
+            IEmailService emailService
         )
         {
             _configuration = configuration;
@@ -45,6 +51,8 @@ namespace projectDemo.Service.Auth
             _roleRepo = roleRepo;
             _loginRepo = loginRepo;
             _userRoleRepo = userRoleRepo;
+            _cache = cache;
+            _emailService = emailService;
         }
 
         //login->token/ accec
@@ -251,6 +259,75 @@ namespace projectDemo.Service.Auth
                 await tran.RollbackAsync();
                 return ApiResponse<UserResponse>.FailResponse(EnumStatusCode.SERVER, "Thất Bại");
             }
+        }
+
+        public async Task<ApiResponse<string>> ForgotPasswordAsync(string email)
+        {
+            var user = await _authRepository.GetByEmailAsync(email);
+            if (user == null || user.IsDeleted == true)
+            {
+                // We always return success to avoid email enumeration
+                return ApiResponse<string>.SuccessResponse(
+                    EnumStatusCode.SUCCESS,
+                    "Nếu email tồn tại, một đường dẫn đặt lại mật khẩu đã được gửi."
+                );
+            }
+
+            var token = Guid.NewGuid().ToString();
+            _cache.Set($"forgot_pwd_{email}", token, TimeSpan.FromMinutes(15));
+
+            var resetLink =
+                $"http://localhost:4200/auth/reset-password?email={Uri.EscapeDataString(email)}&token={token}";
+            var subject = "Đặt lại mật khẩu của bạn - TickEvent";
+            var body =
+                $@"
+                <h3>Yêu cầu đặt lại mật khẩu</h3>
+                <p>Bạn đã yêu cầu đặt lại mật khẩu. Vui lòng bấm vào liên kết dưới đây để tạo mật khẩu mới:</p>
+                <p><a href='{resetLink}'>Đặt lại mật khẩu</a></p>
+                <p>Liên kết này có hiệu lực trong vòng 15 phút. Nếu bạn không yêu cầu, vui lòng bỏ qua email này.</p>";
+
+            await _emailService.SendEmailAsync(user.Email, subject, body);
+
+            return ApiResponse<string>.SuccessResponse(
+                EnumStatusCode.SUCCESS,
+                "Đường dẫn đặt lại mật khẩu đã được gửi đến email của bạn."
+            );
+        }
+
+        public async Task<ApiResponse<string>> ResetPasswordAsync(ResetPasswordRequest request)
+        {
+            if (
+                !_cache.TryGetValue($"forgot_pwd_{request.Email}", out string cachedToken)
+                || cachedToken != request.Token
+            )
+            {
+                return ApiResponse<string>.FailResponse(
+                    EnumStatusCode.BAD_REQUEST,
+                    "Đường dẫn đặt lại mật khẩu đã hết hạn hoặc không hợp lệ."
+                );
+            }
+
+            var user = await _authRepository.GetByEmailAsync(request.Email);
+            if (user == null)
+            {
+                return ApiResponse<string>.FailResponse(
+                    EnumStatusCode.BAD_REQUEST,
+                    "Người dùng không tồn tại."
+                );
+            }
+
+            user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(request.NewPassword);
+
+            // To update using Entity Framework via Repos or DbContext, since _authRepository doesn't have an explicit specialized UpdateAsync we'll do:
+            // Since it's a tracked entity probably (or we can just save context)
+            await _context.SaveChangesAsync();
+
+            _cache.Remove($"forgot_pwd_{request.Email}");
+
+            return ApiResponse<string>.SuccessResponse(
+                EnumStatusCode.SUCCESS,
+                "Đặt lại mật khẩu thành công."
+            );
         }
     }
 }

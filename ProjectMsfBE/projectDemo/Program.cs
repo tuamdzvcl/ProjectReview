@@ -34,6 +34,8 @@ using projectDemo.Service.PermissionService;
 using projectDemo.Service.ReportService;
 using projectDemo.Service.TicketTypeService;
 using projectDemo.Service.UserService;
+using projectDemo.Service.EmailService;
+using projectDemo.DTO.Response.Email;
 using projectDemo.UnitOfWork;
 using projectDemo.UnitOfWorks;
 
@@ -53,6 +55,9 @@ namespace projectDemo
 
             builder.Services.Configure<MomoOptionModel>(
                 builder.Configuration.GetSection("MomoAPI")
+            );
+            builder.Services.Configure<EmailSettings>(
+                builder.Configuration.GetSection("EmailSettings")
             );
             builder.Services.AddScoped<IMomoService, MomoService>();
 
@@ -315,6 +320,7 @@ namespace projectDemo
             builder.Services.AddScoped<IImageService, ImageService>();
             builder.Services.AddHttpClient();
             builder.Services.AddScoped<GoogleAuthService>();
+            builder.Services.AddScoped<IEmailService, EmailService>();
 
             builder.Services.AddSingleton<IAuthorizationPolicyProvider, PermissionPolicyProvider>();
             builder.Services.AddAuthorization();

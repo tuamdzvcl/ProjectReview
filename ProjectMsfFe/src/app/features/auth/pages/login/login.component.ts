@@ -3,12 +3,12 @@ import { ChangeDetectionStrategy, Component, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { AuthLayoutComponent } from '../../ui/auth-layout/auth-layout.component';
 import { AuthService } from '../../auth.service';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, AuthLayoutComponent],
+  imports: [CommonModule, ReactiveFormsModule, AuthLayoutComponent, RouterModule],
   templateUrl: './login.component.html',
   styleUrl: './login.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

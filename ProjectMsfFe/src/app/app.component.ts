@@ -23,10 +23,7 @@ export class AppComponent {
   }
 
   logout() {
-    localStorage.removeItem('access_token');
-    localStorage.removeItem('refresh_token');
-    localStorage.removeItem('user');
-    localStorage.removeItem('token');
+    this.authService.logout();
     this.router.navigate(['/']);
   }
 }

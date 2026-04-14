@@ -18,10 +18,15 @@ export class BookingService {
   bookingState$;
 
   constructor() {
-    const savedData = localStorage.getItem(this.STORAGE_KEY);
-    const initialState: BookingState = savedData
-      ? JSON.parse(savedData)
-      : { event: null, selectedTickets: {}, totalPrice: 0 };
+    let initialState: BookingState = { event: null, selectedTickets: {}, totalPrice: 0 };
+    try {
+      const savedData = localStorage.getItem(this.STORAGE_KEY);
+      if (savedData) {
+        initialState = JSON.parse(savedData);
+      }
+    } catch (e) {
+      localStorage.removeItem(this.STORAGE_KEY);
+    }
 
     this.bookingState = new BehaviorSubject<BookingState>(initialState);
     this.bookingState$ = this.bookingState.asObservable();

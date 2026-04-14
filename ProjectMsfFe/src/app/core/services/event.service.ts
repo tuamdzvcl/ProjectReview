@@ -61,7 +61,6 @@ export class EventService extends BaseApiService {
       params
     ).pipe(
       map((res: PageResult<EventModel>) => {
-        console.log(params);
         return {
           items: res.Items,
           pageIndex: res.PageIndex,
@@ -108,7 +107,6 @@ export class EventService extends BaseApiService {
   GetEventId(id: string) {
     return this.get<EventModel>(`event/${id}`).pipe(
       map((res: EventModel) => {
-        console.log('eventid', res);
         return res;
       })
     );

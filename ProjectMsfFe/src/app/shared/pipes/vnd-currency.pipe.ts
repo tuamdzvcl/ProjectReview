@@ -17,7 +17,7 @@ export class VndCurrencyPipe implements PipeTransform {
       return '0 ₫';
     }
 
-    const finalValue = numValue < 1000 ? numValue * 1000 : numValue;
+    const finalValue = numValue;
 
     const formatted = new Intl.NumberFormat('vi-VN', {
       style: 'currency',

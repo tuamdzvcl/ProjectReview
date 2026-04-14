@@ -27,8 +27,6 @@ export class LoginSuccessComponent implements OnInit {
     }
     this.authService.getGoogleResult(key).subscribe({
       next: (res)=>{
-        
-          console.log("ừ ",res)
           this.token.setToken(res.AccessToken,res.RefreshToken)
         localStorage.setItem('user', JSON.stringify(res.User));
         this.router.navigate(['/']);

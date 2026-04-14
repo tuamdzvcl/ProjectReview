@@ -50,7 +50,7 @@
               </div>
             </td>
             <td>
-              <span class="font-medium text-blue-600">{{log.Method}}</span>
+              <p-tag [value]="log.Method" [severity]="getMethodSeverity(log.Method)"></p-tag>
             </td>
             <td>
               <code class="text-secondary">{{log.Path}}</code>

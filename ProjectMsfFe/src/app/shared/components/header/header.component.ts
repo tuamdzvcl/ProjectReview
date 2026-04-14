@@ -12,7 +12,6 @@ import { TokenService } from '../../../core/services/token.service';
   styleUrl: './header.component.scss',
 })
 export class HeaderComponent {
-  userRole: string = '';
   isMenuOpen: boolean = false;
 
   toggleMenu() {
@@ -23,26 +22,10 @@ export class HeaderComponent {
     this.isMenuOpen = false;
   }
 
-  constructor(private tokenService: TokenService) {
-    this.getUserRole();
-  }
-
-  private getUserRole() {
-    try {
-      const accessToken = this.tokenService.getAccessToken();
-      if (accessToken) {
-        const tokenPayload = JSON.parse(atob(accessToken.split('.')[1]));
-        this.userRole = tokenPayload.role || tokenPayload.Role || '';
-      }
-    } catch (error) {
-      this.userRole = '';
-    }
-  }
+  constructor(private tokenService: TokenService) {}
 
   canCreateEvent(): boolean {
-    return (
-      this.userRole === 'admin'.toUpperCase() ||
-      this.userRole === 'organizer'.toUpperCase()
-    );
+    const role = this.tokenService.getRole();
+    return role === 'ADMIN' || role === 'ORGANIZER';
   }
 }

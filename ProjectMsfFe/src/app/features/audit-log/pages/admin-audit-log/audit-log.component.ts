@@ -107,4 +107,23 @@ export class AuditLogComponent implements OnInit {
     if (statusCode >= 400) return 'Lỗi';
     return 'Thông tin';
   }
+
+  getMethodSeverity(
+    method: string
+  ):
+    | 'success'
+    | 'secondary'
+    | 'info'
+    | 'warn'
+    | 'danger'
+    | 'contrast'
+    | undefined {
+    switch (method?.toUpperCase()) {
+      case 'GET': return 'info';
+      case 'POST': return 'success';
+      case 'PUT': return 'warn';
+      case 'DELETE': return 'danger';
+      default: return 'secondary';
+    }
+  }
 }

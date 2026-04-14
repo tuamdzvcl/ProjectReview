@@ -30,6 +30,8 @@ import { PaymentsComponent } from './features/payments/pages/admin-payments/paym
 import { AuditLogComponent } from './features/audit-log/pages/admin-audit-log/audit-log.component';
 import { MembershipComponent } from './features/membership/pages/admin-membership/membership.component';
 import { PaymentResultComponent } from './features/payment/pages/payment-result/payment-result.component';
+import { ForgotPasswordComponent } from './features/auth/pages/forgot-password/forgot-password.component';
+import { ResetPasswordComponent } from './features/auth/pages/reset-password/reset-password.component';
 
 export const routes: Routes = [
   { path: 'header', component: HeaderComponent },
@@ -119,6 +121,8 @@ export const routes: Routes = [
       {
         path: 'checkout',
         component: CheckoutPageComponent,
+        canActivate: [authGuard],
+        data: { requiresAuth: true }
       },
       {
         path: 'payment',
@@ -131,6 +135,8 @@ export const routes: Routes = [
     children: [
       { path: 'login', component: LoginComponent },
       { path: 'signup', component: SignupComponent },
+      { path: 'forgot-password', component: ForgotPasswordComponent },
+      { path: 'reset-password', component: ResetPasswordComponent }
     ],
   },
   {
@@ -142,20 +148,20 @@ export const routes: Routes = [
     canActivate: [authGuard],
     data: { requiresAuth: true },
     children: [
-      { path: 'dashboard', component: DashboardComponent },
-      { path: 'events', component: EventsComponent },
-      { path: 'events/:id', component: AdminEventDetailComponent },
-      { path: 'user', component: UserComponent },
+      { path: 'dashboard', component: DashboardComponent, data: { requiresAuth: true } },
+      { path: 'events', component: EventsComponent, data: { requiresAuth: true } },
+      { path: 'events/:id', component: AdminEventDetailComponent, data: { requiresAuth: true } },
+      { path: 'user', component: UserComponent, data: { requiresAuth: true } },
       {
         path: 'UserForm',
         component: UserFormComponent,
         canActivate: [authGuard],
         data: { requiresAuth: true },
       },
-      { path: 'promotions', component: PromotionsComponent },
-      { path: 'payments', component: PaymentsComponent },
-      { path: 'audit-log', component: AuditLogComponent },
-      { path: 'membership', component: MembershipComponent },
+      { path: 'promotions', component: PromotionsComponent, data: { requiresAuth: true } },
+      { path: 'payments', component: PaymentsComponent, data: { requiresAuth: true } },
+      { path: 'audit-log', component: AuditLogComponent, data: { requiresAuth: true } },
+      { path: 'membership', component: MembershipComponent, data: { requiresAuth: true } },
     ],
   },
   {

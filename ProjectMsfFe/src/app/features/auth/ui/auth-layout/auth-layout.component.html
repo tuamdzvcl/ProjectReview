@@ -30,22 +30,22 @@
       </div>
 
       <ng-content />
+
+      @if (showSocial) {
       <div class="auth__social">
         <button class="btn btn--social" type="button" (click)="logingoogle()">
-          <span class="btn__icon" aria-hidden="true"
-            ><i class="fa-brands fa-google"></i
-          ></span>
-          Sign in with Google
+          <span class="btn__icon" aria-hidden="true"><i class="fa-brands fa-google"></i></span>
+          Đăng nhập với Google
         </button>
         <button class="btn btn--social" type="button">
-          <span class="btn__icon btn__icon--fb" aria-hidden="true"
-            ><i class="fa-brands fa-facebook"></i
-          ></span>
-          Sign in with Facebook
+          <span class="btn__icon btn__icon--fb" aria-hidden="true"><i class="fa-brands fa-facebook"></i></span>
+          Đăng nhập với Facebook
         </button>
       </div>
+      }
+
       <div class="footer">
-        © 2024, Barren. All rights reserved. Powered by Gambolthemes
+        © 2024, Msf System. All rights reserved.
       </div>
     </div>
   </section>

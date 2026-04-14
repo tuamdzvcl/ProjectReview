@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { EventService } from '../../../../core/services/event.service';
@@ -48,7 +48,8 @@ export class EventDetailPageComponent implements OnInit, OnDestroy {
     private route: ActivatedRoute,
     private router: Router,
     private eventService: EventService,
-    private bookingService: BookingService
+    private bookingService: BookingService,
+    private cdr: ChangeDetectorRef
   ) { }
 
   ngOnInit(): void {
@@ -106,6 +107,10 @@ export class EventDetailPageComponent implements OnInit, OnDestroy {
   }
 
   startCountdown(): void {
+    if (this.timerSubscription) {
+      this.timerSubscription.unsubscribe();
+    }
+
     if (!this.event?.StartDate) return;
 
     const startDate = new Date(this.event.StartDate).getTime();
@@ -129,6 +134,7 @@ export class EventDetailPageComponent implements OnInit, OnDestroy {
       this.hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
       this.minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
       this.seconds = Math.floor((distance % (1000 * 60)) / 1000);
+      this.cdr.markForCheck();
     });
   }
 

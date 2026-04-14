@@ -32,7 +32,7 @@ export class AuthService extends BaseApiService {
     });
   }
   logout() {
-    localStorage.clear();
+    this.tokenService.clear();
   }
   getUser() {
     const user = localStorage.getItem('user');
@@ -48,6 +48,14 @@ export class AuthService extends BaseApiService {
     const now = Math.floor(Date.now() / 1000);
 
     return decoded.exp < now;
+  }
+
+  forgotPassword(email: string) {
+    return this.post<any>('auth/forgot-password', { email });
+  }
+
+  resetPassword(data: any) {
+    return this.post<any>('auth/reset-password', data);
   }
 }
 

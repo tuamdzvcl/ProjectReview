@@ -18,6 +18,7 @@ export class AuthLayoutComponent {
   @Input({ required: true }) topLinkTo!: string | any[];
 
   @Input({ required: true }) title!: string;
+  @Input() showSocial: boolean = true;
 
   constructor(
     private readonly baseApiService: BaseApiService
