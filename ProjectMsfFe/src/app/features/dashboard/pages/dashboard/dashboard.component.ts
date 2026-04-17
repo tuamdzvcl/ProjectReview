@@ -23,6 +23,8 @@ export class DashboardComponent implements OnInit {
   chartData: any;
   chartOptions: any;
   selectedTab: string = 'Monthly';
+  selectedDataType: string = 'Revenue'; // 'Revenue' or 'Tickets'
+  private cachedChartList: any[] = [];
 
   // Summary data from API (Defaults to 0 to prevent "NaN" or layout break)
   totalRevenue: number = 0;
@@ -58,20 +60,18 @@ export class DashboardComponent implements OnInit {
 
   fetchRevenueStats(type: string) {
     this.selectedTab = type;
-    const groupBy = type.toLowerCase(); // 'yearly', 'monthly', 'daily'
+    const groupBy = type.toLowerCase();
 
     let fromDate: string | undefined;
     let toDate: string | undefined;
 
     if (this.rangeDates && this.rangeDates[0] && this.rangeDates[1]) {
-      // Sử dụng hàm định dạng local để tránh bị lệch múi giờ (không dùng toISOString)
       fromDate = this.formatDateToLocalISO(this.rangeDates[0]);
       toDate = this.formatDateToLocalISO(this.rangeDates[1]);
     }
 
     this.reportService.GetRevenueReport(fromDate, toDate, groupBy).subscribe({
       next: (data: ReportResponse) => {
-        // Cập nhật các con số tổng quát
         const summary = data?.Summary || {};
         this.totalRevenue = summary.TotalRevenue ?? 0;
         this.totalOrders = summary.TotalOrders ?? 0;
@@ -82,37 +82,44 @@ export class DashboardComponent implements OnInit {
         this.growthTickets = summary.GrowthTickets ?? 0;
         this.growthViews = summary.GrowthViews ?? 0;
 
-        // Cập nhật dữ liệu biểu đồ
-        const chartList = data?.Chart || [];
-        this.chartData = {
-          labels: chartList.map((c) => c.Label || ''),
-          datasets: [
-            {
-              label: 'Doanh thu',
-              data: chartList.map((c) => c.Revenue ?? 0),
-              backgroundColor: '#81E979',
-              borderColor: '#6cc04a',
-              borderWidth: 1,
-              borderRadius: 6,
-              barThickness: 32,
-            }
-          ]
-        };
+        this.cachedChartList = data?.Chart || [];
+        this.updateChartData();
 
         this.cdr.markForCheck();
       },
       error: (err) => {
-        // Hiển thị lỗi từ backend (ví dụ: giới hạn 1 tháng cho báo cáo ngày)
         let msg = 'Lỗi khi tải dữ liệu báo cáo.';
         if (err.error?.Message) {
           msg = err.error.Message;
         }
-        alert(msg); // Hoặc dùng notification service nếu có
-
+        alert(msg);
         this.resetStats();
         this.cdr.markForCheck();
       }
     });
+  }
+
+  updateChartData() {
+    const isRevenue = this.selectedDataType === 'Revenue';
+    const label = isRevenue ? 'Doanh thu' : 'Vé đã bán';
+    const color = isRevenue ? '#81E979' : '#3B82F6';
+    const borderColor = isRevenue ? '#6cc04a' : '#2563EB';
+
+    this.chartData = {
+      labels: this.cachedChartList.map((c) => c.Label || ''),
+      datasets: [
+        {
+          label: label,
+          data: this.cachedChartList.map((c) => isRevenue ? (c.Revenue ?? 0) : (c.Tickets ?? 0)),
+          backgroundColor: color,
+          borderColor: borderColor,
+          borderWidth: 1,
+          borderRadius: 6,
+          barThickness: 32,
+        }
+      ]
+    };
+    this.cdr.markForCheck();
   }
 
   private formatDateToLocalISO(date: Date): string {
@@ -158,8 +165,13 @@ export class DashboardComponent implements OnInit {
             label: (context: any) => {
               let label = context.dataset.label || '';
               if (label) label += ': ';
-              if (context.parsed.y !== null) {
-                label += new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(context.parsed.y);
+              const val = context.parsed.y;
+              if (val !== null) {
+                if (this.selectedDataType === 'Revenue') {
+                  label += new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(val);
+                } else {
+                  label += val + ' vé';
+                }
               }
               return label;
             }
@@ -175,7 +187,12 @@ export class DashboardComponent implements OnInit {
           grid: { color: '#f1f5f9', drawBorder: false },
           ticks: {
             color: '#94a3b8',
-            callback: (value: any) => new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(value)
+            callback: (value: any) => {
+              if (this.selectedDataType === 'Revenue') {
+                return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND', maximumFractionDigits: 0 }).format(value);
+              }
+              return value;
+            }
           }
         }
       }

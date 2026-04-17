@@ -1,4 +1,4 @@
-﻿using EventTick.Model.Models;
+using EventTick.Model.Models;
 using projectDemo.DTO.Projection;
 
 namespace projectDemo.Repository.OrderRepository
@@ -10,6 +10,7 @@ namespace projectDemo.Repository.OrderRepository
         int UpdateOrder(Order order);
         int DeleteOrder(Order order);
         Task<Order> GetOrderbyID(Guid orderID);
+        Task<Order?> GetOrderForEmailAsync(Guid orderID);
 
         Task<bool> HasOrderByUserId(Guid userId);
 

@@ -1,4 +1,4 @@
-﻿using System.Data;
+using System.Data;
 using System.Management;
 using AutoMapper;
 using AutoMapper.QueryableExtensions;
@@ -61,7 +61,7 @@ namespace projectDemo.Repository
                 var now = DateTime.Now;
                 var query = _dbSet
                     .AsNoTracking()
-                    .Where(e => e.IsDeleted == false && e.Status != EnumStatusEvent.CANNEL && e.SaleStartDate<now || e.SaleEndDate> now);
+                    .Where(e => e.IsDeleted == false && e.Status != EnumStatusEvent.CANNEL && e.SaleStartDate <= now && e.SaleEndDate >= now);
 
                 if (request.categoryId != Guid.Empty)
                 {

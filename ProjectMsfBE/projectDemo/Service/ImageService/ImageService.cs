@@ -9,6 +9,35 @@
             _env = env;
         }
 
+        public string CloneImage(string oldPath)
+        {
+            if (string.IsNullOrEmpty(oldPath))
+                return null;
+
+            var rootPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot");
+
+            var oldFullPath = Path.Combine(rootPath, oldPath.TrimStart('/'));
+
+            if (!File.Exists(oldFullPath))
+                return null;
+
+            // Tạo tên file mới
+            var newFileName = Guid.NewGuid().ToString() + Path.GetExtension(oldFullPath);
+
+            // Tạo folder mới (event clone)
+            var newFolder = Path.Combine(rootPath, "images/events/" + Guid.NewGuid());
+            Directory.CreateDirectory(newFolder);
+
+            var newFullPath = Path.Combine(newFolder, newFileName);
+
+            File.Copy(oldFullPath, newFullPath);
+
+            // Trả về path để lưu DB
+            var relativePath = newFullPath.Replace(rootPath, "").Replace("\\", "/");
+
+            return relativePath;
+        }
+
         public void Delete(string imageUrl)
         {
             if (string.IsNullOrEmpty(imageUrl))

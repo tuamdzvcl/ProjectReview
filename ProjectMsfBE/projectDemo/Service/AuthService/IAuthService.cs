@@ -10,6 +10,9 @@ namespace projectDemo.Service.Auth
         string GenerateRefreshToken();
         Task<ApiResponse<LoginResponse>> AuthenCase(LoginRequest resquest);
         Task<ApiResponse<UserResponse>> Regiter(RegisterRequest resquest);
+        Task<ApiResponse<string>> VerifyEmailAsync(VerifyEmailRequest request);
+        Task<ApiResponse<string>> ResendVerificationEmailAsync(ResendVerificationRequest request);
+
 
         string GenerateToken(User user, List<PermissionResponse> perResponse);
         Task<ApiResponse<string>> ForgotPasswordAsync(string email);

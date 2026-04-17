@@ -1,4 +1,4 @@
-﻿using System.Data;
+using System.Data;
 using Dapper;
 using EventTick.Model.Models;
 using Microsoft.EntityFrameworkCore;
@@ -36,16 +36,20 @@ namespace projectDemo.Repository
 
         public async Task<List<PermissionResponse>> GetPermissionNameAsyncByUserId(Guid UserID)
         {
-            var param = new DynamicParameters();
+            var result = await _dbSet
+                .Where(u => u.Id == UserID)
+                .SelectMany(u => u.UserRoles)
+                .SelectMany(ur => ur.Role.RolePermissions)
+                .Select(rp => rp.Permissions)
+                .Select(p => new PermissionResponse
+                {
+                    PermissonsName = p.PermissonsName,
+                    PermissonsDescription = p.PermissonsDescription
+                })
+                .Distinct()
+                .ToListAsync();
 
-            param.Add("@UserID", UserID);
-
-            var result = await _uow.connection.QueryAsync<PermissionResponse>(
-                "GetPermissonNameByid",
-                param,
-                commandType: CommandType.StoredProcedure
-            );
-            return result.ToList();
+            return result;
         }
 
         public async Task AddAsync()

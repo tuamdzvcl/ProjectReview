@@ -54,8 +54,9 @@
 
     <section class="chart card">
       <header class="chart__header">
-        <select class="chart__title">
+        <select class="chart__title" [(ngModel)]="selectedDataType" (change)="updateChartData()">
           <option value="Revenue">Doanh thu</option>
+          <option value="Tickets">Vé đã bán</option>
         </select>
         <div class="chart__tabs">
           <button class="chip" [class.chip--active]="selectedTab === 'Yearly'" type="button"

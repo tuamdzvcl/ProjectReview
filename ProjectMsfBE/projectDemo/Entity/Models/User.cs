@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -56,5 +56,7 @@ namespace EventTick.Model.Models
         public virtual ICollection<Order> Orders { get; set; }
 
         public virtual ICollection<ApiLog> ApiLogs { get; set; }
+
+        public virtual ICollection<UserUpgrade> UserUpgrades { get; set; }
     }
 }

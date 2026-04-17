@@ -4,5 +4,7 @@
     {
         Task<string> UploadAsync(IFormFile file);
         void Delete(string imageUrl);
+
+        string CloneImage(string oldPath);
     }
 }

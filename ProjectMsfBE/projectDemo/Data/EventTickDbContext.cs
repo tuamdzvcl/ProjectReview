@@ -18,6 +18,8 @@ namespace projectDemo.Data
         public DbSet<UserLogin> UserLogin { get; set; }
         public DbSet<Role> Role { get; set; }
         public DbSet<UserRole> UserRole { get; set; }
+        public DbSet<EmailVerificationToken> EmailVerificationTokens { get; set; }
+        public DbSet<RefreshToken> RefreshTokens { get; set; }
         public DbSet<TicketType> TicketType { get; set; }
         public DbSet<Ticket> Ticket { get; set; }
         public DbSet<Order> Order { get; set; }
@@ -29,9 +31,23 @@ namespace projectDemo.Data
         public DbSet<Catetory> Catetory { get; set; }
         public DbSet<Permissions> Permissions { get; set; }
         public DbSet<RolePermissions> RolePermissions { get; set; }
+        public DbSet<Upgrade> Upgrade { get; set; }
+        public DbSet<UserUpgrade> UserUpgrades { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            modelBuilder.Entity<UserUpgrade>()
+                .HasOne(uu => uu.User)
+                .WithMany(u => u.UserUpgrades)
+                .HasForeignKey(uu => uu.UserId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<UserUpgrade>()
+                .HasOne(uu => uu.Upgrade)
+                .WithMany(u => u.UserUpgrades)
+                .HasForeignKey(uu => uu.UpgradeId)
+                .OnDelete(DeleteBehavior.Restrict);
+
             modelBuilder.Entity<UserRole>().HasKey(ur => new { ur.UserId, ur.RoleId });
 
             modelBuilder
@@ -140,6 +156,7 @@ namespace projectDemo.Data
                         PasswordHash = BCrypt.Net.BCrypt.HashPassword("Admin@123"),
                     }
                 );
+           
 
             modelBuilder
                 .Entity<UserRole>()
@@ -173,17 +190,17 @@ namespace projectDemo.Data
                     new Catetory
                     {
                         Id = Guid.Parse("11111111-1111-1111-1111-111111111111"),
-                        Name = "MUSIC",
+                        Name = "Âm Nhạc",
                     },
                     new Catetory
                     {
                         Id = Guid.Parse("22222222-2222-2222-2222-222222222222"),
-                        Name = "SPORT",
+                        Name = "Thể Thao",
                     },
                     new Catetory
                     {
                         Id = Guid.Parse("33333333-3333-3333-3333-333333333333"),
-                        Name = "TECHNOLOGY",
+                        Name = "Trí Tuệ",
                     }
                 );
         }

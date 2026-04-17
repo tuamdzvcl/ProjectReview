@@ -1,4 +1,4 @@
-﻿using System.IdentityModel.Tokens.Jwt;
+using System.IdentityModel.Tokens.Jwt;
 using EventTick.Model.Enum;
 using EventTick.Model.Models;
 using Google.Apis.Auth;
@@ -162,23 +162,33 @@ namespace projectDemo.Service.AuthService
                     };
 
                     var CreataUser = await _userReposiotry.Create(users);
-                    var urole = _userRole.InsertAsync(ur);
-                    var provider = _loginRepo.InsertAsync(ul);
-                }
-                var permission = await _authRepository.GetPermissionsbyRoleName(
-                    EnumRoleName.CUSTOMER.ToString()
-                );
-                var role = await _userReposiotry.GetRoleByUser(users.Id);
-                if (role == null)
-                {
-                    return ApiResponse<AuthResponse>.FailResponse(
-                        EnumStatusCode.NOT_FOUND,
-                        "không tìm thấy role"
-                    );
+                    await _userRole.InsertAsync(ur);
+                    await _loginRepo.InsertAsync(ul);
                 }
 
                 await _uow.SaveChangesAsync();
+
+                var permission = await _authRepository.GetPermissionsbyRoleName(
+                    EnumRoleName.CUSTOMER.ToString()
+                );
+
+                var role = await _userReposiotry.GetRoleByUser(users.Id);
+                if (role == null || !role.Any())
+                {
+                    return ApiResponse<AuthResponse>.FailResponse(
+                        EnumStatusCode.NOT_FOUND,
+                        "Không tìm thấy role"
+                    );
+                }
+
                 await _uow.CommitAsync();
+
+                users.UserRoles = role.Select(r => new UserRole
+                    {
+                        Role = new EventTick.Model.Models.Role { RoleName = r },
+                    })
+                    .ToList();
+
                 var token = _authService.GenerateToken(users, permission);
 
                 var responses = new AuthResponse

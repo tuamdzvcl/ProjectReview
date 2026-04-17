@@ -14,6 +14,7 @@ namespace projectDemo.Repository.Ipml
         User Update(User user);
         string Delete(User user);
 
+
         Task<(List<User>, int)> GetAll(int pageIndex, int pageSize, string key, string role);
     }
 }

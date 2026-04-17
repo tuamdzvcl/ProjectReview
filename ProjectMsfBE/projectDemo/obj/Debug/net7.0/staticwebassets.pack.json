@@ -13,12 +13,20 @@
       "PackagePath": "staticwebassets\\images\\2d9e83d9-6732-4bfb-8263-3679af80d5c1.png"
     },
     {
+      "Id": "D:\\Msf\\ProjectMsfBE\\projectDemo\\wwwroot\\images\\3d4d556d-ebd5-41f8-a2eb-5b90d117c7b8.jpg",
+      "PackagePath": "staticwebassets\\images\\3d4d556d-ebd5-41f8-a2eb-5b90d117c7b8.jpg"
+    },
+    {
       "Id": "D:\\Msf\\ProjectMsfBE\\projectDemo\\wwwroot\\images\\4f2e5b46-a8e0-428b-9ed4-dcd62d87ef32.jpg",
       "PackagePath": "staticwebassets\\images\\4f2e5b46-a8e0-428b-9ed4-dcd62d87ef32.jpg"
     },
     {
       "Id": "D:\\Msf\\ProjectMsfBE\\projectDemo\\wwwroot\\images\\5438a07b-ca8e-4111-954f-11e00a2f6863.jpg",
       "PackagePath": "staticwebassets\\images\\5438a07b-ca8e-4111-954f-11e00a2f6863.jpg"
+    },
+    {
+      "Id": "D:\\Msf\\ProjectMsfBE\\projectDemo\\wwwroot\\images\\70265bec-56de-4025-bc88-2c48a2d305e0.jpg",
+      "PackagePath": "staticwebassets\\images\\70265bec-56de-4025-bc88-2c48a2d305e0.jpg"
     },
     {
       "Id": "D:\\Msf\\ProjectMsfBE\\projectDemo\\wwwroot\\images\\857e9a51-66e2-415e-9d65-e742386a8831.jpg",
@@ -51,6 +59,10 @@
     {
       "Id": "D:\\Msf\\ProjectMsfBE\\projectDemo\\wwwroot\\images\\fb9c44af-0921-4523-b65b-a55e1f1faac2.png",
       "PackagePath": "staticwebassets\\images\\fb9c44af-0921-4523-b65b-a55e1f1faac2.png"
+    },
+    {
+      "Id": "D:\\Msf\\ProjectMsfBE\\projectDemo\\wwwroot\\images\\fba7f11d-3d43-47ab-9145-80b921fec3ff.jpg",
+      "PackagePath": "staticwebassets\\images\\fba7f11d-3d43-47ab-9145-80b921fec3ff.jpg"
     },
     {
       "Id": "obj\\Debug\\net7.0\\staticwebassets\\msbuild.build.projectDemo.props",

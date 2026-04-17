@@ -47,6 +47,28 @@ namespace projectDemo.Controllers
             return Ok(result);
         }
 
+        [HttpPost("verify-email")]
+        [AllowAnonymous]
+        public async Task<IActionResult> VerifyEmail([FromBody] VerifyEmailRequest request)
+        {
+            var result = await _authService.VerifyEmailAsync(request);
+            if (result.StatusCode == Entity.Enum.EnumStatusCode.SUCCESS)
+                return Ok(result);
+
+            return BadRequest(result);
+        }
+
+        [HttpPost("resend-verification")]
+        [AllowAnonymous]
+        public async Task<IActionResult> ResendVerificationEmail([FromBody] ResendVerificationRequest request)
+        {
+            var result = await _authService.ResendVerificationEmailAsync(request);
+            if (result.StatusCode == Entity.Enum.EnumStatusCode.SUCCESS)
+                return Ok(result);
+
+            return BadRequest(result);
+        }
+
         [HttpGet("google-login-url")]
         public IActionResult GetGoogleLoginUrl()
         {

@@ -12,6 +12,7 @@ using projectDemo.DTO.Request;
 using projectDemo.DTO.Respone;
 using projectDemo.DTO.Response;
 using projectDemo.Entity.Enum;
+using projectDemo.Entity.Models;
 using projectDemo.Repository.Ipml;
 using projectDemo.Service.EmailService;
 using projectDemo.UnitOfWorks;
@@ -30,6 +31,7 @@ namespace projectDemo.Service.Auth
         private readonly IUserRoleRepository _userRoleRepo;
         private readonly IMemoryCache _cache;
         private readonly IEmailService _emailService;
+        private readonly IUnitOfWork _uow;
 
         public AutheService(
             IConfiguration configuration,
@@ -45,8 +47,8 @@ namespace projectDemo.Service.Auth
         )
         {
             _configuration = configuration;
+            _uow = uow;
             _context = context;
-
             _authRepository = authRepository;
             _roleRepo = roleRepo;
             _loginRepo = loginRepo;
@@ -64,10 +66,16 @@ namespace projectDemo.Service.Auth
                     EnumStatusCode.EMAILNOTFOUD,
                     "Email hoặc mật khẩu không đúng"
                 );
-            if (user.IsLock || !user.IsActive || user.IsDeleted == true)
+            if (!user.IsActive)
                 return ApiResponse<LoginResponse>.FailResponse(
                     EnumStatusCode.ISLOOK,
-                    "Tài khoản đã bị khóa "
+                    "Tài khoản chưa được kích hoạt. Vui lòng kiểm tra email của bạn."
+                );
+
+            if (user.IsLock || user.IsDeleted == true)
+                return ApiResponse<LoginResponse>.FailResponse(
+                    EnumStatusCode.ISLOOK,
+                    "Tài khoản đã bị khóa hoặc bị xóa."
                 );
 
             bool isPasswordValid = BCrypt.Net.BCrypt.Verify(resquest.password, user.PasswordHash);
@@ -194,7 +202,7 @@ namespace projectDemo.Service.Auth
                 );
             }
 
-            using var tran = _context.Database.BeginTransaction();
+            using var tran = _uow.BeginTransactionAsync();
             try
             {
                 var existedUser = await _authRepository.GetByEmailAsync(resquest.Email);
@@ -214,7 +222,7 @@ namespace projectDemo.Service.Auth
                     FirstName = resquest.FirstName,
                     LastName = resquest.LastName,
                     Email = resquest.Email,
-                    IsActive = true,
+                    IsActive = false,
                     IsLock = false,
                     CreatedDate = DateTime.UtcNow,
                     CreatedBy = "System",
@@ -237,8 +245,34 @@ namespace projectDemo.Service.Auth
                 await _loginRepo.InsertAsync(ul);
 
                 await _context.SaveChangesAsync();
-                await tran.CommitAsync();
 
+                var verificationToken = new EmailVerificationToken
+                {
+                    Id = Guid.NewGuid(),
+                    UserId = user.Id,
+                    Token = Guid.NewGuid().ToString("N"),
+                    ExpiryDate = DateTime.UtcNow.AddMinutes(15),
+                    IsUsed = false,
+                };
+                await _context.Set<EmailVerificationToken>().AddAsync(verificationToken);
+                await _context.SaveChangesAsync();
+
+                await _uow.CommitAsync();
+
+                // Send Email Verification
+                var verifyLink =
+                    $"http://localhost:4200/auth/verify-email?token={verificationToken.Token}";
+                var subject = "Xác thực tài khoản TickEvent của bạn";
+                var body =
+                    $@"
+                    <h3>Chào mừng đến với TickEvent!</h3>
+                    <p>Xin chào {user.FirstName} {user.LastName},</p>
+                    <p>Cảm ơn bạn đã đăng ký tài khoản. Vui lòng click vào link bên dưới để xác thực email của bạn:</p>
+                    <p><a href='{verifyLink}' style='display:inline-block; padding:10px 20px; background:#4CAF50; color:white; text-decoration:none; border-radius:5px;'>Xác thực tài khoản</a></p>
+                    <p>Link này có hiệu lực trong vòng 15 phút. Vui lòng không chia sẻ link này với ai.</p>
+                ";
+
+                await _emailService.SendEmailAsync(user.Email, subject, body);
                 List<string> roleString = new List<string>();
 
                 var response = new UserResponse
@@ -256,9 +290,127 @@ namespace projectDemo.Service.Auth
             catch (Exception ex)
             {
                 Console.WriteLine($"System Error: {ex.Message}");
-                await tran.RollbackAsync();
+                await _uow.RollbackAsync();
                 return ApiResponse<UserResponse>.FailResponse(EnumStatusCode.SERVER, "Thất Bại");
             }
+        }
+
+        public async Task<ApiResponse<string>> VerifyEmailAsync(VerifyEmailRequest request)
+        {
+            var tokenEntity = _context
+                .Set<EmailVerificationToken>()
+                .FirstOrDefault(t => t.Token == request.Token);
+
+            if (tokenEntity == null)
+            {
+                return ApiResponse<string>.FailResponse(
+                    EnumStatusCode.BAD_REQUEST,
+                    "Token không hợp lệ."
+                );
+            }
+
+            if (tokenEntity.IsUsed)
+            {
+                return ApiResponse<string>.FailResponse(
+                    EnumStatusCode.BAD_REQUEST,
+                    "Token đã được sử dụng."
+                );
+            }
+
+            if (tokenEntity.ExpiryDate < DateTime.UtcNow)
+            {
+                return ApiResponse<string>.FailResponse(
+                    EnumStatusCode.BAD_REQUEST,
+                    "Token đã hết hạn."
+                );
+            }
+
+            var user = await _context.User.FindAsync(tokenEntity.UserId);
+            if (user == null)
+            {
+                return ApiResponse<string>.FailResponse(
+                    EnumStatusCode.BAD_REQUEST,
+                    "Người dùng không tồn tại."
+                );
+            }
+
+            user.IsActive = true;
+            tokenEntity.IsUsed = true;
+
+            await _context.SaveChangesAsync();
+
+            return ApiResponse<string>.SuccessResponse(
+                EnumStatusCode.SUCCESS,
+                "Xác thực email thành công."
+            );
+        }
+
+        public async Task<ApiResponse<string>> ResendVerificationEmailAsync(
+            ResendVerificationRequest request
+        )
+        {
+            var user = await _authRepository.GetByEmailAsync(request.Email);
+            if (user == null)
+            {
+                return ApiResponse<string>.FailResponse(
+                    EnumStatusCode.BAD_REQUEST,
+                    "Người dùng không tồn tại."
+                );
+            }
+
+            if (user.IsActive)
+            {
+                return ApiResponse<string>.FailResponse(
+                    EnumStatusCode.BAD_REQUEST,
+                    "Tài khoản đã được kích hoạt."
+                );
+            }
+
+            // Xóa các token chưa dùng cũ
+            var oldTokens = _context
+                .Set<EmailVerificationToken>()
+                .Where(t => t.UserId == user.Id && !t.IsUsed);
+            _context.Set<EmailVerificationToken>().RemoveRange(oldTokens);
+
+            var verificationToken = new EmailVerificationToken
+            {
+                Id = Guid.NewGuid(),
+                UserId = user.Id,
+                Token = Guid.NewGuid().ToString("N"),
+                ExpiryDate = DateTime.UtcNow.AddMinutes(15),
+                IsUsed = false,
+            };
+            await _context.Set<EmailVerificationToken>().AddAsync(verificationToken);
+            await _context.SaveChangesAsync();
+
+            var verifyLink =
+                $"http://localhost:4200/auth/verify-email?token={verificationToken.Token}";
+            var subject = "Xác thực tài khoản TickEvent của bạn (Gửi lại)";
+            var body =
+                $@"
+                <h3>Chào mừng đến với TickEvent!</h3>
+                <p>Xin chào {user.FirstName} {user.LastName},</p>
+                <p>Bạn đã yêu cầu gửi lại link xác thực. Vui lòng click vào link bên dưới để xác thực email của bạn:</p>
+                <p><a href='{verifyLink}' style='display:inline-block; padding:10px 20px; background:#4CAF50; color:white; text-decoration:none; border-radius:5px;'>Xác thực tài khoản</a></p>
+                <p>Link này có hiệu lực trong vòng 15 phút. Vui lòng không chia sẻ link này với ai.</p>
+            ";
+
+            _ = Task.Run(async () =>
+            {
+                try
+                {
+                    await _emailService.SendEmailAsync(user.Email, subject, body);
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Error resending verification email: {ex.Message}");
+                }
+            });
+
+            return ApiResponse<string>.SuccessResponse(
+                EnumStatusCode.SUCCESS,
+                "Đã gửi lại email xác thực."
+            );
         }
 
         public async Task<ApiResponse<string>> ForgotPasswordAsync(string email)
@@ -269,7 +421,7 @@ namespace projectDemo.Service.Auth
                 // We always return success to avoid email enumeration
                 return ApiResponse<string>.SuccessResponse(
                     EnumStatusCode.SUCCESS,
-                    "Nếu email tồn tại, một đường dẫn đặt lại mật khẩu đã được gửi."
+                    "Email không tồn tại hoặc đã quá hạn sử dụng liên hệ admin để được hỗ trợ"
                 );
             }
 
@@ -318,8 +470,6 @@ namespace projectDemo.Service.Auth
 
             user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(request.NewPassword);
 
-            // To update using Entity Framework via Repos or DbContext, since _authRepository doesn't have an explicit specialized UpdateAsync we'll do:
-            // Since it's a tracked entity probably (or we can just save context)
             await _context.SaveChangesAsync();
 
             _cache.Remove($"forgot_pwd_{request.Email}");

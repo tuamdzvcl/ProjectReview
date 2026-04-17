@@ -13,6 +13,7 @@ export interface RevenueChart {
   Time: string;
   Label: string;
   Revenue: number;
+  Tickets: number;
 }
 
 export interface RevenueMeta {

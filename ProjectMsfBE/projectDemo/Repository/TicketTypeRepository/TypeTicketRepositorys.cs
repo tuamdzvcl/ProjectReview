@@ -1,4 +1,4 @@
-﻿using System.Data;
+using System.Data;
 using Dapper;
 using EventTick.Model.Models;
 using Microsoft.EntityFrameworkCore;
@@ -50,6 +50,7 @@ namespace projectDemo.Repository.TickTypeRepository
             string messager
         )> GetListTypeTickByEventID(Guid eventID)
         {
+
             try
             {
                 var param = new DynamicParameters();
@@ -90,7 +91,9 @@ namespace projectDemo.Repository.TickTypeRepository
 
         public TicketType? GetTicketTypebyId(int tickettype)
         {
-            return Find(x => x.Id == tickettype).FirstOrDefault();
+            return Find(x => x.Id == tickettype)
+                .Include(x=>x.Event)
+                .FirstOrDefault();
         }
 
         public async Task<TicketType?> GetTypeTickectByEventID(Guid EventID)

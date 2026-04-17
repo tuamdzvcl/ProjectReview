@@ -1,7 +1,9 @@
 import { AuthData } from '../../../../core/model/response/auth-data.model';
+import Swal from 'sweetalert2';
 import { ApiResponse } from '../../../../core/model/base/api-response.model';
 import { AuthService } from '../../auth.service';
 import { CommonModule } from '@angular/common';
+import { ApiError } from '../../../../core/model/base/ApiError.model';
 import { ChangeDetectionStrategy, Component, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { AuthLayoutComponent } from '../../ui/auth-layout/auth-layout.component';
@@ -57,25 +59,59 @@ export class SignupComponent {
 
     this.authservice.register(payload).subscribe({
       next: (res) => {
+        console.log('Đăng ký thành công, dữ liệu nhận được:', res);
         this.isSubmitting.set(false);
-        alert('đăng kí thành công chuyển sang Login');
-        this.router.navigate(['auth/login']);
+        this.router.navigate(['auth/register-success'], { queryParams: { email: payload.Email } });
       },
       error: (err) => {
+        console.error('Call API Error:', err);
         this.isSubmitting.set(false);
-        if (err.status === 400) {
+        
+        if (err instanceof ApiError || err.name === 'ApiError') {
+           Swal.fire({
+             icon: 'error',
+             title: 'Đăng ký thất bại',
+             text: err.message || 'Lỗi từ Backend.',
+             confirmButtonColor: '#1976d2'
+           });
+        } 
+        else if (err.status === 400 && err.error?.errors) {
           const errors = err.error.errors;
+          let errorMessage = '<ul style="text-align: left; list-style-type: disc; margin-left: 20px;">';
 
           if (errors?.FirstName) {
-            alert(errors.FirstName[0]);
+            errorMessage += `<li>${errors.FirstName[0]}</li>`;
           }
           if (errors?.LastName) {
-            alert(errors.LastName[0]);
+            errorMessage += `<li>${errors.LastName[0]}</li>`;
           }
-
           if (errors?.Email) {
-            alert(errors.Email[0]);
+            errorMessage += `<li>${errors.Email[0]}</li>`;
           }
+          
+          errorMessage += '</ul>';
+
+          Swal.fire({
+             icon: 'warning',
+             title: 'Lỗi thông tin',
+             html: errorMessage,
+             confirmButtonColor: '#1976d2'
+          });
+        } else if (err.status === 500) {
+          Swal.fire({
+             icon: 'error',
+             title: 'Lỗi hệ thống',
+             text: 'Lỗi hệ thống Server. Vui lòng thử lại sau.',
+             confirmButtonColor: '#1976d2'
+          });
+        } else {
+          // HTTP error generic fallback
+          Swal.fire({
+             icon: 'error',
+             title: 'Lỗi mạng',
+             text: err.error?.message || err.message || 'Đã có lỗi xảy ra. Hãy kiểm tra lại kết nối mạng.',
+             confirmButtonColor: '#1976d2'
+          });
         }
       },
     });

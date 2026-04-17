@@ -57,6 +57,14 @@ export class AuthService extends BaseApiService {
   resetPassword(data: any) {
     return this.post<any>('auth/reset-password', data);
   }
+
+  verifyEmail(token: string) {
+    return this.post<any>('auth/verify-email', { token });
+  }
+
+  resendVerification(email: string) {
+    return this.post<any>('auth/resend-verification', { email });
+  }
 }
 
 

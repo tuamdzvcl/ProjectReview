@@ -32,6 +32,8 @@ import { MembershipComponent } from './features/membership/pages/admin-membershi
 import { PaymentResultComponent } from './features/payment/pages/payment-result/payment-result.component';
 import { ForgotPasswordComponent } from './features/auth/pages/forgot-password/forgot-password.component';
 import { ResetPasswordComponent } from './features/auth/pages/reset-password/reset-password.component';
+import { VerifyEmailComponent } from './features/auth/pages/verify-email/verify-email.component';
+import { RegisterSuccessComponent } from './features/auth/pages/register-success/register-success.component';
 
 export const routes: Routes = [
   { path: 'header', component: HeaderComponent },
@@ -136,7 +138,10 @@ export const routes: Routes = [
       { path: 'login', component: LoginComponent },
       { path: 'signup', component: SignupComponent },
       { path: 'forgot-password', component: ForgotPasswordComponent },
-      { path: 'reset-password', component: ResetPasswordComponent }
+      { path: 'reset-password', component: ResetPasswordComponent },
+      { path: 'verify-email', component: VerifyEmailComponent },
+      { path: 'register-success', component: RegisterSuccessComponent },
+
     ],
   },
   {

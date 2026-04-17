@@ -1,4 +1,4 @@
-﻿using System.Data;
+using System.Data;
 using Dapper;
 using EventTick.Model.Enum;
 using EventTick.Model.Models;
@@ -51,7 +51,26 @@ namespace projectDemo.Repository.OrderRepository
             return await _dbSet
                 .Include(x => x.OrderDetails)
                     .ThenInclude(x => x.TicketTypes)
+                    .Include(o => o.OrderDetails)
+    .ThenInclude(od => od.Ticket)
                 .Include(x => x.Payment)
+                .Include(x => x.User)
+                .FirstOrDefaultAsync(x => x.Id == orderID && x.IsDeleted == false);
+        }
+
+        /// <summary>
+        /// Read-only query cho email: load đầy đủ Event + Ticket info, không tracking.
+        /// </summary>
+        public async Task<Order?> GetOrderForEmailAsync(Guid orderID)
+        {
+            return await _dbSet
+                .AsNoTracking()
+                .Include(x => x.User)
+                .Include(x => x.OrderDetails)
+                    .ThenInclude(x => x.TicketTypes)
+                        .ThenInclude(x => x.Event)
+                .Include(x => x.OrderDetails)
+                    .ThenInclude(x => x.Ticket)
                 .FirstOrDefaultAsync(x => x.Id == orderID && x.IsDeleted == false);
         }
 

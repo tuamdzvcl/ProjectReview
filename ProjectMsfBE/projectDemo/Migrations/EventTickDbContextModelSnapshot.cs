@@ -113,6 +113,10 @@ namespace projectDemo.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
+                    b.Property<string>("OrderType")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<int>("Status")
                         .HasColumnType("int");
 
@@ -129,9 +133,15 @@ namespace projectDemo.Migrations
                     b.Property<Guid>("UserID")
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<Guid?>("UserUpgradeId")
+                        .IsRequired()
+                        .HasColumnType("uniqueidentifier");
+
                     b.HasKey("Id");
 
                     b.HasIndex("UserID");
+
+                    b.HasIndex("UserUpgradeId");
 
                     b.ToTable("Orders");
                 });
@@ -259,21 +269,21 @@ namespace projectDemo.Migrations
                         new
                         {
                             Id = 1,
-                            CreatedDate = new DateTime(2026, 4, 13, 9, 34, 25, 388, DateTimeKind.Utc).AddTicks(4662),
+                            CreatedDate = new DateTime(2026, 4, 17, 15, 48, 54, 33, DateTimeKind.Utc).AddTicks(3986),
                             IsDeleted = false,
                             RoleName = "ADMIN"
                         },
                         new
                         {
                             Id = 2,
-                            CreatedDate = new DateTime(2026, 4, 13, 9, 34, 25, 388, DateTimeKind.Utc).AddTicks(4680),
+                            CreatedDate = new DateTime(2026, 4, 17, 15, 48, 54, 33, DateTimeKind.Utc).AddTicks(3997),
                             IsDeleted = false,
                             RoleName = "ORGANIZER"
                         },
                         new
                         {
                             Id = 3,
-                            CreatedDate = new DateTime(2026, 4, 13, 9, 34, 25, 388, DateTimeKind.Utc).AddTicks(4682),
+                            CreatedDate = new DateTime(2026, 4, 17, 15, 48, 54, 33, DateTimeKind.Utc).AddTicks(4000),
                             IsDeleted = false,
                             RoleName = "CUSTOMER"
                         });
@@ -461,7 +471,7 @@ namespace projectDemo.Migrations
                             IsDeleted = false,
                             IsLock = false,
                             LastName = "admin",
-                            PasswordHash = "$2a$11$dMxvZWkdhwp.KNAqIDJTqOXAfML81gmLvXcS0XxIOAesF97z/Gl/q",
+                            PasswordHash = "$2a$11$pN/qEa1hzMz0onuG7I.PIe/k/Ach8UwbnZDcAABo/4BdEOEKjKYSG",
                             Username = "admin"
                         });
                 });
@@ -652,18 +662,45 @@ namespace projectDemo.Migrations
                         new
                         {
                             Id = new Guid("11111111-1111-1111-1111-111111111111"),
-                            Name = "MUSIC"
+                            Name = "Âm Nhạc"
                         },
                         new
                         {
                             Id = new Guid("22222222-2222-2222-2222-222222222222"),
-                            Name = "SPORT"
+                            Name = "Thể Thao"
                         },
                         new
                         {
                             Id = new Guid("33333333-3333-3333-3333-333333333333"),
-                            Name = "TECHNOLOGY"
+                            Name = "Trí Tuệ"
                         });
+                });
+
+            modelBuilder.Entity("projectDemo.Entity.Models.EmailVerificationToken", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("ExpiryDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsUsed")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Token")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("EmailVerificationToken");
                 });
 
             modelBuilder.Entity("projectDemo.Entity.Models.Permissions", b =>
@@ -841,6 +878,34 @@ namespace projectDemo.Migrations
                         });
                 });
 
+            modelBuilder.Entity("projectDemo.Entity.Models.RefreshToken", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("ExpiryDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsRevoked")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Token")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("RefreshTokens");
+                });
+
             modelBuilder.Entity("projectDemo.Entity.Models.RolePermissions", b =>
                 {
                     b.Property<int>("RoleId")
@@ -989,6 +1054,116 @@ namespace projectDemo.Migrations
                         });
                 });
 
+            modelBuilder.Entity("projectDemo.Entity.Models.Upgrade", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("CreatedBy")
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<DateTime?>("CreatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("DailyLimit")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsDailyPackage")
+                        .HasColumnType("bit");
+
+                    b.Property<bool?>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<decimal>("Price")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<string>("TitleUpgrade")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("UpdatedBy")
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<DateTime?>("UpdatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("status")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Upgrade");
+                });
+
+            modelBuilder.Entity("projectDemo.Entity.Models.UserUpgrade", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("CreatedBy")
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<DateTime?>("CreatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("CurrentDayUsageCount")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("EndDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool?>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime?>("LastUsageDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<decimal>("PricePaid")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<DateTime>("StartDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<string>("UpdatedBy")
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<DateTime?>("UpdatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("UpgradeId")
+                        .HasColumnType("int");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UpgradeId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("UserUpgrade");
+                });
+
             modelBuilder.Entity("EventTick.Model.Models.Event", b =>
                 {
                     b.HasOne("projectDemo.Entity.Models.Catetory", "Catetory")
@@ -1016,7 +1191,15 @@ namespace projectDemo.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("projectDemo.Entity.Models.UserUpgrade", "UserUpgrade")
+                        .WithMany()
+                        .HasForeignKey("UserUpgradeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.Navigation("User");
+
+                    b.Navigation("UserUpgrade");
                 });
 
             modelBuilder.Entity("EventTick.Model.Models.OrderDetail", b =>
@@ -1112,6 +1295,28 @@ namespace projectDemo.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("projectDemo.Entity.Models.EmailVerificationToken", b =>
+                {
+                    b.HasOne("EventTick.Model.Models.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("projectDemo.Entity.Models.RefreshToken", b =>
+                {
+                    b.HasOne("EventTick.Model.Models.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("projectDemo.Entity.Models.RolePermissions", b =>
                 {
                     b.HasOne("projectDemo.Entity.Models.Permissions", "Permissions")
@@ -1129,6 +1334,25 @@ namespace projectDemo.Migrations
                     b.Navigation("Permissions");
 
                     b.Navigation("Role");
+                });
+
+            modelBuilder.Entity("projectDemo.Entity.Models.UserUpgrade", b =>
+                {
+                    b.HasOne("projectDemo.Entity.Models.Upgrade", "Upgrade")
+                        .WithMany("UserUpgrades")
+                        .HasForeignKey("UpgradeId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("EventTick.Model.Models.User", "User")
+                        .WithMany("UserUpgrades")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Upgrade");
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("EventTick.Model.Models.Event", b =>
@@ -1172,6 +1396,8 @@ namespace projectDemo.Migrations
                     b.Navigation("UserLogins");
 
                     b.Navigation("UserRoles");
+
+                    b.Navigation("UserUpgrades");
                 });
 
             modelBuilder.Entity("projectDemo.Entity.Models.Catetory", b =>
@@ -1182,6 +1408,11 @@ namespace projectDemo.Migrations
             modelBuilder.Entity("projectDemo.Entity.Models.Permissions", b =>
                 {
                     b.Navigation("RolePermissions");
+                });
+
+            modelBuilder.Entity("projectDemo.Entity.Models.Upgrade", b =>
+                {
+                    b.Navigation("UserUpgrades");
                 });
 #pragma warning restore 612, 618
         }

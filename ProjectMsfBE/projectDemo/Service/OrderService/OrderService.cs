@@ -5,17 +5,20 @@ using Azure;
 using EventTick.Model.Enum;
 using EventTick.Model.Models;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using projectDemo.Data;
 using projectDemo.DTO.Request;
 using projectDemo.DTO.Respone;
 using projectDemo.DTO.Response;
 using projectDemo.DTO.Response.Momo;
+using projectDemo.DTO.Response.Tick;
 using projectDemo.DTO.UpdateRequest;
 using projectDemo.Entity.Enum;
 using projectDemo.Repository.Ipml;
 using projectDemo.Repository.OrderQuery;
 using projectDemo.Repository.OrderRepository;
 using projectDemo.Repository.PaymentRepository;
+using projectDemo.Repository.TickRepository;
 using projectDemo.Repository.TickTypeRepository;
 using projectDemo.Service.MomoService;
 using projectDemo.UnitOfWorks;
@@ -25,6 +28,7 @@ namespace projectDemo.Service.OrderService
     public class OrderService : IOrderService
     {
         private readonly ITypeTicketRepositorys _ticketRepositorys;
+        private readonly ITickRepository _ticketsRepositorys;
         private readonly IUserReposiotry _userReposiotry;
         private readonly IEventRepository _eventRepository;
         private readonly IMapper _mapper;
@@ -34,14 +38,17 @@ namespace projectDemo.Service.OrderService
         private readonly IUnitOfWork _uow;
         private readonly IPaymentRepository _paymentRepository;
         private readonly IMomoService _momoservice;
+        private readonly IOptions<TickOption> _options;
 
         public OrderService(
             IMomoService momoService,
+            IOptions<TickOption> options,
             IPaymentRepository paymentRepository,
             IUserReposiotry userReposiotry,
             IUnitOfWork uow,
             IOrderDetailRepository orderDetailRepository,
             ITypeTicketRepositorys ticketRepositorys,
+            ITickRepository ticketsRepositorys,
             IEventRepository eventRepository,
             IMapper mapper,
             IOrderRepository order,
@@ -49,8 +56,10 @@ namespace projectDemo.Service.OrderService
         )
         {
             _momoservice = momoService;
+            _options = options;
             _paymentRepository = paymentRepository;
             _ticketRepositorys = ticketRepositorys;
+            _ticketsRepositorys = ticketsRepositorys;
             _eventRepository = eventRepository;
             _mapper = mapper;
             _orderRepository = order;
@@ -64,6 +73,27 @@ namespace projectDemo.Service.OrderService
         public static string GenerateCode()
         {
             return Guid.NewGuid().ToString("N").Substring(0, 8).ToUpper();
+        }
+
+        private string GenerateQrCode(TickCreateQrCode request)
+        {
+            // Bước 1: Chuyển payload thành JSON
+            string jsonString = System.Text.Json.JsonSerializer.Serialize(request);
+
+            // Bước 2: Mã hóa sang Base64
+            byte[] plainTextBytes = System.Text.Encoding.UTF8.GetBytes(jsonString);
+            string base64Payload = Convert.ToBase64String(plainTextBytes);
+
+            // Bước 3: Tạo chữ ký HMAC để chống fake
+            // Cần lấy SecretKey từ cấu hình, dùng HmacSha256Helper
+            string secretKey = _options.Value?.SecretKey ?? "default_secret_key_if_not_configured";
+            string signature = projectDemo.Common.HmacSha256Helper.ComputeHmacSha256(
+                base64Payload,
+                secretKey
+            );
+
+            // Bước 4: Ghép lại dạng Payload.Signature (gần giống JWT)
+            return $"{base64Payload}.{signature}";
         }
 
         //chuyển từ enum sang string
@@ -145,6 +175,23 @@ namespace projectDemo.Service.OrderService
                     };
                     order.OrderDetails.Add(detail);
                     TotalAmount += typeTicket.Price * item.Quantity;
+                    var tickqr = new TickCreateQrCode
+                    {
+                        EventID = typeTicket.EventID,
+                        OrderId = order.Id,
+                        TickTypeId = typeTicket.Id,
+                        expiration = typeTicket.Event.EndDate,
+                    };
+                    var qrcode = GenerateQrCode(tickqr);
+
+                    var tick = new Ticket
+                    {
+                        QRCode = qrcode,
+                        Status = EnumStatusTick.VALID,
+                        CreatedDate = DateTime.Now,
+                        OrderDetailID = detail.Id,
+                    };
+                    await _ticketsRepositorys.CreateTicket(tick);
                 }
                 order.TotalAmount = TotalAmount;
                 await _orderRepository.CreateOrder(order);
@@ -161,6 +208,7 @@ namespace projectDemo.Service.OrderService
                     TransactionCode = EnumStatusPayment.PENDING.ToString(),
                     RequestId = EnumStatusPayment.PENDING.ToString(),
                 };
+
                 await _paymentRepository.Create(payment);
                 await _uow.SaveChangesAsync();
                 await _uow.CommitAsync();

@@ -114,16 +114,6 @@ export class CheckoutPageComponent implements OnInit {
   }
 
   onConfirmBooking(): void {
-    if (!this.phoneNumber || !this.address) {
-      Swal.fire({
-        icon: 'error',
-        title: 'Thiếu thông tin',
-        text: 'Vui lòng nhập số điện thoại và địa chỉ nhận vé.',
-      });
-      return;
-    }
-
-    // Lấy danh sách các vé đã chọn (OrderItemRequest)
     const orderItems = Object.keys(this.bookingData?.selectedTickets || {})
       .filter((id) => this.bookingData!.selectedTickets[Number(id)] > 0)
       .map((id) => ({
@@ -131,12 +121,9 @@ export class CheckoutPageComponent implements OnInit {
         Quantity: this.bookingData!.selectedTickets[Number(id)],
       }));
 
-    // Tạo đối tượng CreateOrderRequest khớp với Backend
     const orderData: CreateOrderRequest = {
       User: {
         fullName: this.customerName,
-        Address: this.address,
-        Phone: this.phoneNumber,
         Email: this.customerEmail,
       },
       Items: orderItems,
@@ -168,7 +155,6 @@ export class CheckoutPageComponent implements OnInit {
             window.location.href = response.PayUrl;
           },
           error: (err) => {
-
             Swal.fire({
               icon: 'error',
               title: 'Đặt vé thất bại',

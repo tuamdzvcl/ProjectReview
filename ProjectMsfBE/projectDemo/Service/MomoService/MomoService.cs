@@ -3,12 +3,16 @@ using System.Text;
 using EventTick.Model.Enum;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
+using projectDemo.Common;
 using projectDemo.DTO.Request;
 using projectDemo.DTO.Respone;
 using projectDemo.DTO.Response.Momo;
 using projectDemo.Entity.Enum;
+using projectDemo.Entity.Models;
 using projectDemo.Repository.OrderRepository;
 using projectDemo.Repository.PaymentRepository;
+using projectDemo.Repository.UserUpgradeRepository;
+using projectDemo.Service.EmailService;
 using projectDemo.Service.PaymetService;
 using projectDemo.UnitOfWorks;
 
@@ -21,13 +25,17 @@ namespace projectDemo.Service.MomoService
         private readonly IOrderRepository _orderRepository;
         private readonly IUnitOfWork _uow;
         private readonly IPaymentRepository _paymentRepository;
+        private readonly IEmailService _emailService;
+        private readonly IUserUpgradeRepository _userUpgradeRepository;
 
         public MomoService(
             IPaymentRepository paymentRepository,
             IUnitOfWork uow,
             IOrderRepository orderRepository,
             IOptions<MomoOptionModel> options,
-            HttpClient httpClient
+            HttpClient httpClient,
+            IEmailService emailService,
+            IUserUpgradeRepository userUpgradeRepository
         )
         {
             _paymentRepository = paymentRepository;
@@ -35,6 +43,8 @@ namespace projectDemo.Service.MomoService
             _orderRepository = orderRepository;
             _options = options;
             _httpClient = httpClient;
+            _emailService = emailService;
+            _userUpgradeRepository = userUpgradeRepository;
         }
 
         public async Task<MomoCreatePaymentResponseModel> CreatePaymentAsync(MomoRequest req)
@@ -58,7 +68,7 @@ namespace projectDemo.Service.MomoService
                 + $"&requestId={requestId}"
                 + $"&requestType={requestType}";
 
-            var signature = ComputeHmacSha256(rawData, _options.Value.SecretKey);
+            var signature = HmacSha256Helper.ComputeHmacSha256(rawData, _options.Value.SecretKey);
 
             var requestData = new
             {
@@ -122,24 +132,16 @@ namespace projectDemo.Service.MomoService
                 + $"&resultCode={request.ResultCode}"
                 + $"&transId={request.TransId}";
 
-            var expectedSignature = ComputeHmacSha256(rawData, _options.Value.SecretKey);
+            var expectedSignature = HmacSha256Helper.ComputeHmacSha256(
+                rawData,
+                _options.Value.SecretKey
+            );
 
             return string.Equals(
                 expectedSignature,
                 request.Signature,
                 StringComparison.OrdinalIgnoreCase
             );
-        }
-
-        private string ComputeHmacSha256(string message, string secretKey)
-        {
-            var keyBytes = Encoding.UTF8.GetBytes(secretKey);
-            var messageBytes = Encoding.UTF8.GetBytes(message);
-
-            using var hmac = new HMACSHA256(keyBytes);
-            var hashBytes = hmac.ComputeHash(messageBytes);
-
-            return BitConverter.ToString(hashBytes).Replace("-", "").ToLower();
         }
 
         public async Task<string> MomoCallBack(MomoIpnRequest request)
@@ -156,22 +158,47 @@ namespace projectDemo.Service.MomoService
             if (payment == null)
                 return "Không tìm thấy Payment";
 
-            // tránh bị gọi lại nhiều lần
             if (payment.Status == EnumStatusPayment.SUCCESS)
                 return "Vé đã được thanh toán";
+
+            bool isSuccess = status == 0;
+
             try
             {
                 await _uow.BeginTransactionAsync();
 
-                if (status == 0)
+                if (isSuccess)
                 {
                     order.Status = EnumStatusOrder.PAID;
                     payment.Status = EnumStatusPayment.SUCCESS;
                     payment.UpdatedDate = DateTime.Now;
-                    foreach (var i in order.OrderDetails)
+
+                    if (order.OrderType == EnumOrderType.TICKET.ToString())
                     {
-                        i.TicketTypes.SoldQuantity += i.Quantity;
-                        i.TicketTypes.ReservedQuantity -= i.Quantity;
+                        foreach (var i in order.OrderDetails)
+                        {
+                            i.TicketTypes.SoldQuantity += i.Quantity;
+                            i.TicketTypes.ReservedQuantity -= i.Quantity;
+                        }
+                    }
+                    else if (
+                        order.OrderType == EnumOrderType.UPGRADE.ToString()
+                        && order.UserUpgradeId != null
+                    )
+                    {
+                        var userUpgrade = await _userUpgradeRepository.GetByIdWithUpgradeAsync(order.UserUpgradeId.Value);
+                        if (userUpgrade != null)
+                        {
+                            userUpgrade.Status = "ACTIVE";
+                            userUpgrade.UpdatedDate = DateTime.Now;
+                            userUpgrade.StartDate = DateTime.Now;
+                            // Quy định gói theo tháng
+                            userUpgrade.EndDate = userUpgrade.Upgrade.IsDailyPackage
+                                ? DateTime.Now.AddDays(1)
+                                : DateTime.Now.AddMonths(1);
+                            userUpgrade.CurrentDayUsageCount = 0;
+                            userUpgrade.LastUsageDate = DateTime.Now;
+                        }
                     }
                 }
                 else
@@ -179,9 +206,27 @@ namespace projectDemo.Service.MomoService
                     order.Status = EnumStatusOrder.CANCELLED;
                     payment.Status = EnumStatusPayment.FAILED;
                     payment.UpdatedDate = DateTime.Now;
-                    foreach (var i in order.OrderDetails)
+
+                    if (order.OrderType == EnumOrderType.TICKET.ToString())
                     {
-                        i.TicketTypes.ReservedQuantity -= i.Quantity;
+                        foreach (var i in order.OrderDetails)
+                        {
+                            i.TicketTypes.ReservedQuantity -= i.Quantity;
+                        }
+                    }
+                    else if (
+                        order.OrderType == EnumOrderType.UPGRADE.ToString()
+                        && order.UserUpgradeId != null
+                    )
+                    {
+                        var userUpgrade = await _userUpgradeRepository.GetByIdAsync(
+                            order.UserUpgradeId.Value
+                        );
+                        if (userUpgrade != null)
+                        {
+                            userUpgrade.Status = "FAILED";
+                            userUpgrade.UpdatedDate = DateTime.Now;
+                        }
                     }
                 }
 
@@ -194,18 +239,58 @@ namespace projectDemo.Service.MomoService
                 throw;
             }
 
+            if (order.OrderType == EnumOrderType.TICKET.ToString())
+            {
+                await SendBookingEmailAsync(orderId, isSuccess);
+            }
+
             return $"http://localhost:4200/payment?resultCode={status}&orderId={orderId}";
         }
 
-        // loại bỏ vé tạm trong db
-        private int TotalReservedQuantity(int ReservedQuantity, int quantity)
+        private async Task SendBookingEmailAsync(Guid orderId, bool isSuccess)
         {
-            return ReservedQuantity - quantity;
-        }
+            var order = await _orderRepository.GetOrderForEmailAsync(orderId);
+            if (order == null)
+                return;
 
-        private int TotalSoldQuantity(int SoldQuantity, int quantity)
-        {
-            return SoldQuantity + quantity;
+            var user = order.User;
+            var eventInfo = order.OrderDetails?.FirstOrDefault()?.TicketTypes?.Event;
+
+            var emailData = new BookingEmailData
+            {
+                FullName = user != null ? $"{user.FirstName} {user.LastName}" : "Khách hàng",
+                Email = user?.Email ?? "",
+                OrderCode = order.OrderCode,
+                TotalAmount = order.TotalAmount,
+                EventName = eventInfo?.Title ?? "Không rõ",
+                EventLocation = eventInfo?.Location ?? "",
+                EventStartDate = eventInfo?.StartDate ?? DateTime.MinValue,
+                EventEndDate = eventInfo?.EndDate ?? DateTime.MinValue,
+                EventPosterUrl = eventInfo?.PosterUrl ?? "",
+                Tickets =
+                    order
+                        .OrderDetails?.SelectMany(od =>
+                            od.Ticket?.Select(t => new TicketEmailItem
+                            {
+                                TicketCode = t.TicketCode,
+                                TicketTypeName = od.TicketTypes?.Name ?? "",
+                                Price = od.Price,
+                                QRCodeUrl = "test đã ",
+                            }) ?? Enumerable.Empty<TicketEmailItem>()
+                        )
+                        .ToList()
+                    ?? new List<TicketEmailItem>(),
+            };
+
+            var subject = isSuccess
+                ? $"🎉 Đặt vé thành công - {emailData.EventName}"
+                : $"❌ Đặt vé không thành công - {emailData.EventName}";
+
+            var htmlBody = isSuccess
+                ? EmailBodyBuilder.BuildBookingSuccessBody(emailData)
+                : EmailBodyBuilder.BuildBookingFailedBody(emailData);
+
+            await _emailService.SendEmailAsync(emailData.Email, subject, htmlBody);
         }
     }
 }

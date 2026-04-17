@@ -1,0 +1,25 @@
+<div class="success-container">
+  <div class="success-card">
+    <div class="icon">
+      <i class="material-icons">mark_email_unread</i>
+    </div>
+    <h2>Đăng ký thành công!</h2>
+    <p>Hệ thống đã gửi một email xác thực đến địa chỉ:</p>
+    <div class="email-badge">{{ userEmail || 'your-email@example.com' }}</div>
+    <p class="instruction">
+      Vui lòng kiểm tra hộp thư đến (và hộp thư rác) của bạn, sau đó click vào link để kích hoạt tài khoản trước khi đăng nhập.
+    </p>
+
+    <div class="actions">
+      <button 
+        type="button" 
+        class="resend-btn" 
+        [disabled]="countdown > 0 || isSending"
+        (click)="resendEmail()">
+        {{ countdown > 0 ? 'Gửi lại sau ' + formatTime(countdown) : 'Gửi lại email' }}
+      </button>
+
+      <button class="login-btn" (click)="goToLogin()">Đến trang Đăng nhập</button>
+    </div>
+  </div>
+</div>

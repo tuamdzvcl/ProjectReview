@@ -4,6 +4,7 @@ using AutoMapper;
 using EventTick.Model.Enum;
 using EventTick.Model.Models;
 using projectDemo.DTO.Request;
+using projectDemo.DTO.Request.Upgrade;
 using projectDemo.DTO.Respone;
 using projectDemo.DTO.Response;
 using projectDemo.DTO.UpdateRequest;
@@ -13,6 +14,7 @@ using projectDemo.Repository.OrderRepository;
 using projectDemo.Repository.PemisstionRepository;
 using projectDemo.Repository.RolePermissionRepository;
 using projectDemo.Repository.TickTypeRepository;
+using projectDemo.Repository.UpgradeRepository;
 using projectDemo.UnitOfWorks;
 
 namespace projectDemo.Service.UserService
@@ -24,11 +26,13 @@ namespace projectDemo.Service.UserService
         private readonly IUserRoleRepository _roleUserRepo;
         private readonly IRoleRepository _roleRepository;
         private readonly IEventRepository _eventRepository;
+        private readonly IUpgradeRepository _upgradeRepository;
         private readonly IOrderRepository _orderRepository;
         private readonly IPemisstionRepository _petRepository;
         private readonly IUserLoginRepository _userLoginRepository;
         private readonly IRolePermissionRepository _rolePermission;
         private readonly IUnitOfWork _uow;
+
 
         public UserService(
             IOrderRepository order,
@@ -36,6 +40,7 @@ namespace projectDemo.Service.UserService
             IUserRoleRepository userRole,
             IUnitOfWork uow,
             IUserReposiotry userReposiotry,
+            IUpgradeRepository upgradeRepository,
             IMapper mapper,
             IRoleRepository roleRepository,
             IPemisstionRepository petRepository,
@@ -44,6 +49,7 @@ namespace projectDemo.Service.UserService
         )
         {
             _userReposiotry = userReposiotry;
+            _upgradeRepository = upgradeRepository;
             _mapper = mapper;
             _roleRepository = roleRepository;
             _petRepository = petRepository;

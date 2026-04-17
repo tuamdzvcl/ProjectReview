@@ -24,13 +24,11 @@ namespace projectDemo.Service.ReportService
         {
             string groupBy = (request.GroupBy ?? "monthly").Trim().ToLower();
 
-            // 1. Xác định khoảng thời gian báo cáo
             DateTime fromDate;
             DateTime toDate;
 
             if (groupBy == "yearly")
             {
-                // Mặc định lấy cả năm từ 1/1 đến 31/12
                 int year = request.FromDate?.Year ?? DateTime.Today.Year;
                 fromDate = new DateTime(year, 1, 1);
                 toDate = new DateTime(year, 12, 31);
@@ -65,10 +63,9 @@ namespace projectDemo.Service.ReportService
                 }
             }
 
-            // 2. Lấy dữ liệu và tính toán Summary (Kỳ hiện tại và Kỳ trước để tính tăng trưởng)
             var totalDays = (toDate - fromDate).Days + 1;
             var previousFromDate = fromDate.AddDays(-totalDays);
-            var previousToDate = fromDate; // Exclusive boundary
+            var previousToDate = fromDate;
 
             var currentRows = await _reportQuery.GetRevenueRowsAsync(
                 userId,
@@ -83,7 +80,6 @@ namespace projectDemo.Service.ReportService
 
             var summary = CalculateSummary(currentRows, previousRows);
 
-            // 3. Xây dựng dữ liệu biểu đồ (Chart) có bù đắp ngày/tháng trống
             var chart = BuildChart(currentRows, groupBy, fromDate, toDate);
 
             var response = new ReportResponse
@@ -139,53 +135,83 @@ namespace projectDemo.Service.ReportService
 
             if (groupBy == "yearly")
             {
-                var dataDict = rows.GroupBy(x => x.PaidDate.Month)
-                    .ToDictionary(g => g.Key, g => g.Sum(x => x.Revenue));
+                var grouped = rows.GroupBy(x => x.PaidDate.Month)
+                    .ToDictionary(
+                        g => g.Key,
+                        g => new
+                        {
+                            Revenue = g.Sum(x => x.Revenue),
+                            Tickets = g.Sum(x => x.TicketQuantity),
+                        }
+                    );
                 for (int m = 1; m <= 12; m++)
                 {
+                    var data = grouped.GetValueOrDefault(m, new { Revenue = 0m, Tickets = 0 });
                     result.Add(
                         new RevenueChartDto
                         {
                             Time = new DateTime(from.Year, m, 1),
                             Label = $"Tháng {m}",
-                            Revenue = dataDict.GetValueOrDefault(m, 0),
+                            Revenue = data.Revenue,
+                            Tickets = data.Tickets,
                         }
                     );
                 }
             }
             else if (groupBy == "monthly")
             {
-                var dataDict = rows.GroupBy(x => new DateTime(x.PaidDate.Year, x.PaidDate.Month, 1))
-                    .ToDictionary(g => g.Key, g => g.Sum(x => x.Revenue));
+                var grouped = rows.GroupBy(x => new DateTime(x.PaidDate.Year, x.PaidDate.Month, 1))
+                    .ToDictionary(
+                        g => g.Key,
+                        g => new
+                        {
+                            Revenue = g.Sum(x => x.Revenue),
+                            Tickets = g.Sum(x => x.TicketQuantity),
+                        }
+                    );
 
                 DateTime current = new DateTime(from.Year, from.Month, 1);
                 DateTime endMonth = new DateTime(to.Year, to.Month, 1);
 
                 while (current <= endMonth)
                 {
+                    var data = grouped.GetValueOrDefault(
+                        current,
+                        new { Revenue = 0m, Tickets = 0 }
+                    );
                     result.Add(
                         new RevenueChartDto
                         {
                             Time = current,
                             Label = current.ToString("MM/yyyy"),
-                            Revenue = dataDict.GetValueOrDefault(current, 0),
+                            Revenue = data.Revenue,
+                            Tickets = data.Tickets,
                         }
                     );
                     current = current.AddMonths(1);
                 }
             }
-            else // daily
+            else
             {
-                var dataDict = rows.GroupBy(x => x.PaidDate.Date)
-                    .ToDictionary(g => g.Key, g => g.Sum(x => x.Revenue));
+                var grouped = rows.GroupBy(x => x.PaidDate.Date)
+                    .ToDictionary(
+                        g => g.Key,
+                        g => new
+                        {
+                            Revenue = g.Sum(x => x.Revenue),
+                            Tickets = g.Sum(x => x.TicketQuantity),
+                        }
+                    );
                 for (DateTime d = from; d <= to; d = d.AddDays(1))
                 {
+                    var data = grouped.GetValueOrDefault(d, new { Revenue = 0m, Tickets = 0 });
                     result.Add(
                         new RevenueChartDto
                         {
                             Time = d,
                             Label = d.ToString("dd/MM"),
-                            Revenue = dataDict.GetValueOrDefault(d, 0),
+                            Revenue = data.Revenue,
+                            Tickets = data.Tickets,
                         }
                     );
                 }

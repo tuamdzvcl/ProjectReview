@@ -24,6 +24,7 @@ namespace projectDemo.DTO.Response
         public DateTime Time { get; set; }
         public string Label { get; set; } = string.Empty;
         public decimal Revenue { get; set; }
+        public int Tickets { get; set; }
     }
 
     public class RevenueMetaDto

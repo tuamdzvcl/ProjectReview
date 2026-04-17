@@ -75,7 +75,6 @@ namespace projectDemo.Repository
             try
             {
                 return await _dbSet
-                    .AsNoTracking()
                     .Where(u => u.Id == Userid && u.IsDeleted == false)
                     .SelectMany(u => u.UserRoles)
                     .Select(ur => ur.Role.RoleName.ToUpper())

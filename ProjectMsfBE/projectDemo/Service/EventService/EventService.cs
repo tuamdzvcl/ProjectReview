@@ -8,10 +8,13 @@ using projectDemo.DTO.Request;
 using projectDemo.DTO.Respone;
 using projectDemo.DTO.Response;
 using projectDemo.DTO.UpdateRequest;
+using projectDemo.Entity.Enum;
 using projectDemo.Entity.Models;
 using projectDemo.Repository.CatetoryRepository;
 using projectDemo.Repository.Ipml;
 using projectDemo.Repository.TickTypeRepository;
+using projectDemo.Repository.UpgradeRepository;
+using projectDemo.Repository.UserUpgradeRepository;
 using projectDemo.Service.Auth;
 using projectDemo.Service.ImageService;
 using projectDemo.UnitOfWorks;
@@ -26,25 +29,34 @@ namespace projectDemo.Service.EventService
         private readonly IUnitOfWork _uow;
         private readonly ICatetoryReposioty _catrtoeyRepository;
         private readonly ITypeTicketRepositorys _typeTicketRepository;
+        private readonly IAuthRepository _authRepository;
+        private readonly IUpgradeRepository _upgradeRepository;
+        private readonly IUserUpgradeRepository _userUpgradeRepository;
         private readonly IMapper _mapper;
 
         public EventService(
             ICatetoryReposioty catetoryReposioty,
+            IAuthRepository auth,
             IUnitOfWork uow,
             IImageService imageService,
             IEventRepository eventRepository,
             IMapper mapper,
             IUserReposiotry userReposiotry,
-            ITypeTicketRepositorys typeTicketRepository
+            ITypeTicketRepositorys typeTicketRepository,
+            IUpgradeRepository upgradeRepository,
+            IUserUpgradeRepository userUpgradeRepository
         )
         {
             _eventRepository = eventRepository;
+            _authRepository = auth;
             _mapper = mapper;
             _userReposiotry = userReposiotry;
             _imageService = imageService;
             _uow = uow;
             _catrtoeyRepository = catetoryReposioty;
             _typeTicketRepository = typeTicketRepository;
+            _upgradeRepository = upgradeRepository;
+            _userUpgradeRepository = userUpgradeRepository;
         }
 
         private static TimeZoneInfo GetVietnamTimeZone()
@@ -224,77 +236,6 @@ namespace projectDemo.Service.EventService
             return await _userReposiotry.GetRoleByUser(UserID);
         }
 
-        //tạo event ->done
-        //public async Task<ApiResponse<EventResponse>> CreateEvent(EventRequest resquest,Guid Userid)
-        //{
-        //    try
-        //    {
-        //        var check = checkVadidate(resquest);
-
-        //        if (!check)
-        //        {
-        //            return ApiResponse<EventResponse>.FailResponse(Entity.Enum.EnumStatusCode.DATE, "Kiêm tra lại ngày và giờ");
-        //        }
-        //        var userid = await _userReposiotry.GetUserByid(Userid);
-        //        if (userid == null)
-        //        {
-        //            return ApiResponse<EventResponse>.FailResponse(Entity.Enum.EnumStatusCode.USERNOTFOUND, "Không tìm thấy user ");
-
-        //        }
-        //        var catetory =await _catrtoeyRepository.GetByName(resquest.CatetoryName.ToUpper());
-        //        if (catetory == null)
-        //        {
-        //            return ApiResponse<EventResponse>.FailResponse(Entity.Enum.EnumStatusCode.NOT_FOUND, "Không tìm thấy thể loại ");
-        //        }
-
-        //        var image = await _imageService.UploadAsync(resquest.PosterUrl);
-
-        //        Event events = new Event
-        //        {
-        //            Id = Guid.NewGuid(),
-        //            UserID = Userid,
-        //            Title = resquest.Title,
-        //            Status = EnumStatusEvent.DRAFT,
-        //            PosterUrl = image,
-        //            StartDate = resquest.StartDate,
-        //            EndDate = resquest.EndDate,
-        //            SaleStartDate = resquest.SaleStartDate,
-        //            SaleEndDate = resquest.SaleEndDate,
-        //            Description = resquest.Description,
-        //            Location = resquest.Location,
-        //            CreatedDate = DateTime.Now,
-        //            CatetoryID=catetory.Id,
-        //            IsDeleted= false
-
-        //        };
-        //        await _eventRepository.CreateEvent(events);
-        //        await _uow.SaveChangesAsync();
-
-        //        EventResponse response = new EventResponse
-        //        {
-        //            UserID = events.UserID,
-        //            Status = events.Status.ToString(),
-        //            PosterUrl = events.PosterUrl,
-        //            StartDate = events.StartDate,
-        //            EndDate = events.EndDate,
-        //            SaleStartDate = events.SaleStartDate,
-        //            SaleEndDate = events.SaleEndDate,
-        //            Description = events.Description,
-        //            Location = events.Location,
-        //            EventID = events.Id,
-        //            Title = events.Title
-        //        };
-        //        return ApiResponse<EventResponse>.SuccessResponse(Entity.Enum.EnumStatusCode.SUCCESS, response);
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        Console.WriteLine($"System Error: {ex.Message}");
-
-        //        return ApiResponse<EventResponse>.FailResponse(Entity.Enum.EnumStatusCode.SERVER, "lỗi", ex.Message);
-        //    }
-
-        //}
-        //done
         public async Task<
             ApiResponse<CreateEventWithTicketTypesResponse>
         > CreateEventWithTicketTypes(CreateEventWithTicketTypesRequest request, Guid userId)
@@ -304,10 +245,45 @@ namespace projectDemo.Service.EventService
 
             try
             {
+                // 1. Kiểm tra gói nâng cấp và giới hạn ngày
+                var activeUpgrade = await _userUpgradeRepository.GetActiveUpgradeByUserIdAsync(userId);
+                if (activeUpgrade == null)
+                {
+                    return ApiResponse<CreateEventWithTicketTypesResponse>.FailResponse(
+                        EnumStatusCode.UNAUTHORIZED,
+                        "Bạn cần mua gói nâng cấp để thực hiện chức năng này."
+                    );
+                }
+
+                // Kiểm tra reset lượt theo ngày
+                var today = DateTime.Today;
+                if (!activeUpgrade.LastUsageDate.HasValue || activeUpgrade.LastUsageDate.Value.Date != today)
+                {
+                    activeUpgrade.CurrentDayUsageCount = 0;
+                    activeUpgrade.LastUsageDate = DateTime.Now;
+                }
+
+                if (activeUpgrade.CurrentDayUsageCount >= activeUpgrade.Upgrade.DailyLimit)
+                {
+                    var dailyPackages = (await _upgradeRepository.GetAllAsync())
+                        .Where(u => u.IsDailyPackage && u.status == "ACTIVE")
+                        .ToList();
+
+                    string suggestion = dailyPackages.Any()
+                        ? ". Gợi ý các gói ngày: " + string.Join(", ", dailyPackages.Select(p => p.TitleUpgrade))
+                        : "";
+
+                    return ApiResponse<CreateEventWithTicketTypesResponse>.FailResponse(
+                        EnumStatusCode.BAD_REQUEST,
+                        $"Bạn đã đạt giới hạn tạo sự kiện trong ngày ({activeUpgrade.Upgrade.DailyLimit} event){suggestion}"
+                    );
+                }
+
+                // 2. Các kiểm tra dữ liệu hiện tại
                 if (!checkVadidate(request))
                 {
                     return ApiResponse<CreateEventWithTicketTypesResponse>.FailResponse(
-                        Entity.Enum.EnumStatusCode.DATE,
+                        EnumStatusCode.DATE,
                         "Kiểm tra lại ngày giờ của event"
                     );
                 }
@@ -315,7 +291,7 @@ namespace projectDemo.Service.EventService
                 if (request.TicketTypes == null || !request.TicketTypes.Any())
                 {
                     return ApiResponse<CreateEventWithTicketTypesResponse>.FailResponse(
-                        Entity.Enum.EnumStatusCode.BAD_REQUEST,
+                        EnumStatusCode.BAD_REQUEST,
                         "Event phải có ít nhất 1 loại vé"
                     );
                 }
@@ -323,7 +299,7 @@ namespace projectDemo.Service.EventService
                 if (HasInvalidTicketTypes(request.TicketTypes))
                 {
                     return ApiResponse<CreateEventWithTicketTypesResponse>.FailResponse(
-                        Entity.Enum.EnumStatusCode.BAD_REQUEST,
+                        EnumStatusCode.BAD_REQUEST,
                         "Thông tin loại vé không hợp lệ"
                     );
                 }
@@ -331,7 +307,7 @@ namespace projectDemo.Service.EventService
                 if (request.PosterUrl == null)
                 {
                     return ApiResponse<CreateEventWithTicketTypesResponse>.FailResponse(
-                        Entity.Enum.EnumStatusCode.BAD_REQUEST,
+                        EnumStatusCode.BAD_REQUEST,
                         "PosterUrl không được để trống"
                     );
                 }
@@ -340,7 +316,7 @@ namespace projectDemo.Service.EventService
                 if (user == null)
                 {
                     return ApiResponse<CreateEventWithTicketTypesResponse>.FailResponse(
-                        Entity.Enum.EnumStatusCode.USERNOTFOUND,
+                        EnumStatusCode.USERNOTFOUND,
                         "Không tìm thấy user"
                     );
                 }
@@ -349,15 +325,15 @@ namespace projectDemo.Service.EventService
                 if (catetory == null)
                 {
                     return ApiResponse<CreateEventWithTicketTypesResponse>.FailResponse(
-                        Entity.Enum.EnumStatusCode.NOT_FOUND,
+                        EnumStatusCode.NOT_FOUND,
                         "Không tìm thấy thể loại"
                     );
                 }
 
                 await _uow.BeginTransactionAsync();
+                transactionStarted = true;
 
                 imageUrl = await _imageService.UploadAsync(request.PosterUrl);
-                transactionStarted = true;
 
                 var eventEntity = new Event
                 {
@@ -392,6 +368,12 @@ namespace projectDemo.Service.EventService
 
                 await _eventRepository.CreateEvent(eventEntity);
                 await _typeTicketRepository.CreateRangeTicketTypes(ticketTypeEntities);
+
+                // Tăng lượt sử dụng trong ngày
+                activeUpgrade.CurrentDayUsageCount++;
+                activeUpgrade.LastUsageDate = DateTime.Now;
+                _userUpgradeRepository.Update(activeUpgrade);
+
                 await _uow.SaveChangesAsync();
                 await _uow.CommitAsync();
 
@@ -423,7 +405,7 @@ namespace projectDemo.Service.EventService
                 };
 
                 return ApiResponse<CreateEventWithTicketTypesResponse>.SuccessResponse(
-                    Entity.Enum.EnumStatusCode.SUCCESS,
+                    EnumStatusCode.SUCCESS,
                     response
                 );
             }
@@ -441,7 +423,7 @@ namespace projectDemo.Service.EventService
                 }
 
                 return ApiResponse<CreateEventWithTicketTypesResponse>.FailResponse(
-                    Entity.Enum.EnumStatusCode.SERVER,
+                    EnumStatusCode.SERVER,
                     "Lỗi khi tạo event",
                     ex.Message
                 );
@@ -766,6 +748,8 @@ namespace projectDemo.Service.EventService
 
                 await _uow.BeginTransactionAsync();
                 transactionStarted = true;
+
+                var posterUrl = _imageService.CloneImage(originalEvent.PosterUrl);
 
                 var newEvent = new Event
                 {
