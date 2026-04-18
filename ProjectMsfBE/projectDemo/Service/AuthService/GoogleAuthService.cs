@@ -182,13 +182,6 @@ namespace projectDemo.Service.AuthService
                 }
 
                 await _uow.CommitAsync();
-
-                users.UserRoles = role.Select(r => new UserRole
-                    {
-                        Role = new EventTick.Model.Models.Role { RoleName = r },
-                    })
-                    .ToList();
-
                 var token = _authService.GenerateToken(users, permission);
 
                 var responses = new AuthResponse

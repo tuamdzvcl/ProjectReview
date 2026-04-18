@@ -9,5 +9,15 @@ namespace projectDemo.Repository.ReportQuery
             DateTime fromDate,
             DateTime toDateExclusive
         );
+
+        Task<List<RevenueReportFlatRow>> GetPlatformRevenueRowsAsync(
+            DateTime fromDate,
+            DateTime toDateExclusive
+        );
+
+        Task<List<RevenueReportFlatRow>> GetUpgradeRowsAsync(
+            DateTime fromDate,
+            DateTime toDateExclusive
+        );
     }
 }

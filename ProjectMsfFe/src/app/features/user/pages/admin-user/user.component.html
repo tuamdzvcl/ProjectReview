@@ -17,7 +17,7 @@
       </div>
     </div>
 
-    <div class="users-header__right">
+    <div class="users-header__right" *ngIf="userRole === 'ADMIN'">
       <div class="users-header__filters">
         <button (click)="onSave()" class="btn btn--tab" type="button">
           Add User

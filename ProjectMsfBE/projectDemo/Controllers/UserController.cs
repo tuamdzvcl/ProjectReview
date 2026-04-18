@@ -19,6 +19,14 @@ namespace projectDemo.Controllers
             _userService = userService;
         }
 
+        [HttpGet("me")]
+        public async Task<IActionResult> GetProfile()
+        {
+            var userId = Guid.Parse(User.FindFirst("id").Value);
+            var result = await _userService.GetByid(userId);
+            return Ok(result);
+        }
+
         [HttpGet("events")]
         public async Task<IActionResult> GetAllEvent()
         {
@@ -63,6 +71,22 @@ namespace projectDemo.Controllers
         public async Task<IActionResult> Update(Guid id, UserUpdateRequest request)
         {
             var result = await _userService.Update(id, request);
+            return Ok(result);
+        }
+
+        [HttpGet("participants")]
+        public async Task<IActionResult> GetParticipantsByOrganizer([FromQuery] projectDemo.Common.PageRequest.PageRequest request)
+        {
+            var userId = Guid.Parse(User.FindFirst("id").Value);
+            var result = await _userService.GetParticipantsByOrganizer(userId, request);
+            return Ok(result);
+        }
+
+        [HttpPut("avatar")]
+        public async Task<IActionResult> UpdateAvatar(IFormFile file)
+        {
+            var userId = Guid.Parse(User.FindFirst("id").Value);
+            var result = await _userService.UpdateAvatarAsync(userId, file);
             return Ok(result);
         }
     }

@@ -11,11 +11,12 @@ namespace projectDemo.Service.UpgradeService
 {
     public interface IUpgradeService
     {
-        Task<ApiResponse<PageResponse<UpgradeResponse>>> GetAllUpgradesAsync(UpgradeQuery query);
+        Task<PageResponse<UpgradeResponse>> GetAllUpgradesAsync(UpgradeQuery query);
         Task<ApiResponse<UpgradeResponse>> GetUpgradeByIdAsync(int id);
         Task<ApiResponse<UpgradeResponse>> CreateUpgradeAsync(UpgradeCreateRequest request);
         Task<ApiResponse<UpgradeResponse>> UpdateUpgradeAsync(int id, UpgradeUpdateRequest request);
         Task<ApiResponse<MomoCreatePaymentResponseModel>> RegisterUpgradePackageAsync(Guid userId, int upgradeId);
         Task<ApiResponse<UserUpgradeResponse>> GetCurrentUserUpgradeAsync(Guid userId);
+        Task<ApiResponse<bool>> DeleteUpgradeAsync(int id);
     }
 }

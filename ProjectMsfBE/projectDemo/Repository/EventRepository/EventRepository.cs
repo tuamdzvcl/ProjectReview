@@ -51,7 +51,8 @@ namespace projectDemo.Repository
 
         //get event anh typeticj
         public async Task<PageResponse<EventTypeTickResponses>> GetAllWithTicketTypesAsync(
-            PageRequest request
+            PageRequest request,
+            bool isAdmin = false
         )
         {
             try
@@ -59,9 +60,17 @@ namespace projectDemo.Repository
                 var pageIndex = request.PageIndex;
                 var pageSize = request.PageSize;
                 var now = DateTime.Now;
-                var query = _dbSet
-                    .AsNoTracking()
-                    .Where(e => e.IsDeleted == false && e.Status != EnumStatusEvent.CANNEL && e.SaleStartDate <= now && e.SaleEndDate >= now);
+
+                var query = _dbSet.AsNoTracking().Where(e => e.IsDeleted == false && e.Status != EnumStatusEvent.CANNEL);
+
+                if (isAdmin)
+                {
+                    query = query.Where(e => e.Status != EnumStatusEvent.DRAFT);
+                }
+                else
+                {
+                    query = query.Where(e => e.Status == EnumStatusEvent.PUBLISHED && e.SaleStartDate <= now && e.SaleEndDate >= now);
+                }
 
                 if (request.categoryId != Guid.Empty)
                 {

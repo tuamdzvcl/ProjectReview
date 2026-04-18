@@ -43,6 +43,7 @@ export class UserComponent {
   selectedRole = '';
 
   currentUserId: string | null = null;
+  userRole: string | null = null;
 
   totalAll = 0;
   totalOrganizer = 0;
@@ -50,21 +51,33 @@ export class UserComponent {
 
   ngOnInit(): void {
     this.currentUserId = this.tokenService.getUserId();
+    this.userRole = this.tokenService.getRole();
     this.loadUsers();
     console.log('Userid =', this.users);
   }
-  loadUsers() {
-    this.userService
-      .GetUsers(this.pageIndex, this.rows, '', this.selectedRole)
-      .subscribe({
-        next: (res) => {
-          console.log(res.items);
 
+  loadUsers() {
+    if (this.userRole === 'ADMIN') {
+      this.userService
+        .GetUsers(this.pageIndex, this.rows, '', this.selectedRole)
+        .subscribe({
+          next: (res) => {
+            this.users = res.items;
+            this.totalRecords = res.totalRecords;
+            this.setTotals(res.items, res.totalRecords);
+          },
+        });
+    } else {
+      // Dành cho Organisation (Người tổ chức)
+      this.userService.GetParticipants(this.pageIndex, this.rows).subscribe({
+        next: (res) => {
           this.users = res.items;
           this.totalRecords = res.totalRecords;
-          this.setTotals(res.items, res.totalRecords);
+          // Không đếm totals cho Organisation vì họ chỉ quản lý 1 tập người dùng
+          this.totalAll = res.totalRecords;
         },
       });
+    }
   }
 
   setTotals(users: any[], totalRecords: number) {

@@ -61,6 +61,30 @@ export class UserService extends BaseApiService {
     return this.get<UserProfile>(url);
   }
   GetUserbyid() {
-    return this.get<UserResponse>('users');
+    return this.get<UserResponse>('users/me');
+  }
+
+  GetParticipants(pageIndex: number, pageSize: number) {
+    const params: any = {
+      pageIndex: pageIndex,
+      pageSize: pageSize,
+    };
+    return this.getpage<UserResponse>('users/participants', params).pipe(
+      map((res: PageResult<UserResponse>) => {
+        return {
+          items: res.Items,
+          pageIndex: res.PageIndex,
+          pageSize: res.PageSize,
+          totalRecords: res.TotalRecords,
+          totalPages: res.TotalPages,
+        };
+      })
+    );
+  }
+
+  updateAvatar(file: File): Observable<ApiResponse<string>> {
+    const formData = new FormData();
+    formData.append('file', file);
+    return this.put<ApiResponse<string>>('users/avatar', formData);
   }
 }

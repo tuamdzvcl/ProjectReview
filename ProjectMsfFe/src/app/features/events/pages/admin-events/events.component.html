@@ -1,16 +1,16 @@
 <app-shell>
   <div class="box">
     <div class="topbar__left">
-      <h1 class="topbar__title">Event</h1>
+      <h1 class="topbar__title">Sự kiện</h1>
     </div>
     <section class="events-header card">
       <div style="display: flex; flex-direction: column; gap: 10px">
         <div class="events-header__left">
-          <h2 class="events-header__title">Events ({{ totalRecords }})</h2>
+          <h2 class="events-header__title">Danh sách sự kiện ({{ totalRecords }})</h2>
         </div>
         <div class="events-search__control">
           <span class="events-search__icon">🔍</span>
-          <input class="events-search__input" type="text" placeholder="Search by event name, status"
+          <input class="events-search__input" type="text" placeholder="Tìm kiếm theo tên sự kiện, trạng thái"
             (input)="onSearch($event)" />
         </div>
       </div>
@@ -18,13 +18,13 @@
       <div class="events-header__right">
         <div class="events-header__filters">
           <button class="btn btn--tab btn--tab-active" type="button" (click)="onTabChange('')">
-            All Event ({{ totalRecords }})
+            Tất cả ({{ totalRecords }})
           </button>
           <button class="btn btn--tab" type="button" (click)="onTabChange('online')">
-            PUBLISHED (0)
+            ĐÃ XUẤT BẢN (0)
           </button>
           <button class="btn btn--tab" type="button" (click)="onTabChange('venue')">
-            DRAFT ({{ totalRecords }})
+            BẢN NHÁP ({{ totalRecords }})
           </button>
         </div>
       </div>
@@ -40,32 +40,32 @@
       </div>
       <div class="event-item__body">
         <div class="event-item__title">
-          {{ event.Title || "Untitled Event" }}
+          {{ event.Title || "Sự kiện chưa đặt tên" }}
         </div>
         <div class="event-item__meta-row">
           <div class="event-meta">
-            <div class="event-meta__label">Status</div>
+            <div class="event-meta__label">Trạng thái</div>
             <div class="event-meta__value event-meta__value--green">
               {{ event.Status }}
             </div>
           </div>
 
           <div class="event-meta">
-            <div class="event-meta__label">Starts on</div>
+            <div class="event-meta__label">Bắt đầu lúc</div>
             <div class="event-meta__value">
               {{ event.StartDate | formatDate }}
             </div>
           </div>
 
           <div class="event-meta">
-            <div class="event-meta__label">Total Tickets</div>
+            <div class="event-meta__label">Tổng số vé</div>
             <div class="event-meta__value">
               {{ getTotalTickets(event) }}
             </div>
           </div>
 
           <div class="event-meta">
-            <div class="event-meta__label">Total Sold</div>
+            <div class="event-meta__label">Đã bán</div>
             <div class="event-meta__value" style="color: #6cc04a;">
               {{ getTotalSold(event) }}
             </div>
@@ -87,10 +87,20 @@
         <div class="action-dropdown" [class.active]="showDropdown === event.Id">
           <button class="btn btn--icon" type="button" (click)="toggleDropdown(event.Id, $event)">⋮</button>
           <div class="dropdown-menu">
+            <button class="dropdown-item" *ngIf="userRole !== 'ADMIN' && event.Status === 'DRAFT'"
+              (click)="publicEvent(event); $event.stopPropagation()">
+              <i class="fa-solid fa-megaphone"></i>
+              Công khai
+            </button>
+            <button class="dropdown-item" *ngIf="userRole === 'ADMIN' && event.Status !== 'PUBLISHED'"
+              (click)="approveEvent(event); $event.stopPropagation()">
+              <i class="fa-solid fa-check-circle"></i>
+              Duyệt
+            </button>
             <button class="dropdown-item" *ngIf="!isEventEnded(event) && event.Status !== 'PUBLISHED'"
               (click)="editEvent(event); $event.stopPropagation()">
               <i class="fa-regular fa-edit"></i>
-              Edit
+              Sửa
             </button>
             <button class="dropdown-item" *ngIf="isEventEnded(event)"
               (click)="duplicateEvent(event); $event.stopPropagation()">
@@ -100,11 +110,11 @@
             <button class="dropdown-item" *ngIf="event.Status !== 'PUBLISHED'"
               (click)="deleteEvent(event); $event.stopPropagation()">
               <i class="fa-regular fa-trash-can"></i>
-              Delete
+              Xóa
             </button>
             <button class="dropdown-item" (click)="viewDetails(event); $event.stopPropagation()">
               <i class="fa-solid fa-circle-info"></i>
-              View Details
+              Xem chi tiết
             </button>
 
           </div>
@@ -118,9 +128,9 @@
         <div class="no-events__icon">
           <span><i class="fa-regular fa-calendar-days"></i></span>
         </div>
-        <h3 class="no-events__title">No Events Found</h3>
+        <h3 class="no-events__title">Không tìm thấy sự kiện nào</h3>
         <p class="no-events__description">
-          There are no events matching your search criteria.
+          Không có sự kiện nào khớp với tiêu chí tìm kiếm của bạn.
         </p>
       </div>
     </section>

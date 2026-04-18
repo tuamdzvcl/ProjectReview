@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Net.WebSockets;
 using AutoMapper;
 using EventTick.Model.Enum;
@@ -34,6 +34,10 @@ namespace projectDemo.Service.UserService
         private readonly IUnitOfWork _uow;
 
 
+        private readonly projectDemo.Service.ImageService.IImageService _imageService;
+        private readonly projectDemo.Repository.ParticipantQuery.IParticipantQuery _participantQuery;
+
+
         public UserService(
             IOrderRepository order,
             IEventRepository eventrp,
@@ -45,7 +49,9 @@ namespace projectDemo.Service.UserService
             IRoleRepository roleRepository,
             IPemisstionRepository petRepository,
             IUserLoginRepository userLoginRepository,
-            IRolePermissionRepository rolePermission
+            IRolePermissionRepository rolePermission,
+            projectDemo.Repository.ParticipantQuery.IParticipantQuery participantQuery,
+            projectDemo.Service.ImageService.IImageService imageService
         )
         {
             _userReposiotry = userReposiotry;
@@ -59,6 +65,51 @@ namespace projectDemo.Service.UserService
             _roleUserRepo = userRole;
             _eventRepository = eventrp;
             _orderRepository = order;
+            _participantQuery = participantQuery;
+            _imageService = imageService;
+        }
+
+        public async Task<ApiResponse<string>> UpdateAvatarAsync(Guid userId, IFormFile file)
+        {
+            try
+            {
+                if (file == null || file.Length == 0)
+                {
+                    return ApiResponse<string>.FailResponse(
+                        Entity.Enum.EnumStatusCode.BAD_REQUEST,
+                        "File is null or empty"
+                    );
+                }
+
+                var imageUrl = await _imageService.UploadAsync(file);
+
+                var user = await _userReposiotry.GetUserByid(userId);
+                if (user == null)
+                {
+                    return ApiResponse<string>.FailResponse(
+                        Entity.Enum.EnumStatusCode.USERNOTFOUND,
+                        "User not found"
+                    );
+                }
+
+                user.AvatarUrl = imageUrl;
+                user.UpdatedDate = DateTime.UtcNow;
+
+                await _uow.SaveChangesAsync();
+
+                return ApiResponse<string>.SuccessResponse(
+                    Entity.Enum.EnumStatusCode.SUCCESS,
+                    imageUrl
+                );
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.ToString());
+                return ApiResponse<string>.FailResponse(
+                    Entity.Enum.EnumStatusCode.SERVER,
+                    ex.Message
+                );
+            }
         }
 
         // lấy tất cả các e event do user tạo
@@ -342,6 +393,87 @@ namespace projectDemo.Service.UserService
                 Entity.Enum.EnumStatusCode.SUCCESS,
                 userReponse
             );
+        }
+
+        public async Task<PageResponse<UserResponse>> GetParticipantsByOrganizer(Guid organizerId, projectDemo.Common.PageRequest.PageRequest request)
+        {
+            try
+            {
+                if (request.PageIndex <= 0) request.PageIndex = 1;
+                if (request.PageSize <= 0) request.PageSize = 10;
+
+                var (rawData, totalCount) = await _participantQuery.GetParticipantsByOrganizerAsync(organizerId, request.PageIndex, request.PageSize);
+
+                // Manual mapping using LINQ
+                var items = rawData.Select(x => new UserResponse
+                {
+                    ID = x.Id,
+                    Email = x.Email,
+                    Username = x.Username,
+                    FirstName = x.FirstName,
+                    LastName = x.LastName,
+                    AvatarUrl = x.AvatarUrl
+                }).ToList();
+
+                return new PageResponse<UserResponse>
+                {
+                    Items = items,
+                    PageIndex = request.PageIndex,
+                    PageSize = request.PageSize,
+                    TotalRecords = totalCount,
+                    TotalPages = (int)Math.Ceiling((double)totalCount / request.PageSize),
+                    Success = true,
+                    Message = "Lấy danh sách người tham gia thành công"
+                };
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.ToString());
+                return new PageResponse<UserResponse>
+                {
+                    Success = false,
+                    Message = "Có lỗi xảy ra khi lấy danh sách người tham gia"
+                };
+            }
+        }
+        public async Task<ApiResponse<UserResponse>> GetByid(Guid id)
+        {
+            try
+            {
+                var user = await _userReposiotry.GetUserByid(id);
+                if (user == null)
+                {
+                    return ApiResponse<UserResponse>.FailResponse(
+                        Entity.Enum.EnumStatusCode.USERNOTFOUND,
+                        "Không tìm thấy người dùng"
+                    );
+                }
+
+                var response = new UserResponse
+                {
+                    ID = user.Id,
+                    Email = user.Email,
+                    Username = user.Username,
+                    FirstName = user.FirstName,
+                    LastName = user.LastName,
+                    AvatarUrl = user.AvatarUrl,
+                    RoleName = user.UserRoles.Select(x => x.Role.RoleName.ToUpper()).ToList()
+                };
+
+                return ApiResponse<UserResponse>.SuccessResponse(
+                    Entity.Enum.EnumStatusCode.SUCCESS,
+                    response,
+                    "Lấy thông tin người dùng thành công"
+                );
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.ToString());
+                return ApiResponse<UserResponse>.FailResponse(
+                    Entity.Enum.EnumStatusCode.SERVER,
+                    "Lỗi server khi lấy thông tin người dùng"
+                );
+            }
         }
     }
 }

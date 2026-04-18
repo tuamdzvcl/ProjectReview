@@ -133,7 +133,6 @@
 }
 
 .tier-stats {
-  flex-grow: 1;
   margin-bottom: 2rem;
 
   .stat {
@@ -164,26 +163,34 @@
 
 .card-body {
   flex-grow: 1;
-}
 
-.feature-list {
-  list-style: none;
-  padding: 0;
-  margin: 0 0 1.5rem 0;
-
-  li {
-    padding: 8px 0;
-    color: #555;
-    position: relative;
-    padding-left: 28px;
+  .description {
+    color: #666;
     font-size: 0.95rem;
+    line-height: 1.5;
+    margin-bottom: 1.5rem;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
 
-    &:before {
-      content: '✓';
+  .limit-info {
+    font-size: 0.9rem;
+    color: #555;
+    background: #f8f9fa;
+    padding: 0.8rem;
+    border-radius: 8px;
+    margin-bottom: 1.5rem;
+
+    i {
       color: #81E979;
-      position: absolute;
-      left: 0;
-      font-weight: bold;
+      margin-right: 0.5rem;
+    }
+
+    strong {
+      color: #2c3e50;
+      font-size: 1.05rem;
     }
   }
 }
@@ -196,5 +203,45 @@
   &:hover {
     background-color: #ffebee;
     border-color: #ffb3c1;
+  }
+}
+
+// Dialog Form Styles
+.pkg-form {
+  .field {
+    margin-bottom: 1.5rem;
+
+    label {
+      display: block;
+      margin-bottom: 0.5rem;
+      font-weight: 600;
+      color: #2c3e50;
+    }
+
+    textarea {
+      width: 100%;
+      resize: vertical;
+      padding: 0.5rem;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      font-family: inherit;
+
+      &:focus {
+        border-color: #81E979;
+        outline: none;
+      }
+    }
+  }
+}
+
+:host ::v-deep {
+  .p-dialog-header {
+    background: #f8f9fa;
+    border-bottom: 1px solid #eee;
+  }
+
+  .p-dialog-footer {
+    border-top: 1px solid #eee;
+    padding: 1rem;
   }
 }

@@ -34,4 +34,8 @@ export class UpgradeService extends BaseApiService {
   getPackageById(id: number): Observable<UpgradeResponse> {
     return this.get<UpgradeResponse>(`upgrade/admin/${id}`);
   }
+
+  deleteUpgrade(id: number): Observable<any> {
+    return this.deleteById('upgrade/admin', id);
+  }
 }

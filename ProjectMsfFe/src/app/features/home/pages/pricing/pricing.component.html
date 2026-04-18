@@ -4,54 +4,57 @@
       <h1>Bảng giá dịch vụ</h1>
       <p>Chọn gói phù hợp để trở thành người tạo sự kiện chuyên nghiệp và tận hưởng những tính năng độc quyền.</p>
     </div>
-    <div class="pricing-cards">
-      <!-- Card 1 -->
-      <div class="card card-blue">
-        <div class="card-header">
-          <h3>Cơ bản</h3>
-          <div class="price">300.000 <span>VNĐ/tháng</span></div>
-        </div>
-        <div class="card-body">
-          <ul>
-            <li>Tạo tối đa 5 sự kiện/tháng</li>
-            <li>Quản lý người tham dự cơ bản</li>
-            <li>Hỗ trợ qua email</li>
-          </ul>
-          <button class="btn-primary">Đăng ký làm Người Tạo Sự Kiện</button>
-        </div>
-      </div>
-      <!-- Card 2 -->
-      <div class="card highlight card-green">
-        <div class="card-header">
-          <h3>Chuyên nghiệp</h3>
-          <div class="price">500.000 <span>VNĐ/tháng</span></div>
-        </div>
-        <div class="card-body">
-          <ul>
-            <li>Tạo tối đa 15 sự kiện/tháng</li>
-            <li>Quản lý người tham dự nâng cao</li>
-            <li>Hỗ trợ qua email & chat</li>
-            <li>Phân tích báo cáo cơ bản</li>
-          </ul>
-          <button class="btn-primary">Đăng ký làm Người Tạo Sự Kiện</button>
-        </div>
-      </div>
-      <!-- Card 3 -->
-      <div class="card">
-        <div class="card-header">
-          <h3>Cao cấp</h3>
-          <div class="price">1.000.000 <span>VNĐ/tháng</span></div>
-        </div>
-        <div class="card-body">
-          <ul>
-            <li>Không giới hạn số lượng sự kiện</li>
-            <li>Đầy đủ tính năng quản lý</li>
-            <li>Hỗ trợ 24/7 (Email, Chat, Phone)</li>
-            <li>Báo cáo phân tích chuyên sâu</li>
-          </ul>
-          <button class="btn-primary">Đăng ký làm Người Tạo Sự Kiện</button>
-        </div>
-      </div>
+
+    @if (isLoading()) {
+    <div class="loading-state">
+      <i class="fa-solid fa-circle-notch fa-spin"></i>
+      <p>Đang tải bảng giá...</p>
     </div>
+    } @else {
+    <div class="pricing-cards">
+      @for (pkg of packages(); track pkg.Id; let i = $index) {
+      <div class="card" [class.highlight]="pkg.Price > 500000" [class.premium-card]="pkg.Price >= 1000000">
+        <div class="card-header">
+          <h3>{{ pkg.TitleUpgrade }}</h3>
+          <div class="price">
+            {{ pkg.Price | number:'1.0-0' }} <span>VNĐ/tháng</span>
+          </div>
+        </div>
+        <div class="card-body">
+          <div class="pkg-desc">
+            <p>{{ pkg.Description }}</p>
+          </div>
+          <ul class="benefit-list">
+            <li>
+              <i class="fa-solid fa-check"></i>
+              Tạo tối đa <strong>{{ pkg.DailyLimit }}</strong> sự kiện/ngày
+            </li>
+            <li>
+              <i class="fa-solid fa-check"></i>
+              Quản lý người tham dự chuyên nghiệp
+            </li>
+            <li>
+              <i class="fa-solid fa-check"></i>
+              Hỗ trợ ưu tiên qua hệ thống
+            </li>
+          </ul>
+          <button class="btn-primary" (click)="registerPackage(pkg.Id)">
+            Đăng ký nâng cấp
+          </button>
+        </div>
+        
+        @if (pkg.Price > 500000) {
+        <div class="badge">Phổ biến nhất</div>
+        }
+      </div>
+      }
+    </div>
+    }
+
+    @if (!isLoading() && packages().length === 0) {
+    <div class="empty-state">
+      <p>Hiện tại chưa có gói dịch vụ nào khả dụng.</p>
+    </div>
+    }
   </div>
 </div>

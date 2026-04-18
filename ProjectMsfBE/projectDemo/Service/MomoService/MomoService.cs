@@ -1,6 +1,7 @@
 using System.Security.Cryptography;
 using System.Text;
 using EventTick.Model.Enum;
+using EventTick.Model.Models;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using projectDemo.Common;
@@ -9,6 +10,7 @@ using projectDemo.DTO.Respone;
 using projectDemo.DTO.Response.Momo;
 using projectDemo.Entity.Enum;
 using projectDemo.Entity.Models;
+using projectDemo.Repository.Ipml;
 using projectDemo.Repository.OrderRepository;
 using projectDemo.Repository.PaymentRepository;
 using projectDemo.Repository.UserUpgradeRepository;
@@ -27,9 +29,11 @@ namespace projectDemo.Service.MomoService
         private readonly IPaymentRepository _paymentRepository;
         private readonly IEmailService _emailService;
         private readonly IUserUpgradeRepository _userUpgradeRepository;
+        private readonly IUserReposiotry _userRepository;
 
         public MomoService(
             IPaymentRepository paymentRepository,
+            IUserReposiotry userReposiotry,
             IUnitOfWork uow,
             IOrderRepository orderRepository,
             IOptions<MomoOptionModel> options,
@@ -39,6 +43,7 @@ namespace projectDemo.Service.MomoService
         )
         {
             _paymentRepository = paymentRepository;
+            _userRepository= userReposiotry;
             _uow = uow;
             _orderRepository = orderRepository;
             _options = options;
@@ -198,6 +203,11 @@ namespace projectDemo.Service.MomoService
                                 : DateTime.Now.AddMonths(1);
                             userUpgrade.CurrentDayUsageCount = 0;
                             userUpgrade.LastUsageDate = DateTime.Now;
+                           var user = await _userRepository.GetUserByid(userUpgrade.UserId);
+                            if (user == null)
+                                return "cút";
+                            user.UserRoles.Select(
+                                u=> u.RoleId=(int) EnumRoleName.ORGANIZER);
                         }
                     }
                 }
@@ -227,6 +237,9 @@ namespace projectDemo.Service.MomoService
                             userUpgrade.Status = "FAILED";
                             userUpgrade.UpdatedDate = DateTime.Now;
                         }
+
+                        
+
                     }
                 }
 

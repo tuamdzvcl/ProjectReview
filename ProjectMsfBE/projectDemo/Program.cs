@@ -323,6 +323,7 @@ namespace projectDemo
             builder.Services.AddScoped<ITickRepository, TickRepository>();
             builder.Services.AddScoped<projectDemo.Repository.UserUpgradeRepository.IUserUpgradeRepository, projectDemo.Repository.UserUpgradeRepository.UserUpgradeRepository>();
             builder.Services.AddScoped<projectDemo.Repository.UpgradeRepository.IUpgradeRepository, projectDemo.Repository.UpgradeRepository.UpgradeRepository>();
+            builder.Services.AddScoped<projectDemo.Repository.ParticipantQuery.IParticipantQuery, projectDemo.Repository.ParticipantQuery.ParticipantQuery>();
             builder.Services.AddScoped<projectDemo.Service.UpgradeService.IUpgradeService, projectDemo.Service.UpgradeService.UpgradeServices>();
 
             builder.Services.AddScoped<IImageService, ImageService>();

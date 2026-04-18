@@ -66,5 +66,12 @@ namespace projectDemo.Controllers
             var result = await _upgradeService.GetUpgradeByIdAsync(id);
             return Ok(result);
         }
+
+        [HttpDelete("admin/{id}")]
+        public async Task<IActionResult> Delete(int id)
+        {
+            var result = await _upgradeService.DeleteUpgradeAsync(id);
+            return Ok(result);
+        }
     }
 }

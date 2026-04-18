@@ -22,16 +22,59 @@
   <div class="secondary-tabs" *ngIf="isOwner && activeTab === 'home'">
     <button *ngIf="isOwner" class="sub-tab" [class.active]="activeSubTab === 'saved'" (click)="activeSubTab = 'saved'">
       <span class="tab-badge badge-saved">1</span>
-      <span class="tab-label">Sự kiện đã lưu</span>
+      <span class="tab-label">Sự kiện đã lưu({{ savedEvents.length }})</span>
     </button>
-    <button class="sub-tab" [class.active]="activeSubTab === 'organised'" (click)="activeSubTab = 'organised'">
-      <span class="tab-badge badge-organised">{{ events.length }}</span>
+    <button *ngIf="canSeeOrganisedEvents" class="sub-tab" [class.active]="activeSubTab === 'organised'"
+      (click)="activeSubTab = 'organised'">
+      <span class="tab-badge badge-organised">2</span>
       <span class="tab-label">Sự kiện đã tổ chức ({{ events.length }})</span>
     </button>
     <button class="sub-tab" [class.active]="activeSubTab === 'attending'" (click)="activeSubTab = 'attending'">
-      <span class="tab-badge badge-attending">0</span>
-      <span class="tab-label">Sự kiện đã tham gia</span>
+      <span class="tab-badge badge-attending">3</span>
+      <span class="tab-label">Sự kiện đã tham gia({{ attendingEvents.length }})</span>
     </button>
+  </div>
+
+
+  <div *ngIf="activeTab === 'home' && activeSubTab === 'saved'" class="event-list">
+    <div *ngFor="let event of savedEvents" class="event-card">
+      <div class="event-image">
+        <img [src]="event.PosterUrl" [alt]="event.Title" />
+      </div>
+      <div class="event-body">
+        <h3 class="event-title">{{ event.Title }}</h3>
+        <p class="event-date">{{ event.StartDate | formatDate }}</p>
+        <div class="event-actions">
+          <button class="btn-save btn-saved-active">
+            <i class="fa-solid fa-bookmark"></i> Saved
+          </button>
+          <button class="btn-view">
+            <i class="fa-solid fa-arrow-up-right-from-square"></i> View
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <div *ngIf="activeTab === 'home' && activeSubTab === 'attending'" class="event-list">
+    <div *ngFor="let event of attendingEvents" class="event-card">
+      <div class="event-image">
+        <img [src]="event.PosterUrl | imageUrl" [alt]="event.Title" />
+      </div>
+      <div class="event-body">
+        <h3 class="event-title">{{ event.Title }}</h3>
+        <p class="event-date">{{ event.StartDate | formatDate }}</p>
+        <div class="event-actions">
+          <button class="btn-save btn-saved-active">
+            <i class="fa-solid fa-circle-check"></i> Đang tham gia
+          </button>
+          <button class="btn-view">
+            <i class="fa-solid fa-arrow-up-right-from-square"></i> Chi tiết
+          </button>
+        </div>
+      </div>
+    </div>
   </div>
 
 
@@ -58,7 +101,8 @@
 
   <!-- Order list in My Orders tab -->
   <div *ngIf="activeTab === 'orders' && userOrders.length > 0" class="order-list">
-    <div *ngFor="let order of userOrders" class="order-card">
+    <div *ngFor="let order of userOrders" class="order-card" [routerLink]="['/order', order.OrderId]"
+      style="cursor: pointer;">
       <!-- Header: mã đơn + trạng thái -->
       <div class="order-header">
         <div class="order-header-left">
@@ -128,8 +172,48 @@
   </div>
 
 
-  <div *ngIf="activeTab !== 'home' && activeTab !== 'orders'" class="empty-state">
-    <i class="fa-solid fa-wrench"></i>
-    <p>Tính năng đang được phát triển...</p>
+  <div *ngIf="activeTab === 'about'" class="about-section card">
+    <div class="about-header">
+      <h3 class="section-title"><i class="fa-solid fa-user-tag"></i> Giới thiệu bản thân</h3>
+    </div>
+    <div class="about-body">
+      <p class="bio-text">
+        Xin chào! Tôi là một người đam mê công nghệ và sự kiện. Với kinh nghiệm tham gia và tổ chức nhiều sự kiện quy mô
+        lớn,
+        tôi luôn mong muốn kết nối mọi người thông qua những trải nghiệm ý nghĩa.
+      </p>
+      <div class="personal-info-grid">
+        <div class="info-item">
+          <span class="info-label">Kỹ năng:</span>
+          <span class="info-value">Quản lý sự kiện, Tiếp thị, Giao tiếp</span>
+        </div>
+        <div class="info-item">
+          <span class="info-label">Sở thích:</span>
+          <span class="info-value">Du hành, Nhiếp ảnh, Công nghệ mới</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <div *ngIf="activeTab === 'setting'" class="settings-section card">
+    <div class="settings-group">
+      <h4><i class="fa-solid fa-user-gear"></i> Tài khoản</h4>
+      <div class="setting-item">
+        <label>Email</label>
+        <p>{{ currentUser?.Email || 'Đang nạp...' }}</p>
+      </div>
+      <div class="setting-item">
+        <label>Mật khẩu</label>
+        <button class="btn-change">Thay đổi</button>
+      </div>
+    </div>
+    <div class="settings-group">
+      <h4><i class="fa-solid fa-bell"></i> Thông báo</h4>
+      <div class="setting-item toggle">
+        <span>Nhận email thông báo sự kiện</span>
+        <input type="checkbox" checked />
+      </div>
+    </div>
   </div>
 </main>

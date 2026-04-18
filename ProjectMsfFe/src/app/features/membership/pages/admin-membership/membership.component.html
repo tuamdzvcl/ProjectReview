@@ -1,45 +1,54 @@
 <app-shell>
   <div class="box">
-
     <div class="dashboard-page">
       <div class="page-header">
         <h2>Quản lý Gói Thành Viên</h2>
-        <button class="btn btn-primary" (click)="addPackage()"><i class="fa-solid fa-plus"></i> Tạo gói mới</button>
+        <button class="btn btn-primary" (click)="showAddDialog()">
+          <i class="fa-solid fa-plus"></i> Tạo gói mới
+        </button>
       </div>
 
       <div class="membership-grid">
-        @for (pkg of packages(); track pkg.id) {
-        <div class="membership-card" [class.highlight]="pkg.highlight">
+        @for (pkg of packages(); track pkg.Id) {
+        <div class="membership-card" [class.highlight]="pkg.Price > 500000">
           <div class="tier-header">
-            <h3>{{ pkg.name }}</h3>
-            <div class="tier-price">{{ pkg.price | number:'1.0-0' }} <span>VNĐ/tháng</span></div>
-            @if (pkg.highlight) {
+            <h3>{{ pkg.TitleUpgrade }}</h3>
+            <div class="tier-price">
+              {{ pkg.Price | number : "1.0-0" }} <span>VNĐ/tháng</span>
+            </div>
+            @if (pkg.Price > 500000) {
             <span class="popular-badge">Phổ biến nhất</span>
             }
           </div>
 
           <div class="card-body">
-            <ul class="feature-list">
-              @for (feature of pkg.features; track $index) {
-              <li>{{ feature.text }}</li>
-              }
-            </ul>
+            <p class="description">{{ pkg.Description }}</p>
+            <div class="limit-info">
+              <i class="fa-solid fa-bolt"></i> Giới hạn:
+              <strong>{{ pkg.DailyLimit }}</strong> sự kiện/ngày
+            </div>
           </div>
 
           <div class="tier-stats">
-            <div class="stat"><span>Người dùng hiện tại:</span> <strong>{{ pkg.activeUsers | number }}</strong></div>
             <div class="stat">
               <span>Trạng thái:</span>
-              <strong [style.color]="pkg.status === 'active' ? '#3ca233' : '#e74c3c'">
-                {{ pkg.status === 'active' ? 'Đang hoạt động' : 'Ngừng hoạt động' }}
+              <strong
+                [style.color]="pkg.status === 'active' ? '#3ca233' : '#e74c3c'"
+              >
+                {{
+                  pkg.status === "active" ? "Đang hoạt động" : "Ngừng hoạt động"
+                }}
               </strong>
             </div>
           </div>
 
           <div class="tier-actions">
-            <button class="btn btn-outline" (click)="editPackage(pkg)"><i class="fa-solid fa-pen"></i> Sửa</button>
-            <button class="btn btn-danger" (click)="deletePackage(pkg.id)"><i class="fa-solid fa-trash"></i>
-              Xóa</button>
+            <button class="btn btn-outline" (click)="showEditDialog(pkg)">
+              <i class="fa-solid fa-pen"></i> Sửa
+            </button>
+            <button class="btn btn-danger" (click)="deletePackage(pkg.Id)">
+              <i class="fa-solid fa-trash"></i> Xóa
+            </button>
           </div>
         </div>
         }
@@ -47,3 +56,109 @@
     </div>
   </div>
 </app-shell>
+
+<!-- Dialog thêm/sửa gói -->
+<p-dialog
+  [(visible)]="displayDialog"
+  [header]="isEditMode ? 'Chỉnh sửa Gói' : 'Tạo Gói Mới'"
+  [modal]="true"
+  [responsive]="true"
+  [style]="{ width: '500px' }"
+  [draggable]="false"
+  [resizable]="false"
+  class="premium-dialog"
+>
+  <div class="pkg-form p-fluid">
+    <!-- Tên gói -->
+    <div class="field mb-4">
+      <label for="title" class="font-bold block mb-2">
+        <i class="fa-solid fa-tag mr-2 text-primary"></i> Tên gói
+      </label>
+      <input
+        type="text"
+        pInputText
+        id="title"
+        [(ngModel)]="selectedPkg.titleUpgrade"
+        placeholder="VD: Gói Chuyên Nghiệp"
+        required
+      />
+    </div>
+
+    <!-- Giá & Giới hạn -->
+    <div class="grid">
+      <div class="col-12 md:col-6 field mb-4">
+        <label for="price" class="font-bold block mb-2">
+          <i class="fa-solid fa-money-bill-wave mr-2 text-primary"></i> Giá (VNĐ)
+        </label>
+        <p-inputNumber
+          id="price"
+          [(ngModel)]="selectedPkg.price"
+          mode="currency"
+          currency="VND"
+          locale="vi-VN"
+          [min]="0"
+          placeholder="0"
+        ></p-inputNumber>
+      </div>
+      <div class="col-12 md:col-6 field mb-4">
+        <label for="limit" class="font-bold block mb-2">
+          <i class="fa-solid fa-bolt mr-2 text-primary"></i> Giới hạn/ngày
+        </label>
+        <p-inputNumber
+          id="limit"
+          [(ngModel)]="selectedPkg.dailyLimit"
+          [showButtons]="true"
+          [min]="1"
+          placeholder="10"
+        ></p-inputNumber>
+      </div>
+    </div>
+
+    <!-- Trạng thái -->
+    <div class="field mb-4">
+      <label for="status" class="font-bold block mb-2">
+        <i class="fa-solid fa-circle-check mr-2 text-primary"></i> Trạng thái hoạt động
+      </label>
+      <p-dropdown
+        [options]="statusOptions"
+        [(ngModel)]="selectedPkg.status"
+        optionLabel="label"
+        optionValue="value"
+        appendTo="body"
+      ></p-dropdown>
+    </div>
+
+    <!-- Mô tả -->
+    <div class="field mb-1">
+      <label for="description" class="font-bold block mb-2">
+        <i class="fa-solid fa-align-left mr-2 text-primary"></i> Mô tả tính năng
+      </label>
+      <textarea
+        id="description"
+        pInputTextarea
+        [(ngModel)]="selectedPkg.description"
+        rows="4"
+        placeholder="Nhập mô tả các tính năng nổi bật của gói này..."
+      ></textarea>
+    </div>
+  </div>
+
+  <ng-template pTemplate="footer">
+    <div class="flex justify-content-end gap-2 pt-2">
+      <button
+        pButton
+        label="Hủy"
+        icon="pi pi-times"
+        class="p-button-text p-button-secondary"
+        (click)="displayDialog = false"
+      ></button>
+      <button
+        pButton
+        [label]="isEditMode ? 'Cập nhật' : 'Tạo mới'"
+        [icon]="isEditMode ? 'pi pi-save' : 'pi pi-plus'"
+        class="p-button-primary px-4"
+        (click)="savePackage()"
+      ></button>
+    </div>
+  </ng-template>
+</p-dialog>

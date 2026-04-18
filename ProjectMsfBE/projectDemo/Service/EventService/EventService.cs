@@ -866,7 +866,7 @@ namespace projectDemo.Service.EventService
                     );
                 }
 
-                events.Status = EnumStatusEvent.PUBLISHED;
+                events.Status = request.Status.Value;
                 events.UpdatedDate = DateTime.Now;
 
                 await _uow.SaveChangesAsync();
@@ -888,7 +888,8 @@ namespace projectDemo.Service.EventService
         }
 
         public async Task<PageResponse<EventTypeTickResponses>> GetPageWithTicketTypes(
-            PageRequest query
+            PageRequest query,
+            bool isAdmin = false
         )
         {
             await SyncEndedEventsAsync();
@@ -897,7 +898,7 @@ namespace projectDemo.Service.EventService
             if (query.PageSize <= 0)
                 query.PageSize = 10;
 
-            return await _eventRepository.GetAllWithTicketTypesAsync(query);
+            return await _eventRepository.GetAllWithTicketTypesAsync(query, isAdmin);
         }
 
         public async Task<PageResponse<EventTypeTickResponses>> GetPageWithTicketTypesbyId(

@@ -95,8 +95,8 @@ export class UserProfileComponent implements OnInit {
     this.coverImageUrl = URL.createObjectURL(file);
   }
 
-  onAvatarChange(file: File) {
-    this.profileImageUrl = URL.createObjectURL(file);
+  onAvatarChange(newUrl: string) {
+    this.profileImageUrl = newUrl;
   }
 
   onFollow() {

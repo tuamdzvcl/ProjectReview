@@ -24,4 +24,8 @@ export class OrderService extends BaseApiService {
     };
     return this.getpage<any>('order/user', params);
   }
+
+  getOrderDetail(OrderId: string): Observable<any> {
+    return this.get<any>(`order/${OrderId}/detail`);
+  }
 }

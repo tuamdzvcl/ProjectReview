@@ -7,6 +7,7 @@ import { DatePicker } from 'primeng/datepicker';
 import { ReportService } from '../../../../core/services/report.service';
 import { ReportResponse } from '../../../../core/model/response/report.model';
 import { VndCurrencyPipe } from '../../../../shared/pipes/vnd-currency.pipe';
+import { TokenService } from '../../../../core/services/token.service';
 
 @Component({
   selector: 'app-dashboard',
@@ -18,12 +19,14 @@ import { VndCurrencyPipe } from '../../../../shared/pipes/vnd-currency.pipe';
 })
 export class DashboardComponent implements OnInit {
   private reportService = inject(ReportService);
+  private tokenService = inject(TokenService);
   private cdr = inject(ChangeDetectorRef);
 
   chartData: any;
   chartOptions: any;
   selectedTab: string = 'Monthly';
-  selectedDataType: string = 'Revenue'; // 'Revenue' or 'Tickets'
+  selectedDataType: string = 'Revenue'; // 'Revenue', 'Tickets', 'PlatformRevenue', 'Packages'
+  isAdmin: boolean = false;
   private cachedChartList: any[] = [];
 
   // Summary data from API (Defaults to 0 to prevent "NaN" or layout break)
@@ -40,6 +43,7 @@ export class DashboardComponent implements OnInit {
   rangeDates: Date[] | undefined;
 
   ngOnInit() {
+    this.isAdmin = this.tokenService.getRole()?.toUpperCase() === 'ADMIN';
     this.initChartOptions();
 
     // Mặc định chọn tháng hiện tại
@@ -58,6 +62,10 @@ export class DashboardComponent implements OnInit {
     }
   }
 
+  onDataTypeChange() {
+    this.fetchRevenueStats(this.selectedTab);
+  }
+
   fetchRevenueStats(type: string) {
     this.selectedTab = type;
     const groupBy = type.toLowerCase();
@@ -70,7 +78,16 @@ export class DashboardComponent implements OnInit {
       toDate = this.formatDateToLocalISO(this.rangeDates[1]);
     }
 
-    this.reportService.GetRevenueReport(fromDate, toDate, groupBy).subscribe({
+    let request$;
+    if (this.selectedDataType === 'PlatformRevenue') {
+      request$ = this.reportService.GetPlatformRevenueReport(fromDate, toDate, groupBy);
+    } else if (this.selectedDataType === 'Packages') {
+      request$ = this.reportService.GetUpgradesReport(fromDate, toDate, groupBy);
+    } else {
+      request$ = this.reportService.GetRevenueReport(fromDate, toDate, groupBy);
+    }
+
+    request$.subscribe({
       next: (data: ReportResponse) => {
         const summary = data?.Summary || {};
         this.totalRevenue = summary.TotalRevenue ?? 0;
@@ -100,17 +117,26 @@ export class DashboardComponent implements OnInit {
   }
 
   updateChartData() {
-    const isRevenue = this.selectedDataType === 'Revenue';
-    const label = isRevenue ? 'Doanh thu' : 'Vé đã bán';
-    const color = isRevenue ? '#81E979' : '#3B82F6';
-    const borderColor = isRevenue ? '#6cc04a' : '#2563EB';
+    const isRevenue = this.selectedDataType === 'Revenue' || this.selectedDataType === 'PlatformRevenue' || this.selectedDataType === 'Packages';
+    
+    let label = 'Doanh thu';
+    if (this.selectedDataType === 'Tickets') label = 'Vé đã bán';
+    if (this.selectedDataType === 'Packages') label = 'Doanh thu gói';
+    
+    let color = '#81E979';
+    if (this.selectedDataType === 'Tickets') color = '#3B82F6';
+    if (this.selectedDataType === 'Packages') color = '#A855F7';
+
+    let borderColor = '#6cc04a';
+    if (this.selectedDataType === 'Tickets') borderColor = '#2563EB';
+    if (this.selectedDataType === 'Packages') borderColor = '#9333EA';
 
     this.chartData = {
       labels: this.cachedChartList.map((c) => c.Label || ''),
       datasets: [
         {
           label: label,
-          data: this.cachedChartList.map((c) => isRevenue ? (c.Revenue ?? 0) : (c.Tickets ?? 0)),
+          data: this.cachedChartList.map((c) => (this.selectedDataType === 'Tickets') ? (c.Tickets ?? 0) : (c.Revenue ?? 0)),
           backgroundColor: color,
           borderColor: borderColor,
           borderWidth: 1,

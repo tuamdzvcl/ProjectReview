@@ -19,4 +19,20 @@ export class ReportService extends BaseApiService {
 
     return this.get<ReportResponse>(queryString);
   }
+
+  GetPlatformRevenueReport(fromDate?: string, toDate?: string, groupBy: string = 'monthly'): Observable<ReportResponse> {
+    let queryString = `report/revenue?groupBy=${groupBy}&all=true`;
+    if (fromDate) queryString += `&fromDate=${fromDate}`;
+    if (toDate) queryString += `&toDate=${toDate}`;
+
+    return this.get<ReportResponse>(queryString);
+  }
+
+  GetUpgradesReport(fromDate?: string, toDate?: string, groupBy: string = 'monthly'): Observable<ReportResponse> {
+    let queryString = `report/upgrades?groupBy=${groupBy}`;
+    if (fromDate) queryString += `&fromDate=${fromDate}`;
+    if (toDate) queryString += `&toDate=${toDate}`;
+
+    return this.get<ReportResponse>(queryString);
+  }
 }

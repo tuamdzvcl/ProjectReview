@@ -6,11 +6,11 @@
 
   
   <div *ngIf="user">
-    <img src="cat.jpg" class="avatar" (click)="toggleDropdown()" />
+    <img [src]="user.AvatarUrl | imageUrl" class="avatar" (click)="toggleDropdown()" />
 
     <div class="dropdown" *ngIf="isOpen">
       <div class="user-info">
-        <img src="cat.jpg" alt="avarta" />
+        <img [src]="user.AvatarUrl | imageUrl" alt="avarta" />
         <div class="infor">
           <h4>{{ fullName }}</h4>
           <p>{{ user?.Email }}</p>

@@ -15,6 +15,7 @@ import { Router } from '@angular/router';
 import { ConfirmationService, MessageService } from 'primeng/api';
 import { ConfirmDialog } from 'primeng/confirmdialog';
 import { Toast } from 'primeng/toast';
+import { TokenService } from '../../../../core/services/token.service';
 
 @Component({
   selector: 'app-events',
@@ -37,7 +38,8 @@ export class EventsComponent implements OnInit {
     private eventService: EventService,
     private router: Router,
     private confirmationService: ConfirmationService,
-    private messageService: MessageService
+    private messageService: MessageService,
+    private tokenService: TokenService
   ) {}
 
   events: any[] = [];
@@ -46,24 +48,37 @@ export class EventsComponent implements OnInit {
   pageSize = 10;
   key = '';
   showDropdown: string | null = null;
+  userRole: string | null = null;
 
   ngOnInit() {
+    this.userRole = this.tokenService.getRole();
     this.loadEvents();
   }
 
   loadEvents() {
-    this.eventService
-      .GetEventswithTypeticketbyid(this.pageIndex, this.pageSize, this.key)
-      .subscribe({
-        next: (res) => {
-          console.log('DATA:', res);
-          console.log(res.items);
-          this.events = res.items;
-        },
-        error: (err) => {
-          console.error('ERROR:', err);
-        },
-      });
+    const serviceMethod =
+      this.userRole === 'ADMIN'
+        ? this.eventService.GetEventswithTypeticket(
+            this.pageIndex,
+            this.pageSize,
+            this.key
+          )
+        : this.eventService.GetEventswithTypeticketbyid(
+            this.pageIndex,
+            this.pageSize,
+            this.key
+          );
+
+    serviceMethod.subscribe({
+      next: (res) => {
+        console.log('DATA:', res);
+        this.events = res.items;
+        this.totalRecords = res.totalRecords;
+      },
+      error: (err) => {
+        console.error('ERROR:', err);
+      },
+    });
   }
 
   onSearch(event: any) {
@@ -147,6 +162,72 @@ export class EventsComponent implements OnInit {
               severity: 'error',
               summary: 'Lỗi',
               detail: 'Có lỗi xảy ra khi nhân bản sự kiện!',
+            });
+          },
+        });
+      },
+    });
+  }
+
+  publicEvent(event: any) {
+    this.showDropdown = null;
+    this.confirmationService.confirm({
+      message: `Bạn có chắc chắn muốn công khai sự kiện "${event.Title}"? Sau khi công khai, Admin sẽ có thể duyệt sự kiện của bạn.`,
+      header: 'Xác nhận công khai',
+      icon: 'pi pi-megaphone',
+      acceptLabel: 'Công khai',
+      rejectLabel: 'Hủy',
+      acceptButtonStyleClass: 'p-button-info',
+      rejectButtonStyleClass: 'p-button-text',
+      accept: () => {
+        this.eventService.UpdateEventStatus(event.Id, 4).subscribe({
+          next: () => {
+            this.messageService.add({
+              severity: 'success',
+              summary: 'Thành công',
+              detail: `Sự kiện đã được chuyển sang trạng thái chờ duyệt!`,
+            });
+            this.loadEvents();
+          },
+          error: (err) => {
+            console.error('Lỗi khi công khai:', err);
+            this.messageService.add({
+              severity: 'error',
+              summary: 'Lỗi',
+              detail: 'Có lỗi xảy ra khi thay đổi trạng thái sự kiện!',
+            });
+          },
+        });
+      },
+    });
+  }
+
+  approveEvent(event: any) {
+    this.showDropdown = null;
+    this.confirmationService.confirm({
+      message: `Bạn có chắc chắn muốn duyệt và công khai sự kiện "${event.Title}" không?`,
+      header: 'Xác nhận duyệt sự kiện',
+      icon: 'pi pi-check-circle',
+      acceptLabel: 'Duyệt',
+      rejectLabel: 'Hủy',
+      acceptButtonStyleClass: 'p-button-success',
+      rejectButtonStyleClass: 'p-button-text',
+      accept: () => {
+        this.eventService.UpdateEventStatus(event.Id, 2).subscribe({
+          next: () => {
+            this.messageService.add({
+              severity: 'success',
+              summary: 'Thành công',
+              detail: `Sự kiện "${event.Title}" đã được duyệt thành công!`,
+            });
+            this.loadEvents();
+          },
+          error: (err) => {
+            console.error('Lỗi khi duyệt sự kiện:', err);
+            this.messageService.add({
+              severity: 'error',
+              summary: 'Lỗi',
+              detail: 'Có lỗi xảy ra khi duyệt sự kiện. Vui lòng thử lại!',
             });
           },
         });

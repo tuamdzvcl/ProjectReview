@@ -2,10 +2,9 @@
   <div class="profile-card">
     <div class="avatar-wrapper">
       <div class="avatar-circle">
-        <img [src]="profileImageUrl" alt="Ảnh đại diện" />
+        <img [src]="profileImageUrl | imageUrl" alt="Ảnh đại diện" />
       </div>
 
-      <!-- Nút camera nhỏ để đổi ảnh đại diện (chỉ hiện nếu là chủ sở hữu) -->
       <label class="avatar-edit-btn" for="avatar-upload" *ngIf="isOwner">
         <i class="fa-solid fa-camera"></i>
         <input id="avatar-upload" type="file" class="hidden-input" accept="image/*" (change)="onFileSelected($event)" />

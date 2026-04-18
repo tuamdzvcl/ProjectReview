@@ -22,46 +22,8 @@ namespace projectDemo.Service.ReportService
             ReportRequest request
         )
         {
-            string groupBy = (request.GroupBy ?? "monthly").Trim().ToLower();
-
-            DateTime fromDate;
-            DateTime toDate;
-
-            if (groupBy == "yearly")
-            {
-                int year = request.FromDate?.Year ?? DateTime.Today.Year;
-                fromDate = new DateTime(year, 1, 1);
-                toDate = new DateTime(year, 12, 31);
-            }
-            else
-            {
-                if (!request.FromDate.HasValue || !request.ToDate.HasValue)
-                {
-                    return ApiResponse<ReportResponse>.FailResponse(
-                        EnumStatusCode.BAD_REQUEST,
-                        "Vui lòng chọn Ngày bắt đầu và Ngày kết thúc."
-                    );
-                }
-
-                fromDate = request.FromDate.Value.Date;
-                toDate = request.ToDate.Value.Date;
-
-                if (fromDate > toDate)
-                {
-                    return ApiResponse<ReportResponse>.FailResponse(
-                        EnumStatusCode.BAD_REQUEST,
-                        "Ngày bắt đầu không được lớn hơn ngày kết thúc."
-                    );
-                }
-
-                if (groupBy == "daily" && (toDate - fromDate).TotalDays > 31)
-                {
-                    return ApiResponse<ReportResponse>.FailResponse(
-                        EnumStatusCode.BAD_REQUEST,
-                        "Báo cáo theo ngày chỉ hỗ trợ tối đa 1 tháng."
-                    );
-                }
-            }
+            var (fromDate, toDate, groupBy, error) = ValidateRequest(request);
+            if (error != null) return error;
 
             var totalDays = (toDate - fromDate).Days + 1;
             var previousFromDate = fromDate.AddDays(-totalDays);
@@ -78,8 +40,86 @@ namespace projectDemo.Service.ReportService
                 previousToDate
             );
 
-            var summary = CalculateSummary(currentRows, previousRows);
+            return GenerateSuccessResponse(currentRows, previousRows, fromDate, toDate, groupBy);
+        }
 
+        public async Task<ApiResponse<ReportResponse>> GetPlatformRevenueReportAsync(ReportRequest request)
+        {
+            var (fromDate, toDate, groupBy, error) = ValidateRequest(request);
+            if (error != null) return error;
+
+            var totalDays = (toDate - fromDate).Days + 1;
+            var previousFromDate = fromDate.AddDays(-totalDays);
+            var previousToDate = fromDate;
+
+            var currentRows = await _reportQuery.GetPlatformRevenueRowsAsync(
+                fromDate,
+                toDate.AddDays(1)
+            );
+            var previousRows = await _reportQuery.GetPlatformRevenueRowsAsync(
+                previousFromDate,
+                previousToDate
+            );
+
+            return GenerateSuccessResponse(currentRows, previousRows, fromDate, toDate, groupBy);
+        }
+
+        public async Task<ApiResponse<ReportResponse>> GetUpgradeReportAsync(ReportRequest request)
+        {
+            var (fromDate, toDate, groupBy, error) = ValidateRequest(request);
+            if (error != null) return error;
+
+            var totalDays = (toDate - fromDate).Days + 1;
+            var previousFromDate = fromDate.AddDays(-totalDays);
+            var previousToDate = fromDate;
+
+            var currentRows = await _reportQuery.GetUpgradeRowsAsync(
+                fromDate,
+                toDate.AddDays(1)
+            );
+            var previousRows = await _reportQuery.GetUpgradeRowsAsync(
+                previousFromDate,
+                previousToDate
+            );
+
+            return GenerateSuccessResponse(currentRows, previousRows, fromDate, toDate, groupBy);
+        }
+
+        private (DateTime fromDate, DateTime toDate, string groupBy, ApiResponse<ReportResponse>? error) ValidateRequest(ReportRequest request)
+        {
+            string groupBy = (request.GroupBy ?? "monthly").Trim().ToLower();
+            DateTime fromDate;
+            DateTime toDate;
+
+            if (groupBy == "yearly")
+            {
+                int year = request.FromDate?.Year ?? DateTime.Today.Year;
+                fromDate = new DateTime(year, 1, 1);
+                toDate = new DateTime(year, 12, 31);
+            }
+            else
+            {
+                if (!request.FromDate.HasValue || !request.ToDate.HasValue)
+                {
+                    return (default, default, groupBy, ApiResponse<ReportResponse>.FailResponse(EnumStatusCode.BAD_REQUEST, "Vui lòng chọn Ngày bắt đầu và Ngày kết thúc."));
+                }
+                fromDate = request.FromDate.Value.Date;
+                toDate = request.ToDate.Value.Date;
+                if (fromDate > toDate)
+                {
+                    return (default, default, groupBy, ApiResponse<ReportResponse>.FailResponse(EnumStatusCode.BAD_REQUEST, "Ngày bắt đầu không được lớn hơn ngày kết thúc."));
+                }
+                if (groupBy == "daily" && (toDate - fromDate).TotalDays > 31)
+                {
+                    return (default, default, groupBy, ApiResponse<ReportResponse>.FailResponse(EnumStatusCode.BAD_REQUEST, "Báo cáo theo ngày chỉ hỗ trợ tối đa 1 tháng."));
+                }
+            }
+            return (fromDate, toDate, groupBy, null);
+        }
+
+        private ApiResponse<ReportResponse> GenerateSuccessResponse(List<RevenueReportFlatRow> currentRows, List<RevenueReportFlatRow> previousRows, DateTime fromDate, DateTime toDate, string groupBy)
+        {
+            var summary = CalculateSummary(currentRows, previousRows);
             var chart = BuildChart(currentRows, groupBy, fromDate, toDate);
 
             var response = new ReportResponse
@@ -94,11 +134,7 @@ namespace projectDemo.Service.ReportService
                 },
             };
 
-            return ApiResponse<ReportResponse>.SuccessResponse(
-                EnumStatusCode.SUCCESS,
-                response,
-                "Lấy báo cáo doanh thu thành công"
-            );
+            return ApiResponse<ReportResponse>.SuccessResponse(EnumStatusCode.SUCCESS, response, "Lấy báo cáo thành công");
         }
 
         private RevenueSummaryDto CalculateSummary(

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -22,7 +22,6 @@ namespace EventTick.Model.Models
         public string TicketCode { get; set; } = null!;
 
         [Required]
-        [MaxLength(255)]
         public string QRCode { get; set; } = null!;
 
         [Required]

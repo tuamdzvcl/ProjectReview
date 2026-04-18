@@ -45,6 +45,9 @@ namespace EventTick.Model.Models
         [MaxLength(500)]
         public string? AvatarUrl { get; set; }
 
+        [MaxLength(500)]
+        public string? BackGroupUrl { get; set; }
+
         public DateTime? DateLock { get; set; }
         public int? Isfalse { get; set; }
 

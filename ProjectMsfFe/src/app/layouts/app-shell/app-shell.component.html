@@ -31,8 +31,8 @@
         </button>
       </ng-container>
 
-      <button *ngIf="userRole() === 'ADMIN'" class="nav-item" type="button" routerLink="/admin/user"
-        routerLinkActive="nav-item--active">
+      <button *ngIf="userRole() === 'ADMIN' || userRole() === 'ORGANIZER'" class="nav-item" type="button"
+        routerLink="/admin/user" routerLinkActive="nav-item--active">
         <span class="nav-item__icon"><i class="fa-solid fa-address-book"></i></span>
         <span class="nav-item__label">Danh sách User</span>
       </button>

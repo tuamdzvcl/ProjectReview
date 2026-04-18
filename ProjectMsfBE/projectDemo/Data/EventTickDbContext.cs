@@ -111,6 +111,10 @@ namespace projectDemo.Data
                 .WithOne(p => p.Orders)
                 .HasForeignKey<Payment>(p => p.OrderID);
 
+            modelBuilder.Entity<Order>()
+                .Property(o => o.UserUpgradeId)
+                .IsRequired(false);
+
             modelBuilder
                 .Entity<User>()
                 .HasMany(u => u.ApiLogs)

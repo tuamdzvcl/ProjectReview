@@ -109,7 +109,8 @@ namespace projectDemo.Controllers
         [AllowAnonymous]
         public async Task<IActionResult> GetPageWithTicketTypes([FromQuery] PageRequest query)
         {
-            var result = await _eventService.GetPageWithTicketTypes(query);
+            var isAdmin = User.Identity.IsAuthenticated && User.IsInRole("ADMIN");
+            var result = await _eventService.GetPageWithTicketTypes(query, isAdmin);
             return Ok(result);
         }
 

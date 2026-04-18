@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Net.WebSockets;
 using AutoMapper;
 using Azure;
@@ -133,6 +133,7 @@ namespace projectDemo.Service.OrderService
                 var order = new Order()
                 {
                     Id = Guid.NewGuid(),
+                    OrderType= EnumOrderType.TICKET.ToString(),
                     OrderCode = GenerateCode(),
                     Status = EnumStatusOrder.PENDING,
                     CreatedBy = user.Username,
@@ -182,16 +183,21 @@ namespace projectDemo.Service.OrderService
                         TickTypeId = typeTicket.Id,
                         expiration = typeTicket.Event.EndDate,
                     };
-                    var qrcode = GenerateQrCode(tickqr);
 
-                    var tick = new Ticket
+                    // For each item in the quantity, create a unique ticket
+                    for (int i = 0; i < item.Quantity; i++)
                     {
-                        QRCode = qrcode,
-                        Status = EnumStatusTick.VALID,
-                        CreatedDate = DateTime.Now,
-                        OrderDetailID = detail.Id,
-                    };
-                    await _ticketsRepositorys.CreateTicket(tick);
+                        var qrcode = GenerateQrCode(tickqr);
+                        var tick = new Ticket
+                        {
+                            TicketCode = Guid.NewGuid().ToString(),
+                            QRCode = qrcode,
+                            Status = EnumStatusTick.VALID,
+                            CreatedDate = DateTime.Now,
+                            OrderDetailID = detail.Id,
+                        };
+                        await _ticketsRepositorys.CreateTicket(tick);
+                    }
                 }
                 order.TotalAmount = TotalAmount;
                 await _orderRepository.CreateOrder(order);
@@ -341,31 +347,49 @@ namespace projectDemo.Service.OrderService
         {
             try
             {
-                var (order, code, mes) = await _orderRepository.GetOrderListOrderDetail(OrderID);
-                if (code != 200)
+                var order = await _orderRepository.GetOrderForEmailAsync(OrderID);
+                if (order == null)
                 {
                     return ApiResponse<OrderResponse>.FailResponse(
                         Entity.Enum.EnumStatusCode.OrderNOTFOUND,
-                        "Không tìm thấy Order "
+                        "Không tìm thấy Order"
                     );
                 }
 
-                var orderDetails = order
-                    .orderDetails.Select(x => new OrderDetailResponse
+                var firstDetail = order.OrderDetails.FirstOrDefault();
+                var eventInfo = firstDetail?.TicketTypes?.Event;
+
+                var orderDetails = order.OrderDetails.Select(x => new OrderDetailResponse
+                {
+                    OrderIdDetail = x.Id,
+                    Price = x.Price,
+                    Quantity = x.Quantity,
+                    SubTotal = order.TotalAmount,
+                    TicketTypeName = x.TicketTypes?.Name ?? "Unknown",
+                    Tickets = x.Ticket != null ? x.Ticket.Select(t => new TicketResponse
                     {
-                        OrderIdDetail = x.Id,
-                        Price = x.Price,
-                        Quantity = x.Quantity,
-                        TicketTypeName = x.TicketTypeName.ToString(),
-                    })
-                    .ToList();
+                        TicketCode = t.TicketCode,
+                        QRCode = t.QRCode,
+                        Status = t.Status.ToString()
+                    }).ToList() : new List<TicketResponse>()
+                }).ToList();
+
                 var response = new OrderResponse()
                 {
                     OrderID = order.Id,
+                    CreateAt = order.CreatedDate,
                     OrderCode = order.OrderCode,
                     Status = order.Status.ToString(),
-                    FullName = $"{order.FirstName} {order.LastName}",
+                    FullName = order.User != null ? $"{order.User.FirstName} {order.User.LastName}" : "Unknown",
                     TotalAmount = order.TotalAmount,
+
+                    // Event info from the first detail's ticket type
+                    EventName = eventInfo?.Title ?? "",
+                    EventLocation = eventInfo?.Location ?? "",
+                    EventPosterUrl = eventInfo?.PosterUrl ?? "",
+                    EventStartDate = eventInfo?.StartDate ?? DateTime.MinValue,
+                    EventEndDate = eventInfo?.EndDate,
+
                     orderDetails = orderDetails,
                 };
 
@@ -377,8 +401,8 @@ namespace projectDemo.Service.OrderService
             catch (Exception ex)
             {
                 return ApiResponse<OrderResponse>.FailResponse(
-                    Entity.Enum.EnumStatusCode.SUCCESS,
-                    ex.Message
+                    Entity.Enum.EnumStatusCode.SERVER,
+                    ex.InnerException?.Message ?? ex.Message
                 );
             }
         }

@@ -134,7 +134,6 @@ namespace projectDemo.Migrations
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<Guid?>("UserUpgradeId")
-                        .IsRequired()
                         .HasColumnType("uniqueidentifier");
 
                     b.HasKey("Id");
@@ -269,21 +268,21 @@ namespace projectDemo.Migrations
                         new
                         {
                             Id = 1,
-                            CreatedDate = new DateTime(2026, 4, 17, 15, 48, 54, 33, DateTimeKind.Utc).AddTicks(3986),
+                            CreatedDate = new DateTime(2026, 4, 18, 6, 47, 25, 513, DateTimeKind.Utc).AddTicks(3451),
                             IsDeleted = false,
                             RoleName = "ADMIN"
                         },
                         new
                         {
                             Id = 2,
-                            CreatedDate = new DateTime(2026, 4, 17, 15, 48, 54, 33, DateTimeKind.Utc).AddTicks(3997),
+                            CreatedDate = new DateTime(2026, 4, 18, 6, 47, 25, 513, DateTimeKind.Utc).AddTicks(3472),
                             IsDeleted = false,
                             RoleName = "ORGANIZER"
                         },
                         new
                         {
                             Id = 3,
-                            CreatedDate = new DateTime(2026, 4, 17, 15, 48, 54, 33, DateTimeKind.Utc).AddTicks(4000),
+                            CreatedDate = new DateTime(2026, 4, 18, 6, 47, 25, 513, DateTimeKind.Utc).AddTicks(3474),
                             IsDeleted = false,
                             RoleName = "CUSTOMER"
                         });
@@ -315,8 +314,7 @@ namespace projectDemo.Migrations
 
                     b.Property<string>("QRCode")
                         .IsRequired()
-                        .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("Status")
                         .HasColumnType("int");
@@ -404,6 +402,10 @@ namespace projectDemo.Migrations
                         .HasMaxLength(500)
                         .HasColumnType("nvarchar(500)");
 
+                    b.Property<string>("BackGroupUrl")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
                     b.Property<string>("CreatedBy")
                         .HasMaxLength(255)
                         .HasColumnType("nvarchar(255)");
@@ -471,7 +473,7 @@ namespace projectDemo.Migrations
                             IsDeleted = false,
                             IsLock = false,
                             LastName = "admin",
-                            PasswordHash = "$2a$11$pN/qEa1hzMz0onuG7I.PIe/k/Ach8UwbnZDcAABo/4BdEOEKjKYSG",
+                            PasswordHash = "$2a$11$kZnHVxPlXOt0cuJNS8XBROkEN.9m2mbm6k87NYJ8AGLyGXyn1Bbqy",
                             Username = "admin"
                         });
                 });
@@ -1193,9 +1195,7 @@ namespace projectDemo.Migrations
 
                     b.HasOne("projectDemo.Entity.Models.UserUpgrade", "UserUpgrade")
                         .WithMany()
-                        .HasForeignKey("UserUpgradeId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("UserUpgradeId");
 
                     b.Navigation("User");
 

@@ -1,0 +1,124 @@
+<main class="order-detail-page">
+  <!-- Top Navigation -->
+  <nav class="top-nav">
+    <div class="container">
+      <a routerLink="/profile" class="btn-back">
+        <i class="fa-solid fa-chevron-left"></i> Quay lại hồ sơ
+      </a>
+    </div>
+  </nav>
+
+  <div *ngIf="isLoading" class="loading-state">
+    <div class="spinner"></div>
+    <p>Đang chuẩn bị vé của bạn...</p>
+  </div>
+
+  <div *ngIf="!isLoading && order" class="order-content animate-fade-in">
+    <!-- Hero Header -->
+    <header class="event-hero">
+      <div class="hero-bg">
+        <img [src]="order.EventPosterUrl | imageUrl" [alt]="order.EventName" />
+        <div class="hero-overlay"></div>
+      </div>
+      <div class="container hero-content">
+        <div class="order-meta">
+          <span class="order-id">Đơn hàng #{{ order.OrderCode }}</span>
+          <span class="order-status" [attr.data-status]="order.Status">{{ order.Status }}</span>
+        </div>
+        <h1 class="event-title">{{ order.EventName }}</h1>
+        <div class="event-quick-info">
+          <div class="item">
+            <i class="fa-solid fa-location-dot"></i>
+            <span>{{ order.EventLocation }}</span>
+          </div>
+          <div class="item">
+            <i class="fa-regular fa-calendar-check"></i>
+            <span>{{ order.EventStartDate | formatDate }}</span>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <div class="container main-layout">
+      <!-- Sidebar/Info Column -->
+      <aside class="info-column">
+        <div class="info-card glass-card">
+          <h3 class="card-title">Thông tin giao dịch</h3>
+          <div class="info-list">
+            <div class="info-row">
+              <span class="label">Người đặt</span>
+              <span class="value">{{ order.FullName }}</span>
+            </div>
+            <div class="info-row">
+              <span class="label">Ngày đặt</span>
+              <span class="value">{{ order.CreateAt | formatDate }}</span>
+            </div>
+            <div class="info-row highlight">
+              <span class="label">Tổng cộng</span>
+              <span class="value price">{{ order.TotalAmount | vndCurrency }}</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="security-card glass-card">
+          <i class="fa-solid fa-shield-halved"></i>
+          <p>Mã QR này dùng để check-in tại cổng. Không chia sẻ mã này cho người lạ.</p>
+        </div>
+      </aside>
+
+      <!-- Tickets Grid Column -->
+      <section class="tickets-column">
+        <h2 class="column-title">Vé đã mua ({{ order.Quantity }} vé)</h2>
+
+        <div class="ticket-groups">
+          <div *ngFor="let detail of order.orderDetails" class="ticket-type-group">
+            <div class="type-header">
+              <span class="type-name">{{ detail.TicketTypeName }}</span>
+              <span class="type-qty">×{{ detail.Quantity }}</span>
+            </div>
+
+            <div class="tickets-grid">
+              <div *ngFor="let ticket of detail.Tickets; let i = index" class="premium-ticket-card">
+                <div class="ticket-left">
+                  <div class="ticket-stub">
+                    <span class="ticket-num">VÉ #{{ i + 1 }}</span>
+                    <h4 class="ticket-event-name">{{ order.EventName }}</h4>
+                    <p class="ticket-type-badge">{{ detail.TicketTypeName }}</p>
+                  </div>
+                  <div class="ticket-footer">
+                    <span class="ticket-code">{{ ticket.TicketCode }}</span>
+                    <span class="status-indicator" [attr.data-status]="ticket.Status">
+                      <i class="fa-solid fa-circle"></i> {{ ticket.Status }}
+                    </span>
+                  </div>
+                </div>
+
+                <div class="ticket-divider">
+                  <div class="notch top"></div>
+                  <div class="dash-line"></div>
+                  <div class="notch bottom"></div>
+                </div>
+
+                <div class="ticket-right">
+                  <div class="qr-wrapper">
+                    <img [src]="getQrCodeUrl(ticket.QRCode)" [alt]="'QR Code'" />
+                  </div>
+                  <span class="qr-label">QUÉT TẠI CỔNG</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+  </div>
+
+  <div *ngIf="!isLoading && !order" class="error-state animate-fade-in">
+    <div class="error-box">
+      <i class="fa-solid fa-receipt"></i>
+      <h3>Oops! Không thấy đơn hàng</h3>
+      <p>Thông tin bạn yêu cầu hiện không có hoặc bạn không có quyền truy cập.</p>
+      <button routerLink="/profile" class="btn-primary">Quay lại hồ sơ</button>
+    </div>
+  </div>
+</main>

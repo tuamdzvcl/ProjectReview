@@ -1,107 +1,157 @@
-import { Component, signal } from '@angular/core';
+import { Component, OnInit, signal, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { AppShellComponent } from '../../../../layouts/app-shell/app-shell.component';
-
-interface MembershipFeature {
-  text: string;
-}
-
-export interface MembershipPackage {
-  id: string;
-  name: string;
-  price: number;
-  highlight?: boolean;
-  features: MembershipFeature[];
-  activeUsers: number;
-  status: 'active' | 'inactive';
-}
+import { UpgradeService } from '../../../../core/services/upgrade.service';
+import {
+  UpgradeResponse,
+  UpgradeRequest,
+} from '../../../../core/model/response/upgrade.model';
+import { DialogModule } from 'primeng/dialog';
+import { ButtonModule } from 'primeng/button';
+import { InputTextModule } from 'primeng/inputtext';
+import { InputNumberModule } from 'primeng/inputnumber';
+import { DropdownModule } from 'primeng/dropdown';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-membership',
   standalone: true,
-  imports: [CommonModule, AppShellComponent],
+  imports: [
+    CommonModule,
+    AppShellComponent,
+    FormsModule,
+    DialogModule,
+    ButtonModule,
+    InputTextModule,
+    InputNumberModule,
+    DropdownModule,
+  ],
   templateUrl: './membership.component.html',
-  styleUrl: './membership.component.scss'
+  styleUrl: './membership.component.scss',
 })
-export class MembershipComponent {
-  packages = signal<MembershipPackage[]>([
-    {
-      id: '1',
-      name: 'Cơ bản',
-      price: 300000,
-      activeUsers: 1245,
-      status: 'active',
-      features: [
-        { text: 'Tạo tối đa 5 sự kiện/tháng' },
-        { text: 'Quản lý người tham dự cơ bản' },
-        { text: 'Hỗ trợ qua email' }
-      ]
-    },
-    {
-      id: '2',
-      name: 'Chuyên nghiệp',
-      price: 500000,
-      highlight: true,
-      activeUsers: 850,
-      status: 'active',
-      features: [
-        { text: 'Tạo tối đa 15 sự kiện/tháng' },
-        { text: 'Quản lý người tham dự nâng cao' },
-        { text: 'Hỗ trợ qua email & chat' },
-        { text: 'Phân tích báo cáo cơ bản' }
-      ]
-    },
-    {
-      id: '3',
-      name: 'Cao cấp',
-      price: 1000000,
-      activeUsers: 120,
-      status: 'active',
-      features: [
-        { text: 'Không giới hạn số lượng sự kiện' },
-        { text: 'Đầy đủ tính năng quản lý' },
-        { text: 'Hỗ trợ 24/7 (Email, Chat, Phone)' },
-        { text: 'Báo cáo phân tích chuyên sâu' }
-      ]
-    }
-  ]);
+export class MembershipComponent implements OnInit {
+  private upgradeService = inject(UpgradeService);
 
-  addPackage() {
-    const name = prompt('Nhập tên gói thành viên mới (VD: Siêu cấp):');
-    if (!name) return;
-    const priceStr = prompt('Nhập giá VNĐ/tháng cho gói này (VD: 2000000):', '300000');
-    const price = priceStr ? parseInt(priceStr, 10) : 0;
-    
-    const newPkg: MembershipPackage = {
-      id: Date.now().toString(),
-      name,
-      price,
-      activeUsers: 0,
-      status: 'active',
-      features: [{ text: 'Tính năng mặc định 1' }]
+  packages = signal<UpgradeResponse[]>([]);
+  displayDialog = false;
+  isEditMode = false;
+
+  statusOptions = [
+    { label: 'Đang hoạt động', value: 'active' },
+    { label: 'Ngừng hoạt động', value: 'inactive' },
+  ];
+
+  selectedPkg: UpgradeRequest = {
+    titleUpgrade: '',
+    description: '',
+    status: 'active',
+    dailyLimit: 0,
+    price: 0,
+  };
+
+  currentId: number | null = null;
+
+  ngOnInit() {
+    this.loadPackages();
+  }
+
+  loadPackages() {
+    const params = {
+      PageIndex: 1,
+      PageSize: 100,
     };
-    
-    this.packages.update(pkgs => [...pkgs, newPkg]);
+    this.upgradeService.getAll(params).subscribe({
+      next: (res) => {
+        console.log(res);
+        this.packages.set(res.Items);
+      },
+      error: (err) => {
+        console.error('Lỗi khi lấy danh sách gói:', err);
+        Swal.fire('Lỗi', 'Không thể lấy danh sách gói thành viên', 'error');
+      },
+    });
   }
 
-  editPackage(pkg: MembershipPackage) {
-    const newName = prompt('Chỉnh sửa tên gói:', pkg.name);
-    if (!newName) return;
-    
-    const newPriceStr = prompt('Chỉnh sửa giá VNĐ/tháng:', pkg.price.toString());
-    const newPrice = newPriceStr ? parseInt(newPriceStr, 10) : pkg.price;
-    
-    this.packages.update(pkgs => pkgs.map(p => {
-      if (p.id === pkg.id) {
-        return { ...p, name: newName, price: newPrice };
-      }
-      return p;
-    }));
+  showAddDialog() {
+    this.isEditMode = false;
+    this.currentId = null;
+    this.selectedPkg = {
+      titleUpgrade: '',
+      description: '',
+      status: 'active',
+      dailyLimit: 10,
+      price: 0,
+    };
+    this.displayDialog = true;
   }
 
-  deletePackage(id: string) {
-    if (confirm('Bạn có chắc chắn muốn xóa gói dịch vụ này? Hành động này không thể hoàn tác.')) {
-      this.packages.update(pkgs => pkgs.filter(p => p.id !== id));
+  showEditDialog(pkg: UpgradeResponse) {
+    this.isEditMode = true;
+    this.currentId = pkg.Id;
+    this.selectedPkg = {
+      titleUpgrade: pkg.TitleUpgrade,
+      description: pkg.Description,
+      status: pkg.status,
+      dailyLimit: pkg.DailyLimit,
+      price: pkg.Price,
+    };
+    this.displayDialog = true;
+  }
+
+  savePackage() {
+    if (!this.selectedPkg.titleUpgrade) {
+      Swal.fire('Cảnh báo', 'Vui lòng nhập tên gói', 'warning');
+      return;
     }
+
+    if (this.isEditMode && this.currentId) {
+      this.upgradeService.update(this.currentId, this.selectedPkg).subscribe({
+        next: () => {
+          Swal.fire('Thành công', 'Cập nhật gói thành công', 'success');
+          this.displayDialog = false;
+          this.loadPackages();
+        },
+        error: (err) => {
+          Swal.fire('Lỗi', 'Cập nhật thất bại: ' + err.message, 'error');
+        },
+      });
+    } else {
+      this.upgradeService.create(this.selectedPkg).subscribe({
+        next: () => {
+          Swal.fire('Thành công', 'Thêm gói mới thành công', 'success');
+          this.displayDialog = false;
+          this.loadPackages();
+        },
+        error: (err) => {
+          Swal.fire('Lỗi', 'Thêm mới thất bại: ' + err.message, 'error');
+        },
+      });
+    }
+  }
+
+  deletePackage(Id: number) {
+    Swal.fire({
+      title: 'Xác nhận xóa?',
+      text: 'Bạn có chắc muốn xóa gói này không? Hành động này không thể hoàn tác.',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#d33',
+      cancelButtonColor: '#3085d6',
+      confirmButtonText: 'Xóa',
+      cancelButtonText: 'Hủy',
+    }).then((result) => {
+      if (result.isConfirmed) {
+        this.upgradeService.deleteUpgrade(Id).subscribe({
+          next: () => {
+            Swal.fire('Đã xóa', 'Gói đã được xóa thành công', 'success');
+            this.loadPackages();
+          },
+          error: (err) => {
+            Swal.fire('Lỗi', 'Xóa thất bại: ' + err.message, 'error');
+          },
+        });
+      }
+    });
   }
 }

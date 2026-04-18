@@ -19,6 +19,7 @@ import { NotFoundComponent } from './shared/components/not-found/not-found.compo
 import { AdminEventDetailComponent } from './features/events/pages/admin-event-detail/admin-event-detail.component';
 import { UserProfileComponent } from './features/user/pages/user-profile/user-profile.component';
 import { CheckoutPageComponent } from './features/events/pages/checkout-page/checkout-page.component';
+import { OrderDetailPageComponent } from './features/events/pages/order-detail-page/order-detail-page.component';
 
 import { LandingPageComponent } from './features/home/pages/landing-page/landing-page.component';
 import { PricingComponent } from './features/home/pages/pricing/pricing.component';
@@ -129,6 +130,12 @@ export const routes: Routes = [
       {
         path: 'payment',
         component: PaymentResultComponent,
+      },
+      {
+        path: 'order/:id',
+        component: OrderDetailPageComponent,
+        canActivate: [authGuard],
+        data: { requiresAuth: true }
       },
     ],
   },

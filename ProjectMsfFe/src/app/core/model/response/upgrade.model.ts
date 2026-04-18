@@ -1,12 +1,12 @@
 export interface UpgradeResponse {
-  id: number;
-  titleUpgrade: string;
-  description: string;
+  Id: number;
+  TitleUpgrade: string;
+  Description: string;
   status: string;
-  dailyLimit: number;
-  price: number;
-  createdAt: string;
-  updatedAt: string;
+  DailyLimit: number;
+  Price: number;
+  CreatedAt: string;
+  UpdatedAt: string;
   isDailyPackage: boolean;
 }
 

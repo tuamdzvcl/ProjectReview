@@ -58,9 +58,7 @@ namespace projectDemo.Repository.OrderRepository
                 .FirstOrDefaultAsync(x => x.Id == orderID && x.IsDeleted == false);
         }
 
-        /// <summary>
-        /// Read-only query cho email: load đầy đủ Event + Ticket info, không tracking.
-        /// </summary>
+     
         public async Task<Order?> GetOrderForEmailAsync(Guid orderID)
         {
             return await _dbSet

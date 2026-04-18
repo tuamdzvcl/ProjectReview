@@ -47,7 +47,7 @@ namespace projectDemo.Service.UpgradeService
             _momoService = momoService;
         }
 
-        public async Task<ApiResponse<PageResponse<UpgradeResponse>>> GetAllUpgradesAsync(UpgradeQuery query)
+        public async Task<PageResponse<UpgradeResponse>> GetAllUpgradesAsync(UpgradeQuery query)
         {
             var upgrades = await _upgradeRepository.GetAllAsync();
 
@@ -59,8 +59,11 @@ namespace projectDemo.Service.UpgradeService
                         u.TitleUpgrade.Contains(query.key, StringComparison.OrdinalIgnoreCase)
                         || (
                             u.Description != null
-                            && u.Description.Contains(query.key, StringComparison.OrdinalIgnoreCase)
+                            && u.Description.Contains(query.key, StringComparison.OrdinalIgnoreCase
+                            )
+
                         )
+                        && u.IsDeleted==false
                     )
                     .ToList();
             }
@@ -95,11 +98,8 @@ namespace projectDemo.Service.UpgradeService
                 Success = true,
             };
 
-            return ApiResponse<PageResponse<UpgradeResponse>>.SuccessResponse(
-                EnumStatusCode.SUCCESS,
-                pageResponse,
-                "Lấy danh sách thành công"
-            );
+            return pageResponse;
+            
         }
 
         public async Task<ApiResponse<UpgradeResponse>> GetUpgradeByIdAsync(int id)
@@ -149,7 +149,6 @@ namespace projectDemo.Service.UpgradeService
 
             await _upgradeRepository.AddAsync(upgrade);
             await _uow.SaveChangesAsync();
-            await _uow.CommitAsync();
 
             var result = new UpgradeResponse
             {
@@ -194,7 +193,6 @@ namespace projectDemo.Service.UpgradeService
 
             _upgradeRepository.Update(existingUpgrade);
             await _uow.SaveChangesAsync();
-            await _uow.CommitAsync();
 
             var result = new UpgradeResponse
             {
@@ -226,10 +224,8 @@ namespace projectDemo.Service.UpgradeService
                     "Không tìm thấy gói Upgrade"
                 );
             }
-
-            _upgradeRepository.Remove(existingUpgrade);
+            existingUpgrade.IsDeleted=true;
             await _uow.SaveChangesAsync();
-            await _uow.CommitAsync();
 
             return ApiResponse<bool>.SuccessResponse(
                 EnumStatusCode.SUCCESS,
@@ -304,6 +300,7 @@ namespace projectDemo.Service.UpgradeService
                 // 4. Tạo Payment PENDING
                 var payment = new Payment
                 {
+                    RequestId = EnumOrderType.UPGRADE.ToString(),
                     OrderID = order.Id,
                     Amount = totalAmount,
                     PaymentMethod = "MOMO",
@@ -319,6 +316,7 @@ namespace projectDemo.Service.UpgradeService
                 // 5. Gọi MomoService tạo link thanh toán
                 var momoReq = new MomoRequest
                 {
+                    
                     FullName = "User Upgrade",
                     OrderId = order.Id.ToString(),
                     OrderInfor = $"Thanh toán nâng cấp gói: {upgrade.TitleUpgrade} (Giảm trừ: {discount:N0})",

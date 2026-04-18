@@ -10,7 +10,7 @@ import { environment } from '../../../environments/environment';
 export class BaseApiService {
   protected baseUrl = environment.apiBaseUrl;
 
-  constructor(protected http: HttpClient) {}
+  constructor(protected http: HttpClient) { }
 
   get<T>(url: string): Observable<T> {
     return this.http.get<ApiResponse<T>>(`${this.baseUrl}/${url}`).pipe(

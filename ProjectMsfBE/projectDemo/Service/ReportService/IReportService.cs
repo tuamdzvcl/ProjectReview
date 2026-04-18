@@ -7,5 +7,7 @@ namespace projectDemo.Service.ReportService
     public interface IReportService
     {
         Task<ApiResponse<ReportResponse>> GetRevenueReportAsync(Guid userId, ReportRequest request);
+        Task<ApiResponse<ReportResponse>> GetPlatformRevenueReportAsync(ReportRequest request);
+        Task<ApiResponse<ReportResponse>> GetUpgradeReportAsync(ReportRequest request);
     }
 }

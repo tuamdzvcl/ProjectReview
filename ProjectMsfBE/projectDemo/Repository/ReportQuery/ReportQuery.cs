@@ -55,5 +55,76 @@ ORDER BY p.PaidDate ASC;";
 
             return rows.ToList();
         }
+
+        public async Task<List<RevenueReportFlatRow>> GetPlatformRevenueRowsAsync(
+            DateTime fromDate,
+            DateTime toDateExclusive
+        )
+        {
+            const string sql =
+                @"
+SELECT
+    o.Id AS OrderId,
+    p.PaidDate AS PaidDate,
+    (od.Price * od.Quantity) AS Revenue,
+    od.Quantity AS TicketQuantity
+FROM Orders o
+INNER JOIN Payment p ON p.OrderID = o.Id
+INNER JOIN OrderDetail od ON od.OrderID = o.Id
+INNER JOIN TicketType tt ON tt.Id = od.TicketTypeId
+INNER JOIN Event e ON e.Id = tt.EventID
+WHERE o.IsDeleted = 0
+  AND tt.IsDeleted = 0
+  AND o.Status = @paidOrderStatus
+  AND p.Status = @successPaymentStatus
+  AND p.PaidDate IS NOT NULL
+  AND p.PaidDate >= @fromDate
+  AND p.PaidDate < @toDateExclusive
+ORDER BY p.PaidDate ASC;";
+
+            var rows = await _uow.connection.QueryAsync<RevenueReportFlatRow>(
+                sql,
+                new
+                {
+                    fromDate,
+                    toDateExclusive,
+                    paidOrderStatus = 2,
+                    successPaymentStatus = 2,
+                }
+            );
+
+            return rows.ToList();
+        }
+
+        public async Task<List<RevenueReportFlatRow>> GetUpgradeRowsAsync(
+            DateTime fromDate,
+            DateTime toDateExclusive
+        )
+        {
+            const string sql =
+                @"
+SELECT
+    Id AS OrderId,
+    CreatedDate AS PaidDate,
+    PricePaid AS Revenue,
+    1 AS TicketQuantity
+FROM UserUpgrade
+WHERE Status = @successStatus
+  AND CreatedDate >= @fromDate
+  AND CreatedDate < @toDateExclusive
+ORDER BY CreatedDate ASC;";
+
+            var rows = await _uow.connection.QueryAsync<RevenueReportFlatRow>(
+                sql,
+                new
+                {
+                    fromDate,
+                    toDateExclusive,
+                    successStatus = "ACTIVE",
+                }
+            );
+
+            return rows.ToList();
+        }
     }
 }
