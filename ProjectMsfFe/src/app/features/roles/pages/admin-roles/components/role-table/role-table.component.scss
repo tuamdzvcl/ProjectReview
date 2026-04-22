@@ -1,0 +1,205 @@
+$primary: #6cc04a;
+$primary-light: rgba(108, 192, 74, 0.1);
+$primary-dark: #5aad3a;
+$text-dark: #2c3e50;
+$text-muted: #7f8c8d;
+$border: #e8ecf1;
+$bg-light: #f8faf7;
+$danger: #e74c3c;
+$white: #ffffff;
+
+.table-container {
+  background: $white;
+  border-radius: 16px;
+  border: 1px solid $border;
+  overflow: hidden;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
+}
+
+:host ::ng-deep {
+  .p-datatable {
+    .p-datatable-thead > tr > th {
+      background: $bg-light;
+      color: $text-muted;
+      font-weight: 600;
+      font-size: 0.82rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      padding: 1rem 1.25rem;
+      border: none;
+      border-bottom: 2px solid $border;
+    }
+
+    .p-datatable-tbody > tr > td {
+      padding: 1rem 1.25rem;
+      border: none;
+      border-bottom: 1px solid #f2f4f6;
+      vertical-align: middle;
+    }
+
+    .p-datatable-tbody > tr:hover {
+      background: $bg-light !important;
+    }
+
+    .p-paginator {
+      border: none;
+      padding: 1rem;
+      background: $bg-light;
+    }
+  }
+}
+
+.role-name-cell {
+  .role-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.4rem 0.9rem;
+    border-radius: 8px;
+    font-weight: 700;
+    font-size: 0.85rem;
+    background: $primary-light;
+    color: $primary-dark;
+    letter-spacing: 0.5px;
+
+    i {
+      font-size: 0.75rem;
+    }
+
+    &.system {
+      background: rgba(52, 152, 219, 0.1);
+      color: #2980b9;
+    }
+  }
+}
+
+.perm-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+.perm-chip {
+  display: inline-block;
+  padding: 0.25rem 0.6rem;
+  border-radius: 6px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  background: #f0f4f8;
+  color: #5a6c7d;
+  letter-spacing: 0.3px;
+  white-space: nowrap;
+
+  &.more {
+    background: $primary-light;
+    color: $primary-dark;
+    cursor: pointer;
+    transition: all 0.2s;
+
+    &:hover {
+      background: $primary;
+      color: $white;
+    }
+  }
+}
+
+.type-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.3rem 0.75rem;
+  border-radius: 20px;
+  font-size: 0.78rem;
+  font-weight: 600;
+
+  &.system {
+    background: rgba(52, 152, 219, 0.1);
+    color: #2980b9;
+  }
+
+  &.custom {
+    background: rgba(155, 89, 182, 0.1);
+    color: #9b59b6;
+  }
+
+  i {
+    font-size: 0.7rem;
+  }
+}
+
+.action-buttons {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.btn-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  border: 1px solid $border;
+  background: $white;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.25s ease;
+  font-size: 0.85rem;
+
+  &.btn-view {
+    color: $primary;
+
+    &:hover {
+      background: $primary;
+      color: $white;
+      border-color: $primary;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(108, 192, 74, 0.25);
+    }
+  }
+
+  &.btn-edit {
+    color: #3498db;
+
+    &:hover {
+      background: #3498db;
+      color: $white;
+      border-color: #3498db;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(52, 152, 219, 0.25);
+    }
+  }
+
+  &.btn-delete {
+    color: $danger;
+
+    &:hover:not(:disabled) {
+      background: $danger;
+      color: $white;
+      border-color: $danger;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(231, 76, 60, 0.25);
+    }
+
+    &:disabled {
+      opacity: 0.35;
+      cursor: not-allowed;
+    }
+  }
+}
+
+.empty-message {
+  text-align: center;
+  padding: 3rem !important;
+
+  i {
+    font-size: 3rem;
+    color: #ddd;
+    display: block;
+    margin-bottom: 1rem;
+  }
+
+  p {
+    color: $text-muted;
+    margin: 0;
+  }
+}

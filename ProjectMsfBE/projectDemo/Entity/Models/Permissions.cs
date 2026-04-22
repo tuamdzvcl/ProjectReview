@@ -1,4 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using EventTick.Model.asbtract;
 
@@ -20,5 +20,6 @@ namespace projectDemo.Entity.Models
         public string PermissonsDescription { get; set; }
 
         public virtual ICollection<RolePermissions> RolePermissions { get; set; }
+        public virtual ICollection<MenuPermissions> MenuPermissions { get; set; }
     }
 }

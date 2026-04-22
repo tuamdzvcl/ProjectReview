@@ -26,10 +26,11 @@
 <div class="btn-save flex gap-3">
   <button *ngIf="activeIndex > 0" class="btn-back" (click)="onBackStep()">Quay lại</button>
 
-  <button (click)="onNextStep()">
+  <button (click)="onNextStep()" [disabled]="isSaving" [class.opacity-50]="isSaving">
     <ng-container *ngIf="activeIndex < 2">Tiếp tục</ng-container>
     <ng-container *ngIf="activeIndex === 2">
-      {{ eventId ? 'Cập nhật sự kiện' : 'Lưu sự kiện' }}
+      <i *ngIf="isSaving" class="pi pi-spin pi-spinner mr-2"></i>
+      {{ isSaving ? (eventId ? 'Đang cập nhật...' : 'Đang lưu...') : (eventId ? 'Cập nhật sự kiện' : 'Lưu sự kiện') }}
     </ng-container>
   </button>
 </div>

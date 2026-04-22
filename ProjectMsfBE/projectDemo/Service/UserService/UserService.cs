@@ -3,18 +3,22 @@ using System.Net.WebSockets;
 using AutoMapper;
 using EventTick.Model.Enum;
 using EventTick.Model.Models;
+using projectDemo.Common.PageRequest;
 using projectDemo.DTO.Request;
 using projectDemo.DTO.Request.Upgrade;
 using projectDemo.DTO.Respone;
 using projectDemo.DTO.Response;
 using projectDemo.DTO.UpdateRequest;
+using projectDemo.Entity.Models;
 using projectDemo.Repository;
 using projectDemo.Repository.Ipml;
 using projectDemo.Repository.OrderRepository;
+using projectDemo.Repository.ParticipantQuery;
 using projectDemo.Repository.PemisstionRepository;
 using projectDemo.Repository.RolePermissionRepository;
 using projectDemo.Repository.TickTypeRepository;
 using projectDemo.Repository.UpgradeRepository;
+using projectDemo.Service.ImageService;
 using projectDemo.UnitOfWorks;
 
 namespace projectDemo.Service.UserService
@@ -28,15 +32,12 @@ namespace projectDemo.Service.UserService
         private readonly IEventRepository _eventRepository;
         private readonly IUpgradeRepository _upgradeRepository;
         private readonly IOrderRepository _orderRepository;
-        private readonly IPemisstionRepository _petRepository;
         private readonly IUserLoginRepository _userLoginRepository;
         private readonly IRolePermissionRepository _rolePermission;
         private readonly IUnitOfWork _uow;
 
-
-        private readonly projectDemo.Service.ImageService.IImageService _imageService;
-        private readonly projectDemo.Repository.ParticipantQuery.IParticipantQuery _participantQuery;
-
+        private readonly IImageService _imageService;
+        private readonly IParticipantQuery _participantQuery;
 
         public UserService(
             IOrderRepository order,
@@ -47,18 +48,17 @@ namespace projectDemo.Service.UserService
             IUpgradeRepository upgradeRepository,
             IMapper mapper,
             IRoleRepository roleRepository,
-            IPemisstionRepository petRepository,
+            IPermisstionRepository petRepository,
             IUserLoginRepository userLoginRepository,
             IRolePermissionRepository rolePermission,
-            projectDemo.Repository.ParticipantQuery.IParticipantQuery participantQuery,
-            projectDemo.Service.ImageService.IImageService imageService
+            IParticipantQuery participantQuery,
+            IImageService imageService
         )
         {
             _userReposiotry = userReposiotry;
             _upgradeRepository = upgradeRepository;
             _mapper = mapper;
             _roleRepository = roleRepository;
-            _petRepository = petRepository;
             _userLoginRepository = userLoginRepository;
             _rolePermission = rolePermission;
             _uow = uow;
@@ -192,6 +192,16 @@ namespace projectDemo.Service.UserService
         //tạo
         async Task<ApiResponse<UserResponse>> IUserService.Create(UserRequest request, Guid userid)
         {
+            if (
+                string.IsNullOrWhiteSpace(request.FirstName)
+                && string.IsNullOrWhiteSpace(request.LastName)
+            )
+            {
+                return ApiResponse<UserResponse>.FailResponse(
+                    Entity.Enum.EnumStatusCode.BAD_REQUEST,
+                    "Xem lại các trường thông tin "
+                );
+            }
             await _uow.BeginTransactionAsync();
             try
             {
@@ -277,6 +287,13 @@ namespace projectDemo.Service.UserService
                 return ApiResponse<string>.FailResponse(
                     Entity.Enum.EnumStatusCode.NOT_FOUND,
                     "không tìm thấy user"
+                );
+            }
+            if (user.IsAdmin == true)
+            {
+                return ApiResponse<string>.FailResponse(
+                    Entity.Enum.EnumStatusCode.BAD_REQUEST,
+                    "Không thể xoa User này"
                 );
             }
 
@@ -395,27 +412,52 @@ namespace projectDemo.Service.UserService
             );
         }
 
-        public async Task<PageResponse<UserResponse>> GetParticipantsByOrganizer(Guid organizerId, projectDemo.Common.PageRequest.PageRequest request)
+        public async Task<PageResponse<UserInEvent>> GetParticipantsByOrganizer(
+            Guid organizerId,
+            PageRequest request
+        )
         {
             try
             {
-                if (request.PageIndex <= 0) request.PageIndex = 1;
-                if (request.PageSize <= 0) request.PageSize = 10;
+                if (request.PageIndex <= 0)
+                    request.PageIndex = 1;
+                if (request.PageSize <= 0)
+                    request.PageSize = 10;
 
-                var (rawData, totalCount) = await _participantQuery.GetParticipantsByOrganizerAsync(organizerId, request.PageIndex, request.PageSize);
+                var (rawData, totalCount) = await _participantQuery.GetParticipantsByOrganizerAsync(
+                    organizerId,
+                    request.PageIndex,
+                    request.PageSize
+                );
 
+               
                 // Manual mapping using LINQ
-                var items = rawData.Select(x => new UserResponse
-                {
-                    ID = x.Id,
-                    Email = x.Email,
-                    Username = x.Username,
-                    FirstName = x.FirstName,
-                    LastName = x.LastName,
-                    AvatarUrl = x.AvatarUrl
-                }).ToList();
+                var items = rawData
+                    .GroupBy( x => x.Id )
+                    .Select(ug => new UserInEvent
+                    {
+                        UserName = ug.First().Username,
+                        Email = ug.First().Email,
+                        FirstName= ug.First().FirstName,
+                        LastName= ug.First().LastName,
+                        Avarta = ug.First().AvatarUrl??"null",
+                        
+                        ID = ug.Key,
+                        Events = ug.GroupBy(x=>x.EventTitle)
+                        .Select(eg => new EventInfo
+                        {
+                            EventTitle = eg.Key??"null",
+                            Tickets = eg.Select(t=>new TicketInfo
+                            {
+                                TicketName = t.TicketName,
+                                Quantity = t.TicketQuantity,
+                                Price = t.TotalAmount,
+                            }).ToList()
+                        }).ToList()
+                    })
+                    .ToList();
 
-                return new PageResponse<UserResponse>
+                return new PageResponse<UserInEvent>
                 {
                     Items = items,
                     PageIndex = request.PageIndex,
@@ -423,19 +465,20 @@ namespace projectDemo.Service.UserService
                     TotalRecords = totalCount,
                     TotalPages = (int)Math.Ceiling((double)totalCount / request.PageSize),
                     Success = true,
-                    Message = "Lấy danh sách người tham gia thành công"
+                    Message = "Lấy danh sách người tham gia thành công",
                 };
             }
             catch (Exception ex)
             {
                 Console.WriteLine(ex.ToString());
-                return new PageResponse<UserResponse>
+                return new PageResponse<UserInEvent>
                 {
                     Success = false,
-                    Message = "Có lỗi xảy ra khi lấy danh sách người tham gia"
+                    Message = "Có lỗi xảy ra khi lấy danh sách người tham gia",
                 };
             }
         }
+
         public async Task<ApiResponse<UserResponse>> GetByid(Guid id)
         {
             try
@@ -457,8 +500,12 @@ namespace projectDemo.Service.UserService
                     FirstName = user.FirstName,
                     LastName = user.LastName,
                     AvatarUrl = user.AvatarUrl,
-                    RoleName = user.UserRoles.Select(x => x.Role.RoleName.ToUpper()).ToList()
+                    RoleName = user.UserRoles.Select(x => x.Role.RoleName.ToUpper()).ToList(),
                 };
+                var permissions = await _roleUserRepo.GetAllByUserId(id);
+                response.Permissions = (permissions ?? Enumerable.Empty<Permissions>())
+                    .Select(p => p.PermissonsName)
+                    .ToList();
 
                 return ApiResponse<UserResponse>.SuccessResponse(
                     Entity.Enum.EnumStatusCode.SUCCESS,

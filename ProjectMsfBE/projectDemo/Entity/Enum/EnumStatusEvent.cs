@@ -13,5 +13,6 @@ namespace EventTick.Model.Enum
         CANNEL = 3,
         PUBLIC = 4,
         ENDED = 5,
+
     }
 }

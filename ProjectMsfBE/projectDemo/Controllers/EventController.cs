@@ -74,7 +74,8 @@ namespace projectDemo.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteId(Guid id)
         {
-            var result = await _eventService.DeleteEvent(id);
+            var isAdmin = User.Identity.IsAuthenticated && User.IsInRole("ADMIN");
+            var result = await _eventService.DeleteEvent(id, isAdmin);
             return Ok(result);
         }
 

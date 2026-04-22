@@ -246,7 +246,13 @@ namespace projectDemo.Migrations
                     b.Property<DateTime?>("CreatedDate")
                         .HasColumnType("datetime2");
 
+                    b.Property<bool>("IsAdmin")
+                        .HasColumnType("bit");
+
                     b.Property<bool?>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsSystem")
                         .HasColumnType("bit");
 
                     b.Property<string>("RoleName")
@@ -268,22 +274,28 @@ namespace projectDemo.Migrations
                         new
                         {
                             Id = 1,
-                            CreatedDate = new DateTime(2026, 4, 18, 6, 47, 25, 513, DateTimeKind.Utc).AddTicks(3451),
+                            CreatedDate = new DateTime(2026, 4, 22, 6, 39, 59, 371, DateTimeKind.Utc).AddTicks(168),
+                            IsAdmin = true,
                             IsDeleted = false,
+                            IsSystem = true,
                             RoleName = "ADMIN"
                         },
                         new
                         {
                             Id = 2,
-                            CreatedDate = new DateTime(2026, 4, 18, 6, 47, 25, 513, DateTimeKind.Utc).AddTicks(3472),
+                            CreatedDate = new DateTime(2026, 4, 22, 6, 39, 59, 371, DateTimeKind.Utc).AddTicks(181),
+                            IsAdmin = false,
                             IsDeleted = false,
+                            IsSystem = true,
                             RoleName = "ORGANIZER"
                         },
                         new
                         {
                             Id = 3,
-                            CreatedDate = new DateTime(2026, 4, 18, 6, 47, 25, 513, DateTimeKind.Utc).AddTicks(3474),
+                            CreatedDate = new DateTime(2026, 4, 22, 6, 39, 59, 371, DateTimeKind.Utc).AddTicks(183),
+                            IsAdmin = false,
                             IsDeleted = false,
+                            IsSystem = true,
                             RoleName = "CUSTOMER"
                         });
                 });
@@ -429,6 +441,9 @@ namespace projectDemo.Migrations
                     b.Property<bool>("IsActive")
                         .HasColumnType("bit");
 
+                    b.Property<bool>("IsAdmin")
+                        .HasColumnType("bit");
+
                     b.Property<bool?>("IsDeleted")
                         .HasColumnType("bit");
 
@@ -470,10 +485,11 @@ namespace projectDemo.Migrations
                             Email = "admin@system.com",
                             FirstName = "admin",
                             IsActive = true,
+                            IsAdmin = true,
                             IsDeleted = false,
                             IsLock = false,
                             LastName = "admin",
-                            PasswordHash = "$2a$11$kZnHVxPlXOt0cuJNS8XBROkEN.9m2mbm6k87NYJ8AGLyGXyn1Bbqy",
+                            PasswordHash = "$2a$11$YAEOOSZW/uj2lmwwKymwp.Cj74.ShzbCD6gMGe6LQUGXb88Swoquy",
                             Username = "admin"
                         });
                 });
@@ -678,6 +694,62 @@ namespace projectDemo.Migrations
                         });
                 });
 
+            modelBuilder.Entity("projectDemo.Entity.Models.EmailSetting", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("CreatedBy")
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<DateTime?>("CreatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("EnableSsl")
+                        .HasColumnType("bit");
+
+                    b.Property<bool?>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Password")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<int>("Port")
+                        .HasColumnType("int");
+
+                    b.Property<string>("SenderEmail")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("SenderName")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("SmtpServer")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("UpdatedBy")
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<DateTime?>("UpdatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("EmailSettings");
+                });
+
             modelBuilder.Entity("projectDemo.Entity.Models.EmailVerificationToken", b =>
                 {
                     b.Property<Guid>("Id")
@@ -703,6 +775,75 @@ namespace projectDemo.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("EmailVerificationToken");
+                });
+
+            modelBuilder.Entity("projectDemo.Entity.Models.Menu", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("CreatedBy")
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<DateTime?>("CreatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool?>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<int>("OrderIndex")
+                        .HasColumnType("int");
+
+                    b.Property<int>("ParentId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Path")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<string>("UpdatedBy")
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<DateTime?>("UpdatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Menu");
+                });
+
+            modelBuilder.Entity("projectDemo.Entity.Models.MenuPermissions", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("MenuId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("PermissionId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("MenuId");
+
+                    b.HasIndex("PermissionId");
+
+                    b.ToTable("MenuPermissions");
                 });
 
             modelBuilder.Entity("projectDemo.Entity.Models.Permissions", b =>
@@ -880,6 +1021,69 @@ namespace projectDemo.Migrations
                         });
                 });
 
+            modelBuilder.Entity("projectDemo.Entity.Models.Promotion", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Code")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<string>("CreatedBy")
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<DateTime?>("CreatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<string>("DiscountType")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.Property<decimal>("DiscountValue")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<DateTime>("EndDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<bool?>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime>("StartDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("UpdatedBy")
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<DateTime?>("UpdatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int?>("UsageLimit")
+                        .HasColumnType("int");
+
+                    b.Property<int>("UsedCount")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Promotions");
+                });
+
             modelBuilder.Entity("projectDemo.Entity.Models.RefreshToken", b =>
                 {
                     b.Property<int>("Id")
@@ -923,6 +1127,12 @@ namespace projectDemo.Migrations
                     b.Property<DateTime?>("CreatedDate")
                         .HasColumnType("datetime2");
 
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
                     b.Property<bool?>("IsDeleted")
                         .HasColumnType("bit");
 
@@ -944,116 +1154,179 @@ namespace projectDemo.Migrations
                         {
                             RoleId = 1,
                             PermissionId = 1,
+                            Id = 1,
                             IsDeleted = false
                         },
                         new
                         {
                             RoleId = 1,
                             PermissionId = 2,
+                            Id = 2,
                             IsDeleted = false
                         },
                         new
                         {
                             RoleId = 1,
                             PermissionId = 3,
+                            Id = 3,
                             IsDeleted = false
                         },
                         new
                         {
                             RoleId = 1,
                             PermissionId = 4,
+                            Id = 4,
                             IsDeleted = false
                         },
                         new
                         {
                             RoleId = 1,
                             PermissionId = 5,
+                            Id = 5,
                             IsDeleted = false
                         },
                         new
                         {
                             RoleId = 1,
                             PermissionId = 6,
+                            Id = 6,
                             IsDeleted = false
                         },
                         new
                         {
                             RoleId = 1,
                             PermissionId = 7,
+                            Id = 7,
                             IsDeleted = false
                         },
                         new
                         {
                             RoleId = 1,
                             PermissionId = 8,
+                            Id = 8,
                             IsDeleted = false
                         },
                         new
                         {
                             RoleId = 1,
                             PermissionId = 9,
+                            Id = 9,
                             IsDeleted = false
                         },
                         new
                         {
                             RoleId = 1,
                             PermissionId = 10,
+                            Id = 10,
                             IsDeleted = false
                         },
                         new
                         {
                             RoleId = 1,
                             PermissionId = 11,
+                            Id = 11,
                             IsDeleted = false
                         },
                         new
                         {
                             RoleId = 1,
                             PermissionId = 12,
+                            Id = 12,
                             IsDeleted = false
                         },
                         new
                         {
                             RoleId = 1,
                             PermissionId = 13,
+                            Id = 13,
                             IsDeleted = false
                         },
                         new
                         {
                             RoleId = 1,
                             PermissionId = 14,
+                            Id = 14,
                             IsDeleted = false
                         },
                         new
                         {
                             RoleId = 1,
                             PermissionId = 15,
+                            Id = 15,
                             IsDeleted = false
                         },
                         new
                         {
                             RoleId = 1,
                             PermissionId = 16,
+                            Id = 16,
                             IsDeleted = false
                         },
                         new
                         {
                             RoleId = 1,
                             PermissionId = 17,
+                            Id = 17,
                             IsDeleted = false
                         },
                         new
                         {
                             RoleId = 1,
                             PermissionId = 18,
+                            Id = 18,
                             IsDeleted = false
                         },
                         new
                         {
                             RoleId = 1,
                             PermissionId = 19,
+                            Id = 19,
                             IsDeleted = false
                         });
+                });
+
+            modelBuilder.Entity("projectDemo.Entity.Models.SystemSetting", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("CreatedBy")
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<DateTime?>("CreatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<bool?>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("SettingKey")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("SettingValue")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("UpdatedBy")
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<DateTime?>("UpdatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Setting");
                 });
 
             modelBuilder.Entity("projectDemo.Entity.Models.Upgrade", b =>
@@ -1306,6 +1579,25 @@ namespace projectDemo.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("projectDemo.Entity.Models.MenuPermissions", b =>
+                {
+                    b.HasOne("projectDemo.Entity.Models.Menu", "Menu")
+                        .WithMany("MenuPermissions")
+                        .HasForeignKey("MenuId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("projectDemo.Entity.Models.Permissions", "Permission")
+                        .WithMany("MenuPermissions")
+                        .HasForeignKey("PermissionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Menu");
+
+                    b.Navigation("Permission");
+                });
+
             modelBuilder.Entity("projectDemo.Entity.Models.RefreshToken", b =>
                 {
                     b.HasOne("EventTick.Model.Models.User", "User")
@@ -1405,8 +1697,15 @@ namespace projectDemo.Migrations
                     b.Navigation("Events");
                 });
 
+            modelBuilder.Entity("projectDemo.Entity.Models.Menu", b =>
+                {
+                    b.Navigation("MenuPermissions");
+                });
+
             modelBuilder.Entity("projectDemo.Entity.Models.Permissions", b =>
                 {
+                    b.Navigation("MenuPermissions");
+
                     b.Navigation("RolePermissions");
                 });
 

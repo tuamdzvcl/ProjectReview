@@ -13,7 +13,7 @@ export const authGuard: CanActivateFn = (route, state) => {
 
   const accessToken = tokenService.getAccessToken();
   if (accessToken && !authService.checkTokenExpired()) {
-    
+
     const protectedRoutes = [
       {
         urls: ['/admin/user', '/admin/UserForm'],
@@ -44,7 +44,7 @@ export const authGuard: CanActivateFn = (route, state) => {
       }
     }
 
-    return true; 
+    return true;
   }
 
   tokenService.clear();

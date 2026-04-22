@@ -1,7 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { AppShellComponent } from '../../../../layouts/app-shell/app-shell.component';
 import { ChartModule } from 'primeng/chart';
 import { DatePicker } from 'primeng/datepicker';
 import { ReportService } from '../../../../core/services/report.service';
@@ -12,7 +11,7 @@ import { TokenService } from '../../../../core/services/token.service';
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [CommonModule, AppShellComponent, ChartModule, DatePicker, FormsModule, VndCurrencyPipe],
+  imports: [CommonModule, ChartModule, DatePicker, FormsModule, VndCurrencyPipe],
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush
@@ -44,6 +43,9 @@ export class DashboardComponent implements OnInit {
 
   ngOnInit() {
     this.isAdmin = this.tokenService.getRole()?.toUpperCase() === 'ADMIN';
+    if (this.isAdmin) {
+      this.selectedDataType = 'PlatformRevenue';
+    }
     this.initChartOptions();
 
     // Mặc định chọn tháng hiện tại
@@ -118,11 +120,11 @@ export class DashboardComponent implements OnInit {
 
   updateChartData() {
     const isRevenue = this.selectedDataType === 'Revenue' || this.selectedDataType === 'PlatformRevenue' || this.selectedDataType === 'Packages';
-    
+
     let label = 'Doanh thu';
     if (this.selectedDataType === 'Tickets') label = 'Vé đã bán';
     if (this.selectedDataType === 'Packages') label = 'Doanh thu gói';
-    
+
     let color = '#81E979';
     if (this.selectedDataType === 'Tickets') color = '#3B82F6';
     if (this.selectedDataType === 'Packages') color = '#A855F7';

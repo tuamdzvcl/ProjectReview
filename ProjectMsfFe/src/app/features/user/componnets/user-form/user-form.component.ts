@@ -39,8 +39,8 @@ export class UserFormComponent implements OnChanges {
 
   form = this.fb.group({
     id: [null],
-    firstName: ['', Validators.required],
-    lastName: ['', Validators.required],
+    firstName: ['', [Validators.required, Validators.pattern('^(?=.*[a-zA-ZÀ-ỹ])[a-zA-ZÀ-ỹ\\s]+$')]],
+    lastName: ['', [Validators.required, Validators.pattern('^(?=.*[a-zA-ZÀ-ỹ])[a-zA-ZÀ-ỹ\\s]+$')]],
     email: ['', [Validators.required, Validators.email]],
     role: [null, Validators.required],
   });
@@ -62,8 +62,6 @@ export class UserFormComponent implements OnChanges {
   }
   onSubmit() {
     if (this.form.invalid) return;
-    console.log('test');
-
     this.submitForm.emit(this.form.value);
     this.close();
   }

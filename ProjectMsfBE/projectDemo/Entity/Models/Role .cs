@@ -21,6 +21,10 @@ namespace EventTick.Model.Models
         [Required]
         public string RoleName { get; set; }
 
+        public bool IsSystem { get; set; }
+
+        public bool IsAdmin { get; set; }
+
         public virtual ICollection<UserRole> UserRole { get; set; }
 
         public virtual ICollection<RolePermissions> RolePermissions { get; set; }

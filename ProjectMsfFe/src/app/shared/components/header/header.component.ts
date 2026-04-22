@@ -22,7 +22,7 @@ export class HeaderComponent {
     this.isMenuOpen = false;
   }
 
-  constructor(private tokenService: TokenService) {}
+  constructor(private tokenService: TokenService) { }
 
   canCreateEvent(): boolean {
     const role = this.tokenService.getRole();

@@ -94,7 +94,7 @@ namespace projectDemo
 
                     var response = DTO.Respone.ApiResponse<object>.FailResponse(
                         Entity.Enum.EnumStatusCode.BAD_REQUEST,
-                        "Du lieu gui len khong hop le",
+                        "Xem Lại các trường thông tin còn để trống",
                         errors
                     );
 
@@ -311,20 +311,33 @@ namespace projectDemo
             builder.Services.AddScoped<IReportService, ReportService>();
             builder.Services.AddScoped<IUserReposiotry, UserRepository>();
             builder.Services.AddScoped<IUnitOfWork, UnitOfWorkk>();
-            builder.Services.AddScoped<IPemisstionRepository, PemisstionRepository>();
-            builder.Services.AddScoped<IPemissionService, PemissionService>();
+            builder.Services.AddScoped<IPermisstionRepository, PermisstionRepository>();
+            builder.Services.AddScoped<IPermissionService, PermissionService>();
             builder.Services.AddSingleton<IAuthorizationHandler, PermissionHandler>();
             builder.Services.AddScoped<IRolePermissionRepository, RolePermissionRepository>();
+            builder.Services.AddScoped<IRolePermissionService, RolePermissionService>();
             builder.Services.AddScoped<ICatetoryReposioty, CatetoryRepository>();
             builder.Services.AddScoped<IPaymentRepository, PaymentRepository>();
             builder.Services.AddScoped<IPaymentService, PaymentService>();
             builder.Services.AddScoped<ICatetoryService, CatetoryService>();
             builder.Services.AddScoped<ITickService, TickService>();
             builder.Services.AddScoped<ITickRepository, TickRepository>();
-            builder.Services.AddScoped<projectDemo.Repository.UserUpgradeRepository.IUserUpgradeRepository, projectDemo.Repository.UserUpgradeRepository.UserUpgradeRepository>();
-            builder.Services.AddScoped<projectDemo.Repository.UpgradeRepository.IUpgradeRepository, projectDemo.Repository.UpgradeRepository.UpgradeRepository>();
-            builder.Services.AddScoped<projectDemo.Repository.ParticipantQuery.IParticipantQuery, projectDemo.Repository.ParticipantQuery.ParticipantQuery>();
-            builder.Services.AddScoped<projectDemo.Service.UpgradeService.IUpgradeService, projectDemo.Service.UpgradeService.UpgradeServices>();
+            builder.Services.AddScoped<
+                projectDemo.Repository.UserUpgradeRepository.IUserUpgradeRepository,
+                projectDemo.Repository.UserUpgradeRepository.UserUpgradeRepository
+            >();
+            builder.Services.AddScoped<
+                projectDemo.Repository.UpgradeRepository.IUpgradeRepository,
+                projectDemo.Repository.UpgradeRepository.UpgradeRepository
+            >();
+            builder.Services.AddScoped<
+                projectDemo.Repository.ParticipantQuery.IParticipantQuery,
+                projectDemo.Repository.ParticipantQuery.ParticipantQuery
+            >();
+            builder.Services.AddScoped<
+                projectDemo.Service.UpgradeService.IUpgradeService,
+                projectDemo.Service.UpgradeService.UpgradeServices
+            >();
 
             builder.Services.AddScoped<IImageService, ImageService>();
             builder.Services.AddHttpClient();

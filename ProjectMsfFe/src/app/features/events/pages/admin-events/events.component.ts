@@ -5,7 +5,6 @@ import {
   OnInit,
   HostListener,
 } from '@angular/core';
-import { AppShellComponent } from '../../../../layouts/app-shell/app-shell.component';
 import { EventService } from '../../../../core/services/event.service';
 import { ImageUrlPipe } from '../../../../shared/pipes/image-url.pipe';
 import { FormatDatePipe } from '../../../../shared/pipes/format-date.pipe';
@@ -22,7 +21,6 @@ import { TokenService } from '../../../../core/services/token.service';
   standalone: true,
   imports: [
     CommonModule,
-    AppShellComponent,
     ImageUrlPipe,
     FormatDatePipe,
     VndCurrencyPipe,
@@ -40,7 +38,7 @@ export class EventsComponent implements OnInit {
     private confirmationService: ConfirmationService,
     private messageService: MessageService,
     private tokenService: TokenService
-  ) {}
+  ) { }
 
   events: any[] = [];
   totalRecords = 0;
@@ -57,17 +55,11 @@ export class EventsComponent implements OnInit {
 
   loadEvents() {
     const serviceMethod =
-      this.userRole === 'ADMIN'
-        ? this.eventService.GetEventswithTypeticket(
-            this.pageIndex,
-            this.pageSize,
-            this.key
-          )
-        : this.eventService.GetEventswithTypeticketbyid(
-            this.pageIndex,
-            this.pageSize,
-            this.key
-          );
+      this.eventService.GetEventswithTypeticketbyid(
+        this.pageIndex,
+        this.pageSize,
+        this.key
+      );
 
     serviceMethod.subscribe({
       next: (res) => {

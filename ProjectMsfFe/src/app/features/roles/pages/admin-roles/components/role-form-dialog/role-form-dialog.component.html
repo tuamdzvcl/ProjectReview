@@ -1,0 +1,47 @@
+<p-dialog [(visible)]="visible" [header]="isEditMode ? 'Chỉnh sửa Role' : 'Thêm Role mới'" [modal]="true"
+  [style]="{ width: '680px' }" [draggable]="false" [resizable]="false" class="premium-dialog" (onHide)="onHide()">
+  <div class="role-form">
+    <div class="form-group">
+      <label for="roleName">
+        <i class="fa-solid fa-tag"></i> Tên Role
+      </label>
+      <input type="text" pInputText id="roleName" [(ngModel)]="roleName" placeholder="VD: MODERATOR, EDITOR..."
+        class="w-full" />
+    </div>
+
+    <div class="form-group">
+      <label>
+        <i class="fa-solid fa-key"></i> Gán quyền cho Role
+      </label>
+      <div class="perm-select-actions">
+        <button class="btn-link" (click)="selectAllPermissions()">Chọn tất cả</button>
+        <span class="divider">|</span>
+        <button class="btn-link" (click)="deselectAllPermissions()">Bỏ chọn tất cả</button>
+        <span class="selected-count">
+          Đã chọn: <strong>{{ selectedPermissionIds.length }}</strong> / {{ allPermissions.length }}
+        </span>
+      </div>
+      <div class="perm-checkbox-grid">
+        @for (perm of allPermissions; track perm.Id) {
+        <label class="perm-checkbox-item" [class.checked]="isPermissionSelected(perm.Id)"
+          (click)="togglePermission(perm.Id)">
+          <div class="checkbox-box"></div>
+          <div class="checkbox-content">
+            <span class="perm-name">{{ perm.PermissonsName }}</span>
+            <span class="perm-desc">{{ perm.PermissonsDescription }}</span>
+          </div>
+        </label>
+        }
+      </div>
+    </div>
+  </div>
+
+  <ng-template pTemplate="footer">
+    <div class="dialog-footer">
+      <button pButton label="Hủy" icon="pi pi-times" class="p-button-text p-button-secondary"
+        (click)="onHide()"></button>
+      <button pButton [label]="isEditMode ? 'Cập nhật' : 'Tạo mới'" [icon]="isEditMode ? 'pi pi-save' : 'pi pi-plus'"
+        class="p-button-primary" (click)="saveRole()"></button>
+    </div>
+  </ng-template>
+</p-dialog>

@@ -6,18 +6,22 @@
       <div class="col-6 field">
         <label>First Name</label>
         <input pInputText formControlName="firstName" />
-        <small *ngIf="
-            form.get('firstName')?.invalid && form.get('firstName')?.touched
-          " class="p-error">
+        <small *ngIf="form.get('firstName')?.hasError('required') && form.get('firstName')?.touched" class="p-error">
           Required
+        </small>
+        <small *ngIf="form.get('firstName')?.hasError('pattern') && form.get('firstName')?.touched" class="p-error">
+          Tên không hợp lệ
         </small>
       </div>
 
       <div class="col-6 field">
         <label>Last Name</label>
         <input pInputText formControlName="lastName" />
-        <small *ngIf="form.get('lastName')?.invalid && form.get('lastName')?.touched" class="p-error">
+        <small *ngIf="form.get('lastName')?.hasError('required') && form.get('lastName')?.touched" class="p-error">
           Required
+        </small>
+        <small *ngIf="form.get('lastName')?.hasError('pattern') && form.get('lastName')?.touched" class="p-error">
+          Tên không hợp lệ
         </small>
       </div>
     </div>

@@ -43,7 +43,7 @@ namespace projectDemo.Service.MomoService
         )
         {
             _paymentRepository = paymentRepository;
-            _userRepository= userReposiotry;
+            _userRepository = userReposiotry;
             _uow = uow;
             _orderRepository = orderRepository;
             _options = options;
@@ -191,7 +191,9 @@ namespace projectDemo.Service.MomoService
                         && order.UserUpgradeId != null
                     )
                     {
-                        var userUpgrade = await _userUpgradeRepository.GetByIdWithUpgradeAsync(order.UserUpgradeId.Value);
+                        var userUpgrade = await _userUpgradeRepository.GetByIdWithUpgradeAsync(
+                            order.UserUpgradeId.Value
+                        );
                         if (userUpgrade != null)
                         {
                             userUpgrade.Status = "ACTIVE";
@@ -203,11 +205,17 @@ namespace projectDemo.Service.MomoService
                                 : DateTime.Now.AddMonths(1);
                             userUpgrade.CurrentDayUsageCount = 0;
                             userUpgrade.LastUsageDate = DateTime.Now;
-                           var user = await _userRepository.GetUserByid(userUpgrade.UserId);
+                            var user = await _userRepository.GetUserByid(userUpgrade.UserId);
                             if (user == null)
-                                return "cút";
-                            user.UserRoles.Select(
-                                u=> u.RoleId=(int) EnumRoleName.ORGANIZER);
+                                return "User not found";
+                            user.UserRoles.Clear();
+                            user.UserRoles.Add(
+                                new UserRole
+                                {
+                                    UserId = user.Id,
+                                    RoleId = (int)EnumRoleName.ORGANIZER,
+                                }
+                            );
                         }
                     }
                 }
@@ -237,9 +245,6 @@ namespace projectDemo.Service.MomoService
                             userUpgrade.Status = "FAILED";
                             userUpgrade.UpdatedDate = DateTime.Now;
                         }
-
-                        
-
                     }
                 }
 

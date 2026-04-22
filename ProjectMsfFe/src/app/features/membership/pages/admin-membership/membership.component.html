@@ -1,61 +1,75 @@
-<app-shell>
-  <div class="box">
-    <div class="dashboard-page">
-      <div class="page-header">
-        <h2>Quản lý Gói Thành Viên</h2>
+<div class="box">
+  <div class="dashboard-page">
+    <div class="topbar__left">
+      <h1 class="topbar__title">Quản lý Gói Thành Viên</h1>
+    </div>
+    <div class="page-header">
+      <div class="header-actions">
         <button class="btn btn-primary" (click)="showAddDialog()">
           <i class="fa-solid fa-plus"></i> Tạo gói mới
         </button>
-      </div>
-
-      <div class="membership-grid">
-        @for (pkg of packages(); track pkg.Id) {
-        <div class="membership-card" [class.highlight]="pkg.Price > 500000">
-          <div class="tier-header">
-            <h3>{{ pkg.TitleUpgrade }}</h3>
-            <div class="tier-price">
-              {{ pkg.Price | number : "1.0-0" }} <span>VNĐ/tháng</span>
-            </div>
-            @if (pkg.Price > 500000) {
-            <span class="popular-badge">Phổ biến nhất</span>
-            }
-          </div>
-
-          <div class="card-body">
-            <p class="description">{{ pkg.Description }}</p>
-            <div class="limit-info">
-              <i class="fa-solid fa-bolt"></i> Giới hạn:
-              <strong>{{ pkg.DailyLimit }}</strong> sự kiện/ngày
-            </div>
-          </div>
-
-          <div class="tier-stats">
-            <div class="stat">
-              <span>Trạng thái:</span>
-              <strong
-                [style.color]="pkg.status === 'active' ? '#3ca233' : '#e74c3c'"
-              >
-                {{
-                  pkg.status === "active" ? "Đang hoạt động" : "Ngừng hoạt động"
-                }}
-              </strong>
-            </div>
-          </div>
-
-          <div class="tier-actions">
-            <button class="btn btn-outline" (click)="showEditDialog(pkg)">
-              <i class="fa-solid fa-pen"></i> Sửa
-            </button>
-            <button class="btn btn-danger" (click)="deletePackage(pkg.Id)">
-              <i class="fa-solid fa-trash"></i> Xóa
-            </button>
-          </div>
+        <div class="excel-actions">
+          <button class="btn btn-success" (click)="exportToExcel()">
+            <i class="fa-solid fa-file-export"></i> Xuất Excel
+          </button>
+          <button class="btn btn-info" (click)="downloadTemplate()">
+            <i class="fa-solid fa-file-download"></i> Tải Mẫu
+          </button>
+          <button class="btn btn-warning" (click)="triggerImport()">
+            <i class="fa-solid fa-file-import"></i> Nhập Excel
+          </button>
+          <input type="file" id="importFile" style="display: none" (change)="onFileSelected($event)" accept=".xlsx, .xls">
         </div>
-        }
       </div>
     </div>
+
+    <div class="membership-grid">
+      @for (pkg of packages(); track pkg.Id) {
+      <div class="membership-card" [class.highlight]="pkg.Price > 500000">
+        <div class="tier-header">
+          <h3>{{ pkg.TitleUpgrade }}</h3>
+          <div class="tier-price">
+            {{ pkg.Price | number : "1.0-0" }} <span>VNĐ/tháng</span>
+          </div>
+          @if (pkg.Price > 500000) {
+          <span class="popular-badge">Phổ biến nhất</span>
+          }
+        </div>
+
+        <div class="card-body">
+          <p class="description">{{ pkg.Description }}</p>
+          <div class="limit-info">
+            <i class="fa-solid fa-bolt"></i> Giới hạn:
+            <strong>{{ pkg.DailyLimit }}</strong> sự kiện/ngày
+          </div>
+        </div>
+
+        <div class="tier-stats">
+          <div class="stat">
+            <span>Trạng thái:</span>
+            <strong
+              [style.color]="pkg.status === 'active' ? '#3ca233' : '#e74c3c'"
+            >
+              {{
+                pkg.status === "active" ? "Đang hoạt động" : "Ngừng hoạt động"
+              }}
+            </strong>
+          </div>
+        </div>
+
+        <div class="tier-actions">
+          <button class="btn btn-outline" (click)="showEditDialog(pkg)">
+            <i class="fa-solid fa-pen"></i> Sửa
+          </button>
+          <button class="btn btn-danger" (click)="deletePackage(pkg.Id)">
+            <i class="fa-solid fa-trash"></i> Xóa
+          </button>
+        </div>
+      </div>
+      }
+    </div>
   </div>
-</app-shell>
+</div>
 
 <!-- Dialog thêm/sửa gói -->
 <p-dialog
@@ -78,7 +92,7 @@
         type="text"
         pInputText
         id="title"
-        [(ngModel)]="selectedPkg.titleUpgrade"
+        [(ngModel)]="selectedPkg.TitleUpgrade"
         placeholder="VD: Gói Chuyên Nghiệp"
         required
       />
@@ -92,7 +106,7 @@
         </label>
         <p-inputNumber
           id="price"
-          [(ngModel)]="selectedPkg.price"
+          [(ngModel)]="selectedPkg.Price"
           mode="currency"
           currency="VND"
           locale="vi-VN"
@@ -106,7 +120,7 @@
         </label>
         <p-inputNumber
           id="limit"
-          [(ngModel)]="selectedPkg.dailyLimit"
+          [(ngModel)]="selectedPkg.DailyLimit"
           [showButtons]="true"
           [min]="1"
           placeholder="10"
@@ -135,8 +149,8 @@
       </label>
       <textarea
         id="description"
-        pInputTextarea
-        [(ngModel)]="selectedPkg.description"
+        pTextarea
+        [(ngModel)]="selectedPkg.Description"
         rows="4"
         placeholder="Nhập mô tả các tính năng nổi bật của gói này..."
       ></textarea>

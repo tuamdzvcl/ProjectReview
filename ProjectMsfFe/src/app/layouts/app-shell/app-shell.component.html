@@ -27,14 +27,25 @@
         </button>
         <button class="nav-item" type="button" routerLink="/admin/events" routerLinkActive="nav-item--active">
           <span class="nav-item__icon"><i class="fa-regular fa-calendar"></i></span>
-          <span class="nav-item__label">Sự kiện</span>
+          <span class="nav-item__label">Sự kiện Của tôi</span>
+        </button>
+        <button *ngIf="userRole() === 'ADMIN'" class="nav-item" type="button" routerLink="/admin/approve-events"
+          routerLinkActive="nav-item--active">
+          <span class="nav-item__icon"><i class="fa-solid fa-check-to-slot"></i></span>
+          <span class="nav-item__label">Duyệt sự kiện</span>
         </button>
       </ng-container>
 
-      <button *ngIf="userRole() === 'ADMIN' || userRole() === 'ORGANIZER'" class="nav-item" type="button"
+      <button *ngIf="userRole() === 'ADMIN'" class="nav-item" type="button"
         routerLink="/admin/user" routerLinkActive="nav-item--active">
         <span class="nav-item__icon"><i class="fa-solid fa-address-book"></i></span>
         <span class="nav-item__label">Danh sách User</span>
+      </button>
+
+      <button *ngIf="userRole() === 'ADMIN' || userRole() === 'ORGANIZER'" class="nav-item" type="button"
+        routerLink="/admin/participants" routerLinkActive="nav-item--active">
+        <span class="nav-item__icon"><i class="fa-solid fa-users-viewfinder"></i></span>
+        <span class="nav-item__label">Người tham gia</span>
       </button>
 
       <ng-container *ngIf="userRole() === 'ADMIN' || userRole() === 'ORGANIZER'">
@@ -58,12 +69,17 @@
         <span class="nav-item__icon"><i class="fa-solid fa-user-group"></i></span>
         <span class="nav-item__label">Quản lý gói thành viên</span>
       </button>
+      <button *ngIf="userRole() === 'ADMIN'" class="nav-item" type="button" routerLink="/admin/roles"
+        routerLinkActive="nav-item--active">
+        <span class="nav-item__icon"><i class="fa-solid fa-shield-halved"></i></span>
+        <span class="nav-item__label">Phân quyền</span>
+      </button>
     </nav>
   </aside>
 
   <div class="main">
     <main class="content">
-      <ng-content />
+      <router-outlet></router-outlet>
     </main>
   </div>
 </div>

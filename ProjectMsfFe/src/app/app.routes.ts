@@ -7,6 +7,7 @@ import { HeaderComponent } from './shared/components/header/header.component';
 import { EventsPageComponent } from './features/events/pages/events-page/events-page.component';
 import { CreateEventComponent } from './features/events/components/create-event/create-event.component';
 import { MainLayoutComponent } from './layouts/main-layout/main-layout.component';
+import { AppShellComponent } from './layouts/app-shell/app-shell.component';
 import { LoginSuccessComponent } from './features/auth/pages/login-success/login-success.component';
 import { UserFormComponent } from './features/user/componnets/user-form/user-form.component';
 import { authGuard } from './core/guards/auth.guard';
@@ -20,6 +21,8 @@ import { AdminEventDetailComponent } from './features/events/pages/admin-event-d
 import { UserProfileComponent } from './features/user/pages/user-profile/user-profile.component';
 import { CheckoutPageComponent } from './features/events/pages/checkout-page/checkout-page.component';
 import { OrderDetailPageComponent } from './features/events/pages/order-detail-page/order-detail-page.component';
+import { ApproveEventsComponent } from './features/events/pages/approve-events/approve-events.component';
+import { ParticipantListComponent } from './features/user/pages/participant-list/participant-list.component';
 
 import { LandingPageComponent } from './features/home/pages/landing-page/landing-page.component';
 import { PricingComponent } from './features/home/pages/pricing/pricing.component';
@@ -35,6 +38,7 @@ import { ForgotPasswordComponent } from './features/auth/pages/forgot-password/f
 import { ResetPasswordComponent } from './features/auth/pages/reset-password/reset-password.component';
 import { VerifyEmailComponent } from './features/auth/pages/verify-email/verify-email.component';
 import { RegisterSuccessComponent } from './features/auth/pages/register-success/register-success.component';
+import { RoleComponent } from './features/roles/pages/admin-roles/role.component';
 
 export const routes: Routes = [
   { path: 'header', component: HeaderComponent },
@@ -157,13 +161,16 @@ export const routes: Routes = [
   },
   {
     path: 'admin',
+    component: AppShellComponent,
     canActivate: [authGuard],
     data: { requiresAuth: true },
     children: [
       { path: 'dashboard', component: DashboardComponent, data: { requiresAuth: true } },
       { path: 'events', component: EventsComponent, data: { requiresAuth: true } },
+      { path: 'approve-events', component: ApproveEventsComponent, data: { requiresAuth: true } },
       { path: 'events/:id', component: AdminEventDetailComponent, data: { requiresAuth: true } },
       { path: 'user', component: UserComponent, data: { requiresAuth: true } },
+      { path: 'participants', component: ParticipantListComponent, data: { requiresAuth: true } },
       {
         path: 'UserForm',
         component: UserFormComponent,
@@ -174,6 +181,7 @@ export const routes: Routes = [
       { path: 'payments', component: PaymentsComponent, data: { requiresAuth: true } },
       { path: 'audit-log', component: AuditLogComponent, data: { requiresAuth: true } },
       { path: 'membership', component: MembershipComponent, data: { requiresAuth: true } },
+      { path: 'roles', component: RoleComponent, data: { requiresAuth: true } },
     ],
   },
   {

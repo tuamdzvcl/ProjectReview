@@ -9,9 +9,9 @@ namespace projectDemo.Controllers
     [ApiController]
     public class PermissionController : ControllerBase
     {
-        private readonly IPemissionService _permissionService;
+        private readonly IPermissionService _permissionService;
 
-        public PermissionController(IPemissionService permissionService)
+        public PermissionController(IPermissionService permissionService)
         {
             _permissionService = permissionService;
         }
@@ -37,6 +37,13 @@ namespace projectDemo.Controllers
             return Ok(result);
             ;
         }
+        [HttpGet()]
+        public async Task<IActionResult> GetAll()
+        {
+            var result = await _permissionService.GetListPermission();
+            return Ok(result);
+            ;
+        }
 
         [HttpGet("role/{roleId}")]
         public async Task<IActionResult> GetByRole(int roleId)
@@ -45,5 +52,6 @@ namespace projectDemo.Controllers
             return Ok(result);
             ;
         }
+       
     }
 }

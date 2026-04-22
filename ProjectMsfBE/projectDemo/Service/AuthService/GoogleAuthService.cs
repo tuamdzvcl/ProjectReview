@@ -1,4 +1,5 @@
 using System.IdentityModel.Tokens.Jwt;
+using System.Linq;
 using EventTick.Model.Enum;
 using EventTick.Model.Models;
 using Google.Apis.Auth;
@@ -9,6 +10,8 @@ using projectDemo.DTO.Response;
 using projectDemo.Entity.Enum;
 using projectDemo.Repository;
 using projectDemo.Repository.Ipml;
+using projectDemo.Repository.PemisstionRepository;
+using projectDemo.Repository.RolePermissionRepository;
 using projectDemo.Service.Auth;
 using projectDemo.UnitOfWorks;
 
@@ -20,13 +23,17 @@ namespace projectDemo.Service.AuthService
         private readonly HttpClient _http;
         private readonly IAuthService _authService;
         private readonly IUserReposiotry _userReposiotry;
+        private readonly IRolePermissionRepository _rolePermissionRepository;
         private readonly IAuthRepository _authRepository;
         private readonly IUnitOfWork _uow;
         private readonly IUserRoleRepository _userRole;
         private readonly IUserLoginRepository _loginRepo;
+        private readonly IPermisstionRepository _pemisstionRepository;
 
         public GoogleAuthService(
             IUserRoleRepository userRole,
+            IPermisstionRepository pemisstionRepository,
+            IRolePermissionRepository RolepemisstionRepository,
             IUserLoginRepository login,
             IUnitOfWork unitOf,
             IAuthRepository authRepository,
@@ -37,6 +44,8 @@ namespace projectDemo.Service.AuthService
         )
         {
             _config = config;
+            _pemisstionRepository=pemisstionRepository;
+            _rolePermissionRepository=RolepemisstionRepository;
             _http = factory.CreateClient();
             _authService = authService;
             _userReposiotry = userRepository;
@@ -71,7 +80,6 @@ namespace projectDemo.Service.AuthService
 
         public async Task<ApiResponse<AuthResponse>> HandleGoogleCallback(string code)
         {
-            Console.WriteLine($"code: {code}");
             var clientId = _config["GoogleAuth:ClientId"];
             var clientSecret = _config["GoogleAuth:client_secret"];
             var redirectUri = _config["GoogleAuth:RedirectUri"];
@@ -90,16 +98,8 @@ namespace projectDemo.Service.AuthService
                 "https://oauth2.googleapis.com/token",
                 new FormUrlEncodedContent(tokenRequest)
             );
-            Console.WriteLine($"response: {response}");
-            response.EnsureSuccessStatusCode();
 
             var json = await response.Content.ReadAsStringAsync();
-
-            if (!response.IsSuccessStatusCode)
-            {
-                Console.WriteLine("GOOGLE ERROR: " + json);
-                throw new Exception(json);
-            }
             var tokenData = System.Text.Json.JsonSerializer.Deserialize<Dictionary<string, object>>(
                 json
             );
@@ -112,7 +112,7 @@ namespace projectDemo.Service.AuthService
             {
                 return ApiResponse<AuthResponse>.FailResponse(
                     EnumStatusCode.NOT_FOUND,
-                    "không tìm thấy toke"
+                    "không tìm thấy token"
                 );
             }
 
@@ -124,8 +124,7 @@ namespace projectDemo.Service.AuthService
             User users;
             try
             {
-                var check = existingLogin != null;
-                if (check)
+                if (existingLogin != null)
                 {
                     users = await _userReposiotry.GetUserByid(existingLogin.UserId);
                 }
@@ -151,6 +150,7 @@ namespace projectDemo.Service.AuthService
                         UserId = users.Id,
                     };
 
+
                     var ul = new UserLogin
                     {
                         Provider = EnumProviderName.Google.ToString().ToUpper(),
@@ -162,15 +162,28 @@ namespace projectDemo.Service.AuthService
                     };
 
                     var CreataUser = await _userReposiotry.Create(users);
+
                     await _userRole.InsertAsync(ur);
                     await _loginRepo.InsertAsync(ul);
                 }
 
                 await _uow.SaveChangesAsync();
+                await _uow.CommitAsync();
 
-                var permission = await _authRepository.GetPermissionsbyRoleName(
-                    EnumRoleName.CUSTOMER.ToString()
-                );
+                var test = users.UserRoles.ToList();
+                Console.WriteLine($"=====test====={test}");
+                
+                users = await _userReposiotry.GetUserByid(users.Id);
+
+                var UserRole = users.UserRoles.Select(x => x.Role.RoleName).ToList();
+                List<PermissionResponse> permission = new List<PermissionResponse>();
+                foreach (var p in UserRole)
+                {
+                    var perms = await _rolePermissionRepository.GetPermissionsbyRoleName(p);
+                    permission.AddRange(perms);
+                }
+
+                
 
                 var role = await _userReposiotry.GetRoleByUser(users.Id);
                 if (role == null || !role.Any())
@@ -181,7 +194,6 @@ namespace projectDemo.Service.AuthService
                     );
                 }
 
-                await _uow.CommitAsync();
                 var token = _authService.GenerateToken(users, permission);
 
                 var responses = new AuthResponse
@@ -198,7 +210,7 @@ namespace projectDemo.Service.AuthService
                         ID = users.Id,
                         RoleName = role,
                     },
-                    Isnew = !check,
+                    Isnew = existingLogin==null,
                 };
 
                 return ApiResponse<AuthResponse>.SuccessResponse(EnumStatusCode.SUCCESS, responses);
@@ -208,7 +220,7 @@ namespace projectDemo.Service.AuthService
                 Console.WriteLine($"loginGG === {ex.Message}");
                 return ApiResponse<AuthResponse>.FailResponse(
                     EnumStatusCode.NOT_FOUND,
-                    $"===ERORR=== \n {ex.ToString}"
+                    $"===ERORR=== \n {ex.ToString()}"
                 );
             }
         }

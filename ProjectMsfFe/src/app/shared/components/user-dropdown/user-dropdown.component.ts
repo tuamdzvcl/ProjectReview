@@ -1,6 +1,11 @@
 import { Router, RouterLink } from '@angular/router';
 import { CommonModule } from '@angular/common';
-import { Component, HostListener, OnInit } from '@angular/core';
+import {
+  ChangeDetectorRef,
+  Component,
+  HostListener,
+  OnInit,
+} from '@angular/core';
 import { AuthService } from '../../../features/auth/auth.service';
 import { ImageUrlPipe } from '../../pipes/image-url.pipe';
 import { UserService } from '../../../core/services/user.service';
@@ -14,9 +19,12 @@ import { UserService } from '../../../core/services/user.service';
 })
 export class UserDropdownComponent implements OnInit {
   isOpen = false;
-  constructor(private authService: AuthService
-    , private userService: UserService
-    , private router: Router) { }
+  constructor(
+    private authService: AuthService,
+    private userService: UserService,
+    private router: Router,
+    private cd: ChangeDetectorRef
+  ) {}
 
   toggleDropdown() {
     this.isOpen = !this.isOpen;
@@ -24,27 +32,28 @@ export class UserDropdownComponent implements OnInit {
 
   @HostListener('document:click', ['$event'])
   clickOutside(event: Event) {
-    const target = event.target as HTMLElement
+    const target = event.target as HTMLElement;
     if (!target.closest('.user')) {
-      this.isOpen = false
+      this.isOpen = false;
     }
   }
   user: any;
 
   get fullName(): string {
-    return this.user
-      ? `${this.user.FirstName} ${this.user.LastName}`
-      : '';
+    return this.user ? `${this.user.FirstName} ${this.user.LastName}` : '';
   }
   ngOnInit(): void {
+    console.log('test');
     this.userService.GetUserbyid().subscribe({
       next: (user) => {
         this.user = user;
+        this.cd.detectChanges();
       },
       error: (err) => {
         console.error('Lỗi khi lấy thông tin người dùng:', err);
-      }
+      },
     });
+    // this.user = this.authService.getUser();
   }
   hasRole(roles: string[]): boolean {
     return this.user?.RoleName?.some((r: string) => roles.includes(r)) ?? false;
@@ -55,4 +64,3 @@ export class UserDropdownComponent implements OnInit {
     this.router.navigate(['auth/login']);
   }
 }
-

@@ -30,6 +30,7 @@ export class EventCreatePageComponent {
   steps = [{ label: 'Chi Tiết' }, { label: 'Vé' }, { label: 'Cài Đặt' }];
   activeIndex = 0;
   isDataLoaded: boolean = false;
+  isSaving: boolean = false;
   eventId: string | null = null;
 
   ngOnInit() {
@@ -67,7 +68,6 @@ export class EventCreatePageComponent {
       ? new Date(eventData.SaleStartDate)
       : null;
     const sEnd = eventData.SaleEndDate ? new Date(eventData.SaleEndDate) : null;
-    const matched = categories.find((c) => c.Name === eventData.CatetoryName);
 
     const mappedTickets = (eventData.ListTypeTick || []).map((t: any) => ({
       id: t.Id,
@@ -96,7 +96,7 @@ export class EventCreatePageComponent {
       title: eventData.Title || '',
       description: eventData.Description || '',
       location: eventData.Location || '',
-      selectedCategory: matched ? matched.CatetoryId : null,
+      selectedCategory: eventData.CatetoryName || null,
       eventDate: eventData.StartDate ? new Date(eventData.StartDate) : undefined,
       eventTime: eventData.StartDate ? new Date(eventData.StartDate) : undefined,
       duration: (eventData.StartDate && eventData.EndDate) ? this.calcDurationHours(eventData.StartDate, eventData.EndDate) : 1,
@@ -172,31 +172,20 @@ export class EventCreatePageComponent {
     const { startDate, endDate } = this.calculateEventDates(draft);
     const { saleStartDate, saleEndDate } = this.calculateSaleDates(draft, startDate);
 
-    this.categoryService.GetCatetory().subscribe({
-      next: (res: any) => {
-        const categories = res.Data || [];
-        const matchedCategory = categories.find(
-          (c: any) => c.CatetoryId === draft.selectedCategory
-        );
-        const categoryName = matchedCategory ? matchedCategory.Name : '';
+    const categoryName = draft.selectedCategory || '';
 
-        const formData = this.buildFormData({
-          draft,
-          file,
-          startDate,
-          endDate,
-          saleStartDate,
-          saleEndDate,
-          categoryName,
-        });
-
-        this.submitEvent(formData);
-        console.log('formdate ', formData);
-      },
-      error: (err: any) => {
-        console.error('Không thể lấy danh mục:', err);
-      },
+    const formData = this.buildFormData({
+      draft,
+      file,
+      startDate,
+      endDate,
+      saleStartDate,
+      saleEndDate,
+      categoryName,
     });
+
+    this.submitEvent(formData);
+    console.log('formdate ', formData);
   }
 
   private isFormDataValid(draft: any): boolean {
@@ -294,11 +283,13 @@ export class EventCreatePageComponent {
   }
   private submitEvent(formData: FormData) {
     console.log('formData', formData);
+    this.isSaving = true;
     const request$ = this.eventId
       ? this.eventService.UpdateEvent(this.eventId, formData)
       : this.eventService.CreateEvent(formData);
     request$.subscribe({
       next: (result) => {
+        this.isSaving = false;
         this.messageService.add({
           severity: 'success',
           summary: 'Thành công',
@@ -325,6 +316,7 @@ export class EventCreatePageComponent {
           detail: errorMessage,
         });
         console.error('Lỗi API:', err);
+        this.isSaving = false;
       },
     });
   }

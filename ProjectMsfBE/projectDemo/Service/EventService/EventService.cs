@@ -245,39 +245,7 @@ namespace projectDemo.Service.EventService
 
             try
             {
-                // 1. Kiểm tra gói nâng cấp và giới hạn ngày
-                var activeUpgrade = await _userUpgradeRepository.GetActiveUpgradeByUserIdAsync(userId);
-                if (activeUpgrade == null)
-                {
-                    return ApiResponse<CreateEventWithTicketTypesResponse>.FailResponse(
-                        EnumStatusCode.UNAUTHORIZED,
-                        "Bạn cần mua gói nâng cấp để thực hiện chức năng này."
-                    );
-                }
-
-                // Kiểm tra reset lượt theo ngày
-                var today = DateTime.Today;
-                if (!activeUpgrade.LastUsageDate.HasValue || activeUpgrade.LastUsageDate.Value.Date != today)
-                {
-                    activeUpgrade.CurrentDayUsageCount = 0;
-                    activeUpgrade.LastUsageDate = DateTime.Now;
-                }
-
-                if (activeUpgrade.CurrentDayUsageCount >= activeUpgrade.Upgrade.DailyLimit)
-                {
-                    var dailyPackages = (await _upgradeRepository.GetAllAsync())
-                        .Where(u => u.IsDailyPackage && u.status == "ACTIVE")
-                        .ToList();
-
-                    string suggestion = dailyPackages.Any()
-                        ? ". Gợi ý các gói ngày: " + string.Join(", ", dailyPackages.Select(p => p.TitleUpgrade))
-                        : "";
-
-                    return ApiResponse<CreateEventWithTicketTypesResponse>.FailResponse(
-                        EnumStatusCode.BAD_REQUEST,
-                        $"Bạn đã đạt giới hạn tạo sự kiện trong ngày ({activeUpgrade.Upgrade.DailyLimit} event){suggestion}"
-                    );
-                }
+               
 
                 // 2. Các kiểm tra dữ liệu hiện tại
                 if (!checkVadidate(request))
@@ -324,10 +292,12 @@ namespace projectDemo.Service.EventService
                 var catetory = await _catrtoeyRepository.GetByName(request.CatetoryName.ToUpper());
                 if (catetory == null)
                 {
-                    return ApiResponse<CreateEventWithTicketTypesResponse>.FailResponse(
-                        EnumStatusCode.NOT_FOUND,
-                        "Không tìm thấy thể loại"
-                    );
+                    catetory = new Catetory
+                    {
+                        Id = Guid.NewGuid(),
+                        Name = request.CatetoryName
+                    };
+                    await _catrtoeyRepository.Create(catetory);
                 }
 
                 await _uow.BeginTransactionAsync();
@@ -369,10 +339,7 @@ namespace projectDemo.Service.EventService
                 await _eventRepository.CreateEvent(eventEntity);
                 await _typeTicketRepository.CreateRangeTicketTypes(ticketTypeEntities);
 
-                // Tăng lượt sử dụng trong ngày
-                activeUpgrade.CurrentDayUsageCount++;
-                activeUpgrade.LastUsageDate = DateTime.Now;
-                _userUpgradeRepository.Update(activeUpgrade);
+             
 
                 await _uow.SaveChangesAsync();
                 await _uow.CommitAsync();
@@ -431,11 +398,14 @@ namespace projectDemo.Service.EventService
         }
 
         // xóa mềm
-        public async Task<ApiResponse<string>> DeleteEvent(Guid EventID)
+        public async Task<ApiResponse<string>> DeleteEvent(Guid EventID,bool isAdmin =false)
         {
             try
             {
                 await SyncEndedEventsAsync();
+
+                
+
                 Event events = await _eventRepository.GetEventById(EventID);
 
                 if (events == null)
@@ -444,6 +414,13 @@ namespace projectDemo.Service.EventService
                         Entity.Enum.EnumStatusCode.EVENTNOTFOUD,
                         "Không tìm thấy event"
                     );
+                }
+                if (!isAdmin)
+                {
+                    return ApiResponse<string>.FailResponse(
+                                           Entity.Enum.EnumStatusCode.BAD_REQUEST,
+                                           "Có phải admin không mà đòi xóa"
+                                       );
                 }
                 await EnsureEventEndedStatusAsync(events);
 
@@ -607,10 +584,12 @@ namespace projectDemo.Service.EventService
                     );
                     if (catetory == null)
                     {
-                        return ApiResponse<string>.FailResponse(
-                            Entity.Enum.EnumStatusCode.NOT_FOUND,
-                            "Không tìm thấy thể loại"
-                        );
+                        catetory = new Catetory
+                        {
+                            Id = Guid.NewGuid(),
+                            Name = resquest.CatetoryName
+                        };
+                        await _catrtoeyRepository.Create(catetory);
                     }
 
                     events.CatetoryID = catetory.Id;

@@ -81,7 +81,7 @@ export class AdminEventDetailComponent implements OnInit {
         if (!this.event) return;
 
 
-        this.eventService.UpdateEventStatus(this.event.Id.toString(), 2).subscribe({
+        this.eventService.UpdateEventStatus(this.event.Id.toString(), 4).subscribe({
           next: () => {
             if (this.event) this.event.Status = 'PUBLISHED';
             this.messageService.add({

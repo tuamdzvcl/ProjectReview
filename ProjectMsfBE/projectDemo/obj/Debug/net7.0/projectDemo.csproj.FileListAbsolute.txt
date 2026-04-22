@@ -157,3 +157,11 @@ D:\Msf\ProjectMsfBE\projectDemo\temp_build_verify\runtimes\win\lib\netstandard2.
 D:\Msf\ProjectMsfBE\projectDemo\temp_build_verify\runtimes\win\lib\netstandard2.0\System.Security.Cryptography.ProtectedData.dll
 D:\Msf\ProjectMsfBE\projectDemo\temp_build_verify\runtimes\win\lib\netcoreapp3.0\System.Windows.Extensions.dll
 D:\Msf\ProjectMsfBE\projectDemo\obj\Debug\net7.0\projectDemo.csproj.CopyComplete
+D:\Msf\ProjectMsfBE\projectDemo\bin\Debug\net7.0\ClosedXML.dll
+D:\Msf\ProjectMsfBE\projectDemo\bin\Debug\net7.0\ClosedXML.Parser.dll
+D:\Msf\ProjectMsfBE\projectDemo\bin\Debug\net7.0\DocumentFormat.OpenXml.dll
+D:\Msf\ProjectMsfBE\projectDemo\bin\Debug\net7.0\DocumentFormat.OpenXml.Framework.dll
+D:\Msf\ProjectMsfBE\projectDemo\bin\Debug\net7.0\ExcelNumberFormat.dll
+D:\Msf\ProjectMsfBE\projectDemo\bin\Debug\net7.0\RBush.dll
+D:\Msf\ProjectMsfBE\projectDemo\bin\Debug\net7.0\SixLabors.Fonts.dll
+D:\Msf\ProjectMsfBE\projectDemo\bin\Debug\net7.0\System.IO.Packaging.dll

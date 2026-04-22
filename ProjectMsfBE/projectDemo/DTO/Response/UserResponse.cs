@@ -1,4 +1,4 @@
-﻿using EventTick.Model.Enum;
+using EventTick.Model.Enum;
 
 namespace projectDemo.DTO.Response
 {
@@ -17,5 +17,6 @@ namespace projectDemo.DTO.Response
 
         public DateTime? DateLock { get; set; }
         public int? Isfalse { get; set; }
+        public List<string> Permissions { get; set; } = new();
     }
 }

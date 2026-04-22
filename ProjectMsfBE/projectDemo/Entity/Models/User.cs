@@ -45,6 +45,8 @@ namespace EventTick.Model.Models
         [MaxLength(500)]
         public string? AvatarUrl { get; set; }
 
+        public bool IsAdmin { get; set; }
+
         [MaxLength(500)]
         public string? BackGroupUrl { get; set; }
 

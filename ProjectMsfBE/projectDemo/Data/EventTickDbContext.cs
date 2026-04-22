@@ -33,16 +33,23 @@ namespace projectDemo.Data
         public DbSet<RolePermissions> RolePermissions { get; set; }
         public DbSet<Upgrade> Upgrade { get; set; }
         public DbSet<UserUpgrade> UserUpgrades { get; set; }
+        public DbSet<Menu> Menu { get; set; }
+        public DbSet<MenuPermissions> MenuPermissions { get; set; }
+        public DbSet<Promotion> Promotions { get; set; }
+        public DbSet<EmailSetting> EmailSettings { get; set; }
+        public DbSet<SystemSetting> Settings { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<UserUpgrade>()
+            modelBuilder
+                .Entity<UserUpgrade>()
                 .HasOne(uu => uu.User)
                 .WithMany(u => u.UserUpgrades)
                 .HasForeignKey(uu => uu.UserId)
                 .OnDelete(DeleteBehavior.Restrict);
 
-            modelBuilder.Entity<UserUpgrade>()
+            modelBuilder
+                .Entity<UserUpgrade>()
                 .HasOne(uu => uu.Upgrade)
                 .WithMany(u => u.UserUpgrades)
                 .HasForeignKey(uu => uu.UpgradeId)
@@ -111,9 +118,7 @@ namespace projectDemo.Data
                 .WithOne(p => p.Orders)
                 .HasForeignKey<Payment>(p => p.OrderID);
 
-            modelBuilder.Entity<Order>()
-                .Property(o => o.UserUpgradeId)
-                .IsRequired(false);
+            modelBuilder.Entity<Order>().Property(o => o.UserUpgradeId).IsRequired(false);
 
             modelBuilder
                 .Entity<User>()
@@ -141,6 +146,19 @@ namespace projectDemo.Data
                 .WithOne(e => e.Catetory)
                 .HasForeignKey(c => c.CatetoryID);
 
+            // MenuPermissions relationship
+            modelBuilder
+                .Entity<MenuPermissions>()
+                .HasOne(mp => mp.Menu)
+                .WithMany(m => m.MenuPermissions)
+                .HasForeignKey(mp => mp.MenuId);
+
+            modelBuilder
+                .Entity<MenuPermissions>()
+                .HasOne(mp => mp.Permission)
+                .WithMany(p => p.MenuPermissions)
+                .HasForeignKey(mp => mp.PermissionId);
+
             modelBuilder.Entity<Role>().HasData(GetRoleSeed.GetRole().ToArray());
             modelBuilder.Entity<Permissions>().HasData(GetPermissionSeed.GetPermission().ToArray());
 
@@ -157,10 +175,10 @@ namespace projectDemo.Data
                         LastName = "admin",
                         Email = "admin@system.com",
                         IsActive = true,
+                        IsAdmin = true,
                         PasswordHash = BCrypt.Net.BCrypt.HashPassword("Admin@123"),
                     }
                 );
-           
 
             modelBuilder
                 .Entity<UserRole>()

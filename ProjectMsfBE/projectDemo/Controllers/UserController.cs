@@ -1,9 +1,11 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using projectDemo.config;
 using projectDemo.DTO.Request;
 using projectDemo.DTO.UpdateRequest;
 using projectDemo.Service.UserService;
+using System.Security.Claims;
 
 namespace projectDemo.Controllers
 {
@@ -22,11 +24,10 @@ namespace projectDemo.Controllers
         [HttpGet("me")]
         public async Task<IActionResult> GetProfile()
         {
-            var userId = Guid.Parse(User.FindFirst("id").Value);
+            var userId = Guid.Parse(User.FindFirstValue("id") ?? "Null");
             var result = await _userService.GetByid(userId);
             return Ok(result);
         }
-
         [HttpGet("events")]
         public async Task<IActionResult> GetAllEvent()
         {
@@ -35,9 +36,7 @@ namespace projectDemo.Controllers
             var result = await _userService.GetListEventByUserID(userId);
             return Ok(result);
         }
-
         [HttpGet("events/{userId}")]
-        [AllowAnonymous]
         public async Task<IActionResult> GetEventByUserId(Guid userId)
         {
             var result = await _userService.GetListEventByUserIDCreate(userId);
@@ -54,6 +53,7 @@ namespace projectDemo.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(Guid id)
         {
+            var userId = Guid.Parse(User.FindFirstValue("id") ?? "Null");
             var result = await _userService.Delete(id);
             return Ok(result);
         }
@@ -61,8 +61,7 @@ namespace projectDemo.Controllers
         [HttpPost()]
         public async Task<IActionResult> Add(UserRequest request)
         {
-            var userId = Guid.Parse(User.FindFirst("id").Value);
-
+            var userId = Guid.Parse(User.FindFirstValue("id") ?? "Null");
             var result = await _userService.Create(request, userId);
             return Ok(result);
         }
@@ -77,7 +76,7 @@ namespace projectDemo.Controllers
         [HttpGet("participants")]
         public async Task<IActionResult> GetParticipantsByOrganizer([FromQuery] projectDemo.Common.PageRequest.PageRequest request)
         {
-            var userId = Guid.Parse(User.FindFirst("id").Value);
+            var userId = Guid.Parse(User.FindFirstValue("id")??"Null");
             var result = await _userService.GetParticipantsByOrganizer(userId, request);
             return Ok(result);
         }
@@ -85,9 +84,10 @@ namespace projectDemo.Controllers
         [HttpPut("avatar")]
         public async Task<IActionResult> UpdateAvatar(IFormFile file)
         {
-            var userId = Guid.Parse(User.FindFirst("id").Value);
+            var userId = Guid.Parse(User.FindFirstValue("id") ?? "Null");
             var result = await _userService.UpdateAvatarAsync(userId, file);
             return Ok(result);
         }
+        
     }
 }

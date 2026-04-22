@@ -14,7 +14,7 @@ namespace projectDemo.Service.EventService
         Task<ApiResponse<EventTypeTickResponses>> GetEventById(Guid EventID);
         Task<ApiResponse<string>> UpdateEvent(Guid EventID, EventUpdateRequest resquest);
         Task<ApiResponse<string>> UpdateEventStatus(Guid eventId, EventStatusUpdateRequest request);
-        Task<ApiResponse<string>> DeleteEvent(Guid EventID);
+        Task<ApiResponse<string>> DeleteEvent(Guid EventID, bool isAdmin = false);
         Task<ApiResponse<CreateEventWithTicketTypesResponse>> CreateEventWithTicketTypes(
             CreateEventWithTicketTypesRequest request,
             Guid userId

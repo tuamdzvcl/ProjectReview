@@ -1,9 +1,9 @@
-.box{
+.box {
   width: 100%;
   height: 88vh;
 }
+
 .dashboard-page {
-  padding: 2rem;
   font-family: 'Inter', sans-serif;
   color: #333;
 }
@@ -13,12 +13,6 @@
   justify-content: space-between;
   align-items: center;
   margin-bottom: 2rem;
-  
-  h2 {
-    font-size: 1.8rem;
-    color: #2c3e50;
-    margin: 0;
-  }
 }
 
 .btn-primary {
@@ -33,7 +27,7 @@
   align-items: center;
   gap: 0.5rem;
   transition: all 0.3s;
-  
+
   &:hover {
     background-color: #6bd063;
     box-shadow: 0 4px 10px rgba(129, 233, 121, 0.3);
@@ -49,7 +43,7 @@
 .payment-card {
   background: white;
   border-radius: 12px;
-  box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
   border: 1px solid #eee;
   overflow: hidden;
   display: flex;
@@ -64,12 +58,12 @@
   margin: 1rem;
   position: relative;
   overflow: hidden;
-  box-shadow: 0 10px 20px rgba(0,0,0,0.1);
-  
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+
   &.mastercard {
     background: linear-gradient(135deg, #e67e22, #d35400);
   }
-  
+
   &::after {
     content: '';
     position: absolute;
@@ -78,38 +72,39 @@
     width: 150px;
     height: 150px;
     border-radius: 50%;
-    background: rgba(255,255,255,0.1);
+    background: rgba(255, 255, 255, 0.1);
   }
 }
 
 .card-chip {
   font-size: 2rem;
   margin-bottom: 1rem;
-  color: #81E979; /* primary accent color for details */
+  color: #81E979;
+  /* primary accent color for details */
 }
 
 .card-number {
   font-size: 1.5rem;
   letter-spacing: 2px;
   margin-bottom: 1.5rem;
-  text-shadow: 0 2px 2px rgba(0,0,0,0.3);
+  text-shadow: 0 2px 2px rgba(0, 0, 0, 0.3);
 }
 
 .card-info {
   display: flex;
   justify-content: space-between;
-  
+
   .info-item {
     display: flex;
     flex-direction: column;
-    
+
     span {
       font-size: 0.75rem;
       text-transform: uppercase;
       opacity: 0.8;
       margin-bottom: 4px;
     }
-    
+
     strong {
       font-size: 1.1rem;
     }
@@ -119,7 +114,7 @@
 .payment-actions {
   display: flex;
   border-top: 1px solid #eee;
-  
+
   .btn-icon {
     flex: 1;
     padding: 1rem;
@@ -128,23 +123,23 @@
     cursor: pointer;
     font-weight: 600;
     transition: background-color 0.3s;
-    
+
     i {
       margin-right: 5px;
     }
-    
+
     &.edit {
       color: #3498db;
       border-right: 1px solid #eee;
-      
+
       &:hover {
         background-color: rgba(52, 152, 219, 0.05);
       }
     }
-    
+
     &.delete {
       color: #e74c3c;
-      
+
       &:hover {
         background-color: rgba(231, 76, 60, 0.05);
       }

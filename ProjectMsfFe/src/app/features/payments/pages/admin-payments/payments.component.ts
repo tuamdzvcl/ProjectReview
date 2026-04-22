@@ -1,11 +1,10 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { AppShellComponent } from '../../../../layouts/app-shell/app-shell.component';
 
 @Component({
   selector: 'app-payments',
   standalone: true,
-  imports: [CommonModule, AppShellComponent],
+  imports: [CommonModule],
   templateUrl: './payments.component.html',
   styleUrl: './payments.component.scss'
 })

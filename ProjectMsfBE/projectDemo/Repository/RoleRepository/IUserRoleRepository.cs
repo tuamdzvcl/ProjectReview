@@ -1,4 +1,5 @@
 ﻿using EventTick.Model.Models;
+using projectDemo.Entity.Models;
 
 namespace projectDemo.Repository.Ipml
 {
@@ -9,5 +10,7 @@ namespace projectDemo.Repository.Ipml
         Task<UserRole> GetByIdAsync(int id);
         string DeleteByIdAsync(UserRole user);
         UserRole Update(UserRole user);
+
+        Task<IEnumerable<Permissions>> GetAllByUserId(Guid userId);
     }
 }

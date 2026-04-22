@@ -1,4 +1,4 @@
-﻿using EventTick.Model.Enum;
+using EventTick.Model.Enum;
 using EventTick.Model.Models;
 
 namespace projectDemo.Repository.Ipml;

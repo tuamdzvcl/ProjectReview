@@ -73,5 +73,26 @@ namespace projectDemo.Controllers
             var result = await _upgradeService.DeleteUpgradeAsync(id);
             return Ok(result);
         }
+
+        [HttpPost("admin/import")]
+        public async Task<IActionResult> Import(IFormFile file)
+        {
+            var result = await _upgradeService.ImportUpgradesAsync(file);
+            return Ok(result);
+        }
+
+        [HttpGet("admin/export")]
+        public async Task<IActionResult> Export()
+        {
+            var bytes = await _upgradeService.ExportUpgradesAsync();
+            return File(bytes, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "MembershipPackages.xlsx");
+        }
+
+        [HttpGet("admin/template")]
+        public async Task<IActionResult> DownloadTemplate()
+        {
+            var bytes = await _upgradeService.DownloadTemplateAsync();
+            return File(bytes, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "MembershipTemplate.xlsx");
+        }
     }
 }

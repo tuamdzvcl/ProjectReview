@@ -1,7 +1,6 @@
 import { Component, OnInit, signal, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { AppShellComponent } from '../../../../layouts/app-shell/app-shell.component';
 import { UpgradeService } from '../../../../core/services/upgrade.service';
 import {
   UpgradeResponse,
@@ -12,6 +11,7 @@ import { ButtonModule } from 'primeng/button';
 import { InputTextModule } from 'primeng/inputtext';
 import { InputNumberModule } from 'primeng/inputnumber';
 import { DropdownModule } from 'primeng/dropdown';
+import { TextareaModule } from 'primeng/textarea';
 import Swal from 'sweetalert2';
 
 @Component({
@@ -19,13 +19,13 @@ import Swal from 'sweetalert2';
   standalone: true,
   imports: [
     CommonModule,
-    AppShellComponent,
     FormsModule,
     DialogModule,
     ButtonModule,
     InputTextModule,
     InputNumberModule,
     DropdownModule,
+    TextareaModule,
   ],
   templateUrl: './membership.component.html',
   styleUrl: './membership.component.scss',
@@ -43,11 +43,11 @@ export class MembershipComponent implements OnInit {
   ];
 
   selectedPkg: UpgradeRequest = {
-    titleUpgrade: '',
-    description: '',
+    TitleUpgrade: '',
+    Description: '',
     status: 'active',
-    dailyLimit: 0,
-    price: 0,
+    DailyLimit: 0,
+    Price: 0,
   };
 
   currentId: number | null = null;
@@ -77,11 +77,11 @@ export class MembershipComponent implements OnInit {
     this.isEditMode = false;
     this.currentId = null;
     this.selectedPkg = {
-      titleUpgrade: '',
-      description: '',
+      TitleUpgrade: '',
+      Description: '',
       status: 'active',
-      dailyLimit: 10,
-      price: 0,
+      DailyLimit: 10,
+      Price: 0,
     };
     this.displayDialog = true;
   }
@@ -90,17 +90,17 @@ export class MembershipComponent implements OnInit {
     this.isEditMode = true;
     this.currentId = pkg.Id;
     this.selectedPkg = {
-      titleUpgrade: pkg.TitleUpgrade,
-      description: pkg.Description,
+      TitleUpgrade: pkg.TitleUpgrade,
+      Description: pkg.Description,
       status: pkg.status,
-      dailyLimit: pkg.DailyLimit,
-      price: pkg.Price,
+      DailyLimit: pkg.DailyLimit,
+      Price: pkg.Price,
     };
     this.displayDialog = true;
   }
 
   savePackage() {
-    if (!this.selectedPkg.titleUpgrade) {
+    if (!this.selectedPkg.TitleUpgrade) {
       Swal.fire('Cảnh báo', 'Vui lòng nhập tên gói', 'warning');
       return;
     }
@@ -153,5 +153,68 @@ export class MembershipComponent implements OnInit {
         });
       }
     });
+  }
+
+  // EXCEL OPERATIONS
+  exportToExcel() {
+    this.upgradeService.exportExcel().subscribe({
+      next: (blob) => {
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'MembershipPackages.xlsx';
+        a.click();
+        window.URL.revokeObjectURL(url);
+      },
+      error: (err) => {
+        Swal.fire('Lỗi', 'Không thể xuất file Excel', 'error');
+      },
+    });
+  }
+
+  downloadTemplate() {
+    this.upgradeService.downloadTemplate().subscribe({
+      next: (blob) => {
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'MembershipTemplate.xlsx';
+        a.click();
+        window.URL.revokeObjectURL(url);
+      },
+      error: (err) => {
+        Swal.fire('Lỗi', 'Không thể tải file mẫu', 'error');
+      },
+    });
+  }
+
+  triggerImport() {
+    document.getElementById('importFile')?.click();
+  }
+
+  onFileSelected(event: any) {
+    const file = event.target.files[0];
+    if (file) {
+      Swal.fire({
+        title: 'Đang xử lý...',
+        text: 'Vui lòng chờ trong giây lát',
+        allowOutsideClick: false,
+        didOpen: () => {
+          Swal.showLoading();
+        },
+      });
+
+      this.upgradeService.importExcel(file).subscribe({
+        next: (res) => {
+          Swal.fire('Thành công', 'Đã nhập dữ liệu từ Excel thành công', 'success');
+          this.loadPackages();
+          event.target.value = ''; // Reset input
+        },
+        error: (err) => {
+          Swal.fire('Lỗi', 'Nhập dữ liệu thất bại: ' + err.message, 'error');
+          event.target.value = ''; // Reset input
+        },
+      });
+    }
   }
 }

@@ -16,11 +16,15 @@ namespace projectDemo.Repository.ParticipantQuery
             _uow = uow;
         }
 
-        public async Task<(List<ParticipantFlatRow> Items, int TotalCount)> GetParticipantsByOrganizerAsync(Guid organizerId, int pageIndex, int pageSize)
+        public async Task<(
+            List<ParticipantFlatRow> Items,
+            int TotalCount
+        )> GetParticipantsByOrganizerAsync(Guid organizerId, int pageIndex, int pageSize)
         {
             var skip = (pageIndex - 1) * pageSize;
 
-            const string sql = @"
+            const string sql =
+                @"
                 SELECT COUNT(DISTINCT u.Id)
                 FROM [User] u
                 INNER JOIN Orders o ON o.UserID = u.Id
@@ -31,13 +35,17 @@ namespace projectDemo.Repository.ParticipantQuery
                   AND u.IsDeleted = 0 
                   AND o.IsDeleted = 0;
 
-                SELECT DISTINCT 
+                SELECT 
                     u.Id, 
                     u.Email, 
                     u.Username, 
                     u.FirstName, 
                     u.LastName, 
-                    u.AvatarUrl
+                    u.AvatarUrl,
+                    e.Title AS EventTitle,
+                    tt.Name AS TicketName,
+                    o.TotalAmount,
+                    od.Quantity AS TicketQuantity
                 FROM [User] u
                 INNER JOIN Orders o ON o.UserID = u.Id
                 INNER JOIN OrderDetail od ON od.OrderID = o.Id
@@ -46,12 +54,17 @@ namespace projectDemo.Repository.ParticipantQuery
                 WHERE e.UserID = @organizerId 
                   AND u.IsDeleted = 0 
                   AND o.IsDeleted = 0
-                ORDER BY u.Username
+                ORDER BY o.Id DESC
                 OFFSET @skip ROWS FETCH NEXT @pageSize ROWS ONLY;";
 
             using var multi = await _uow.connection.QueryMultipleAsync(
                 sql,
-                new { organizerId, skip, pageSize },
+                new
+                {
+                    organizerId,
+                    skip,
+                    pageSize,
+                },
                 transaction: _uow.GetTransaction()
             );
 

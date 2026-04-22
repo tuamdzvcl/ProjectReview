@@ -1,0 +1,133 @@
+.topbar__left {
+  margin-bottom: 24px;
+
+  .topbar__title {
+    font-size: 28px;
+    font-weight: 700;
+    color: #1e293b;
+    margin: 0;
+  }
+}
+
+.card {
+  background: #ffffff;
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+  margin-bottom: 24px;
+}
+
+.participants-header {
+  .header-title {
+    font-size: 20px;
+    font-weight: 600;
+    color: #334155;
+    margin: 0 0 4px 0;
+  }
+
+  .header-subtitle {
+    color: #64748b;
+    font-size: 14px;
+    margin: 0;
+  }
+}
+
+.table-wrapper {
+  margin-top: 8px;
+}
+
+.user-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+
+  .avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid #f1f5f9;
+  }
+
+  .user-details {
+    display: flex;
+    flex-direction: column;
+
+    .full-name {
+      font-weight: 600;
+      color: #1e293b;
+      font-size: 14px;
+    }
+
+    .email {
+      font-size: 12px;
+      color: #64748b;
+    }
+  }
+}
+
+.event-title {
+  color: #1e293b;
+  font-weight: 500;
+  font-size: 14px;
+}
+
+.ticket-badge {
+  background: #eff6ff;
+  color: #2563eb;
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  display: inline-block;
+}
+
+.amount {
+  font-weight: 700;
+  color: #059669;
+  font-size: 14px;
+}
+
+.text-center {
+  text-align: center;
+}
+
+:host ::v-deep {
+  .p-datatable {
+    .p-datatable-thead>tr>th {
+      background: #f8fafc;
+      color: #475569;
+      font-weight: 600;
+      font-size: 13px;
+      padding: 16px;
+      border-bottom: 1px solid #e2e8f0;
+    }
+
+    .p-datatable-tbody>tr>td {
+      padding: 16px;
+      border-bottom: 1px solid #f1f5f9;
+      color: #334155;
+    }
+
+    .p-paginator {
+      border: none;
+      padding: 16px 0 0 0;
+
+      .p-paginator-page,
+      .p-paginator-next,
+      .p-paginator-last,
+      .p-paginator-first,
+      .p-paginator-prev {
+        min-width: 32px;
+        height: 32px;
+        border-radius: 6px;
+        margin: 0 2px;
+      }
+
+      .p-highlight {
+        background: #3b82f6;
+        color: #ffffff;
+      }
+    }
+  }
+}

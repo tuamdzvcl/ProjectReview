@@ -11,9 +11,9 @@ export interface UpgradeResponse {
 }
 
 export interface UpgradeRequest {
-  titleUpgrade: string;
-  description: string;
+  TitleUpgrade: string;
+  Description: string;
   status: string;
-  dailyLimit: number;
-  price: number;
+  DailyLimit: number;
+  Price: number;
 }

@@ -9,6 +9,7 @@ import { UserUpdata } from '../model/update/userupdate.model';
 import { UserRequest } from '../model/request/userRequest.model';
 import { UserEventsResponse } from '../model/response/user-events-response.model';
 import { UserProfile } from '../model/response/userprofile.model';
+import { UserInEvent } from '../model/response/participant.model';
 
 @Injectable({
   providedIn: 'root',
@@ -64,13 +65,19 @@ export class UserService extends BaseApiService {
     return this.get<UserResponse>('users/me');
   }
 
-  GetParticipants(pageIndex: number, pageSize: number) {
+  GetParticipants(pageIndex: number, pageSize: number): Observable<{
+    items: UserInEvent[];
+    pageIndex: number;
+    pageSize: number;
+    totalRecords: number;
+    totalPages: number;
+  }> {
     const params: any = {
-      pageIndex: pageIndex,
-      pageSize: pageSize,
+      PageIndex: pageIndex,
+      PageSize: pageSize,
     };
-    return this.getpage<UserResponse>('users/participants', params).pipe(
-      map((res: PageResult<UserResponse>) => {
+    return this.getpage<UserInEvent>('users/participants', params).pipe(
+      map((res: PageResult<UserInEvent>) => {
         return {
           items: res.Items,
           pageIndex: res.PageIndex,

@@ -1,140 +1,138 @@
-<app-shell>
-  <div class="box">
-    <div class="topbar__left">
-      <h1 class="topbar__title">Sự kiện</h1>
+<div class="box">
+  <div class="topbar__left">
+    <h1 class="topbar__title">Sự kiện</h1>
+  </div>
+  <section class="events-header card">
+    <div style="display: flex; flex-direction: column; gap: 10px">
+      <div class="events-header__left">
+        <h2 class="events-header__title">Danh sách sự kiện ({{ totalRecords }})</h2>
+      </div>
+      <div class="events-search__control">
+        <span class="events-search__icon">🔍</span>
+        <input class="events-search__input" type="text" placeholder="Tìm kiếm theo tên sự kiện, trạng thái"
+          (input)="onSearch($event)" />
+      </div>
     </div>
-    <section class="events-header card">
-      <div style="display: flex; flex-direction: column; gap: 10px">
-        <div class="events-header__left">
-          <h2 class="events-header__title">Danh sách sự kiện ({{ totalRecords }})</h2>
+
+    <div class="events-header__right">
+      <div class="events-header__filters">
+        <button class="btn btn--tab btn--tab-active" type="button" (click)="onTabChange('')">
+          Tất cả ({{ totalRecords }})
+        </button>
+        <button class="btn btn--tab" type="button" (click)="onTabChange('online')">
+          ĐÃ XUẤT BẢN (0)
+        </button>
+        <button class="btn btn--tab" type="button" (click)="onTabChange('venue')">
+          BẢN NHÁP ({{ totalRecords }})
+        </button>
+      </div>
+    </div>
+  </section>
+
+
+  <section class="event-item card" *ngFor="let event of events; let i = index" style="cursor: pointer;"
+    (click)="viewDetails(event)">
+    <div class="event-item__media">
+      <div class="event-item__thumbnail">
+        <img [src]="event.PosterUrl | imageUrl" [alt]="event.name || 'Event'" />
+      </div>
+    </div>
+    <div class="event-item__body">
+      <div class="event-item__title">
+        {{ event.Title || "Sự kiện chưa đặt tên" }}
+      </div>
+      <div class="event-item__meta-row">
+        <div class="event-meta">
+          <div class="event-meta__label">Trạng thái</div>
+          <div class="event-meta__value event-meta__value--green">
+            {{ event.Status }}
+          </div>
         </div>
-        <div class="events-search__control">
-          <span class="events-search__icon">🔍</span>
-          <input class="events-search__input" type="text" placeholder="Tìm kiếm theo tên sự kiện, trạng thái"
-            (input)="onSearch($event)" />
+
+        <div class="event-meta">
+          <div class="event-meta__label">Bắt đầu lúc</div>
+          <div class="event-meta__value">
+            {{ event.StartDate | formatDate }}
+          </div>
+        </div>
+
+        <div class="event-meta">
+          <div class="event-meta__label">Tổng số vé</div>
+          <div class="event-meta__value">
+            {{ getTotalTickets(event) }}
+          </div>
+        </div>
+
+        <div class="event-meta">
+          <div class="event-meta__label">Đã bán</div>
+          <div class="event-meta__value" style="color: #6cc04a;">
+            {{ getTotalSold(event) }}
+          </div>
         </div>
       </div>
 
-      <div class="events-header__right">
-        <div class="events-header__filters">
-          <button class="btn btn--tab btn--tab-active" type="button" (click)="onTabChange('')">
-            Tất cả ({{ totalRecords }})
+      <div class="ticket-chips" *ngIf="event.ListTypeTick?.length"
+        style="display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; padding-top: 12px; ">
+        <div *ngFor="let ticket of event.ListTypeTick"
+          style="font-size: 11px; font-weight: 500; background: #f3f4f6; color: #4b5563; padding: 4px 10px; border-radius: 100px; display: inline-flex; align-items: center; gap: 6px; border: 1px solid #e5e7eb;">
+          <span>{{ ticket.Name }}</span>
+          <span
+            style="display: inline-block; width: 4px; height: 4px; border-radius: 50%; background: #d1d5db;"></span>
+          <span style="color: #16a34a;">{{ ticket.SoldQuantity || 0 }}/{{ ticket.TotalQuantity }} sold</span>
+        </div>
+      </div>
+    </div>
+    <div class="event-item__actions" (click)="$event.stopPropagation()">
+      <div class="action-dropdown" [class.active]="showDropdown === event.Id">
+        <button class="btn btn--icon" type="button" (click)="toggleDropdown(event.Id, $event)">⋮</button>
+        <div class="dropdown-menu">
+          <button class="dropdown-item" *ngIf="userRole !== 'ADMIN' && event.Status === 'DRAFT'"
+            (click)="publicEvent(event); $event.stopPropagation()">
+            <i class="fa-solid fa-megaphone"></i>
+            Công khai
           </button>
-          <button class="btn btn--tab" type="button" (click)="onTabChange('online')">
-            ĐÃ XUẤT BẢN (0)
+          <button class="dropdown-item" *ngIf="userRole === 'ADMIN' && event.Status !== 'PUBLISHED'"
+            (click)="approveEvent(event); $event.stopPropagation()">
+            <i class="fa-solid fa-check-circle"></i>
+            Duyệt
           </button>
-          <button class="btn btn--tab" type="button" (click)="onTabChange('venue')">
-            BẢN NHÁP ({{ totalRecords }})
+          <button class="dropdown-item" *ngIf="!isEventEnded(event) && event.Status !== 'PUBLISHED'"
+            (click)="editEvent(event); $event.stopPropagation()">
+            <i class="fa-regular fa-edit"></i>
+            Sửa
           </button>
-        </div>
-      </div>
-    </section>
-
-
-    <section class="event-item card" *ngFor="let event of events; let i = index" style="cursor: pointer;"
-      (click)="viewDetails(event)">
-      <div class="event-item__media">
-        <div class="event-item__thumbnail">
-          <img [src]="event.PosterUrl | imageUrl" [alt]="event.name || 'Event'" />
-        </div>
-      </div>
-      <div class="event-item__body">
-        <div class="event-item__title">
-          {{ event.Title || "Sự kiện chưa đặt tên" }}
-        </div>
-        <div class="event-item__meta-row">
-          <div class="event-meta">
-            <div class="event-meta__label">Trạng thái</div>
-            <div class="event-meta__value event-meta__value--green">
-              {{ event.Status }}
-            </div>
-          </div>
-
-          <div class="event-meta">
-            <div class="event-meta__label">Bắt đầu lúc</div>
-            <div class="event-meta__value">
-              {{ event.StartDate | formatDate }}
-            </div>
-          </div>
-
-          <div class="event-meta">
-            <div class="event-meta__label">Tổng số vé</div>
-            <div class="event-meta__value">
-              {{ getTotalTickets(event) }}
-            </div>
-          </div>
-
-          <div class="event-meta">
-            <div class="event-meta__label">Đã bán</div>
-            <div class="event-meta__value" style="color: #6cc04a;">
-              {{ getTotalSold(event) }}
-            </div>
-          </div>
-        </div>
-
-        <div class="ticket-chips" *ngIf="event.ListTypeTick?.length"
-          style="display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; padding-top: 12px; ">
-          <div *ngFor="let ticket of event.ListTypeTick"
-            style="font-size: 11px; font-weight: 500; background: #f3f4f6; color: #4b5563; padding: 4px 10px; border-radius: 100px; display: inline-flex; align-items: center; gap: 6px; border: 1px solid #e5e7eb;">
-            <span>{{ ticket.Name }}</span>
-            <span
-              style="display: inline-block; width: 4px; height: 4px; border-radius: 50%; background: #d1d5db;"></span>
-            <span style="color: #16a34a;">{{ ticket.SoldQuantity || 0 }}/{{ ticket.TotalQuantity }} sold</span>
-          </div>
-        </div>
-      </div>
-      <div class="event-item__actions" (click)="$event.stopPropagation()">
-        <div class="action-dropdown" [class.active]="showDropdown === event.Id">
-          <button class="btn btn--icon" type="button" (click)="toggleDropdown(event.Id, $event)">⋮</button>
-          <div class="dropdown-menu">
-            <button class="dropdown-item" *ngIf="userRole !== 'ADMIN' && event.Status === 'DRAFT'"
-              (click)="publicEvent(event); $event.stopPropagation()">
-              <i class="fa-solid fa-megaphone"></i>
-              Công khai
-            </button>
-            <button class="dropdown-item" *ngIf="userRole === 'ADMIN' && event.Status !== 'PUBLISHED'"
-              (click)="approveEvent(event); $event.stopPropagation()">
-              <i class="fa-solid fa-check-circle"></i>
-              Duyệt
-            </button>
-            <button class="dropdown-item" *ngIf="!isEventEnded(event) && event.Status !== 'PUBLISHED'"
-              (click)="editEvent(event); $event.stopPropagation()">
-              <i class="fa-regular fa-edit"></i>
-              Sửa
-            </button>
-            <button class="dropdown-item" *ngIf="isEventEnded(event)"
-              (click)="duplicateEvent(event); $event.stopPropagation()">
-              <i class="fa-regular fa-copy"></i>
-              Nhân bản
-            </button>
+          <button class="dropdown-item" *ngIf="isEventEnded(event)"
+            (click)="duplicateEvent(event); $event.stopPropagation()">
+            <i class="fa-regular fa-copy"></i>
+            Nhân bản
+          </button>
             <button class="dropdown-item" *ngIf="event.Status !== 'PUBLISHED'"
               (click)="deleteEvent(event); $event.stopPropagation()">
               <i class="fa-regular fa-trash-can"></i>
               Xóa
             </button>
-            <button class="dropdown-item" (click)="viewDetails(event); $event.stopPropagation()">
-              <i class="fa-solid fa-circle-info"></i>
-              Xem chi tiết
-            </button>
+          <button class="dropdown-item" (click)="viewDetails(event); $event.stopPropagation()">
+            <i class="fa-solid fa-circle-info"></i>
+            Xem chi tiết
+          </button>
 
-          </div>
         </div>
       </div>
-    </section>
+    </div>
+  </section>
 
 
-    <section class="no-events" *ngIf="events.length == 0">
-      <div class="no-events__content">
-        <div class="no-events__icon">
-          <span><i class="fa-regular fa-calendar-days"></i></span>
-        </div>
-        <h3 class="no-events__title">Không tìm thấy sự kiện nào</h3>
-        <p class="no-events__description">
-          Không có sự kiện nào khớp với tiêu chí tìm kiếm của bạn.
-        </p>
+  <section class="no-events" *ngIf="events.length == 0">
+    <div class="no-events__content">
+      <div class="no-events__icon">
+        <span><i class="fa-regular fa-calendar-days"></i></span>
       </div>
-    </section>
-  </div>
-  <p-toast />
-  <p-confirmDialog />
-</app-shell>
+      <h3 class="no-events__title">Không tìm thấy sự kiện nào</h3>
+      <p class="no-events__description">
+        Không có sự kiện nào khớp với tiêu chí tìm kiếm của bạn.
+      </p>
+    </div>
+  </section>
+</div>
+<p-toast />
+<p-confirmDialog />

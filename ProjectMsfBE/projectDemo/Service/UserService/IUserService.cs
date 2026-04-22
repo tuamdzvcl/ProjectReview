@@ -16,7 +16,7 @@ namespace projectDemo.Service.UserService
         Task<ApiResponse<string>> Delete(Guid id);
         Task<PageResponse<UserResponse>> GetAll(UserQuery param);
         Task<ApiResponse<UserResponse>> GetByid(Guid id);
-        Task<PageResponse<UserResponse>> GetParticipantsByOrganizer(Guid organizerId, projectDemo.Common.PageRequest.PageRequest request);
+        Task<PageResponse<UserInEvent>> GetParticipantsByOrganizer(Guid organizerId, projectDemo.Common.PageRequest.PageRequest request);
         Task<ApiResponse<string>> UpdateAvatarAsync(Guid userId, IFormFile file);
     }
 }

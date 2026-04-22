@@ -6,5 +6,9 @@ namespace projectDemo.DTO.Query
         public DateTime PaidDate { get; set; }
         public decimal Revenue { get; set; }
         public int TicketQuantity { get; set; }
+
+        public string EventTitle { get; set; }
+
+
     }
 }

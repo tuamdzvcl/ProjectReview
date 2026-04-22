@@ -1,75 +1,68 @@
-<app-shell>
-  <div class="audit-container p-4">
+<div class="audit-container p-4">
     <p-card header="Nhật Ký Hệ Thống (Activity Logs)">
-      <div class="flex justify-content-between mb-4 align-items-center flex-wrap gap-3">
-        <div class="flex gap-2 flex-wrap">
-          <span class="p-input-icon-left">
-            <i class="pi pi-user"></i>
-            <input pInputText type="text" [(ngModel)]="username" (input)="onFilter()" placeholder="Tìm theo username..." class="p-inputtext-sm" />
-          </span>
-          <span class="p-input-icon-left">
-            <i class="pi pi-link"></i>
-            <input pInputText type="text" [(ngModel)]="path" (input)="onFilter()" placeholder="/api/..." class="p-inputtext-sm" />
-          </span>
-          <p-button icon="pi pi-filter-slash" severity="secondary" (onClick)="clearFilter()" label="Xóa lọc" size="small"></p-button>
+        <div class="flex justify-content-between mb-4 align-items-center flex-wrap gap-3">
+            <div class="flex gap-2 flex-wrap">
+                <span class="p-input-icon-left">
+                    <i class="pi pi-user"></i>
+                    <input pInputText type="text" [(ngModel)]="username" (input)="onFilter()"
+                        placeholder="Tìm theo username..." class="p-inputtext-sm" />
+                </span>
+                <span class="p-input-icon-left">
+                    <i class="pi pi-link"></i>
+                    <input pInputText type="text" [(ngModel)]="path" (input)="onFilter()" placeholder="/api/..."
+                        class="p-inputtext-sm" />
+                </span>
+                <p-button icon="pi pi-filter-slash" severity="secondary" (onClick)="clearFilter()" label="Xóa lọc"
+                    size="small"></p-button>
+            </div>
+            <p-button icon="pi pi-refresh" (onClick)="loadLogs()" [loading]="loading" label="Làm mới"
+                size="small"></p-button>
         </div>
-        <p-button icon="pi pi-refresh" (onClick)="loadLogs()" [loading]="loading" label="Làm mới" size="small"></p-button>
-      </div>
 
-      <p-table 
-        [value]="logs" 
-        [lazy]="true" 
-        (onLazyLoad)="loadLogs($event)" 
-        [paginator]="true" 
-        [rows]="rows" 
-        [totalRecords]="totalRecords" 
-        [loading]="loading"
-        [showCurrentPageReport]="true"
-        currentPageReportTemplate="Hiển thị {first} đến {last} của {totalRecords} bản ghi"
-        [rowsPerPageOptions]="[10, 20, 50]"
-        styleClass="p-datatable-striped p-datatable-sm shadow-1"
-        [responsiveLayout]="'scroll'"
-      >
-        <ng-template pTemplate="header">
-          <tr>
-            <th style="width: 15%">Thời gian</th>
-            <th style="width: 15%">Người thực hiện</th>
-            <th style="width: 10%">Method</th>
-            <th style="width: 25%">URL Path</th>
-            <th style="width: 10%">Status</th>
-            <th style="width: 25%">Mô tả</th>
-          </tr>
-        </ng-template>
-        <ng-template pTemplate="body" let-log>
-          <tr>
-            <td>{{log.Timestamp | date: 'dd/MM/yyyy HH:mm:ss'}}</td>
-            <td>
-              <div class="flex align-items-center gap-2">
-                <i class="pi pi-user text-blue-500"></i>
-                <span class="font-bold">{{log.Username || 'Hệ thống'}}</span>
-              </div>
-            </td>
-            <td>
-              <p-tag [value]="log.Method" [severity]="getMethodSeverity(log.Method)"></p-tag>
-            </td>
-            <td>
-              <code class="text-secondary">{{log.Path}}</code>
-            </td>
-            <td>
-              <p-tag [value]="log.StatusCode.toString() + ' ' + getStatusLabel(log.StatusCode)" 
-                     [severity]="getSeverity(log.StatusCode)"></p-tag>
-            </td>
-            <td>
-                <span class="text-sm italic text-gray-500">{{log.Note}}</span>
-            </td>
-          </tr>
-        </ng-template>
-        <ng-template pTemplate="emptymessage">
-            <tr>
-                <td colspan="6" class="text-center p-4">Không tìm thấy hoạt động nào.</td>
-            </tr>
-        </ng-template>
-      </p-table>
+        <p-table [value]="logs" [lazy]="true" (onLazyLoad)="loadLogs($event)" [paginator]="true" [rows]="rows"
+            [totalRecords]="totalRecords" [loading]="loading" [showCurrentPageReport]="true"
+            currentPageReportTemplate="Hiển thị {first} đến {last} của {totalRecords} bản ghi"
+            [rowsPerPageOptions]="[10, 20, 50]" styleClass="p-datatable-striped p-datatable-sm shadow-1"
+            [responsiveLayout]="'scroll'">
+            <ng-template pTemplate="header">
+                <tr>
+                    <th style="width: 15%">Thời gian</th>
+                    <th style="width: 15%">Người thực hiện</th>
+                    <th style="width: 10%">Method</th>
+                    <th style="width: 25%">URL Path</th>
+                    <th style="width: 10%">Status</th>
+                    <th style="width: 25%">Mô tả</th>
+                </tr>
+            </ng-template>
+            <ng-template pTemplate="body" let-log>
+                <tr>
+                    <td>{{log.Timestamp | date: 'dd/MM/yyyy HH:mm:ss'}}</td>
+                    <td>
+                        <div class="flex align-items-center gap-2">
+                            <i class="pi pi-user text-blue-500"></i>
+                            <span class="font-bold">{{log.Username || 'Hệ thống'}}</span>
+                        </div>
+                    </td>
+                    <td>
+                        <p-tag [value]="log.Method" [severity]="getMethodSeverity(log.Method)"></p-tag>
+                    </td>
+                    <td>
+                        <code class="text-secondary">{{log.Path}}</code>
+                    </td>
+                    <td>
+                        <p-tag [value]="log.StatusCode.toString() + ' ' + getStatusLabel(log.StatusCode)"
+                            [severity]="getSeverity(log.StatusCode)"></p-tag>
+                    </td>
+                    <td>
+                        <span class="text-sm italic text-gray-500">{{log.Note}}</span>
+                    </td>
+                </tr>
+            </ng-template>
+            <ng-template pTemplate="emptymessage">
+                <tr>
+                    <td colspan="6" class="text-center p-4">Không tìm thấy hoạt động nào.</td>
+                </tr>
+            </ng-template>
+        </p-table>
     </p-card>
-  </div>
-</app-shell>
+</div>

@@ -1,0 +1,58 @@
+<p-dialog [(visible)]="visible" [header]="'Quản lý quyền: ' + (role?.RoleName || '')" [modal]="true"
+  [style]="{ width: '700px' }" [draggable]="false" [resizable]="false" class="premium-dialog" (onHide)="onHide()">
+  @if (role) {
+  <div class="perm-manage-dialog">
+    <div class="perm-header-info">
+      <div class="role-info-badge">
+        <i class="fa-solid fa-shield-halved"></i>
+        <span>{{ role.RoleName }}</span>
+      </div>
+      @if (!readonly) {
+        <div class="perm-select-actions">
+          <button class="btn-link" (click)="selectAllPermissions()">Chọn tất cả</button>
+          <span class="divider">|</span>
+          <button class="btn-link" (click)="deselectAllPermissions()">Bỏ chọn tất cả</button>
+          <span class="selected-count">
+            <strong>{{ selectedPermissionIds.length }}</strong> / {{ allPermissions.length }} quyền
+          </span>
+        </div>
+      } @else {
+        <div class="perm-select-actions readonly">
+          <span class="selected-count">
+            Role có <strong>{{ selectedPermissionIds.length }}</strong> / {{ allPermissions.length }} quyền
+          </span>
+        </div>
+      }
+    </div>
+
+    <div class="perm-checkbox-grid manage-mode" [class.readonly-grid]="readonly">
+      @for (perm of allPermissions; track perm.Id) {
+      <label class="perm-checkbox-item" [class.checked]="isPermissionSelected(perm.Id)"
+        [class.readonly]="readonly"
+        (click)="!readonly && togglePermission(perm.Id)">
+        <div class="checkbox-box">
+          @if (isPermissionSelected(perm.Id)) {
+          <i class="fa-solid fa-check"></i>
+          }
+        </div>
+        <div class="checkbox-content">
+          <span class="perm-name">{{ perm.PermissonsName }}</span>
+          <span class="perm-desc">{{ perm.PermissonsDescription }}</span>
+        </div>
+      </label>
+      }
+    </div>
+  </div>
+  }
+
+  <ng-template pTemplate="footer">
+    <div class="dialog-footer">
+      <button pButton label="Hủy" icon="pi pi-times" class="p-button-text p-button-secondary"
+        (click)="onHide()"></button>
+      @if (!readonly) {
+        <button pButton label="Lưu thay đổi" icon="pi pi-save" class="p-button-primary"
+          (click)="savePermissions()"></button>
+      }
+    </div>
+  </ng-template>
+</p-dialog>

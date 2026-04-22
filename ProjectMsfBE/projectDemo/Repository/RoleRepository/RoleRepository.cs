@@ -1,4 +1,4 @@
-﻿using EventTick.Model.Enum;
+using EventTick.Model.Enum;
 using EventTick.Model.Models;
 using Microsoft.EntityFrameworkCore;
 using projectDemo.Data;
@@ -37,7 +37,7 @@ namespace projectDemo.Repository
 
         public async Task<Role?> GetRole(string roleName)
         {
-            return await _dbSet.FirstOrDefaultAsync(x => x.RoleName == roleName);
+            return await _dbSet.FirstOrDefaultAsync(x => x.RoleName.Contains(roleName));
         }
 
         public Role Update(Role role)

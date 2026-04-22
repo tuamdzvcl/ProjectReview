@@ -1,4 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using EventTick.Model.asbtract;
 using EventTick.Model.Models;
@@ -10,7 +10,7 @@ namespace projectDemo.Entity.Models
     {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public int Id;
+        public int Id { get; set; }
 
         public int RoleId { get; set; }
 

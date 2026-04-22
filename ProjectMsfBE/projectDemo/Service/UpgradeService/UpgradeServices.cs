@@ -17,6 +17,9 @@ using projectDemo.Repository.PaymentRepository;
 using projectDemo.Repository.UpgradeRepository;
 using projectDemo.Repository.UserUpgradeRepository;
 using projectDemo.Service.MomoService;
+using System.IO;
+using ClosedXML.Excel;
+using Microsoft.AspNetCore.Http;
 using projectDemo.UnitOfWorks;
 
 namespace projectDemo.Service.UpgradeService
@@ -63,11 +66,14 @@ namespace projectDemo.Service.UpgradeService
                             )
 
                         )
-                        && u.IsDeleted==false
+                        && u.IsDeleted == false
                     )
                     .ToList();
             }
-
+            else
+            {
+                upgrades=upgrades.Where(x=>x.IsDeleted==false).ToList();
+            }
             var totalRecords = upgrades.Count;
 
             // Phân trang
@@ -99,7 +105,7 @@ namespace projectDemo.Service.UpgradeService
             };
 
             return pageResponse;
-            
+
         }
 
         public async Task<ApiResponse<UpgradeResponse>> GetUpgradeByIdAsync(int id)
@@ -224,7 +230,7 @@ namespace projectDemo.Service.UpgradeService
                     "Không tìm thấy gói Upgrade"
                 );
             }
-            existingUpgrade.IsDeleted=true;
+            existingUpgrade.IsDeleted = true;
             await _uow.SaveChangesAsync();
 
             return ApiResponse<bool>.SuccessResponse(
@@ -316,7 +322,7 @@ namespace projectDemo.Service.UpgradeService
                 // 5. Gọi MomoService tạo link thanh toán
                 var momoReq = new MomoRequest
                 {
-                    
+
                     FullName = "User Upgrade",
                     OrderId = order.Id.ToString(),
                     OrderInfor = $"Thanh toán nâng cấp gói: {upgrade.TitleUpgrade} (Giảm trừ: {discount:N0})",
@@ -370,8 +376,137 @@ namespace projectDemo.Service.UpgradeService
                 PricePaid = activeUpgrade.PricePaid,
                 IsDailyPackage = activeUpgrade.Upgrade.IsDailyPackage
             };
+            return ApiResponse<UserUpgradeResponse>.SuccessResponse(
+                    EnumStatusCode.SUCCESS,
+                    response
+                );
+        }
 
-            return ApiResponse<UserUpgradeResponse>.SuccessResponse(EnumStatusCode.SUCCESS, response);
+            public async Task<ApiResponse<string>> ImportUpgradesAsync(IFormFile file)
+            {
+                if (file == null || file.Length == 0)
+                    return ApiResponse<string>.FailResponse(EnumStatusCode.BAD_REQUEST, "File không hợp lệ.");
+
+                var upgradesToAdd = new List<Upgrade>();
+                using (var stream = new MemoryStream())
+                {
+                    await file.CopyToAsync(stream);
+                    using (var workbook = new XLWorkbook(stream))
+                    {
+                        var worksheet = workbook.Worksheet(1);
+                        var rows = worksheet.RowsUsed().Skip(1); // Bỏ qua header
+
+                        foreach (var row in rows)
+                        {
+                            var title = row.Cell(1).GetValue<string>();
+                            if (string.IsNullOrWhiteSpace(title)) continue;
+
+                            var description = row.Cell(2).GetValue<string>();
+                            var price = row.Cell(3).GetValue<decimal>();
+                            var limit = row.Cell(4).GetValue<int>();
+                            var statusStr = row.Cell(5).GetValue<string>();
+
+                            upgradesToAdd.Add(new Upgrade
+                            {
+                                TitleUpgrade = title,
+                                Description = description,
+                                Price = price,
+                                DailyLimit = limit,
+                                status = statusStr,
+                                CreatedDate = DateTime.Now,
+                                UpdatedDate = DateTime.Now,
+                                IsDeleted = false
+                            });
+                        }
+                    }
+                }
+
+                if (upgradesToAdd.Count > 0)
+                {
+                    foreach (var upgrade in upgradesToAdd)
+                    {
+                        await _upgradeRepository.AddAsync(upgrade);
+                    }
+                    await _uow.SaveChangesAsync();
+                    return ApiResponse<string>.SuccessResponse(EnumStatusCode.SUCCESS, $"Đã import thành công {upgradesToAdd.Count} gói.");
+                }
+
+                return ApiResponse<string>.FailResponse(EnumStatusCode.BAD_REQUEST, "Không có dữ liệu hợp lệ để import.");
+            }
+
+            public async Task<byte[]> ExportUpgradesAsync()
+            {
+                var upgrades = await _upgradeRepository.GetAllAsync();
+                using (var workbook = new XLWorkbook())
+                {
+                    var worksheet = workbook.Worksheets.Add("Membership Packages");
+
+                    // Header
+                    worksheet.Cell(1, 1).Value = "Tiêu đề";
+                    worksheet.Cell(1, 2).Value = "Mô tả";
+                    worksheet.Cell(1, 3).Value = "Giá";
+                    worksheet.Cell(1, 4).Value = "Giới hạn ngày";
+                    worksheet.Cell(1, 5).Value = "Trạng thái";
+
+                    var headerRange = worksheet.Range(1, 1, 1, 5);
+                    headerRange.Style.Font.Bold = true;
+                    headerRange.Style.Fill.BackgroundColor = XLColor.CoolGrey;
+
+                    // Data
+                    var row = 2;
+                    foreach (var u in upgrades.Where(x => x.IsDeleted== false))
+                    {
+                        worksheet.Cell(row, 1).Value = u.TitleUpgrade;
+                        worksheet.Cell(row, 2).Value = u.Description;
+                        worksheet.Cell(row, 3).Value = u.Price;
+                        worksheet.Cell(row, 4).Value = u.DailyLimit;
+                        worksheet.Cell(row, 5).Value = u.status;
+                        row++;
+                    }
+
+                    worksheet.Columns().AdjustToContents();
+
+                    using (var stream = new MemoryStream())
+                    {
+                        workbook.SaveAs(stream);
+                        return stream.ToArray();
+                    }
+                }
+            }
+
+            public async Task<byte[]> DownloadTemplateAsync()
+            {
+                using (var workbook = new XLWorkbook())
+                {
+                    var worksheet = workbook.Worksheets.Add("Template");
+
+                    // Header
+                    worksheet.Cell(1, 1).Value = "Tiêu đề";
+                    worksheet.Cell(1, 2).Value = "Mô tả";
+                    worksheet.Cell(1, 3).Value = "Giá";
+                    worksheet.Cell(1, 4).Value = "Giới hạn ngày";
+                    worksheet.Cell(1, 5).Value = "Trạng thái (active/inactive)";
+
+                    var headerRange = worksheet.Range(1, 1, 1, 5);
+                    headerRange.Style.Font.Bold = true;
+                    headerRange.Style.Fill.BackgroundColor = XLColor.LightSkyBlue;
+
+                    // Sample Data
+                    worksheet.Cell(2, 1).Value = "Gói Cơ Bản";
+                    worksheet.Cell(2, 2).Value = "Mô tả gói cơ bản";
+                    worksheet.Cell(2, 3).Value = 0;
+                    worksheet.Cell(2, 4).Value = 5;
+                    worksheet.Cell(2, 5).Value = "active";
+
+                    worksheet.Columns().AdjustToContents();
+
+                    using (var stream = new MemoryStream())
+                    {
+                        workbook.SaveAs(stream);
+                        return stream.ToArray();
+                    }
+                }
+            }
         }
     }
-}
+

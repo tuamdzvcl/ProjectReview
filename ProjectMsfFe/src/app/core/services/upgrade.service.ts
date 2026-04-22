@@ -38,4 +38,22 @@ export class UpgradeService extends BaseApiService {
   deleteUpgrade(id: number): Observable<any> {
     return this.deleteById('upgrade/admin', id);
   }
+
+  importExcel(file: File): Observable<any> {
+    const formData = new FormData();
+    formData.append('file', file);
+    return this.http.post(`${this.baseUrl}/upgrade/admin/import`, formData);
+  }
+
+  exportExcel(): Observable<Blob> {
+    return this.http.get(`${this.baseUrl}/upgrade/admin/export`, {
+      responseType: 'blob',
+    });
+  }
+
+  downloadTemplate(): Observable<Blob> {
+    return this.http.get(`${this.baseUrl}/upgrade/admin/template`, {
+      responseType: 'blob',
+    });
+  }
 }

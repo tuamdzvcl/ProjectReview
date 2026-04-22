@@ -1,7 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { AppShellComponent } from '../../../../layouts/app-shell/app-shell.component';
 import { AuditLogService } from '../../../../core/services/audit-log.service';
 import { AuditLog } from '../../../../core/model/audit-log.model';
 
@@ -19,7 +18,6 @@ import { CardModule } from 'primeng/card';
   imports: [
     CommonModule,
     FormsModule,
-    AppShellComponent,
     TableModule,
     TagModule,
     InputTextModule,
@@ -36,12 +34,12 @@ export class AuditLogComponent implements OnInit {
   loading: boolean = true;
   first: number = 0;
   rows: number = 10;
-  
+
   // Filters
   username: string = '';
   path: string = '';
 
-  constructor(private auditLogService: AuditLogService) {}
+  constructor(private auditLogService: AuditLogService) { }
 
   ngOnInit() {
     // onLazyLoad will trigger the initial load
@@ -61,14 +59,14 @@ export class AuditLogComponent implements OnInit {
     this.auditLogService
       .getAuditLogs(pageIndex, pageSize, this.username, this.path)
       .subscribe({
-        next: (res) => {
+        next: (res: any) => {
           if (res) {
             this.logs = res.Items;
             this.totalRecords = res.TotalRecords;
           }
           this.loading = false;
         },
-        error: (err) => {
+        error: (err: any) => {
           console.error('Lỗi khi tải nhật ký:', err);
           this.loading = false;
         },

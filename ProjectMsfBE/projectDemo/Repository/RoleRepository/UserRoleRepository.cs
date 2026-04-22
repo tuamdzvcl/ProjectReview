@@ -1,6 +1,7 @@
 ﻿using EventTick.Model.Models;
 using Microsoft.EntityFrameworkCore;
 using projectDemo.Data;
+using projectDemo.Entity.Models;
 using projectDemo.Repository.BaseData;
 using projectDemo.Repository.Ipml;
 using projectDemo.UnitOfWorks;
@@ -21,6 +22,18 @@ namespace projectDemo.Repository
         {
             _dbSet.Remove(role);
             return "Deleted";
+        }
+
+        public async Task<IEnumerable<Permissions>> GetAllByUserId(Guid userId)
+        {
+            return await _dbSet
+        .Where(ur => ur.UserId == userId)
+        .SelectMany(ur => ur.Role.RolePermissions)
+        .Select(rp => rp.Permissions)
+        .Where(p => p.IsDeleted == false)
+        .Distinct()
+        .ToListAsync();
+            
         }
 
         public async Task<UserRole?> GetByIdAsync(int id)

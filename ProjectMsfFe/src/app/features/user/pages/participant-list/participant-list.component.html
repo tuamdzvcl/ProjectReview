@@ -1,0 +1,61 @@
+<div class="topbar__left">
+  <h1 class="topbar__title">Danh sách tham gia</h1>
+</div>
+
+<section class="participants-header card">
+  <div class="header-content">
+    <h2 class="header-title">Người tham gia ({{ totalRecords }})</h2>
+    <p class="header-subtitle">Danh sách người dùng đã đăng ký tham gia các sự kiện của bạn</p>
+  </div>
+</section>
+
+<section class="card">
+  <div class="table-wrapper">
+    <p-table [value]="participants" [paginator]="true" [rows]="rows" [first]="first" [totalRecords]="totalRecords"
+      [lazy]="true" (onPage)="pageChange($event)" [tableStyle]="{ 'min-width': '60rem' }"
+      [rowsPerPageOptions]="[5, 10, 20]" styleClass="p-datatable-striped">
+      <ng-template pTemplate="header">
+        <tr>
+          <th style="width: 5%">STT</th>
+          <th style="width: 25%">Người tham gia</th>
+          <th style="width: 30%">Sự kiện</th>
+          <th style="width: 15%">Loại vé</th>
+          <th style="width: 10%">Số lượng</th>
+          <th style="width: 15%">Tổng tiền</th>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="body" let-participant let-rowIndex="rowIndex">
+        <tr>
+          <td>{{ rowIndex + 1 }}</td>
+          <td>
+            <div class="user-info">
+              <div class="user-details">
+                <span class="full-name">{{ participant.FirstName }} {{ participant.LastName }}</span>
+                <span class="email">{{ participant.Email }}</span>
+              </div>
+            </div>
+          </td>
+          <td>
+            <span class="event-title">{{ participant.Events.EventTitle}}</span>
+          </td>
+          <td>
+            <span class="ticket-badge">{{ participant.TicketName }}</span>
+          </td>
+          <td class="text-center">
+            {{ participant.TicketQuantity }}
+          </td>
+          <td>
+            <span class="amount">{{ participant.TotalAmount | currency:'VND':'symbol':'1.0-0' }}</span>
+          </td>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="emptymessage">
+        <tr>
+          <td colspan="6" class="text-center p-4">
+            Không tìm thấy người tham gia nào.
+          </td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </div>
+</section>

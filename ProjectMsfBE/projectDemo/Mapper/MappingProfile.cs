@@ -30,7 +30,9 @@ namespace projectDemo.Mapper
                 );
             CreateMap<EventUpdateRequest, Event>();
             CreateMap<Order, OrderResponse>();
+
             CreateMap<CreateOrderRequest, OrderDetail>();
+
             CreateMap<OrderUpdate, Order>();
             CreateMap<PermisstionRequest, Permissions>();
             CreateMap<Permissions, PermissionResponse>();
