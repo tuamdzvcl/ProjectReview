@@ -72,7 +72,11 @@ namespace projectDemo.Repository
                     query = query.Where(e => e.Status == EnumStatusEvent.PUBLISHED && e.SaleStartDate <= now && e.SaleEndDate >= now);
                 }
 
-                if (request.categoryId != Guid.Empty)
+                if (request.CategoryIds != null && request.CategoryIds.Any())
+                {
+                    query = query.Where(e => request.CategoryIds.Contains(e.CatetoryID));
+                }
+                else if (request.categoryId != Guid.Empty)
                 {
                     query = query.Where(e => e.CatetoryID == request.categoryId);
                 }
@@ -141,6 +145,79 @@ namespace projectDemo.Repository
             }
         }
 
+        public async Task<PageResponse<EventTypeTickResponses>> GetAdminPendingEventsAsync(PageRequest request)
+        {
+            try
+            {
+                var pageIndex = request.PageIndex;
+                var pageSize = request.PageSize;
+
+                var query = _dbSet.AsNoTracking().Where(e => e.IsDeleted == false && 
+                    (e.Status == EnumStatusEvent.PUBLIC || e.Status == EnumStatusEvent.REQUEST_EDIT));
+
+                if (!string.IsNullOrWhiteSpace(request.key))
+                {
+                    var key = request.key.Trim();
+                    query = query.Where(e =>
+                        e.Title.Contains(key)
+                        || e.Location.Contains(key)
+                        || e.Catetory.Name.Contains(key)
+                    );
+                }
+
+                var totolRecords = await query.CountAsync();
+
+                var items = await query
+                    .OrderBy(e => e.CreatedDate)
+                    .Skip((pageIndex - 1) * pageSize)
+                    .Take(pageSize)
+                    .Select(e => new EventTypeTickResponses
+                    {
+                        Id = e.Id,
+                        Title = e.Title,
+                        Location = e.Location,
+                        Description = e.Description,
+                        StartDate = e.StartDate,
+                        EndDate = e.EndDate,
+                        PosterUrl = e.PosterUrl,
+                        SaleStartDate = e.SaleStartDate,
+                        SaleEndDate = e.SaleEndDate,
+                        Status = e.Status.ToString(),
+                        Reason = e.Reason, // Also include Reason
+                        isfaslse = e.Isfalse,
+                        UserName = e.User.Username,
+                        ListTypeTick = e
+                            .TicketTypes.Select(t => new TypeTickResponse
+                            {
+                                Id = t.Id,
+                                Name = t.Name.ToString(),
+                                Price = t.Price,
+                                TotalQuantity = t.TotalQuantity,
+                                SoldQuantity = t.SoldQuantity,
+                                Status = t.Status.ToString(),
+                            })
+                            .ToList(),
+                    })
+                    .ToListAsync();
+
+                return new PageResponse<EventTypeTickResponses>
+                {
+                    Items = items,
+                    PageIndex = pageIndex,
+                    PageSize = pageSize,
+                    TotalRecords = totolRecords,
+                    TotalPages = (int)Math.Ceiling((double)totolRecords / pageSize),
+                    Success = true,
+                    Message = "Lấy danh sách admin pending thành công",
+                };
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Lỗi {ex.ToString()}");
+                return new PageResponse<EventTypeTickResponses> { Message = ex.ToString() };
+            }
+        }
+
         public async Task<PageResponse<EventTypeTickResponses>> GetAllWithTicketTypesAsyncbyid(
             Guid id,
             PageRequest request
@@ -157,7 +234,11 @@ namespace projectDemo.Repository
                         e.IsDeleted == false && e.Status != EnumStatusEvent.CANNEL && e.UserID == id
                     );
 
-                if (request.categoryId != Guid.Empty)
+                if (request.CategoryIds != null && request.CategoryIds.Any())
+                {
+                    query = query.Where(e => request.CategoryIds.Contains(e.CatetoryID));
+                }
+                else if (request.categoryId != Guid.Empty)
                 {
                     query = query.Where(e => e.CatetoryID == request.categoryId);
                 }
@@ -193,6 +274,8 @@ namespace projectDemo.Repository
                         UserName = e.User.Username,
                         CatetoryName = e.Catetory.Name,
                         CatetoryID = e.CatetoryID,
+                        Reason = e.Reason,
+                        isfaslse = e.Isfalse,
                         ListTypeTick = e
                             .TicketTypes.Where(t => t.IsDeleted == false)
                             .Select(t => new TypeTickResponse

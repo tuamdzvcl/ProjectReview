@@ -208,7 +208,6 @@ namespace projectDemo.Service.MomoService
                             var user = await _userRepository.GetUserByid(userUpgrade.UserId);
                             if (user == null)
                                 return "User not found";
-                            user.UserRoles.Clear();
                             user.UserRoles.Add(
                                 new UserRole
                                 {

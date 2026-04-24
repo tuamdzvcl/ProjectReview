@@ -17,4 +17,6 @@ export interface EventModel {
   CatetoryId: number;
   CatetoryName: string;
   ListTypeTick: Array<TypeTickResponse>;
+  Reason?: string;
+  isfaslse?: boolean;
 }

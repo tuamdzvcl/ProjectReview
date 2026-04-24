@@ -1,8 +1,9 @@
-import { Component } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { RouterLink, RouterOutlet } from '@angular/router';
 import { UserDropdownComponent } from '../user-dropdown/user-dropdown.component';
 import { CommonModule } from '@angular/common';
 import { TokenService } from '../../../core/services/token.service';
+import { PermissionStoreService } from '../../../core/services/permission-store.service';
 
 @Component({
   selector: 'app-header',
@@ -11,7 +12,13 @@ import { TokenService } from '../../../core/services/token.service';
   templateUrl: './header.component.html',
   styleUrl: './header.component.scss',
 })
-export class HeaderComponent {
+export class HeaderComponent implements OnInit {
+  private readonly permissionStore = inject(PermissionStoreService);
+
+  hasPermission(permission: string): boolean {
+    return this.permissionStore.hasPermission(permission);
+  }
+
   isMenuOpen: boolean = false;
 
   toggleMenu() {
@@ -23,6 +30,12 @@ export class HeaderComponent {
   }
 
   constructor(private tokenService: TokenService) { }
+
+  ngOnInit() {
+    if (this.tokenService.getAccessToken() && !this.permissionStore.loaded()) {
+      this.permissionStore.loadPermissions();
+    }
+  }
 
   canCreateEvent(): boolean {
     const role = this.tokenService.getRole();

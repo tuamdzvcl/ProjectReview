@@ -11,6 +11,14 @@
           placeholder="Chọn ngày bắt đầu - ngày kết thúc" (onSelect)="onDateChange()" [showIcon]="true">
         </p-datepicker>
       </div>
+
+      <div class="mode-toggle" *ngIf="hasPermission('VIEW_DASHBOARHALL')"
+        style="margin-left: auto; display: flex; gap: 8px;">
+        <button class="chip" [class.chip--active]="dashboardMode === 'SYSTEM'" type="button"
+          (click)="setDashboardMode('SYSTEM')">Hệ thống</button>
+        <button class="chip" [class.chip--active]="dashboardMode === 'PERSONAL'" type="button"
+          (click)="setDashboardMode('PERSONAL')">Cá nhân</button>
+      </div>
     </div>
 
     <div class="summary__cards">
@@ -26,8 +34,7 @@
       <article class="stat stat--red">
         <div class="stat__label">ĐƠN HÀNG</div>
         <div class="stat__value">{{ totalOrders }}</div>
-        <div class="stat__meta" [class.stat__meta--up]="growthOrders >= 0"
-          [class.stat__meta--down]="growthOrders < 0">
+        <div class="stat__meta" [class.stat__meta--up]="growthOrders >= 0" [class.stat__meta--down]="growthOrders < 0">
           {{ formatGrowth(growthOrders) }} So với kỳ trước
         </div>
       </article>
@@ -54,12 +61,19 @@
   <section class="chart card">
     <header class="chart__header">
       <select class="chart__title" [(ngModel)]="selectedDataType" (change)="onDataTypeChange()">
-        <option value="Revenue">Doanh thu</option>
-        <option value="Tickets">Vé đã bán</option>
-        <option *ngIf="isAdmin" value="PlatformRevenue">Tổng doanh thu hệ thống</option>
-        <option *ngIf="isAdmin" value="Packages">Gói dịch vụ đã bán</option>
+        <ng-container *ngIf="dashboardMode === 'PERSONAL'">
+          <option value="Revenue">Tổng doanh thu</option>
+          <option value="Tickets">Tổng vé</option>
+          <option value="Events">Tổng doanh thu của các sự kiện</option>
+        </ng-container>
+
+        <ng-container *ngIf="dashboardMode === 'SYSTEM'">
+          <option value="SystemRevenue">Toàn bộ doanh thu hệ thống</option>
+          <option value="SystemEvents">Tất cả sự kiện hệ thống</option>
+          <option *ngIf="hasPermission('VIEW_UPGRADE')" value="Packages">Gói dịch vụ đã bán</option>
+        </ng-container>
       </select>
-      <div class="chart__tabs">
+      <div class="chart__tabs" *ngIf="selectedDataType !== 'Events' && selectedDataType !== 'SystemEvents'">
         <button class="chip" [class.chip--active]="selectedTab === 'Yearly'" type="button"
           (click)="fetchRevenueStats('Yearly')">Theo Năm</button>
         <button class="chip" [class.chip--active]="selectedTab === 'Monthly'" type="button"

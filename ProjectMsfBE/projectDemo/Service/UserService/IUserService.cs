@@ -17,6 +17,8 @@ namespace projectDemo.Service.UserService
         Task<PageResponse<UserResponse>> GetAll(UserQuery param);
         Task<ApiResponse<UserResponse>> GetByid(Guid id);
         Task<PageResponse<UserInEvent>> GetParticipantsByOrganizer(Guid organizerId, projectDemo.Common.PageRequest.PageRequest request);
+        Task<PageResponse<ParticipantSummaryResponse>> GetParticipantsSummaryByOrganizer(Guid organizerId, projectDemo.Common.PageRequest.PageRequest request);
+        Task<ApiResponse<UserInEvent>> GetParticipantDetail(Guid organizerId, Guid userId);
         Task<ApiResponse<string>> UpdateAvatarAsync(Guid userId, IFormFile file);
     }
 }

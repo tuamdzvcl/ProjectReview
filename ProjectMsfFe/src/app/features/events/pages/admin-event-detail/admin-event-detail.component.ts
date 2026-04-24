@@ -10,6 +10,7 @@ import { ConfirmationService, MessageService } from 'primeng/api';
 import { Toast } from 'primeng/toast';
 import { ConfirmDialog } from 'primeng/confirmdialog';
 import { AppShellComponent } from '../../../../layouts/app-shell/app-shell.component';
+import { EventStatusPipe } from '../../../../shared/pipes/event-status.pipe';
 
 @Component({
   selector: 'app-admin-event-detail',
@@ -22,6 +23,7 @@ import { AppShellComponent } from '../../../../layouts/app-shell/app-shell.compo
     Toast,
     ConfirmDialog,
     AppShellComponent,
+    EventStatusPipe,
   ],
   templateUrl: './admin-event-detail.component.html',
   styleUrl: './admin-event-detail.component.scss',

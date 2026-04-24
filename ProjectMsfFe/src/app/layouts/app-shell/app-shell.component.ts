@@ -4,6 +4,7 @@ import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { UserDropdownComponent } from '../../shared/components/user-dropdown/user-dropdown.component';
 import { CreateEventComponent } from '../../features/events/components/create-event/create-event.component';
 import { TokenService } from '../../core/services/token.service';
+import { PermissionStoreService } from '../../core/services/permission-store.service';
 
 @Component({
   selector: 'app-shell',
@@ -22,11 +23,20 @@ import { TokenService } from '../../core/services/token.service';
 })
 export class AppShellComponent {
   private tokenService = inject(TokenService);
+  private permissionStore = inject(PermissionStoreService);
 
   sidebarOpen = signal(true);
   userRole = signal<string | null>(this.tokenService.getRole());
 
   toggleSidebar() {
     this.sidebarOpen.update((v) => !v);
+  }
+
+  hasPermission(permission: string): boolean {
+    return this.permissionStore.hasPermission(permission);
+  }
+
+  hasAnyPermission(permissions: string[]): boolean {
+    return this.permissionStore.hasAnyPermission(permissions);
   }
 }

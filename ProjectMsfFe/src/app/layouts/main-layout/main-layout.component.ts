@@ -10,29 +10,29 @@ import { FooterComponent } from '../../shared/components/footer/footer.component
   selector: 'app-main-layout',
   standalone: true,
   imports: [RouterOutlet,
-  HeaderComponent,
-  FooterComponent],
+    HeaderComponent,
+    FooterComponent],
   templateUrl: './main-layout.component.html',
   styleUrl: './main-layout.component.scss'
 })
 export class MainLayoutComponent {
-constructor(private readonly tokenService: TokenService) {}
+  constructor(private readonly tokenService: TokenService) { }
 
-ngOnInit(): void {
-  const params = new URLSearchParams(window.location.search);
-  const token = params.get('token');
+  ngOnInit(): void {
+    const params = new URLSearchParams(window.location.search);
+    const token = params.get('token');
 
-  if (token) {
-    try {
-      const decoded: any = jwtDecode(token);
-      const now = Math.floor(Date.now() / 1000);
-      if (decoded.exp && decoded.exp > now) {
-        this.tokenService.setToken(token, '');
-        window.history.replaceState({}, document.title, '/');
+    if (token) {
+      try {
+        const decoded: any = jwtDecode(token);
+        const now = Math.floor(Date.now() / 1000);
+        if (decoded.exp && decoded.exp > now) {
+          this.tokenService.setToken(token, '');
+          window.history.replaceState({}, document.title, '/');
+        }
+      } catch (e) {
+        // Token không hợp lệ, bỏ qua
       }
-    } catch (e) {
-      // Token không hợp lệ, bỏ qua
     }
   }
-}
 }

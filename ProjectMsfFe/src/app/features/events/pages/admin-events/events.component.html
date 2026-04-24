@@ -45,7 +45,7 @@
         <div class="event-meta">
           <div class="event-meta__label">Trạng thái</div>
           <div class="event-meta__value event-meta__value--green">
-            {{ event.Status }}
+            {{ event.Status | eventStatus }}
           </div>
         </div>
 
@@ -76,10 +76,20 @@
         <div *ngFor="let ticket of event.ListTypeTick"
           style="font-size: 11px; font-weight: 500; background: #f3f4f6; color: #4b5563; padding: 4px 10px; border-radius: 100px; display: inline-flex; align-items: center; gap: 6px; border: 1px solid #e5e7eb;">
           <span>{{ ticket.Name }}</span>
-          <span
-            style="display: inline-block; width: 4px; height: 4px; border-radius: 50%; background: #d1d5db;"></span>
+          <span style="display: inline-block; width: 4px; height: 4px; border-radius: 50%; background: #d1d5db;"></span>
           <span style="color: #16a34a;">{{ ticket.SoldQuantity || 0 }}/{{ ticket.TotalQuantity }} sold</span>
         </div>
+      </div>
+
+      <!-- Rejection Reason for User -->
+      <div *ngIf="event.isfaslse && event.Status === 'PUBLISHED'"
+        style="margin-top: 12px; padding: 10px 14px; background-color: #fff5f5; border-left: 4px solid #ef4444; border-radius: 4px;">
+        <div style="color: #c53030; font-weight: 700; font-size: 13px; margin-bottom: 4px;">
+          <i class="fa-solid fa-circle-exclamation" style="margin-right: 6px;"></i>Yêu cầu chỉnh sửa bị từ chối
+        </div>
+        <p style="margin: 0; color: #742a2a; font-size: 13px; line-height: 1.4;">
+          <strong>Lý do từ Admin:</strong> {{ event.Reason }}
+        </p>
       </div>
     </div>
     <div class="event-item__actions" (click)="$event.stopPropagation()">
@@ -91,12 +101,17 @@
             <i class="fa-solid fa-megaphone"></i>
             Công khai
           </button>
+          <button class="dropdown-item" *ngIf="event.Status === 'PUBLISHED'"
+            (click)="requestEdit(event); $event.stopPropagation()">
+            <i class="fa-solid fa-pen-to-square"></i>
+            Yêu cầu chỉnh sửa
+          </button>
           <button class="dropdown-item" *ngIf="userRole === 'ADMIN' && event.Status !== 'PUBLISHED'"
             (click)="approveEvent(event); $event.stopPropagation()">
             <i class="fa-solid fa-check-circle"></i>
             Duyệt
           </button>
-          <button class="dropdown-item" *ngIf="!isEventEnded(event) && event.Status !== 'PUBLISHED'"
+          <button class="dropdown-item" *ngIf="!isEventEnded(event) && event.Status === 'DRAFT'"
             (click)="editEvent(event); $event.stopPropagation()">
             <i class="fa-regular fa-edit"></i>
             Sửa
@@ -106,11 +121,11 @@
             <i class="fa-regular fa-copy"></i>
             Nhân bản
           </button>
-            <button class="dropdown-item" *ngIf="event.Status !== 'PUBLISHED'"
-              (click)="deleteEvent(event); $event.stopPropagation()">
-              <i class="fa-regular fa-trash-can"></i>
-              Xóa
-            </button>
+          <button class="dropdown-item" *ngIf="event.Status === 'DRAFT'"
+            (click)="deleteEvent(event); $event.stopPropagation()">
+            <i class="fa-regular fa-trash-can"></i>
+            Xóa
+          </button>
           <button class="dropdown-item" (click)="viewDetails(event); $event.stopPropagation()">
             <i class="fa-solid fa-circle-info"></i>
             Xem chi tiết
@@ -136,3 +151,23 @@
 </div>
 <p-toast />
 <p-confirmDialog />
+
+<!-- Dialog Yêu cầu chỉnh sửa -->
+<p-dialog header="Yêu cầu chỉnh sửa sự kiện" [(visible)]="showRequestEditDialog" [modal]="true"
+  [style]="{ width: '500px' }" [closable]="true">
+  <div style="margin-bottom: 12px;">
+    <p style="margin: 0 0 8px;">Sự kiện: <strong>{{ requestEditEvent?.Title }}</strong></p>
+    <label for="requestEditReason" style="font-weight: 600; display: block; margin-bottom: 6px;">Lý do yêu cầu chỉnh sửa
+      <span style="color: red;">*</span></label>
+    <textarea id="requestEditReason" [(ngModel)]="requestEditReason" rows="4"
+      style="width: 100%; border: 1px solid #d1d5db; border-radius: 8px; padding: 10px; font-size: 14px; resize: vertical;"
+      placeholder="Nhập lý do tại sao bạn muốn chỉnh sửa sự kiện này..."></textarea>
+  </div>
+  <div style="display: flex; justify-content: flex-end; gap: 8px;">
+    <button (click)="showRequestEditDialog = false"
+      style="padding: 8px 20px; border: 1px solid #d1d5db; border-radius: 8px; background: white; cursor: pointer;">Hủy</button>
+    <button (click)="submitRequestEdit()"
+      style="padding: 8px 20px; border: none; border-radius: 8px; background: #3b82f6; color: white; cursor: pointer; font-weight: 600;">Gửi
+      yêu cầu</button>
+  </div>
+</p-dialog>

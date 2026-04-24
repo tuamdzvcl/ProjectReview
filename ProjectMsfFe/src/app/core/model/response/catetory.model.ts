@@ -1,4 +1,4 @@
 export interface CatetoryResponse {
-  CatetoryId: number;
-  Name:string;
+  CatetoryId: string;
+  Name: string;
 }

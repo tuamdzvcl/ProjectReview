@@ -42,12 +42,15 @@ $text-muted: #5a6b5a;
   }
 
   .pricing-cards {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
     gap: 2.5rem;
     perspective: 1000px;
 
     .card {
+      width: 100%;
+      max-width: 380px;
       background: rgba(255, 255, 255, 0.95);
       backdrop-filter: blur(12px);
       border-radius: 2.5rem;

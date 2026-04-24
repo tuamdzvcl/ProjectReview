@@ -23,6 +23,7 @@ import { CheckoutPageComponent } from './features/events/pages/checkout-page/che
 import { OrderDetailPageComponent } from './features/events/pages/order-detail-page/order-detail-page.component';
 import { ApproveEventsComponent } from './features/events/pages/approve-events/approve-events.component';
 import { ParticipantListComponent } from './features/user/pages/participant-list/participant-list.component';
+import { ParticipantDetailComponent } from './features/user/pages/participant-detail/participant-detail.component';
 
 import { LandingPageComponent } from './features/home/pages/landing-page/landing-page.component';
 import { PricingComponent } from './features/home/pages/pricing/pricing.component';
@@ -59,13 +60,13 @@ export const routes: Routes = [
         path: 'create-event',
         component: CreateEventComponent,
         canActivate: [authGuard],
-        data: { requiresAuth: true },
+        data: { requiresAuth: true, permissions: ['EVENT_CREATE'] },
       },
       {
         path: 'event-create-page',
         component: EventCreatePageComponent,
         canActivate: [authGuard],
-        data: { requiresAuth: true },
+        data: { requiresAuth: true, permissions: ['EVENT_CREATE'] },
         children: [
           {
             path: '',
@@ -85,7 +86,7 @@ export const routes: Routes = [
         path: 'event-create-page/:id',
         component: EventCreatePageComponent,
         canActivate: [authGuard],
-        data: { requiresAuth: true },
+        data: { requiresAuth: true, permissions: ['EVENT_CREATE'] },
         children: [
           {
             path: '',
@@ -129,7 +130,7 @@ export const routes: Routes = [
         path: 'checkout',
         component: CheckoutPageComponent,
         canActivate: [authGuard],
-        data: { requiresAuth: true }
+        data: { requiresAuth: true },
       },
       {
         path: 'payment',
@@ -139,7 +140,7 @@ export const routes: Routes = [
         path: 'order/:id',
         component: OrderDetailPageComponent,
         canActivate: [authGuard],
-        data: { requiresAuth: true }
+        data: { requiresAuth: true },
       },
     ],
   },
@@ -152,7 +153,6 @@ export const routes: Routes = [
       { path: 'reset-password', component: ResetPasswordComponent },
       { path: 'verify-email', component: VerifyEmailComponent },
       { path: 'register-success', component: RegisterSuccessComponent },
-
     ],
   },
   {
@@ -163,26 +163,80 @@ export const routes: Routes = [
     path: 'admin',
     component: AppShellComponent,
     canActivate: [authGuard],
+    canActivateChild: [authGuard],
     data: { requiresAuth: true },
     children: [
-      { path: 'dashboard', component: DashboardComponent, data: { requiresAuth: true } },
-      { path: 'events', component: EventsComponent, data: { requiresAuth: true } },
-      { path: 'approve-events', component: ApproveEventsComponent, data: { requiresAuth: true } },
-      { path: 'events/:id', component: AdminEventDetailComponent, data: { requiresAuth: true } },
-      { path: 'user', component: UserComponent, data: { requiresAuth: true } },
-      { path: 'participants', component: ParticipantListComponent, data: { requiresAuth: true } },
+      {
+        path: 'dashboard',
+        component: DashboardComponent,
+        data: { requiresAuth: true, permissions: ['VEIW_DASHBOARD'] },
+      },
+      {
+        path: 'events',
+        component: EventsComponent,
+        data: { requiresAuth: true, permissions: ['EVENT_VIEW_DETIAL'] },
+      },
+      {
+        path: 'approve-events',
+        component: ApproveEventsComponent,
+        data: { requiresAuth: true, permissions: ['EVENT_BROWSE'] },
+      },
+      {
+        path: 'events/:id',
+        component: AdminEventDetailComponent,
+        data: { requiresAuth: true, permissions: ['EVENT_VIEW_DETIAL'] },
+      },
+      {
+        path: 'user',
+        component: UserComponent,
+        data: { requiresAuth: true, permissions: ['USER_VIEW_ALL'] },
+      },
+      {
+        path: 'participants',
+        component: ParticipantListComponent,
+        data: { requiresAuth: true, permissions: ['USER_VIEW_ORGANISATION'] },
+      },
+      {
+        path: 'participants/:id',
+        component: ParticipantDetailComponent,
+        data: { requiresAuth: true, permissions: ['USER_VIEW_ORGANISATION'] },
+      },
       {
         path: 'UserForm',
         component: UserFormComponent,
         canActivate: [authGuard],
-        data: { requiresAuth: true },
+        data: { requiresAuth: true, permissions: ['USER_CREATE'] },
       },
-      { path: 'promotions', component: PromotionsComponent, data: { requiresAuth: true } },
-      { path: 'payments', component: PaymentsComponent, data: { requiresAuth: true } },
-      { path: 'audit-log', component: AuditLogComponent, data: { requiresAuth: true } },
-      { path: 'membership', component: MembershipComponent, data: { requiresAuth: true } },
-      { path: 'roles', component: RoleComponent, data: { requiresAuth: true } },
+      {
+        path: 'promotions',
+        component: PromotionsComponent,
+        data: { requiresAuth: true, permissions: ['VIEW_KM'] },
+      },
+      {
+        path: 'payments',
+        component: PaymentsComponent,
+        data: { requiresAuth: true, permissions: ['VIEW_PAYMENT'] },
+      },
+      {
+        path: 'audit-log',
+        component: AuditLogComponent,
+        data: { requiresAuth: true, permissions: ['VIEW_AUDILOG'] },
+      },
+      {
+        path: 'membership',
+        component: MembershipComponent,
+        data: { requiresAuth: true, permissions: ['VIEW_UPGRADE'] },
+      },
+      {
+        path: 'roles',
+        component: RoleComponent,
+        data: { requiresAuth: true, permissions: ['ROLE_VIEW'] },
+      },
     ],
+  },
+  {
+    path: '404',
+    component: NotFoundComponent,
   },
   {
     path: '**',

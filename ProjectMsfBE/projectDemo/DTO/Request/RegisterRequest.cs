@@ -5,11 +5,14 @@ namespace projectDemo.DTO.Request
     public class RegisterRequest
     {
         public string Username { get; set; }
-
-        [Required]
+        [Required(ErrorMessage = "Không được để trống")]
+        [MinLength(3, ErrorMessage = "Tối thiểu 3 ký tự")]
+        [MaxLength(20)]
         public string FirstName { get; set; }
 
-        [Required]
+        [Required(ErrorMessage = "Không được để trống")]
+        [MinLength(3, ErrorMessage = "Tối thiểu 3 ký tự")]
+        [MaxLength(20)]
         public string LastName { get; set; }
 
         [Required]

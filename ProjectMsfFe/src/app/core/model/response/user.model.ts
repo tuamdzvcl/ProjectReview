@@ -6,4 +6,5 @@ export interface UserResponse {
     FirstName: string
     RoleName: Array<string>
     AvatarUrl: string
+    Permissions?: string[]
 }

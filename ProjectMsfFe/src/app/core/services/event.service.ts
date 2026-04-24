@@ -44,7 +44,7 @@ export class EventService extends BaseApiService {
     pageIndex: number,
     pageSize: number,
     key: string,
-    categoryId: number | null = null
+    categoryIds: string[] = []
   ) {
     const params: any = {
       pageIndex: pageIndex,
@@ -53,8 +53,8 @@ export class EventService extends BaseApiService {
     if (key) {
       params.key = key;
     }
-    if (categoryId !== null) {
-      params.categoryId = categoryId;
+    if (categoryIds && categoryIds.length > 0) {
+      params.categoryIds = categoryIds;
     }
     return this.getpage<EventModel>(
       'event/page-with-ticket-types',
@@ -75,7 +75,7 @@ export class EventService extends BaseApiService {
     pageIndex: number,
     pageSize: number,
     key: string,
-    categoryId: number | null = null
+    categoryIds: string[] = []
   ) {
     const params: any = {
       pageIndex: pageIndex,
@@ -84,8 +84,8 @@ export class EventService extends BaseApiService {
     if (key) {
       params.key = key;
     }
-    if (categoryId !== null) {
-      params.categoryId = categoryId;
+    if (categoryIds && categoryIds.length > 0) {
+      params.categoryIds = categoryIds;
     }
     return this.getpage<EventModel>(
       'event/page-with-ticket-types-byid',
@@ -114,8 +114,12 @@ export class EventService extends BaseApiService {
   UpdateEvent(id: string, data: FormData) {
     return this.put<ApiResponse<EventModel>>(`event/${id}`, data);
   }
-  UpdateEventStatus(id: string, status: number) {
-    return this.patch<any>(`event/${id}/status`, { Status: status });
+  UpdateEventStatus(id: string, status: number, reason?: string) {
+    const body: any = { Status: status };
+    if (reason) {
+      body.Reason = reason;
+    }
+    return this.patch<any>(`event/${id}/status`, body);
   }
 
   DeleteEvent(id: string) {
@@ -124,5 +128,33 @@ export class EventService extends BaseApiService {
 
   DuplicateEvent(id: string) {
     return this.post<ApiResponse<any>>(`event/${id}/duplicate`, null);
+  }
+
+  GetAdminPendingEvents(
+    pageIndex: number,
+    pageSize: number,
+    key: string
+  ) {
+    const params: any = {
+      pageIndex: pageIndex,
+      pageSize: pageSize,
+    };
+    if (key) {
+      params.key = key;
+    }
+    return this.getpage<EventModel>(
+      'event/admin-pending-events',
+      params
+    ).pipe(
+      map((res: PageResult<EventModel>) => {
+        return {
+          items: res.Items,
+          pageIndex: res.PageIndex,
+          pageSize: res.PageSize,
+          totalRecords: res.TotalRecords,
+          totalPages: res.TotalPages,
+        };
+      })
+    );
   }
 }

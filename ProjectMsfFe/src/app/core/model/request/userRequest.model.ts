@@ -3,6 +3,6 @@ export interface UserRequest {
   Username: string;
   LastName: string;
   FirstName: string;
-  RoleName: Array<string>;
+  RoleName: number[];
   AvataUrl: string;
 }

@@ -161,11 +161,6 @@ export class EventCreatePageComponent {
     const file = this.draftService.selectedFile;
 
     if (!this.isFormDataValid(draft)) {
-      this.messageService.add({
-        severity: 'warn',
-        summary: 'Cảnh báo',
-        detail: 'Vui lòng điền đầy đủ thông tin bắt buộc (Tiêu đề, Ngày sự kiện)',
-      });
       return;
     }
 
@@ -189,7 +184,62 @@ export class EventCreatePageComponent {
   }
 
   private isFormDataValid(draft: any): boolean {
-    return !!(draft.title && draft.eventDate);
+    const textOnly = (html: string) => {
+      if (!html) return "";
+      const doc = new DOMParser().parseFromString(html, 'text/html');
+      return doc.body.textContent || "";
+    };
+
+    const hasSpecialChars = (str: string) => {
+      if (!str) return false;
+      const regex = /[!@#$%^&*()_+={}\[\]|\\:;"'<>\/?]+/;
+      return regex.test(str);
+    }
+
+    if (!draft.title || draft.title.trim().length <= 5) {
+       this.messageService.add({severity:'warn', summary:'Lỗi thông tin', detail:'Tên sự kiện phải lớn hơn 5 ký tự.'});
+       return false;
+    }
+    if (hasSpecialChars(draft.title)) {
+       this.messageService.add({severity:'warn', summary:'Lỗi thông tin', detail:'Tên sự kiện không được chứa ký tự đặc biệt (!@#$...).'});
+       return false;
+    }
+
+    if (!draft.location || draft.location.trim().length <= 5) {
+       this.messageService.add({severity:'warn', summary:'Lỗi thông tin', detail:'Địa điểm sự kiện phải lớn hơn 5 ký tự.'});
+       return false;
+    }
+    if (hasSpecialChars(draft.location)) {
+       this.messageService.add({severity:'warn', summary:'Lỗi thông tin', detail:'Địa điểm không được chứa ký tự đặc biệt (!@#$...).'});
+       return false;
+    }
+
+    const descText = textOnly(draft.description);
+    if (!descText || descText.trim().length <= 5) {
+       this.messageService.add({severity:'warn', summary:'Lỗi thông tin', detail:'Mô tả sự kiện phải lớn hơn 5 ký tự.'});
+       return false;
+    }
+
+    if (draft.tickets && draft.tickets.length > 0) {
+       for (let i = 0; i < draft.tickets.length; i++) {
+          const tName = draft.tickets[i].name;
+          if (!tName || tName.trim().length <= 5) {
+             this.messageService.add({severity:'warn', summary:'Lỗi thông tin', detail:`Tên vé "${tName || '#' + (i+1)}" phải lớn hơn 5 ký tự.`});
+             return false;
+          }
+          if (hasSpecialChars(tName)) {
+             this.messageService.add({severity:'warn', summary:'Lỗi thông tin', detail:`Tên vé "${tName}" không được chứa ký tự đặc biệt.`});
+             return false;
+          }
+       }
+    }
+
+    if (!draft.eventDate) {
+       this.messageService.add({severity:'warn', summary:'Lỗi thông tin', detail:'Ngày sự kiện không được để trống.'});
+       return false;
+    }
+
+    return true;
   }
 
 

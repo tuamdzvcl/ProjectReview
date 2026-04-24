@@ -6,10 +6,11 @@ import { ButtonModule } from 'primeng/button';
 import { InputTextModule } from 'primeng/inputtext';
 import { InputNumberModule } from 'primeng/inputnumber';
 import { MenuModule } from 'primeng/menu';
-import { MenuItem } from 'primeng/api';
+import { MenuItem, MessageService } from 'primeng/api';
 import { Calendar } from 'primeng/calendar';
 import { VndCurrencyPipe } from '../../../../shared/pipes/vnd-currency.pipe';
 import { EventDraftService } from '../../../../core/services/event-draft.service';
+import { ToastModule } from 'primeng/toast';
 
 @Component({
   selector: 'app-event-create-type',
@@ -23,13 +24,15 @@ import { EventDraftService } from '../../../../core/services/event-draft.service
     InputNumberModule,
     MenuModule,
     Calendar,
-    VndCurrencyPipe
+    VndCurrencyPipe,
+    ToastModule
   ],
   templateUrl: './event-create-type.component.html',
   styleUrl: './event-create-type.component.scss'
 })
 export class EventCreateTypeComponent implements OnInit, OnDestroy {
   private draftService = inject(EventDraftService);
+  private messageService = inject(MessageService);
 
   showDialog: boolean = false;
   isEditMode: boolean = false;
@@ -104,7 +107,16 @@ export class EventCreateTypeComponent implements OnInit, OnDestroy {
   }
 
   saveTicket() {
-    if (!this.ticket.name) return;
+    if (!this.ticket.name || this.ticket.name.trim().length <= 5) {
+      this.messageService.add({severity:'warn', summary:'Lỗi thông tin', detail:'Tên vé phải lớn hơn 5 ký tự.'});
+      return;
+    }
+
+    const regex = /[!@#$%^&*()_+={}\[\]|\\:;"'<>\/?]+/;
+    if (regex.test(this.ticket.name)) {
+      this.messageService.add({severity:'warn', summary:'Lỗi thông tin', detail:'Tên vé không được chứa ký tự đặc biệt (!@#$...).'});
+      return;
+    }
 
     if (this.isEditMode && this.editingIndex !== -1) {
       

@@ -11,6 +11,8 @@ import { PermissionItem, RoleItem, RoleSaveEvent, PermissionSaveEvent } from '..
 import { PermissionService } from '../../../../core/services/permission.service';
 import { RolePermissionService } from '../../../../core/services/role-permission.service';
 import { forkJoin } from 'rxjs';
+import { ApiError } from '../../../../core/model/base/ApiError.model';
+import { ApiErrorHandler } from '../../../../core/utils/api-error-handler.util';
 
 @Component({
   selector: 'app-role',
@@ -73,8 +75,7 @@ export class RoleComponent implements OnInit {
         this.roles.set(mappedRoles);
       },
       error: (err) => {
-        console.error('Error loading data:', err);
-        Swal.fire('Lỗi', 'Không thể tải dữ liệu phân quyền', 'error');
+        ApiErrorHandler.handleError(err, "Thông báo hệ thống")
       }
     });
   }
@@ -138,8 +139,7 @@ export class RoleComponent implements OnInit {
 
       },
       error: (err) => {
-        console.error('Save role error:', err);
-        Swal.fire('Lỗi', 'Không thể kết nối đến máy chủ', 'error');
+        ApiErrorHandler.handleError(err, "Thông báo hệ thống")
       },
     });
   }
@@ -172,8 +172,7 @@ export class RoleComponent implements OnInit {
 
         },
         error: (err) => {
-          console.error('Update permissions error:', err);
-          Swal.fire('Lỗi', 'Không thể cập nhật quyền hạn', 'error');
+          ApiErrorHandler.handleError(err, "Thông báo hệ thống")
         },
       });
   }

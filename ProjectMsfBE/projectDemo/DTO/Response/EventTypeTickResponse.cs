@@ -12,11 +12,14 @@ namespace projectDemo.DTO.Response
         public DateTime? SaleEndDate { get; set; }
         public string PosterUrl { get; set; }
         public string Status { get; set; }
+        public string? Reason { get; set; }
         public string UserName { get; set; }
         public string RoleName { get; set; }
         public Guid CatetoryID { get; set; }
         public string CatetoryName { get; set; }
         public Guid UserID { get; set; }
+        public bool? isfaslse { get; set; }
+        public string? Reasons {  get; set; }
         public List<TypeTickResponse> ListTypeTick { get; set; } = new();
     }
 }

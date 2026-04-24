@@ -47,6 +47,9 @@ namespace projectDemo.Migrations
                     b.Property<bool?>("IsDeleted")
                         .HasColumnType("bit");
 
+                    b.Property<bool?>("Isfalse")
+                        .HasColumnType("bit");
+
                     b.Property<string>("Location")
                         .IsRequired()
                         .HasMaxLength(255)
@@ -54,6 +57,9 @@ namespace projectDemo.Migrations
 
                     b.Property<string>("PosterUrl")
                         .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Reason")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime?>("SaleEndDate")
@@ -274,7 +280,7 @@ namespace projectDemo.Migrations
                         new
                         {
                             Id = 1,
-                            CreatedDate = new DateTime(2026, 4, 22, 6, 39, 59, 371, DateTimeKind.Utc).AddTicks(168),
+                            CreatedDate = new DateTime(2026, 4, 24, 7, 20, 28, 723, DateTimeKind.Utc).AddTicks(6624),
                             IsAdmin = true,
                             IsDeleted = false,
                             IsSystem = true,
@@ -283,7 +289,7 @@ namespace projectDemo.Migrations
                         new
                         {
                             Id = 2,
-                            CreatedDate = new DateTime(2026, 4, 22, 6, 39, 59, 371, DateTimeKind.Utc).AddTicks(181),
+                            CreatedDate = new DateTime(2026, 4, 24, 7, 20, 28, 723, DateTimeKind.Utc).AddTicks(6631),
                             IsAdmin = false,
                             IsDeleted = false,
                             IsSystem = true,
@@ -292,7 +298,7 @@ namespace projectDemo.Migrations
                         new
                         {
                             Id = 3,
-                            CreatedDate = new DateTime(2026, 4, 22, 6, 39, 59, 371, DateTimeKind.Utc).AddTicks(183),
+                            CreatedDate = new DateTime(2026, 4, 24, 7, 20, 28, 723, DateTimeKind.Utc).AddTicks(6633),
                             IsAdmin = false,
                             IsDeleted = false,
                             IsSystem = true,
@@ -489,7 +495,7 @@ namespace projectDemo.Migrations
                             IsDeleted = false,
                             IsLock = false,
                             LastName = "admin",
-                            PasswordHash = "$2a$11$YAEOOSZW/uj2lmwwKymwp.Cj74.ShzbCD6gMGe6LQUGXb88Swoquy",
+                            PasswordHash = "$2a$11$Jjawr85fB4zt8nZ0nKO.6OF3ProsnIy4ZESvMVB9SFBXUzBJIV8g.",
                             Username = "admin"
                         });
                 });
@@ -911,8 +917,8 @@ namespace projectDemo.Migrations
                         {
                             Id = 4,
                             IsDeleted = false,
-                            PermissonsDescription = "xem user",
-                            PermissonsName = "USER_VIEW"
+                            PermissonsDescription = "xem tất cả user sự dụng hệ thống",
+                            PermissonsName = "USER_VIEW_ALL"
                         },
                         new
                         {
@@ -967,57 +973,85 @@ namespace projectDemo.Migrations
                         {
                             Id = 12,
                             IsDeleted = false,
-                            PermissonsDescription = " xem event",
-                            PermissonsName = "EVENT_VIEW"
+                            PermissonsDescription = " xem chi tiết thông tin event",
+                            PermissonsName = "EVENT_VIEW_DETIAL"
                         },
                         new
                         {
                             Id = 13,
                             IsDeleted = false,
-                            PermissonsDescription = "xem tổng vé của event",
-                            PermissonsName = "EVENT_GETTOTALTICKBYID"
+                            PermissonsDescription = "xem vé thành viên",
+                            PermissonsName = "VIEW_UPGRADE"
                         },
                         new
                         {
                             Id = 14,
                             IsDeleted = false,
-                            PermissonsDescription = "xem tổng vé theo user",
-                            PermissonsName = "EVENT_GETTOTALTICKBYUSER"
+                            PermissonsDescription = "tạo vé thành viên",
+                            PermissonsName = "CREATE_UPGRADE"
                         },
                         new
                         {
                             Id = 15,
                             IsDeleted = false,
-                            PermissonsDescription = "tạo mới TypeTicket",
-                            PermissonsName = "TYPETICKET_CREATE"
+                            PermissonsDescription = "xem báo cáo doanh thu",
+                            PermissonsName = "VEIW_DASHBOARD"
                         },
                         new
                         {
                             Id = 16,
                             IsDeleted = false,
-                            PermissonsDescription = "sửa  TypeTicket",
-                            PermissonsName = "TYPETICKET_UPDATE"
+                            PermissonsDescription = "xem báo cáo doanh thu của hệ thống",
+                            PermissonsName = "VIEW_DASHBOARHALL"
                         },
                         new
                         {
                             Id = 17,
                             IsDeleted = false,
-                            PermissonsDescription = "xóa  TypeTicket",
-                            PermissonsName = "TYPETICKET_DELETE"
+                            PermissonsDescription = "xem khuyễn mãi",
+                            PermissonsName = "VIEW_KM"
                         },
                         new
                         {
                             Id = 18,
                             IsDeleted = false,
-                            PermissonsDescription = " xem TypeTicket",
-                            PermissonsName = "TYPETICKET_VIEW"
+                            PermissonsDescription = " xem log của hệ thống",
+                            PermissonsName = "VIEW_AUDILOG"
                         },
                         new
                         {
                             Id = 19,
                             IsDeleted = false,
-                            PermissonsDescription = "xem tổng vé của TypeTicket",
-                            PermissonsName = "TYPETICKET_GETROLEBYID"
+                            PermissonsDescription = "xóa vé thành viên",
+                            PermissonsName = "UPGRADE_DELETE"
+                        },
+                        new
+                        {
+                            Id = 20,
+                            IsDeleted = false,
+                            PermissonsDescription = "Duyệt event",
+                            PermissonsName = "EVENT_BROWSE"
+                        },
+                        new
+                        {
+                            Id = 21,
+                            IsDeleted = false,
+                            PermissonsDescription = "Xem các user đã tham gia sự kiện",
+                            PermissonsName = "USER_VIEW_ORGANISATION"
+                        },
+                        new
+                        {
+                            Id = 22,
+                            IsDeleted = false,
+                            PermissonsDescription = "sửa thông tin thẻ",
+                            PermissonsName = "EDIT_CRAD"
+                        },
+                        new
+                        {
+                            Id = 23,
+                            IsDeleted = false,
+                            PermissonsDescription = "xem danh sách thanh toán",
+                            PermissonsName = "VIEW_PAYMENT"
                         });
                 });
 
@@ -1281,6 +1315,97 @@ namespace projectDemo.Migrations
                             RoleId = 1,
                             PermissionId = 19,
                             Id = 19,
+                            IsDeleted = false
+                        },
+                        new
+                        {
+                            RoleId = 1,
+                            PermissionId = 20,
+                            Id = 20,
+                            IsDeleted = false
+                        },
+                        new
+                        {
+                            RoleId = 1,
+                            PermissionId = 21,
+                            Id = 21,
+                            IsDeleted = false
+                        },
+                        new
+                        {
+                            RoleId = 1,
+                            PermissionId = 22,
+                            Id = 22,
+                            IsDeleted = false
+                        },
+                        new
+                        {
+                            RoleId = 1,
+                            PermissionId = 23,
+                            Id = 23,
+                            IsDeleted = false
+                        },
+                        new
+                        {
+                            RoleId = 2,
+                            PermissionId = 9,
+                            Id = 24,
+                            IsDeleted = false
+                        },
+                        new
+                        {
+                            RoleId = 2,
+                            PermissionId = 10,
+                            Id = 25,
+                            IsDeleted = false
+                        },
+                        new
+                        {
+                            RoleId = 2,
+                            PermissionId = 11,
+                            Id = 26,
+                            IsDeleted = false
+                        },
+                        new
+                        {
+                            RoleId = 2,
+                            PermissionId = 12,
+                            Id = 27,
+                            IsDeleted = false
+                        },
+                        new
+                        {
+                            RoleId = 2,
+                            PermissionId = 15,
+                            Id = 28,
+                            IsDeleted = false
+                        },
+                        new
+                        {
+                            RoleId = 2,
+                            PermissionId = 17,
+                            Id = 29,
+                            IsDeleted = false
+                        },
+                        new
+                        {
+                            RoleId = 2,
+                            PermissionId = 21,
+                            Id = 30,
+                            IsDeleted = false
+                        },
+                        new
+                        {
+                            RoleId = 2,
+                            PermissionId = 22,
+                            Id = 31,
+                            IsDeleted = false
+                        },
+                        new
+                        {
+                            RoleId = 2,
+                            PermissionId = 23,
+                            Id = 32,
                             IsDeleted = false
                         });
                 });

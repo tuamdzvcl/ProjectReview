@@ -3,6 +3,7 @@ using System.Net.WebSockets;
 using AutoMapper;
 using EventTick.Model.Enum;
 using EventTick.Model.Models;
+using projectDemo.Common;
 using projectDemo.Common.PageRequest;
 using projectDemo.DTO.Request;
 using projectDemo.DTO.Request.Upgrade;
@@ -20,6 +21,7 @@ using projectDemo.Repository.TickTypeRepository;
 using projectDemo.Repository.UpgradeRepository;
 using projectDemo.Service.ImageService;
 using projectDemo.UnitOfWorks;
+using static Dapper.SqlMapper;
 
 namespace projectDemo.Service.UserService
 {
@@ -192,9 +194,9 @@ namespace projectDemo.Service.UserService
         //tạo
         async Task<ApiResponse<UserResponse>> IUserService.Create(UserRequest request, Guid userid)
         {
-            if (
-                string.IsNullOrWhiteSpace(request.FirstName)
-                && string.IsNullOrWhiteSpace(request.LastName)
+
+            ValidationHelper.NormalizeAllStrings(request);
+            if (ValidationHelper.HasSpecialCharactersInAny(request.FirstName,request.LastName)
             )
             {
                 return ApiResponse<UserResponse>.FailResponse(
@@ -234,20 +236,12 @@ namespace projectDemo.Service.UserService
                 };
 
                 await _userReposiotry.Create(entity);
-                var Listrole = new List<int>();
-                foreach (var item in request.RoleName)
+                var ds = request.RoleName.ToList();
+                var userRoles = ds.Select(x => new UserRole
                 {
-                    var role = await _roleRepository.GetRole(item.ToUpper());
-                    if (role == null)
-                    {
-                        continue;
-                    }
-                    Listrole.Add(role.Id);
-                }
-                var userRoles = Listrole
-                    .Distinct()
-                    .Select(x => new UserRole { UserId = entity.Id, RoleId = x })
-                    .ToList();
+                    UserId= entity.Id,
+                    RoleId = x
+                }).ToList();
                 await _roleUserRepo.InserList(userRoles);
 
                 await _uow.SaveChangesAsync();
@@ -260,7 +254,6 @@ namespace projectDemo.Service.UserService
                     Email = entity.Email,
                     FirstName = entity.FirstName,
                     LastName = entity.LastName,
-                    RoleName = request.RoleName,
                 };
 
                 return ApiResponse<UserResponse>.SuccessResponse(
@@ -362,31 +355,41 @@ namespace projectDemo.Service.UserService
             UserUpdateRequest request
         )
         {
-            if (request == null)
+            try
             {
-                return ApiResponse<UserResponse>.FailResponse(
-                    Entity.Enum.EnumStatusCode.BAD_REQUEST,
-                    "Request is null"
-                );
-            }
-            var user = await _userReposiotry.GetUserByid(id);
-            if (user == null)
-            {
-                return ApiResponse<UserResponse>.FailResponse(
-                    Entity.Enum.EnumStatusCode.NOT_FOUND,
-                    "KHông tìm thấy User"
-                );
-            }
+                ValidationHelper.NormalizeAllStrings(request);
+                if (ValidationHelper.HasSpecialCharactersInAny(request.FirstName, request.LastName)
+                )
+                {
+                    return ApiResponse<UserResponse>.FailResponse(
+                        Entity.Enum.EnumStatusCode.BAD_REQUEST,
+                        "Xem lại các trường thông tin "
+                    );
+                }
 
-            user.FirstName = request.FirstName?.Trim() ?? user.FirstName;
-            user.LastName = request.LastName?.Trim() ?? user.LastName;
-            user.AvatarUrl = request.AvataUrl ?? user.AvatarUrl;
-            user.UpdatedDate = DateTime.UtcNow;
+                if (request == null)
+                {
+                    return ApiResponse<UserResponse>.FailResponse(
+                        Entity.Enum.EnumStatusCode.BAD_REQUEST,
+                        "Request is null"
+                    );
+                }
+                var user = await _userReposiotry.GetUserByid(id);
+                if (user == null)
+                {
+                    return ApiResponse<UserResponse>.FailResponse(
+                        Entity.Enum.EnumStatusCode.NOT_FOUND,
+                        "KHông tìm thấy User"
+                    );
+                }
+                await _uow.BeginTransactionAsync();
+                user.FirstName = request.FirstName?.Trim() ?? user.FirstName;
+                user.LastName = request.LastName?.Trim() ?? user.LastName;
+                user.AvatarUrl = request.AvataUrl ?? user.AvatarUrl;
+                user.UpdatedDate = DateTime.UtcNow;
 
-            if (!string.IsNullOrWhiteSpace(request.RoleName))
-            {
-                var role = await _roleRepository.GetRole(request.RoleName);
-                if (role == null)
+                var listrole = request.RoleName.Select(async x => await _roleRepository.GetListRoleById(x)).ToList();
+                if (listrole.Any(r => r == null))
                 {
                     return ApiResponse<UserResponse>.FailResponse(
                         Entity.Enum.EnumStatusCode.NOT_FOUND,
@@ -395,24 +398,38 @@ namespace projectDemo.Service.UserService
                 }
 
                 user.UserRoles.Clear();
-                user.UserRoles.Add(new UserRole { UserId = user.Id, RoleId = role.Id });
-            }
-            await _uow.SaveChangesAsync();
+                user.UserRoles = request.RoleName.Select(r => new UserRole
+                {
 
-            var userReponse = new UserResponse
+                    UserId = user.Id,
+                    RoleId = r
+                }).ToList();
+                Console.WriteLine($"===Userrole===`{listrole.Select(x=>x.Id)}`");
+                await _uow.SaveChangesAsync();
+                await _uow.CommitAsync();
+
+                var userReponse = new UserResponse
+                {
+                    AvatarUrl = user.AvatarUrl,
+                    FirstName = user.FirstName,
+                    LastName = user.LastName,
+                    Email = user.Email,
+                };
+                return ApiResponse<UserResponse>.SuccessResponse(
+                    Entity.Enum.EnumStatusCode.SUCCESS,
+                    userReponse
+                );
+            }
+            catch ( Exception ex )
             {
-                AvatarUrl = user.AvatarUrl,
-                FirstName = user.FirstName,
-                LastName = user.LastName,
-                Email = user.Email,
-            };
-            return ApiResponse<UserResponse>.SuccessResponse(
-                Entity.Enum.EnumStatusCode.SUCCESS,
-                userReponse
-            );
+                Console.WriteLine( ex );
+                return ApiResponse<UserResponse>.FailResponse(
+                    Entity.Enum.EnumStatusCode.SUCCESS,
+                    ex.Message);
+            }
         }
 
-        public async Task<PageResponse<UserInEvent>> GetParticipantsByOrganizer(
+        public async Task<PageResponse<ParticipantSummaryResponse>> GetParticipantsSummaryByOrganizer(
             Guid organizerId,
             PageRequest request
         )
@@ -430,34 +447,21 @@ namespace projectDemo.Service.UserService
                     request.PageSize
                 );
 
-               
-                // Manual mapping using LINQ
                 var items = rawData
-                    .GroupBy( x => x.Id )
-                    .Select(ug => new UserInEvent
+                    .GroupBy(x => x.Id)
+                    .Select(ug => new ParticipantSummaryResponse
                     {
+                        Id = ug.Key,
                         UserName = ug.First().Username,
                         Email = ug.First().Email,
-                        FirstName= ug.First().FirstName,
-                        LastName= ug.First().LastName,
-                        Avarta = ug.First().AvatarUrl??"null",
-                        
-                        ID = ug.Key,
-                        Events = ug.GroupBy(x=>x.EventTitle)
-                        .Select(eg => new EventInfo
-                        {
-                            EventTitle = eg.Key??"null",
-                            Tickets = eg.Select(t=>new TicketInfo
-                            {
-                                TicketName = t.TicketName,
-                                Quantity = t.TicketQuantity,
-                                Price = t.TotalAmount,
-                            }).ToList()
-                        }).ToList()
+                        FirstName = ug.First().FirstName,
+                        LastName = ug.First().LastName,
+                        Avarta = ug.First().AvatarUrl ?? "null",
+                        EventCount = ug.Select(x => x.EventTitle).Distinct().Count()
                     })
                     .ToList();
 
-                return new PageResponse<UserInEvent>
+                return new PageResponse<ParticipantSummaryResponse>
                 {
                     Items = items,
                     PageIndex = request.PageIndex,
@@ -465,17 +469,59 @@ namespace projectDemo.Service.UserService
                     TotalRecords = totalCount,
                     TotalPages = (int)Math.Ceiling((double)totalCount / request.PageSize),
                     Success = true,
-                    Message = "Lấy danh sách người tham gia thành công",
+                    Message = "Lấy danh sách tóm tắt người tham gia thành công",
                 };
             }
             catch (Exception ex)
             {
                 Console.WriteLine(ex.ToString());
-                return new PageResponse<UserInEvent>
+                return new PageResponse<ParticipantSummaryResponse>
                 {
                     Success = false,
-                    Message = "Có lỗi xảy ra khi lấy danh sách người tham gia",
+                    Message = "Có lỗi xảy ra khi lấy danh sách tóm tắt người tham gia",
                 };
+            }
+        }
+
+        public async Task<ApiResponse<UserInEvent>> GetParticipantDetail(Guid organizerId, Guid userId)
+        {
+            try
+            {
+                var (rawData, _) = await _participantQuery.GetParticipantsByOrganizerAsync(organizerId, 1, int.MaxValue);
+                var userRows = rawData.Where(x => x.Id == userId).ToList();
+
+                if (!userRows.Any())
+                {
+                    return ApiResponse<UserInEvent>.FailResponse(Entity.Enum.EnumStatusCode.NOT_FOUND, "Không tìm thấy thông tin chi tiết người tham gia");
+                }
+
+                var detail = new UserInEvent
+                {
+                    UserName = userRows.First().Username,
+                    Email = userRows.First().Email,
+                    FirstName = userRows.First().FirstName,
+                    LastName = userRows.First().LastName,
+                    Avarta = userRows.First().AvatarUrl ?? "null",
+                    Events = userRows.GroupBy(x => x.Id)
+                        .Select(eg => new EventInfo
+                        {
+                            EventTitle = eg.First().EventTitle ?? "null",
+                            Tickets = eg.GroupBy(tg=>tg.TicketName)
+                            .Select(t => new TicketInfo
+                            {
+                                TicketName = t.Key,
+                                Quantity =t.Sum(x => x.TicketQuantity),
+                                Price = t.Sum(x => x.TotalAmount),
+                            }).ToList()
+                        }).ToList()
+                };
+
+                return ApiResponse<UserInEvent>.SuccessResponse(Entity.Enum.EnumStatusCode.SUCCESS, detail);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.ToString());
+                return ApiResponse<UserInEvent>.FailResponse(Entity.Enum.EnumStatusCode.SERVER, "Lỗi server khi lấy chi tiết người tham gia");
             }
         }
 
@@ -521,6 +567,11 @@ namespace projectDemo.Service.UserService
                     "Lỗi server khi lấy thông tin người dùng"
                 );
             }
+        }
+
+        public Task<PageResponse<UserInEvent>> GetParticipantsByOrganizer(Guid organizerId, PageRequest request)
+        {
+            throw new NotImplementedException();
         }
     }
 }

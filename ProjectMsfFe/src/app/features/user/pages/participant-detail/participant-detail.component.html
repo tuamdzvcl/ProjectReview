@@ -1,0 +1,82 @@
+<div class="topbar__left" style="display: flex; align-items: center; gap: 10px;">
+  <button pButton pRipple icon="pi pi-chevron-left" class="p-button-text p-button-plain p-button-rounded"
+    routerLink="/admin/participants" pTooltip="Quay lại danh sách"></button>
+  <h1 class="topbar__title" style="margin: 0;">Chi tiết người tham gia</h1>
+</div>
+
+<ng-container *ngIf="participant; else loadingTemplate">
+  <!-- Profile Section -->
+  <section class="card mb-4" style="margin-top: 20px;">
+    <div class="user-profile-header">
+      <div class="user-avatar-box">
+        <img [src]="(participant.Avarta === 'null' ? null : participant.Avarta) | imageUrl" alt="Avatar"
+          class="avatar-img" />
+      </div>
+      <div class="user-info-box">
+        <h2 class="user-name">{{ participant.FirstName }} {{ participant.LastName }}</h2>
+        <div class="user-details">
+          <p><i class="pi pi-envelope text-primary"></i> {{ participant.Email }}</p>
+          <p><i class="pi pi-user text-primary"></i> {{ participant.UserName }}</p>
+        </div>
+      </div>
+      <div class="user-stats-box">
+        <div class="stat-item">
+          <span class="stat-label">Tổng sự kiện:</span>
+          <span class="stat-value text-primary">{{ participant.Events.length }}</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-label">Tổng chi tiêu:</span>
+          <span class="stat-value text-primary">{{ totalSpent | vndCurrency }}</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Events List Section -->
+  <section class="card">
+    <h2 class="section-title mb-4" style="font-size: 1.5rem; color: #333; margin-bottom: 20px;">Lịch sử tham gia sự kiện
+    </h2>
+
+    <div *ngIf="participant.Events.length > 0; else noEvents">
+      <div *ngFor="let event of participant.Events" class="event-record mb-4">
+        <div class="event-record-header">
+          <h3 class="event-name"><i class="pi pi-calendar text-primary mr-2" style="font-size: 1.25rem;"></i> {{
+            event.EventTitle }}</h3>
+        </div>
+        <div class="event-record-body">
+          <p-table [value]="event.Tickets" styleClass="p-datatable-striped p-datatable-sm">
+            <ng-template pTemplate="header">
+              <tr>
+                <th style="width: 40%">Loại vé</th>
+                <th style="width: 20%" class="text-center">Số lượng</th>
+                <th style="width: 20%" class="text-right">Đơn giá</th>
+                <th style="width: 20%" class="text-right">Tổng tiền</th>
+              </tr>
+            </ng-template>
+            <ng-template pTemplate="body" let-ticket>
+              <tr>
+                <td>{{ ticket.TicketName }}</td>
+                <td class="text-center">x{{ ticket.Quantity }}</td>
+                <td class="text-right">{{ ticket.Price | vndCurrency }}</td>
+                <td class="text-right font-bold text-primary">{{ (ticket.Price * ticket.Quantity) | vndCurrency }}</td>
+              </tr>
+            </ng-template>
+          </p-table>
+        </div>
+      </div>
+    </div>
+
+    <ng-template #noEvents>
+      <div class="text-center p-4">
+        <p>Người dùng này chưa có dữ liệu đặt vé.</p>
+      </div>
+    </ng-template>
+  </section>
+</ng-container>
+
+<ng-template #loadingTemplate>
+  <div class="text-center p-5 card" style="margin-top: 20px;">
+    <i class="pi pi-spin pi-spinner text-primary" style="font-size: 2rem"></i>
+    <p class="mt-3">Đang tải thông tin chi tiết...</p>
+  </div>
+</ng-template>

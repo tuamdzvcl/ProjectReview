@@ -4,19 +4,26 @@ import { ButtonModule } from 'primeng/button';
 import { RippleModule } from 'primeng/ripple';
 import { CommonModule } from '@angular/common';
 import { UserService } from '../../../../core/services/user.service';
-import { UserInEvent } from '../../../../core/model/response/participant.model';
+import { ParticipantSummary } from '../../../../core/model/response/participant.model';
+import { Router } from '@angular/router';
+import { VndCurrencyPipe } from '../../../../shared/pipes/vnd-currency.pipe';
+import { TagModule } from 'primeng/tag';
+import { TooltipModule } from 'primeng/tooltip';
+import { ImageUrlPipe } from '../../../../shared/pipes/image-url.pipe';
 
 @Component({
   selector: 'app-participant-list',
   standalone: true,
-  imports: [TableModule, CommonModule, ButtonModule, RippleModule],
+  imports: [TableModule,
+    ImageUrlPipe, CommonModule, ButtonModule, RippleModule, VndCurrencyPipe, TagModule, TooltipModule],
   templateUrl: './participant-list.component.html',
-  styleUrl: './participant-list.component.scss'
+  styleUrl: './participant-list.component.scss',
 })
 export class ParticipantListComponent implements OnInit {
   private userService = inject(UserService);
+  private router = inject(Router);
 
-  participants: UserInEvent[] = [];
+  participants: ParticipantSummary[] = [];
   totalRecords = 0;
   first = 0;
   rows = 10;
@@ -28,13 +35,15 @@ export class ParticipantListComponent implements OnInit {
 
   loadParticipants() {
     this.userService.GetParticipants(this.pageIndex, this.rows).subscribe({
-      next: (res) => {
-        this.participants = res.items;
+      next: (res: any) => {
+        console.log(res.items);
+        this.participants = res.items
+
         this.totalRecords = res.totalRecords;
       },
       error: (err) => {
         console.error('Error fetching participants', err);
-      }
+      },
     });
   }
 
@@ -43,5 +52,9 @@ export class ParticipantListComponent implements OnInit {
     this.rows = event.rows;
     this.pageIndex = event.first / event.rows + 1;
     this.loadParticipants();
+  }
+
+  viewDetail(userId: string) {
+    this.router.navigate(['/admin/participants', userId]);
   }
 }

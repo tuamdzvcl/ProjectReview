@@ -12,9 +12,9 @@ import { CatetoryResponse } from '../../../core/model/response/catetory.model';
 })
 export class FilterTabsComponent implements OnInit {
   categories: CatetoryResponse[] = [];
-  selectedCategoryId: number | null = null;
+  selectedCategoryIds: string[] = [];
 
-  @Output() categoryChange = new EventEmitter<number | null>();
+  @Output() categoryChange = new EventEmitter<string[]>();
 
   constructor(private catetoryService: CatetoryService) { }
 
@@ -34,9 +34,19 @@ export class FilterTabsComponent implements OnInit {
     });
   }
 
-  selectCategory(id: number | null): void {
-    console.log(id)
-    this.selectedCategoryId = id;
-    this.categoryChange.emit(id);
+  selectCategory(id: string | null): void {
+    if (id === null) {
+      this.selectedCategoryIds = [];
+    } else {
+      const index = this.selectedCategoryIds.indexOf(id);
+      if (index > -1) {
+        this.selectedCategoryIds.splice(index, 1);
+      } else {
+        this.selectedCategoryIds.push(id);
+      }
+    }
+    // ensure reference change for angular change detection
+    this.selectedCategoryIds = [...this.selectedCategoryIds];
+    this.categoryChange.emit(this.selectedCategoryIds);
   }
 }

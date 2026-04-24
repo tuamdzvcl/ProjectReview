@@ -25,7 +25,7 @@ namespace projectDemo.Repository.CatetoryRepository
             await _dbSet.AddAsync(entity);
             return entity;
         }
-
+        
         public async Task<string> delete(Guid id)
         {
             var events = await _dbSet.FirstOrDefaultAsync(x => x.Id == id);

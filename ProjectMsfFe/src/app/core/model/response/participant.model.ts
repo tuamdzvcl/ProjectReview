@@ -18,3 +18,13 @@ export interface UserInEvent {
   Avarta?: string;
   Events: EventInfo[];
 }
+
+export interface ParticipantSummary {
+  Id: string;
+  UserName: string;
+  Email: string;
+  FirstName: string;
+  LastName: string;
+  Avarta?: string;
+  EventCount: number;
+}

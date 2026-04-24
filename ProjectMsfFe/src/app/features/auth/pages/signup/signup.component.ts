@@ -5,9 +5,21 @@ import { AuthService } from '../../auth.service';
 import { CommonModule } from '@angular/common';
 import { ApiError } from '../../../../core/model/base/ApiError.model';
 import { ChangeDetectionStrategy, Component, signal } from '@angular/core';
-import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { AbstractControl, FormBuilder, ReactiveFormsModule, ValidationErrors, Validators } from '@angular/forms';
 import { AuthLayoutComponent } from '../../ui/auth-layout/auth-layout.component';
 import { Route, Router } from '@angular/router';
+
+export function noWhitespaceValidator(control: AbstractControl): ValidationErrors | null {
+  const isWhitespace = (control.value || '').trim().length === 0;
+  return isWhitespace ? { whitespace: true } : null;
+}
+
+export function passwordMatchValidator(group: AbstractControl): ValidationErrors | null {
+  const password = group.get('password')?.value;
+  const confirmPassword = group.get('confirmPassword')?.value;
+  if (!password || !confirmPassword) return null;
+  return password === confirmPassword ? null : { passwordMismatch: true };
+}
 
 @Component({
   selector: 'app-signup',
@@ -20,6 +32,7 @@ import { Route, Router } from '@angular/router';
 export class SignupComponent {
   readonly isSubmitting = signal(false);
   readonly passwordVisible = signal(false);
+  readonly confirmPasswordVisible = signal(false);
 
   readonly form;
 
@@ -29,16 +42,21 @@ export class SignupComponent {
     private readonly router: Router
   ) {
     this.form = this.fb.nonNullable.group({
-      firstName: ['', [Validators.required]],
-      lastName: ['', [Validators.required]],
-      email: ['', [Validators.required, Validators.email]],
-      password: ['', [Validators.required, Validators.minLength(6)]],
+      firstName: ['', [Validators.required, Validators.min(1), Validators.max(20)]],
+      lastName: ['', [Validators.required, Validators.min(1), Validators.max(20)]],
+      email: ['', [Validators.required, Validators.email, noWhitespaceValidator]],
+      password: ['', [Validators.required, Validators.minLength(6), noWhitespaceValidator]],
+      confirmPassword: ['', [Validators.required]],
       username: [''],
-    });
+    }, { validators: passwordMatchValidator });
   }
 
   togglePassword(): void {
     this.passwordVisible.update((v) => !v);
+  }
+
+  toggleConfirmPassword(): void {
+    this.confirmPasswordVisible.update((v) => !v);
   }
 
   submit(): void {
@@ -66,15 +84,15 @@ export class SignupComponent {
       error: (err) => {
         console.error('Call API Error:', err);
         this.isSubmitting.set(false);
-        
+
         if (err instanceof ApiError || err.name === 'ApiError') {
-           Swal.fire({
-             icon: 'error',
-             title: 'Đăng ký thất bại',
-             text: err.message || 'Lỗi từ Backend.',
-             confirmButtonColor: '#1976d2'
-           });
-        } 
+          Swal.fire({
+            icon: 'error',
+            title: 'Đăng ký thất bại',
+            text: err.message || 'Lỗi từ Backend.',
+            confirmButtonColor: '#1976d2'
+          });
+        }
         else if (err.status === 400 && err.error?.errors) {
           const errors = err.error.errors;
           let errorMessage = '<ul style="text-align: left; list-style-type: disc; margin-left: 20px;">';
@@ -88,29 +106,29 @@ export class SignupComponent {
           if (errors?.Email) {
             errorMessage += `<li>${errors.Email[0]}</li>`;
           }
-          
+
           errorMessage += '</ul>';
 
           Swal.fire({
-             icon: 'warning',
-             title: 'Lỗi thông tin',
-             html: errorMessage,
-             confirmButtonColor: '#1976d2'
+            icon: 'warning',
+            title: 'Lỗi thông tin',
+            html: errorMessage,
+            confirmButtonColor: '#1976d2'
           });
         } else if (err.status === 500) {
           Swal.fire({
-             icon: 'error',
-             title: 'Lỗi hệ thống',
-             text: 'Lỗi hệ thống Server. Vui lòng thử lại sau.',
-             confirmButtonColor: '#1976d2'
+            icon: 'error',
+            title: 'Lỗi hệ thống',
+            text: 'Lỗi hệ thống Server. Vui lòng thử lại sau.',
+            confirmButtonColor: '#1976d2'
           });
         } else {
           // HTTP error generic fallback
           Swal.fire({
-             icon: 'error',
-             title: 'Lỗi mạng',
-             text: err.error?.message || err.message || 'Đã có lỗi xảy ra. Hãy kiểm tra lại kết nối mạng.',
-             confirmButtonColor: '#1976d2'
+            icon: 'error',
+            title: 'Lỗi mạng',
+            text: err.error?.message || err.message || 'Đã có lỗi xảy ra. Hãy kiểm tra lại kết nối mạng.',
+            confirmButtonColor: '#1976d2'
           });
         }
       },

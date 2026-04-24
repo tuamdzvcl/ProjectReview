@@ -54,7 +54,6 @@ namespace projectDemo.Service.UpgradeService
         {
             var upgrades = await _upgradeRepository.GetAllAsync();
 
-            // Lọc theo keyword (tiêu đề hoặc mô tả)
             if (!string.IsNullOrEmpty(query.key))
             {
                 upgrades = upgrades

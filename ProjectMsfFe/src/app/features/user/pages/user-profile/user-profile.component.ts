@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnChanges, OnInit, SimpleChanges } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute } from '@angular/router';
 import { UserService } from '../../../../core/services/user.service';
@@ -24,7 +24,7 @@ import { ProfileContentComponent } from './components/profile-content/profile-co
   templateUrl: './user-profile.component.html',
   styleUrl: './user-profile.component.scss',
 })
-export class UserProfileComponent implements OnInit {
+export class UserProfileComponent implements OnInit, OnChanges {
   user?: UserResponse;
   events: EventModel[] = [];
   isOwner: boolean = false;
@@ -47,7 +47,10 @@ export class UserProfileComponent implements OnInit {
       this.loadUserProfile(id || undefined);
     });
   }
-
+  ngOnChanges(): void {
+    console.log("onchange")
+    this.loadUserProfile();
+  }
   determineOwnership(urlId: string | null) {
     const currentUserId = this.tokenService.getUserId();
     if (!urlId) {
@@ -78,7 +81,6 @@ export class UserProfileComponent implements OnInit {
         },
       });
     } else {
-      // Viewing own profile
       this.userService.getUserEvents().subscribe({
         next: (res: UserEventsResponse) => {
           this.user = res.User;

@@ -4,6 +4,7 @@ import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { AuthLayoutComponent } from '../../ui/auth-layout/auth-layout.component';
 import { AuthService } from '../../auth.service';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
+import { PermissionStoreService } from '../../../../core/services/permission-store.service';
 
 @Component({
   selector: 'app-login',
@@ -22,7 +23,8 @@ export class LoginComponent {
     private readonly fb: FormBuilder,
     private readonly authService: AuthService,
     private readonly router: Router,
-    private readonly route: ActivatedRoute
+    private readonly route: ActivatedRoute,
+    private readonly permissionStore: PermissionStoreService
   ) {
     this.form = this.fb.nonNullable.group({
       email: ['', [Validators.required, Validators.email]],
@@ -40,8 +42,11 @@ export class LoginComponent {
     const data = this.form.getRawValue();
 
     this.authService.login(data).subscribe({
-      next: (res) => {
+      next: async (res) => {
         localStorage.setItem('user', JSON.stringify(res.User));
+
+        await this.permissionStore.loadPermissions();
+
         this.isSubmitting.set(false);
         const returnUrl =
           this.route.snapshot.queryParamMap.get('returnUrl') || '/';

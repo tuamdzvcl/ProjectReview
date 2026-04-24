@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, ErrorHandler, inject } from '@angular/core';
 import { TableModule } from 'primeng/table';
 import { ButtonModule } from 'primeng/button';
 import { CommonModule, NgTemplateOutlet } from '@angular/common';
@@ -9,9 +9,12 @@ import Swal from 'sweetalert2';
 import { UserFormComponent } from '../../componnets/user-form/user-form.component';
 import { UserService } from '../../../../core/services/user.service';
 import { TokenService } from '../../../../core/services/token.service';
+import { PermissionStoreService } from '../../../../core/services/permission-store.service';
 import { UserResponse } from '../../../../core/model/response/user.model';
 import { UserUpdata } from '../../../../core/model/update/userupdate.model';
 import { UserRequest } from '../../../../core/model/request/userRequest.model';
+import { ApiErrorHandler } from '../../../../core/utils/api-error-handler.util';
+import { RolePipe } from '../../../../shared/pipes/role.pipe';
 @Component({
   selector: 'app-user',
   standalone: true,
@@ -22,6 +25,7 @@ import { UserRequest } from '../../../../core/model/request/userRequest.model';
     ConfirmPopupModule,
     ToastModule,
     UserFormComponent,
+    RolePipe
   ],
   templateUrl: './user.component.html',
   styleUrl: './user.component.scss',
@@ -30,6 +34,7 @@ import { UserRequest } from '../../../../core/model/request/userRequest.model';
 export class UserComponent {
   private userService = inject(UserService);
   private tokenService = inject(TokenService);
+  permissionStore = inject(PermissionStoreService);
 
   count = 4;
   users: UserResponse[] = [];
@@ -49,10 +54,7 @@ export class UserComponent {
 
   ngOnInit(): void {
     this.currentUserId = this.tokenService.getUserId();
-    this.userRole = this.tokenService.getRole();
-    if (this.userRole === 'ADMIN') {
-      this.loadUsers();
-    }
+    this.loadUsers();
   }
 
   loadUsers() {
@@ -69,8 +71,12 @@ export class UserComponent {
 
   setTotals(users: any[], totalRecords: number) {
     this.totalAll = totalRecords;
-    this.totalOrganizer = users.filter((u) => (u.role || u.RoleName?.[0]) === 'organizer').length;
-    this.totalCustomer = users.filter((u) => (u.role || u.RoleName?.[0]) === 'customer').length;
+    this.totalOrganizer = users.filter(
+      (u) => (u.role || u.RoleName?.[0]) === 'organizer'
+    ).length;
+    this.totalCustomer = users.filter(
+      (u) => (u.role || u.RoleName?.[0]) === 'customer'
+    ).length;
   }
 
   pageChange(event: any) {
@@ -117,9 +123,7 @@ export class UserComponent {
       firstName: users?.FirstName ?? users?.firstName ?? '',
       lastName: users?.LastName ?? users?.lastName ?? '',
       email: users?.Email ?? users?.email ?? '',
-      role: Array.isArray(users?.RoleName)
-        ? users.RoleName[0]
-        : users?.RoleName ?? users?.role ?? null,
+      role: users?.RoleName ?? [],
     };
     this.display = true;
   }
@@ -180,7 +184,7 @@ export class UserComponent {
           this.loadUsers();
         },
         error: (err) => {
-          console.error('Update thất bại', err);
+          ApiErrorHandler.handleError(err, 'Update User Thất bại');
         },
       });
     } else {
@@ -198,12 +202,7 @@ export class UserComponent {
           this.loadUsers();
         },
         error: (err) => {
-          console.error('Create thất bại', err.error.errors);
-          Swal.fire({
-            title: 'Error!',
-            text: err.message || 'Create user failed',
-            icon: 'error',
-          });
+          ApiErrorHandler.handleError(err, 'Tạo User Thất bại');
         },
       });
     }
@@ -230,7 +229,7 @@ export class UserComponent {
         data.email?.split('@')[0] || `${data.firstName} ${data.lastName}`,
       FirstName: data.firstName,
       LastName: data.lastName,
-      RoleName: [data.role],
+      RoleName: data.role,
       AvataUrl: data.avataUrl ?? '',
     };
   }

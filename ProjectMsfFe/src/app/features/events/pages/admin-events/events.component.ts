@@ -8,6 +8,7 @@ import {
 import { EventService } from '../../../../core/services/event.service';
 import { ImageUrlPipe } from '../../../../shared/pipes/image-url.pipe';
 import { FormatDatePipe } from '../../../../shared/pipes/format-date.pipe';
+import { EventStatusPipe } from '../../../../shared/pipes/event-status.pipe';
 
 import { VndCurrencyPipe } from '../../../../shared/pipes/vnd-currency.pipe';
 import { Router } from '@angular/router';
@@ -15,6 +16,8 @@ import { ConfirmationService, MessageService } from 'primeng/api';
 import { ConfirmDialog } from 'primeng/confirmdialog';
 import { Toast } from 'primeng/toast';
 import { TokenService } from '../../../../core/services/token.service';
+import { FormsModule } from '@angular/forms';
+import { Dialog } from 'primeng/dialog';
 
 @Component({
   selector: 'app-events',
@@ -26,6 +29,9 @@ import { TokenService } from '../../../../core/services/token.service';
     VndCurrencyPipe,
     ConfirmDialog,
     Toast,
+    FormsModule,
+    Dialog,
+    EventStatusPipe,
   ],
   templateUrl: './events.component.html',
   styleUrls: ['./events.component.scss'],
@@ -47,6 +53,11 @@ export class EventsComponent implements OnInit {
   key = '';
   showDropdown: string | null = null;
   userRole: string | null = null;
+
+  // Request Edit Dialog
+  showRequestEditDialog = false;
+  requestEditReason = '';
+  requestEditEvent: any = null;
 
   ngOnInit() {
     this.userRole = this.tokenService.getRole();
@@ -106,11 +117,50 @@ export class EventsComponent implements OnInit {
     this.router.navigate(['/event-create-page', event.Id]);
   }
 
+  requestEdit(event: any) {
+    this.showDropdown = null;
+    this.requestEditEvent = event;
+    this.requestEditReason = '';
+    this.showRequestEditDialog = true;
+  }
+
+  submitRequestEdit() {
+    if (!this.requestEditReason.trim()) {
+      this.messageService.add({
+        severity: 'warn',
+        summary: 'Cảnh báo',
+        detail: 'Vui lòng nhập lý do yêu cầu chỉnh sửa!',
+      });
+      return;
+    }
+    this.eventService.UpdateEventStatus(this.requestEditEvent.Id, 6, this.requestEditReason).subscribe({
+      next: () => {
+        this.showRequestEditDialog = false;
+        this.messageService.add({
+          severity: 'success',
+          summary: 'Thành công',
+          detail: 'Yêu cầu chỉnh sửa sự kiện đã được gửi thành công!',
+        });
+        this.loadEvents();
+      },
+      error: (err) => {
+        console.error('Lỗi khi yêu cầu chỉnh sửa:', err);
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Lỗi',
+          detail: 'Có lỗi xảy ra khi yêu cầu chỉnh sửa sự kiện!',
+        });
+      },
+    });
+  }
+
   get isEventEnded(): (event: any) => boolean {
     return (event: any) => {
       return event.Status === 'ENDED' || new Date(event.EndDate) < new Date();
     };
   }
+
+  
 
   getTotalTickets(event: any): number {
     if (!event.ListTypeTick || !event.ListTypeTick.length) return 0;

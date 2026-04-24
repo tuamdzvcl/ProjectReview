@@ -1,4 +1,4 @@
-<ng-container *ngIf="userRole === 'ADMIN'; else nonAdmin">
+<ng-container *ngIf="permissionStore.hasPermission('USER_VIEW_ALL')">
   <div class="topbar__left">
     <h1 class="topbar__title">User</h1>
   </div>
@@ -9,7 +9,11 @@
       </div>
       <div class="users-search__control">
         <span class="users-search__icon">🔍</span>
-        <input class="users-search__input" type="text" placeholder="Search by event name, status" />
+        <input
+          class="users-search__input"
+          type="text"
+          placeholder="Search by event name, status"
+        />
       </div>
     </div>
 
@@ -18,16 +22,30 @@
         <button (click)="onSave()" class="btn btn--tab" type="button">
           Add User
         </button>
-        <button class="btn btn--tab" [class.btn--tab-active]="selectedRole === ''" (click)="filterRole('')"
-          type="button">
+        <button
+          class="btn btn--tab"
+          [class.btn--tab-active]="selectedRole === ''"
+          (click)="filterRole('')"
+          type="button"
+        >
           UserAtice ({{ totalAll }})
         </button>
-        <button class="btn btn--tab" type="button" class="btn btn--tab"
-          [class.btn--tab-active]="selectedRole === 'organizer'" (click)="filterRole('organizer')">
+        <button
+          class="btn btn--tab"
+          type="button"
+          class="btn btn--tab"
+          [class.btn--tab-active]="selectedRole === 'organizer'"
+          (click)="filterRole('organizer')"
+        >
           Organisation({{ totalOrganizer }})
         </button>
-        <button class="btn btn--tab" type="button" class="btn btn--tab"
-          [class.btn--tab-active]="selectedRole === 'customer'" (click)="filterRole('customer')">
+        <button
+          class="btn btn--tab"
+          type="button"
+          class="btn btn--tab"
+          [class.btn--tab-active]="selectedRole === 'customer'"
+          (click)="filterRole('customer')"
+        >
           Customer ({{ totalCustomer }})
         </button>
       </div>
@@ -35,9 +53,17 @@
   </section>
   <section class="card">
     <div class="card table-wrapper">
-      <p-table [value]="users" [paginator]="true" [rows]="rows" [first]="first" [totalRecords]="totalRecords"
-        [lazy]="true" (onPage)="pageChange($event)" [tableStyle]="{ 'min-width': '50rem' }"
-        [rowsPerPageOptions]="[5, 10, 20]">
+      <p-table
+        [value]="users"
+        [paginator]="true"
+        [rows]="rows"
+        [first]="first"
+        [totalRecords]="totalRecords"
+        [lazy]="true"
+        (onPage)="pageChange($event)"
+        [tableStyle]="{ 'min-width': '50rem' }"
+        [rowsPerPageOptions]="[5, 10, 20]"
+      >
         <ng-template pTemplate="header">
           <tr>
             <th style="width: 20%">STT</th>
@@ -54,14 +80,24 @@
             <td>{{ user.LastName }} {{ user.FirstName }}</td>
             <td>
               <span *ngFor="let role of user.RoleName" class="role-badge">{{
-                role
-                }}</span>
+                role| roleName
+              }}</span>
             </td>
 
             <td>
               <div class="p-button-group" *ngIf="user.ID !== currentUserId">
-                <p-button label="Edit" icon="fa-regular fa-pen-to-square" class="m-2" (onClick)="onEdit(user)"></p-button>
-                <p-button label="Delete" icon="pi pi-trash" class="m-2" (onClick)="onDelete(user)"></p-button>
+                <p-button
+                  label="Edit"
+                  icon="fa-regular fa-pen-to-square"
+                  class="m-2"
+                  (onClick)="onEdit(user)"
+                ></p-button>
+                <p-button
+                  label="Delete"
+                  icon="pi pi-trash"
+                  class="m-2"
+                  (onClick)="onDelete(user)"
+                ></p-button>
               </div>
             </td>
           </tr>
@@ -69,7 +105,11 @@
       </p-table>
     </div>
   </section>
-  <app-user-form [(visible)]="display" [data]="selectedUser" (submitForm)="handleSubmit($event)">
+  <app-user-form
+    [(visible)]="display"
+    [data]="selectedUser"
+    (submitForm)="handleSubmit($event)"
+  >
   </app-user-form>
 </ng-container>
 

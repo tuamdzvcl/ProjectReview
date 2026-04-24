@@ -9,7 +9,7 @@ import { UserUpdata } from '../model/update/userupdate.model';
 import { UserRequest } from '../model/request/userRequest.model';
 import { UserEventsResponse } from '../model/response/user-events-response.model';
 import { UserProfile } from '../model/response/userprofile.model';
-import { UserInEvent } from '../model/response/participant.model';
+import { UserInEvent, ParticipantSummary } from '../model/response/participant.model';
 
 @Injectable({
   providedIn: 'root',
@@ -66,7 +66,7 @@ export class UserService extends BaseApiService {
   }
 
   GetParticipants(pageIndex: number, pageSize: number): Observable<{
-    items: UserInEvent[];
+    items: ParticipantSummary[];
     pageIndex: number;
     pageSize: number;
     totalRecords: number;
@@ -76,8 +76,8 @@ export class UserService extends BaseApiService {
       PageIndex: pageIndex,
       PageSize: pageSize,
     };
-    return this.getpage<UserInEvent>('users/participants', params).pipe(
-      map((res: PageResult<UserInEvent>) => {
+    return this.getpage<ParticipantSummary>('users/participants/summary', params).pipe(
+      map((res: PageResult<ParticipantSummary>) => {
         return {
           items: res.Items,
           pageIndex: res.PageIndex,
@@ -87,6 +87,10 @@ export class UserService extends BaseApiService {
         };
       })
     );
+  }
+
+  GetParticipantDetail(userId: string): Observable<UserInEvent> {
+    return this.get<UserInEvent>(`users/participants/${userId}/detail`);
   }
 
   updateAvatar(file: File): Observable<ApiResponse<string>> {

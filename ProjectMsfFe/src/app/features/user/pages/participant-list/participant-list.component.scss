@@ -66,6 +66,28 @@
   }
 }
 
+.event-count-badge {
+  background: #f0fdf4;
+  color: #16a34a;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 600;
+  border: 1px solid #dcfce7;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+
+  &::before {
+    content: '';
+    display: inline-block;
+    width: 6px;
+    height: 6px;
+    background: #22c55e;
+    border-radius: 50%;
+  }
+}
+
 .event-title {
   color: #1e293b;
   font-weight: 500;

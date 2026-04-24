@@ -3,6 +3,7 @@ using AutoMapper;
 using EventTick.Model.Enum;
 using EventTick.Model.Models;
 using Microsoft.EntityFrameworkCore;
+using projectDemo.Common;
 using projectDemo.Common.PageRequest;
 using projectDemo.DTO.Request;
 using projectDemo.DTO.Respone;
@@ -17,6 +18,7 @@ using projectDemo.Repository.UpgradeRepository;
 using projectDemo.Repository.UserUpgradeRepository;
 using projectDemo.Service.Auth;
 using projectDemo.Service.ImageService;
+using projectDemo.Service.EmailService;
 using projectDemo.UnitOfWorks;
 
 namespace projectDemo.Service.EventService
@@ -33,6 +35,7 @@ namespace projectDemo.Service.EventService
         private readonly IUpgradeRepository _upgradeRepository;
         private readonly IUserUpgradeRepository _userUpgradeRepository;
         private readonly IMapper _mapper;
+        private readonly IEmailService _emailService;
 
         public EventService(
             ICatetoryReposioty catetoryReposioty,
@@ -44,7 +47,8 @@ namespace projectDemo.Service.EventService
             IUserReposiotry userReposiotry,
             ITypeTicketRepositorys typeTicketRepository,
             IUpgradeRepository upgradeRepository,
-            IUserUpgradeRepository userUpgradeRepository
+            IUserUpgradeRepository userUpgradeRepository,
+            IEmailService emailService
         )
         {
             _eventRepository = eventRepository;
@@ -57,6 +61,7 @@ namespace projectDemo.Service.EventService
             _typeTicketRepository = typeTicketRepository;
             _upgradeRepository = upgradeRepository;
             _userUpgradeRepository = userUpgradeRepository;
+            _emailService = emailService;
         }
 
         private static TimeZoneInfo GetVietnamTimeZone()
@@ -245,7 +250,7 @@ namespace projectDemo.Service.EventService
 
             try
             {
-               
+                ValidationHelper.NormalizeAllStrings(request);
 
                 // 2. Các kiểm tra dữ liệu hiện tại
                 if (!checkVadidate(request))
@@ -846,9 +851,73 @@ namespace projectDemo.Service.EventService
                 }
 
                 events.Status = request.Status.Value;
+                events.Reason = request.Reason;
                 events.UpdatedDate = DateTime.Now;
 
                 await _uow.SaveChangesAsync();
+
+                // Gửi email thông báo khi Admin từ chối yêu cầu chỉnh sửa
+                if (request.Status.Value == EnumStatusEvent.PUBLISHED && !string.IsNullOrEmpty(request.Reason))
+                {
+                    try
+                    {
+                        var user = await _userReposiotry.GetUserByid(events.UserID);
+                        if (user != null && !string.IsNullOrEmpty(user.Email))
+                        {
+                            var subject = $"Yêu cầu chỉnh sửa sự kiện \"{events.Title}\" bị từ chối";
+                            var htmlBody = $@"
+                                <div style='font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;'>
+                                    <h2 style='color: #e53e3e;'>Yêu cầu chỉnh sửa bị từ chối</h2>
+                                    <p>Xin chào <strong>{user.Username}</strong>,</p>
+                                    <p>Yêu cầu chỉnh sửa sự kiện <strong>\'{events.Title}\'</strong> của bạn đã bị Admin từ chối.</p>
+                                    <div style='background: #fff5f5; border-left: 4px solid #e53e3e; padding: 12px 16px; margin: 16px 0;'>
+                                        <strong>Lý do từ chối:</strong>
+                                        <p style='margin: 8px 0 0;'>{request.Reason}</p>
+                                    </div>
+                                    <p>Sự kiện của bạn vẫn đang ở trạng thái <strong>Đã công khai</strong> và hoạt động bình thường.</p>
+                                    <p>Trân trọng,<br/>Hệ thống quản lý sự kiện</p>
+                                </div>";
+                            events.Isfalse = true;
+                            events.Reason = request.Reason.Trim();
+                            await _uow.SaveChangesAsync();
+
+
+                            await _emailService.SendEmailAsync(user.Email, subject, htmlBody);
+                        }
+                    }
+                    catch (Exception emailEx)
+                    {
+                        Console.WriteLine($"Lỗi gửi email thông báo: {emailEx.Message}");
+                    }
+                }
+
+                // Gửi email khi Admin duyệt yêu cầu chỉnh sửa (chuyển về DRAFT)
+                if (request.Status.Value == EnumStatusEvent.DRAFT)
+                {
+                    try
+                    {
+                        var user = await _userReposiotry.GetUserByid(events.UserID);
+                        if (user != null && !string.IsNullOrEmpty(user.Email))
+                        {
+                            var subject = $"Yêu cầu chỉnh sửa sự kiện \"{events.Title}\" đã được chấp nhận";
+                            var htmlBody = $@"
+                                <div style='font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;'>
+                                    <h2 style='color: #38a169;'>Yêu cầu chỉnh sửa đã được duyệt</h2>
+                                    <p>Xin chào <strong>{user.Username}</strong>,</p>
+                                    <p>Yêu cầu chỉnh sửa sự kiện <strong>\'{events.Title}\'</strong> của bạn đã được Admin chấp nhận.</p>
+                                    <p>Sự kiện đã được chuyển về trạng thái <strong>Bản nháp</strong>. Bạn có thể tiến hành chỉnh sửa và gửi lại để được duyệt.</p>
+                                    <p>Trân trọng,<br/>Hệ thống quản lý sự kiện</p>
+                                </div>";
+                            events.Isfalse =false;
+                           await _uow.SaveChangesAsync();
+                            await _emailService.SendEmailAsync(user.Email, subject, htmlBody);
+                        }
+                    }
+                    catch (Exception emailEx)
+                    {
+                        Console.WriteLine($"Lỗi gửi email thông báo: {emailEx.Message}");
+                    }
+                }
 
                 return ApiResponse<string>.SuccessResponse(
                     Entity.Enum.EnumStatusCode.SUCCESS,
@@ -892,6 +961,17 @@ namespace projectDemo.Service.EventService
                 query.PageSize = 10;
 
             return await _eventRepository.GetAllWithTicketTypesAsyncbyid(id, query);
+        }
+
+        public async Task<PageResponse<EventTypeTickResponses>> GetAdminPendingEvents(PageRequest query)
+        {
+            await SyncEndedEventsAsync();
+            if (query.PageIndex <= 0)
+                query.PageIndex = 1;
+            if (query.PageSize <= 0)
+                query.PageSize = 10;
+
+            return await _eventRepository.GetAdminPendingEventsAsync(query);
         }
     }
 }

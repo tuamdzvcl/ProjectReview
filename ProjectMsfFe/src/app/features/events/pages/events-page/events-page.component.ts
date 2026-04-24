@@ -13,9 +13,9 @@ import { UserDropdownComponent } from '../../../../shared/components/user-dropdo
   styleUrl: './events-page.component.scss'
 })
 export class EventsPageComponent {
-  selectedCategoryId: number | null = null;
+  selectedCategoryIds: string[] = [];
 
-  onCategoryChange(categoryId: number | null) {
-    this.selectedCategoryId = categoryId;
+  onCategoryChange(categoryIds: string[]) {
+    this.selectedCategoryIds = categoryIds;
   }
 }

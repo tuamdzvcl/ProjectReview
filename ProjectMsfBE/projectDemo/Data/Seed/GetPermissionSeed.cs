@@ -1,4 +1,4 @@
-﻿using EventTick.Model.Models;
+using EventTick.Model.Models;
 using projectDemo.Entity.Models;
 
 namespace projectDemo.Data.Seed
@@ -31,8 +31,8 @@ namespace projectDemo.Data.Seed
                 new Permissions
                 {
                     Id = 4,
-                    PermissonsName = "user_view".ToUpper(),
-                    PermissonsDescription = "xem user",
+                    PermissonsName = "user_view_all".ToUpper(),
+                    PermissonsDescription = "xem tất cả user sự dụng hệ thống",
                 },
                 //Role
                 new Permissions
@@ -81,51 +81,75 @@ namespace projectDemo.Data.Seed
                 new Permissions
                 {
                     Id = 12,
-                    PermissonsName = "event_view".ToUpper(),
-                    PermissonsDescription = " xem event",
+                    PermissonsName = "event_view_detial".ToUpper(),
+                    PermissonsDescription = " xem chi tiết thông tin event",
                 },
                 new Permissions
                 {
                     Id = 13,
-                    PermissonsName = "event_getTotalTickbyid".ToUpper(),
-                    PermissonsDescription = "xem tổng vé của event",
+                    PermissonsName = "View_Upgrade".ToUpper(),
+                    PermissonsDescription = "xem vé thành viên",
                 },
                 new Permissions
                 {
                     Id = 14,
-                    PermissonsName = "event_getTotalTickByUser".ToUpper(),
-                    PermissonsDescription = "xem tổng vé theo user",
+                    PermissonsName = "Create_Upgrade".ToUpper(),
+                    PermissonsDescription = "tạo vé thành viên",
                 },
-                //typeticket8
+                //Admin
                 new Permissions
                 {
                     Id = 15,
-                    PermissonsName = "TypeTicket_create".ToUpper(),
-                    PermissonsDescription = "tạo mới TypeTicket",
+                    PermissonsName = "Veiw_dashboard".ToUpper(),
+                    PermissonsDescription = "xem báo cáo doanh thu",
                 },
                 new Permissions
                 {
                     Id = 16,
-                    PermissonsName = "TypeTicket_update".ToUpper(),
-                    PermissonsDescription = "sửa  TypeTicket",
+                    PermissonsName = "View_dashboarhAll".ToUpper(),
+                    PermissonsDescription = "xem báo cáo doanh thu của hệ thống",
                 },
                 new Permissions
                 {
                     Id = 17,
-                    PermissonsName = "TypeTicket_delete".ToUpper(),
-                    PermissonsDescription = "xóa  TypeTicket",
+                    PermissonsName = "View_KM".ToUpper(),
+                    PermissonsDescription = "xem khuyễn mãi",
                 },
                 new Permissions
                 {
                     Id = 18,
-                    PermissonsName = "TypeTicket_view".ToUpper(),
-                    PermissonsDescription = " xem TypeTicket",
+                    PermissonsName = "View_Audilog".ToUpper(),
+                    PermissonsDescription = " xem log của hệ thống",
                 },
                 new Permissions
                 {
                     Id = 19,
-                    PermissonsName = "TypeTicket_getrolebyid".ToUpper(),
-                    PermissonsDescription = "xem tổng vé của TypeTicket",
+                    PermissonsName = "Upgrade_delete".ToUpper(),
+                    PermissonsDescription = "xóa vé thành viên",
+                },
+                new Permissions
+                {
+                    Id = 20,
+                    PermissonsName = "Event_browse".ToUpper(),
+                    PermissonsDescription = "Duyệt event",
+                },
+                new Permissions
+                {
+                    Id = 21,
+                    PermissonsName = "User_view_organisation".ToUpper(),
+                    PermissonsDescription = "Xem các user đã tham gia sự kiện",
+                },
+                new Permissions
+                {
+                    Id = 22,
+                    PermissonsName = "Edit_crad".ToUpper(),
+                    PermissonsDescription = "sửa thông tin thẻ",
+                },
+                new Permissions
+                {
+                    Id = 23,
+                    PermissonsName = "View_Payment".ToUpper(),
+                    PermissonsDescription = "xem danh sách thanh toán",
                 },
             };
         }

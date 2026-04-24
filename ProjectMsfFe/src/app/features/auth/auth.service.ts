@@ -5,11 +5,12 @@ import { BaseApiService } from '../../core/services/base-api.service';
 import { TokenService } from '../../core/services/token.service';
 import { AuthData } from '../../core/model/response/auth-data.model';
 import { jwtDecode } from 'jwt-decode';
+import { PermissionStoreService } from '../../core/services/permission-store.service';
 
 
 @Injectable({ providedIn: 'root' })
 export class AuthService extends BaseApiService {
-  constructor(http: HttpClient, private tokenService: TokenService) {
+  constructor(http: HttpClient, private tokenService: TokenService, private permissionStore: PermissionStoreService) {
     super(http);
   }
 
@@ -33,6 +34,7 @@ export class AuthService extends BaseApiService {
   }
   logout() {
     this.tokenService.clear();
+    this.permissionStore.clear();
   }
   getUser() {
     const user = localStorage.getItem('user');

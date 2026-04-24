@@ -192,6 +192,7 @@ namespace projectDemo.Data
                 );
 
             var permissions = GetPermissionSeed.GetPermission();
+
             var rolePermissions = permissions
                 .Select(
                     (p, index) =>
@@ -203,6 +204,34 @@ namespace projectDemo.Data
                         }
                 )
                 .ToList();
+
+            var organizerPermissionNames = new List<string>
+            {
+                "EVENT_CREATE",
+                "EVENT_UPDATE",
+                "EVENT_DELETE",
+                "EVENT_VIEW_DETIAL",
+                "VEIW_DASHBOARD",
+                "VIEW_KM",
+                "USER_VIEW_ORGANISATION",
+                "EDIT_CRAD",
+                "VIEW_PAYMENT",
+            };
+
+            var organizerPermissions = permissions
+                .Where(p => organizerPermissionNames.Contains(p.PermissonsName.ToUpper()))
+                .Select(
+                    (p, index) =>
+                        new RolePermissions
+                        {
+                            Id = rolePermissions.Count + index + 1, // Để ID tiếp tục tăng dần không bị trùng
+                            RoleId = 2,
+                            PermissionId = p.Id,
+                        }
+                )
+                .ToList();
+
+            rolePermissions.AddRange(organizerPermissions);
 
             modelBuilder.Entity<RolePermissions>().HasData(rolePermissions);
 

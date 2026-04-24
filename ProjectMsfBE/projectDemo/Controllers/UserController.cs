@@ -73,11 +73,19 @@ namespace projectDemo.Controllers
             return Ok(result);
         }
 
-        [HttpGet("participants")]
-        public async Task<IActionResult> GetParticipantsByOrganizer([FromQuery] projectDemo.Common.PageRequest.PageRequest request)
+        [HttpGet("participants/summary")]
+        public async Task<IActionResult> GetParticipantsSummaryByOrganizer([FromQuery] projectDemo.Common.PageRequest.PageRequest request)
         {
-            var userId = Guid.Parse(User.FindFirstValue("id")??"Null");
-            var result = await _userService.GetParticipantsByOrganizer(userId, request);
+            var userId = Guid.Parse(User.FindFirstValue("id") ?? "Null");
+            var result = await _userService.GetParticipantsSummaryByOrganizer(userId, request);
+            return Ok(result);
+        }
+
+        [HttpGet("participants/{userId}/detail")]
+        public async Task<IActionResult> GetParticipantDetail(Guid userId)
+        {
+            var organizerId = Guid.Parse(User.FindFirstValue("id") ?? "Null");
+            var result = await _userService.GetParticipantDetail(organizerId, userId);
             return Ok(result);
         }
 

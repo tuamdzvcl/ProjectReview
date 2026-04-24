@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -35,6 +35,8 @@ namespace EventTick.Model.Models
 
         public DateTime? SaleEndDate { get; set; }
 
+        public bool? Isfalse { get; set; }
+
         [Required]
         public string PosterUrl { get; set; }
 
@@ -52,5 +54,7 @@ namespace EventTick.Model.Models
         public virtual Catetory Catetory { get; set; }
 
         public virtual ICollection<TicketType> TicketTypes { get; set; }
+
+        public string? Reason { get; set; }
     }
 }

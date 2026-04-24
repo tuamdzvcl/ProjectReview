@@ -1,4 +1,4 @@
-﻿namespace projectDemo.Common.PageRequest
+namespace projectDemo.Common.PageRequest
 {
     public class PageRequest
     {
@@ -6,5 +6,6 @@
         public int PageIndex { get; set; } = 1;
         public string? key { get; set; } = null;
         public Guid categoryId { get; set; }
+        public List<Guid>? CategoryIds { get; set; }
     }
 }

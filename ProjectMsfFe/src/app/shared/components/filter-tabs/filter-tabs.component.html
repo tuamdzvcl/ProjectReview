@@ -1,13 +1,9 @@
 <div class="filter-tabs">
-  <button 
-    [class.active]="selectedCategoryId === null" 
-    (click)="selectCategory(null)">
+  <button [class.active]="selectedCategoryIds.length === 0" (click)="selectCategory(null)">
     Tất cả
   </button>
-  
-  <button 
-    *ngFor="let cat of categories" 
-    [class.active]="selectedCategoryId === cat.CatetoryId" 
+
+  <button *ngFor="let cat of categories" [class.active]="selectedCategoryIds.includes(cat.CatetoryId)"
     (click)="selectCategory(cat.CatetoryId)">
     {{ cat.Name }}
   </button>

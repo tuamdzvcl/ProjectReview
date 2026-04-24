@@ -3,11 +3,12 @@ import { CommonModule } from '@angular/common';
 import { TableModule } from 'primeng/table';
 import { TooltipModule } from 'primeng/tooltip';
 import { RoleItem } from '../../../../models/role.model';
+import { RolePipe } from '../../../../../../shared/pipes/role.pipe';
 
 @Component({
   selector: 'app-role-table',
   standalone: true,
-  imports: [CommonModule, TableModule, TooltipModule],
+  imports: [CommonModule, TableModule, TooltipModule, RolePipe],
   templateUrl: './role-table.component.html',
   styleUrl: './role-table.component.scss'
 })

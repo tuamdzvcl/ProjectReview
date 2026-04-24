@@ -12,7 +12,7 @@ import { EventCardComponent } from '../event-card/event-card.component';
   styleUrl: './events-grid.component.scss',
 })
 export class EventsGridComponent implements OnInit, OnChanges {
-  @Input() categoryId: number | null = null;
+  @Input() categoryIds: string[] = [];
 
   events: EventModel[] = [];
   pageIndex: number = 1;
@@ -28,7 +28,7 @@ export class EventsGridComponent implements OnInit, OnChanges {
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    if (changes['categoryId'] && !changes['categoryId'].firstChange) {
+    if (changes['categoryIds'] && !changes['categoryIds'].firstChange) {
       this.resetAndLoad();
     }
   }
@@ -45,7 +45,7 @@ export class EventsGridComponent implements OnInit, OnChanges {
     this.isLoading = true;
 
     this.eventService
-      .GetEventswithTypeticket(this.pageIndex, this.pageSize, this.key, this.categoryId)
+      .GetEventswithTypeticket(this.pageIndex, this.pageSize, this.key, this.categoryIds)
       .subscribe({
         next: (res) => {
 

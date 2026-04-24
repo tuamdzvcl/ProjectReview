@@ -123,5 +123,12 @@ namespace projectDemo.Controllers
             var result = await _eventService.GetPageWithTicketTypesbyId(userId, query);
             return Ok(result);
         }
+
+        [HttpGet("admin-pending-events")]
+        public async Task<IActionResult> GetAdminPendingEvents([FromQuery] PageRequest query)
+        {
+            var result = await _eventService.GetAdminPendingEvents(query);
+            return Ok(result);
+        }
     }
 }

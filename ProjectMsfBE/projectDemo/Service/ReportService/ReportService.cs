@@ -227,6 +227,32 @@ namespace projectDemo.Service.ReportService
                     current = current.AddMonths(1);
                 }
             }
+            else if (groupBy == "event")
+            {
+                var grouped = rows.GroupBy(x => string.IsNullOrEmpty(x.EventTitle) ? "Sự kiện/Dịch vụ khác" : x.EventTitle)
+                    .ToDictionary(
+                        g => g.Key,
+                        g => new
+                        {
+                            Revenue = g.Sum(x => x.Revenue),
+                            Tickets = g.Sum(x => x.TicketQuantity),
+                        }
+                    );
+
+                foreach (var kvp in grouped)
+                {
+                    result.Add(
+                        new RevenueChartDto
+                        {
+                            Time = from,
+                            Label = kvp.Key,
+                            Revenue = kvp.Value.Revenue,
+                            Tickets = kvp.Value.Tickets,
+                        }
+                    );
+                }
+            }
+
             else
             {
                 var grouped = rows.GroupBy(x => x.PaidDate.Date)

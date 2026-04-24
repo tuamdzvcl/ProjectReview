@@ -7,10 +7,11 @@
     <div class="brand__name">Barren</div>
   </div>
   <div class="topbar__right">
-    <button class="btn btn--ghost" type="button" routerLink="/">My Home</button>
-    <button class="btn btn--ghost" type="button">Explore Events</button>
-    <button class="btn btn--primary" type="button" routerLink="/event-create-page">
-      Create Event
+    <button class="btn btn--ghost" type="button" routerLink="/">Trang chủ</button>
+    <button class="btn btn--ghost" type="button">Khám phá sự kiện</button>
+    <button class="btn btn--primary" type="button" routerLink="/event-create-page"
+      *ngIf="hasPermission('EVENT_CREATE')">
+      Tạo sự kiện
     </button>
     <app-user-dropdown></app-user-dropdown>
   </div>
@@ -19,57 +20,71 @@
 <div class="shell" [class.shell--collapsed]="!sidebarOpen()">
   <aside class="sidebar">
     <nav class="sidebar__nav">
-      <ng-container *ngIf="userRole() === 'ADMIN' || userRole() === 'ORGANIZER'">
-        <button class="nav-item" type="button" routerLink="/admin/dashboard" routerLinkActive="nav-item--active"
-          [routerLinkActiveOptions]="{ exact: true }">
-          <span class="nav-item__icon"><i class="fa-solid fa-gauge"></i></span>
-          <span class="nav-item__label">Tổng quan</span>
-        </button>
-        <button class="nav-item" type="button" routerLink="/admin/events" routerLinkActive="nav-item--active">
-          <span class="nav-item__icon"><i class="fa-regular fa-calendar"></i></span>
-          <span class="nav-item__label">Sự kiện Của tôi</span>
-        </button>
-        <button *ngIf="userRole() === 'ADMIN'" class="nav-item" type="button" routerLink="/admin/approve-events"
-          routerLinkActive="nav-item--active">
-          <span class="nav-item__icon"><i class="fa-solid fa-check-to-slot"></i></span>
-          <span class="nav-item__label">Duyệt sự kiện</span>
-        </button>
-      </ng-container>
+      <!-- Dashboard -->
+      <button *ngIf="hasPermission('VEIW_DASHBOARD')" class="nav-item" type="button" routerLink="/admin/dashboard"
+        routerLinkActive="nav-item--active" [routerLinkActiveOptions]="{ exact: true }">
+        <span class="nav-item__icon"><i class="fa-solid fa-gauge"></i></span>
+        <span class="nav-item__label">Tổng quan</span>
+      </button>
 
-      <button *ngIf="userRole() === 'ADMIN'" class="nav-item" type="button"
-        routerLink="/admin/user" routerLinkActive="nav-item--active">
+      <!-- My Events -->
+      <button *ngIf="hasPermission('EVENT_VIEW_DETIAL')" class="nav-item" type="button" routerLink="/admin/events"
+        routerLinkActive="nav-item--active">
+        <span class="nav-item__icon"><i class="fa-regular fa-calendar"></i></span>
+        <span class="nav-item__label">Sự kiện Của tôi</span>
+      </button>
+
+      <!-- Approve Events -->
+      <button *ngIf="hasPermission('EVENT_BROWSE')" class="nav-item" type="button" routerLink="/admin/approve-events"
+        routerLinkActive="nav-item--active">
+        <span class="nav-item__icon"><i class="fa-solid fa-check-to-slot"></i></span>
+        <span class="nav-item__label">Duyệt sự kiện</span>
+      </button>
+
+      <!-- User List -->
+      <button *ngIf="hasPermission('USER_VIEW_ALL')" class="nav-item" type="button" routerLink="/admin/user"
+        routerLinkActive="nav-item--active">
         <span class="nav-item__icon"><i class="fa-solid fa-address-book"></i></span>
         <span class="nav-item__label">Danh sách User</span>
       </button>
 
-      <button *ngIf="userRole() === 'ADMIN' || userRole() === 'ORGANIZER'" class="nav-item" type="button"
+      <!-- Participants -->
+      <button *ngIf="hasPermission('USER_VIEW_ORGANISATION')" class="nav-item" type="button"
         routerLink="/admin/participants" routerLinkActive="nav-item--active">
         <span class="nav-item__icon"><i class="fa-solid fa-users-viewfinder"></i></span>
         <span class="nav-item__label">Người tham gia</span>
       </button>
 
-      <ng-container *ngIf="userRole() === 'ADMIN' || userRole() === 'ORGANIZER'">
-        <button class="nav-item" type="button" routerLink="/admin/promotions" routerLinkActive="nav-item--active">
-          <span class="nav-item__icon"><i class="fa-solid fa-tag"></i></span>
-          <span class="nav-item__label">Khuyễn mãi</span>
-        </button>
+      <!-- Promotions -->
+      <button *ngIf="hasPermission('VIEW_KM')" class="nav-item" type="button" routerLink="/admin/promotions"
+        routerLinkActive="nav-item--active">
+        <span class="nav-item__icon"><i class="fa-solid fa-tag"></i></span>
+        <span class="nav-item__label">Khuyến mãi</span>
+      </button>
 
-        <button class="nav-item" type="button" routerLink="/admin/payments" routerLinkActive="nav-item--active">
-          <span class="nav-item__icon"><i class="fa-regular fa-credit-card"></i></span>
-          <span class="nav-item__label">Thanh toán</span>
-        </button>
-        <button *ngIf="userRole() === 'ADMIN'" class="nav-item" type="button" routerLink="/admin/audit-log"
-          routerLinkActive="nav-item--active">
-          <span class="nav-item__icon"><i class="fa-solid fa-chart-pie"></i></span>
-          <span class="nav-item__label">AudiLog</span>
-        </button>
-      </ng-container>
-      <button *ngIf="userRole() === 'ADMIN'" class="nav-item" type="button" routerLink="/admin/membership"
+      <!-- Payments -->
+      <button *ngIf="hasPermission('VIEW_PAYMENT')" class="nav-item" type="button" routerLink="/admin/payments"
+        routerLinkActive="nav-item--active">
+        <span class="nav-item__icon"><i class="fa-regular fa-credit-card"></i></span>
+        <span class="nav-item__label">Thanh toán</span>
+      </button>
+
+      <!-- Audit Log -->
+      <button *ngIf="hasPermission('VIEW_AUDILOG')" class="nav-item" type="button" routerLink="/admin/audit-log"
+        routerLinkActive="nav-item--active">
+        <span class="nav-item__icon"><i class="fa-solid fa-chart-pie"></i></span>
+        <span class="nav-item__label">AuditLog</span>
+      </button>
+
+      <!-- Membership -->
+      <button *ngIf="hasPermission('VIEW_UPGRADE')" class="nav-item" type="button" routerLink="/admin/membership"
         routerLinkActive="nav-item--active">
         <span class="nav-item__icon"><i class="fa-solid fa-user-group"></i></span>
         <span class="nav-item__label">Quản lý gói thành viên</span>
       </button>
-      <button *ngIf="userRole() === 'ADMIN'" class="nav-item" type="button" routerLink="/admin/roles"
+
+      <!-- Roles -->
+      <button *ngIf="hasPermission('ROLE_VIEW')" class="nav-item" type="button" routerLink="/admin/roles"
         routerLinkActive="nav-item--active">
         <span class="nav-item__icon"><i class="fa-solid fa-shield-halved"></i></span>
         <span class="nav-item__label">Phân quyền</span>

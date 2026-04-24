@@ -1,53 +1,168 @@
-<p-dialog [(visible)]="visible" (onHide)="close()" [modal]="true" [style]="{ width: '450px', height: '40vh' }"
-  [header]="data ? 'Update User' : 'Add User'">
+<p-dialog
+  [(visible)]="visible"
+  (onHide)="close()"
+  [modal]="true"
+  [style]="{ width: '700px' }"
+  [header]="data ? 'Update User' : 'Add User'"
+>
   <form [formGroup]="form" (ngSubmit)="onSubmit()" class="p-fluid">
-    
     <div class="grid">
       <div class="col-6 field">
-        <label>First Name</label>
+        <label class="font-semibold"
+          >Họ <span style="color: red">(*)</span>
+        </label>
         <input pInputText formControlName="firstName" />
-        <small *ngIf="form.get('firstName')?.hasError('required') && form.get('firstName')?.touched" class="p-error">
-          Required
+        <small
+          *ngIf="
+            form.get('firstName')?.hasError('required') &&
+            form.get('firstName')?.touched
+          "
+          class="p-error"
+        >
+          <span style="color: red">Không được để trống</span>
         </small>
-        <small *ngIf="form.get('firstName')?.hasError('pattern') && form.get('firstName')?.touched" class="p-error">
-          Tên không hợp lệ
+        <small
+          *ngIf="
+            form.get('firstName')?.hasError('pattern') &&
+            form.get('firstName')?.touched
+          "
+          class="p-error"
+        >
+          <span style="color: red">Họ không hợp lệ</span>
         </small>
       </div>
 
       <div class="col-6 field">
-        <label>Last Name</label>
+        <label class="font-semibold"
+          >Tên <span style="color: red">(*)</span></label
+        >
         <input pInputText formControlName="lastName" />
-        <small *ngIf="form.get('lastName')?.hasError('required') && form.get('lastName')?.touched" class="p-error">
-          Required
+        <small
+          *ngIf="
+            form.get('lastName')?.hasError('required') &&
+            form.get('lastName')?.touched
+          "
+          class="p-error"
+        >
+          <span style="color: red">Không được để trống</span>
         </small>
-        <small *ngIf="form.get('lastName')?.hasError('pattern') && form.get('lastName')?.touched" class="p-error">
-          Tên không hợp lệ
+        <small
+          *ngIf="
+            form.get('lastName')?.hasError('pattern') &&
+            form.get('lastName')?.touched
+          "
+          class="p-error"
+        >
+          <span style="color: red">Tên không hợp lệ</span>
         </small>
       </div>
     </div>
 
-    
     <div class="field">
-      <label>Email</label>
+      <label class="font-semibold"
+        >Email<span style="color: red">(*)</span></label
+      >
       <input pInputText formControlName="email" />
-      <small *ngIf="form.get('email')?.invalid && form.get('email')?.touched" class="p-error">
-        Email không hợp lệ
+      <small
+        *ngIf="form.get('email')?.invalid && form.get('email')?.touched"
+        class="p-error"
+      >
+        <span style="color: red">Email không hợp lệ</span>
       </small>
     </div>
 
-    
-    <div class="field">
-      <label>Role</label>
-      <p-dropdown [options]="roles" formControlName="role" placeholder="Chọn role" optionLabel="label"
-        optionValue="value">
-      </p-dropdown>
+    <div class="col-12 mt-4 field px-0">
+      <div class="flex justify-content-between align-items-center mb-3">
+        <h4 class="m-0 font-semibold">
+          <i class="pi pi-key mr-2"></i> Gán vai trò cho User
+          <span style="color: red">(*)</span>
+        </h4>
+      </div>
+      <div
+        class="flex justify-content-between align-items-center mb-3"
+        style="font-size: 0.9rem"
+      >
+        <div>
+          <span
+            class="cursor-pointer text-green-500 font-medium hover:text-green-600 transition-colors"
+            (click)="selectAll()"
+            >Chọn tất cả</span
+          >
+          |
+          <span
+            class="cursor-pointer text-green-500 font-medium hover:text-green-600 transition-colors"
+            (click)="unselectAll()"
+            >Bỏ chọn tất cả</span
+          >
+        </div>
+        <div class="text-500">
+          Đã chọn: <b class="text-green-600">{{ selectedRoles.length }}</b> /
+          {{ roles.length }}
+        </div>
+      </div>
+
+      <div
+        class="grid"
+        style="
+          border-top: 1px solid #eee;
+          padding-top: 1rem;
+          max-height: 250px;
+          overflow-y: auto;
+        "
+      >
+        <div class="col-12 md:col-6" *ngFor="let role of roles">
+          <div
+            class="border-round p-3 cursor-pointer transition-colors transition-duration-200"
+            [style.borderColor]="
+              selectedRoles.includes(role.value) ? '#4caf50' : '#e0e0e0'
+            "
+            [style.backgroundColor]="
+              selectedRoles.includes(role.value) ? '#f8fff8' : '#ffffff'
+            "
+            style="
+              border: 1px solid;
+              border-radius: 8px;
+              display: flex;
+              align-items: center;
+              gap: 1rem;
+            "
+            (click)="toggleRole(role.value)"
+          >
+            <div style="pointer-events: none">
+              <p-checkbox
+                [binary]="true"
+                [ngModel]="selectedRoles.includes(role.value)"
+                [ngModelOptions]="{ standalone: true }"
+              ></p-checkbox>
+            </div>
+            <div class="flex flex-column mt-1">
+              <span
+                class="font-bold text-900 mb-1"
+                style="font-size: 0.95rem"
+                >{{ role.label | uppercase }}</span
+              >
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
 
-    
-    <div class="form-footer">
-      <button pButton type="button" label="Cancel" severity="secondary" (click)="close()"></button>
-
-      <button pButton type="submit" label="Save" icon="pi pi-check" [disabled]="form.invalid"></button>
+    <div class="form-footer flex justify-content-end gap-2 mt-4">
+      <button
+        pButton
+        type="button"
+        label="Hủy"
+        severity="secondary"
+        icon="pi pi-times"
+        (click)="close()"
+      ></button>
+      <button
+        pButton
+        type="submit"
+        label="Lưu thông tin"
+        icon="pi pi-check"
+        [disabled]="form.invalid"
+      ></button>
     </div>
   </form>
 </p-dialog>

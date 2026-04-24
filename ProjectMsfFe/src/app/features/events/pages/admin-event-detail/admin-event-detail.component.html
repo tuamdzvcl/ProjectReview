@@ -11,7 +11,7 @@
       </div>
       <div class="detail-header__info">
         <span class="status-badge" [ngClass]="event.Status === 'draft' ? 'draft' : 'online'">
-          {{ event.Status || "Draft" | uppercase }}
+          {{ event.Status || "Draft" | eventStatus }}
         </span>
         <h2 class="event-title">
           {{ event.Title || "Sự kiện chưa có tên" }}
@@ -98,10 +98,10 @@
         (click)="backToEventList()">
         <i class="fa-solid fa-arrow-left"></i> Quay lại
       </button>
-      <button class="btn btn-primary" (click)="editEvent()" *ngIf="event.Status !== 'PUBLISHED' && event.Status !== 'online'">
+      <button class="btn btn-primary" (click)="editEvent()" *ngIf="event.Status === 'DRAFT'">
         <i class="fa-solid fa-pen"></i> Sửa sự kiện
       </button>
-      <button class="btn btn-success" (click)="publishEvent()" *ngIf="event.Status !== 'online' && event.Status !== 'PUBLISHED'">
+      <button class="btn btn-success" (click)="publishEvent()" *ngIf="event.Status === 'DRAFT'">
         <i class="fa-solid fa-globe"></i> Công khai
       </button>
     </div>

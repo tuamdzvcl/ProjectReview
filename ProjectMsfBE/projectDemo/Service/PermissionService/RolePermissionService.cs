@@ -40,7 +40,6 @@ namespace projectDemo.Service.PermissionService
         {
             try
             {
-                // 1. Chuẩn hóa và kiểm tra tên Role
                 var roleName = resquest.RoleName?.Trim().ToUpper();
                 if (string.IsNullOrEmpty(roleName))
                     return ApiResponse<string>.FailResponse(
@@ -57,7 +56,6 @@ namespace projectDemo.Service.PermissionService
                     );
                 }
 
-                // 2. Kiểm tra danh sách quyền từ request
                 if (resquest.permissionResquests == null || !resquest.permissionResquests.Any())
                     return ApiResponse<string>.FailResponse(
                         Entity.Enum.EnumStatusCode.BAD_REQUEST,
@@ -69,7 +67,6 @@ namespace projectDemo.Service.PermissionService
                     .Distinct()
                     .ToList();
 
-                // 3. Batch Check: Tối ưu hóa bằng cách lấy tất cả quyền và kiểm tra trong bộ nhớ (tránh loop query)
                 var allPermissions = await _permissionRepository.GetAllAsync();
                 var existingPermissionIds = allPermissions
                     .Where(p => requestedIds.Contains(p.Id))
@@ -85,7 +82,6 @@ namespace projectDemo.Service.PermissionService
                     );
                 }
 
-                // 4. Bắt đầu giao dịch (Transaction)
                 await _uow.BeginTransactionAsync();
 
                 var newRole = new Role { RoleName = roleName,
@@ -129,7 +125,7 @@ namespace projectDemo.Service.PermissionService
         {
             try
             {
-                var result = await _rolePermissionRepository.GetListPermissionRole();
+                var result = await _roleRepository.GetRoleListPermisson();
                 return ApiResponse<List<PermisstionRoleResponse>>.SuccessResponse(
                     Entity.Enum.EnumStatusCode.SUCCESS,
                     result
@@ -228,6 +224,7 @@ namespace projectDemo.Service.PermissionService
                 var toRemove = currentEntries
                     .Where(ce => !requestedIds.Contains(ce.PermissionId))
                     .ToList();
+                
                 var toAddIds = requestedIds.Except(currentPermissionIds).ToList();
 
                 await _uow.BeginTransactionAsync();

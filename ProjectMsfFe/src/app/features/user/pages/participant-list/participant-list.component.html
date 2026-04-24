@@ -5,7 +5,9 @@
 <section class="participants-header card">
   <div class="header-content">
     <h2 class="header-title">Người tham gia ({{ totalRecords }})</h2>
-    <p class="header-subtitle">Danh sách người dùng đã đăng ký tham gia các sự kiện của bạn</p>
+    <p class="header-subtitle">
+      Danh sách người dùng đã đăng ký tham gia các sự kiện của bạn
+    </p>
   </div>
 </section>
 
@@ -17,11 +19,9 @@
       <ng-template pTemplate="header">
         <tr>
           <th style="width: 5%">STT</th>
-          <th style="width: 25%">Người tham gia</th>
-          <th style="width: 30%">Sự kiện</th>
-          <th style="width: 15%">Loại vé</th>
-          <th style="width: 10%">Số lượng</th>
-          <th style="width: 15%">Tổng tiền</th>
+          <th style="width: 35%">Người tham gia</th>
+          <th style="width: 30%">Số lượng sự kiện</th>
+          <th style="width: 15%" class="text-center">Thao tác</th>
         </tr>
       </ng-template>
       <ng-template pTemplate="body" let-participant let-rowIndex="rowIndex">
@@ -36,16 +36,22 @@
             </div>
           </td>
           <td>
-            <span class="event-title">{{ participant.Events.EventTitle}}</span>
-          </td>
-          <td>
-            <span class="ticket-badge">{{ participant.TicketName }}</span>
+            <p-tag 
+              [value]="participant.EventCount + ' sự kiện'" 
+              severity="success" 
+              [rounded]="true"
+              icon="pi pi-calendar"
+            ></p-tag>
           </td>
           <td class="text-center">
-            {{ participant.TicketQuantity }}
-          </td>
-          <td>
-            <span class="amount">{{ participant.TotalAmount | currency:'VND':'symbol':'1.0-0' }}</span>
+            <button 
+              pButton 
+              pRipple 
+              icon="pi pi-eye" 
+              class="p-button-rounded p-button-text p-button-info" 
+              (click)="viewDetail(participant.Id)"
+              pTooltip="Xem chi tiết"
+            ></button>
           </td>
         </tr>
       </ng-template>

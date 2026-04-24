@@ -9,7 +9,7 @@ namespace projectDemo.DTO.UpdateRequest
 
         public string AvataUrl { get; set; }
 
-        public string RoleName { get; set; }
+        public List<int> RoleName { get; set; }
 
         public DateTime UpdateAt { get; set; }
 

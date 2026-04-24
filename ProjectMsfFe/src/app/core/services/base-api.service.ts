@@ -1,6 +1,6 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { map, Observable } from 'rxjs';
+import { map, catchError, throwError, Observable } from 'rxjs';
 import { ApiResponse } from '../model/base/api-response.model';
 import { ApiError } from '../model/base/ApiError.model';
 import { PageResult } from '../model/base/api-page-response.model';
@@ -12,14 +12,22 @@ export class BaseApiService {
 
   constructor(protected http: HttpClient) { }
 
+  private handleError(error: HttpErrorResponse) {
+    if (error.error && error.error.StatusCode) {
+      return throwError(() => new ApiError(error.error.StatusCode, error.error.Message || 'Có lỗi xảy ra', error.error.Errors));
+    }
+    return throwError(() => error);
+  }
+
   get<T>(url: string): Observable<T> {
     return this.http.get<ApiResponse<T>>(`${this.baseUrl}/${url}`).pipe(
       map((res) => {
         if (!res.Success) {
-          throw new ApiError(res.StatusCode, res.Message);
+          throw new ApiError(res.StatusCode, res.Message, res.Errors);
         }
         return res.Data;
-      })
+      }),
+      catchError((err) => this.handleError(err))
     );
   }
 
@@ -27,10 +35,11 @@ export class BaseApiService {
     return this.http.post<ApiResponse<T>>(`${this.baseUrl}/${url}`, body).pipe(
       map((res) => {
         if (!res.Success) {
-          throw new ApiError(res.StatusCode, res.Message);
+          throw new ApiError(res.StatusCode, res.Message, res.Errors);
         }
         return res.Data;
-      })
+      }),
+      catchError((err) => this.handleError(err))
     );
   }
 
@@ -45,7 +54,8 @@ export class BaseApiService {
             throw new ApiError(res.StatusCode, res.Message);
           }
           return res;
-        })
+        }),
+        catchError((err) => this.handleError(err))
       );
   }
 
@@ -57,10 +67,11 @@ export class BaseApiService {
     return this.http.put<ApiResponse<T>>(`${this.baseUrl}/${url}`, body).pipe(
       map((res) => {
         if (!res.Success) {
-          throw new ApiError(res.StatusCode, res.Message);
+          throw new ApiError(res.StatusCode, res.Message, res.Errors);
         }
         return res.Data;
-      })
+      }),
+      catchError((err) => this.handleError(err))
     );
   }
 
@@ -72,10 +83,11 @@ export class BaseApiService {
     return this.http.patch<ApiResponse<T>>(`${this.baseUrl}/${url}`, body).pipe(
       map((res) => {
         if (!res.Success) {
-          throw new ApiError(res.StatusCode, res.Message);
+          throw new ApiError(res.StatusCode, res.Message, res.Errors);
         }
         return res.Data;
-      })
+      }),
+      catchError((err) => this.handleError(err))
     );
   }
 
@@ -85,10 +97,11 @@ export class BaseApiService {
       .pipe(
         map((res) => {
           if (!res.Success) {
-            throw new ApiError(res.StatusCode, res.Message);
+            throw new ApiError(res.StatusCode, res.Message, res.Errors);
           }
           return res.Data;
-        })
+        }),
+        catchError((err) => this.handleError(err))
       );
   }
 

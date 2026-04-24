@@ -10,20 +10,21 @@
     <a routerLink="/pricing" (click)="closeMenu()">Bảng giá</a>
     <a routerLink="/blog" (click)="closeMenu()">Bài viết</a>
     <a routerLink="/support" (click)="closeMenu()">Hỗ trợ</a>
-    
+
     <!-- Move create button here for mobile, display controlled by SCSS -->
-    <button *ngIf="canCreateEvent()" class="create-btn create-btn-mobile" routerLink="/event-create-page" (click)="closeMenu()">
-      Create Event
+    <button *ngIf="hasPermission('EVENT_CREATE')" class="create-btn create-btn-mobile" routerLink="/event-create-page"
+      (click)="closeMenu()">
+      Tạo sự kiện
     </button>
   </nav>
 
   <div class="actions">
-    <button *ngIf="canCreateEvent()" class="create-btn create-btn-desktop" routerLink="/event-create-page">
-      Create Event
+    <button *ngIf="hasPermission('EVENT_CREATE')" class="create-btn create-btn-desktop" routerLink="/event-create-page">
+      Tạo sự kiện
     </button>
 
     <app-user-dropdown></app-user-dropdown>
-    
+
     <button class="mobile-menu-btn" (click)="toggleMenu()">
       <i class="fa-solid" [ngClass]="isMenuOpen ? 'fa-xmark' : 'fa-bars'"></i>
     </button>

@@ -4,4 +4,5 @@ export interface ApiResponse<T> {
   Message: string;
   Data: T;
   Timestamp: string;
+  Errors?: { [key: string]: string[] } | null;
 }

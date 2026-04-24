@@ -3,15 +3,18 @@ import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit, inject }
 import { FormsModule } from '@angular/forms';
 import { ChartModule } from 'primeng/chart';
 import { DatePicker } from 'primeng/datepicker';
+import { TableModule } from 'primeng/table';
 import { ReportService } from '../../../../core/services/report.service';
 import { ReportResponse } from '../../../../core/model/response/report.model';
 import { VndCurrencyPipe } from '../../../../shared/pipes/vnd-currency.pipe';
 import { TokenService } from '../../../../core/services/token.service';
+import { PermissionService } from '../../../../core/services/permission.service';
+import { PermissionStoreService } from '../../../../core/services/permission-store.service';
 
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [CommonModule, ChartModule, DatePicker, FormsModule, VndCurrencyPipe],
+  imports: [CommonModule, ChartModule, DatePicker, FormsModule, VndCurrencyPipe, TableModule],
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush
@@ -20,13 +23,15 @@ export class DashboardComponent implements OnInit {
   private reportService = inject(ReportService);
   private tokenService = inject(TokenService);
   private cdr = inject(ChangeDetectorRef);
+  private permissionStore = inject(PermissionStoreService);
 
   chartData: any;
   chartOptions: any;
   selectedTab: string = 'Monthly';
-  selectedDataType: string = 'Revenue'; // 'Revenue', 'Tickets', 'PlatformRevenue', 'Packages'
+  dashboardMode: 'PERSONAL' | 'SYSTEM' = 'PERSONAL';
+  selectedDataType: string = 'Revenue'; // 'Revenue', 'Tickets', 'Events', 'SystemRevenue', 'SystemEvents', 'Packages'
   isAdmin: boolean = false;
-  private cachedChartList: any[] = [];
+  cachedChartList: any[] = [];
 
   // Summary data from API (Defaults to 0 to prevent "NaN" or layout break)
   totalRevenue: number = 0;
@@ -41,11 +46,14 @@ export class DashboardComponent implements OnInit {
   // Date range for picker
   rangeDates: Date[] | undefined;
 
+  hasPermission(permission: string): boolean {
+    return this.permissionStore.hasPermission(permission);
+  }
   ngOnInit() {
-    this.isAdmin = this.tokenService.getRole()?.toUpperCase() === 'ADMIN';
-    if (this.isAdmin) {
-      this.selectedDataType = 'PlatformRevenue';
-    }
+    this.isAdmin = this.hasPermission("VIEW_DASHBOARHALL");
+    this.dashboardMode = 'PERSONAL';
+    this.selectedDataType = 'Revenue';
+
     this.initChartOptions();
 
     // Mặc định chọn tháng hiện tại
@@ -57,8 +65,14 @@ export class DashboardComponent implements OnInit {
     this.fetchRevenueStats('Monthly');
   }
 
+  setDashboardMode(mode: 'PERSONAL' | 'SYSTEM') {
+    if (mode === 'SYSTEM' && !this.isAdmin) return;
+    this.dashboardMode = mode;
+    this.selectedDataType = mode === 'SYSTEM' ? 'SystemRevenue' : 'Revenue';
+    this.fetchRevenueStats(this.selectedTab);
+  }
+
   onDateChange() {
-    // Tự động tải lại dữ liệu khi chọn khoảng ngày mới
     if (this.rangeDates && this.rangeDates[0] && this.rangeDates[1]) {
       this.fetchRevenueStats(this.selectedTab);
     }
@@ -70,7 +84,8 @@ export class DashboardComponent implements OnInit {
 
   fetchRevenueStats(type: string) {
     this.selectedTab = type;
-    const groupBy = type.toLowerCase();
+    const isEventGroup = this.selectedDataType === 'Events' || this.selectedDataType === 'SystemEvents';
+    const groupBy = isEventGroup ? 'event' : type.toLowerCase();
 
     let fromDate: string | undefined;
     let toDate: string | undefined;
@@ -81,10 +96,10 @@ export class DashboardComponent implements OnInit {
     }
 
     let request$;
-    if (this.selectedDataType === 'PlatformRevenue') {
-      request$ = this.reportService.GetPlatformRevenueReport(fromDate, toDate, groupBy);
-    } else if (this.selectedDataType === 'Packages') {
+    if (this.selectedDataType === 'Packages') {
       request$ = this.reportService.GetUpgradesReport(fromDate, toDate, groupBy);
+    } else if (this.dashboardMode === 'SYSTEM') {
+      request$ = this.reportService.GetPlatformRevenueReport(fromDate, toDate, groupBy);
     } else {
       request$ = this.reportService.GetRevenueReport(fromDate, toDate, groupBy);
     }
@@ -119,34 +134,66 @@ export class DashboardComponent implements OnInit {
   }
 
   updateChartData() {
-    const isRevenue = this.selectedDataType === 'Revenue' || this.selectedDataType === 'PlatformRevenue' || this.selectedDataType === 'Packages';
+    const isDualAxis = this.selectedDataType === 'Events' || this.selectedDataType === 'SystemEvents' || this.selectedDataType === 'SystemRevenue';
 
-    let label = 'Doanh thu';
-    if (this.selectedDataType === 'Tickets') label = 'Vé đã bán';
-    if (this.selectedDataType === 'Packages') label = 'Doanh thu gói';
+    if (isDualAxis) {
+      this.initChartOptions(true);
+      this.chartData = {
+        labels: this.cachedChartList.map((c) => c.Label || ''),
+        datasets: [
+          {
+            label: 'Tổng doanh thu',
+            data: this.cachedChartList.map((c) => c.Revenue ?? 0),
+            backgroundColor: '#81E979',
+            borderColor: '#6cc04a',
+            borderWidth: 1,
+            borderRadius: 6,
+            barThickness: 16,
+            yAxisID: 'y'
+          },
+          {
+            label: 'Tổng số vé',
+            data: this.cachedChartList.map((c) => c.Tickets ?? 0),
+            backgroundColor: '#3B82F6',
+            borderColor: '#2563EB',
+            borderWidth: 1,
+            borderRadius: 6,
+            barThickness: 16,
+            yAxisID: 'y1'
+          }
+        ]
+      };
+    } else {
+      this.initChartOptions(false);
+      let label = 'Tổng doanh thu';
+      if (this.selectedDataType === 'Tickets') label = 'Tổng vé';
+      if (this.selectedDataType === 'Packages') label = 'Doanh thu gói';
 
-    let color = '#81E979';
-    if (this.selectedDataType === 'Tickets') color = '#3B82F6';
-    if (this.selectedDataType === 'Packages') color = '#A855F7';
+      let color = '#81E979';
+      if (this.selectedDataType === 'Tickets') color = '#3B82F6';
+      if (this.selectedDataType === 'Packages') color = '#A855F7';
 
-    let borderColor = '#6cc04a';
-    if (this.selectedDataType === 'Tickets') borderColor = '#2563EB';
-    if (this.selectedDataType === 'Packages') borderColor = '#9333EA';
+      let borderColor = '#6cc04a';
+      if (this.selectedDataType === 'Tickets') borderColor = '#2563EB';
+      if (this.selectedDataType === 'Packages') borderColor = '#9333EA';
 
-    this.chartData = {
-      labels: this.cachedChartList.map((c) => c.Label || ''),
-      datasets: [
-        {
-          label: label,
-          data: this.cachedChartList.map((c) => (this.selectedDataType === 'Tickets') ? (c.Tickets ?? 0) : (c.Revenue ?? 0)),
-          backgroundColor: color,
-          borderColor: borderColor,
-          borderWidth: 1,
-          borderRadius: 6,
-          barThickness: 32,
-        }
-      ]
-    };
+      this.chartData = {
+        labels: this.cachedChartList.map((c) => c.Label || ''),
+        datasets: [
+          {
+            label: label,
+            data: this.cachedChartList.map((c) => (this.selectedDataType === 'Tickets') ? (c.Tickets ?? 0) : (c.Revenue ?? 0)),
+            backgroundColor: color,
+            borderColor: borderColor,
+            borderWidth: 1,
+            borderRadius: 6,
+            barThickness: 32,
+            yAxisID: 'y'
+          }
+        ]
+      };
+    }
+
     this.cdr.markForCheck();
   }
 
@@ -180,12 +227,47 @@ export class DashboardComponent implements OnInit {
     return new Intl.NumberFormat('vi-VN').format(val) + 'đ';
   }
 
-  private initChartOptions() {
+  private initChartOptions(isDualAxis = false) {
+    const scales: any = {
+      x: {
+        grid: { display: false, drawBorder: false },
+        ticks: { color: '#94a3b8' }
+      },
+      y: {
+        type: 'linear',
+        display: true,
+        position: 'left',
+        grid: { color: '#f1f5f9', drawBorder: false },
+        ticks: {
+          color: '#94a3b8',
+          callback: (value: any) => {
+            if (['Revenue', 'SystemRevenue', 'Events', 'SystemEvents', 'Packages'].includes(this.selectedDataType)) {
+              return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND', maximumFractionDigits: 0 }).format(value);
+            }
+            return value;
+          }
+        }
+      }
+    };
+
+    if (isDualAxis) {
+      scales.y1 = {
+        type: 'linear',
+        display: true,
+        position: 'right',
+        grid: { drawOnChartArea: false },
+        ticks: {
+          color: '#94a3b8',
+          callback: (value: any) => value + ' vé'
+        }
+      };
+    }
+
     this.chartOptions = {
       maintainAspectRatio: false,
       aspectRatio: 0.6,
       plugins: {
-        legend: { display: false },
+        legend: { display: isDualAxis, position: 'top' },
         tooltip: {
           mode: 'index',
           intersect: false,
@@ -195,10 +277,17 @@ export class DashboardComponent implements OnInit {
               if (label) label += ': ';
               const val = context.parsed.y;
               if (val !== null) {
-                if (this.selectedDataType === 'Revenue') {
+                if (context.dataset.yAxisID === 'y') {
                   label += new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(val);
-                } else {
+                } else if (context.dataset.yAxisID === 'y1') {
                   label += val + ' vé';
+                } else {
+                  // Fallback for single axis
+                  if (['Revenue', 'Packages', 'SystemRevenue'].includes(this.selectedDataType)) {
+                    label += new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(val);
+                  } else {
+                    label += val + ' vé';
+                  }
                 }
               }
               return label;
@@ -206,24 +295,7 @@ export class DashboardComponent implements OnInit {
           }
         }
       },
-      scales: {
-        x: {
-          grid: { display: false, drawBorder: false },
-          ticks: { color: '#94a3b8' }
-        },
-        y: {
-          grid: { color: '#f1f5f9', drawBorder: false },
-          ticks: {
-            color: '#94a3b8',
-            callback: (value: any) => {
-              if (this.selectedDataType === 'Revenue') {
-                return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND', maximumFractionDigits: 0 }).format(value);
-              }
-              return value;
-            }
-          }
-        }
-      }
+      scales: scales
     };
   }
 }

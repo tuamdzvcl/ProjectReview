@@ -7,6 +7,7 @@ using EventTick.Model.Enum;
 using EventTick.Model.Models;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.IdentityModel.Tokens;
+using projectDemo.Common;
 using projectDemo.Data;
 using projectDemo.DTO.Request;
 using projectDemo.DTO.Respone;
@@ -189,11 +190,9 @@ namespace projectDemo.Service.Auth
         //đăng kí thông tin user đăng kí
         public async Task<ApiResponse<UserResponse>> Regiter(RegisterRequest resquest)
         {
+            ValidationHelper.NormalizeAllStrings(resquest);
             if (
-                string.IsNullOrWhiteSpace(resquest.FirstName)
-                || string.IsNullOrWhiteSpace(resquest.LastName)
-                || string.IsNullOrWhiteSpace(resquest.Email)
-                || string.IsNullOrWhiteSpace(resquest.password)
+                ValidationHelper.HasSpecialCharactersInAny(resquest.FirstName,resquest.LastName)
             )
             {
                 return ApiResponse<UserResponse>.FailResponse(

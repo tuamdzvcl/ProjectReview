@@ -20,7 +20,7 @@ export class ProfileSidebarComponent {
   @Input() profileImageUrl: string = '';
   @Input() isOwner: boolean = false;
 
-  @Output() avatarChange = new EventEmitter<string>(); 
+  @Output() avatarChange = new EventEmitter<string>();
   @Output() followClick = new EventEmitter<void>();
 
   get isCustomer(): boolean {

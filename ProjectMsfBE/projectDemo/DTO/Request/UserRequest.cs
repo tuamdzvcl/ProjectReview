@@ -26,6 +26,6 @@ namespace projectDemo.DTO.Request
         )]
         public string LastName { get; set; }
         public string AvataUrl { get; set; }
-        public List<string> RoleName { get; set; }
+        public List<int> RoleName { get; set; }
     }
 }

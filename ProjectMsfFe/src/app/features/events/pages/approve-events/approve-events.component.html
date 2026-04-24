@@ -18,7 +18,7 @@
       <div class="event-poster" (click)="viewDetails(event)">
         <img [src]="event.PosterUrl | imageUrl" [alt]="event.Title" />
         <div class="status-badge" [ngClass]="'status-' + event.Status.toLowerCase()">
-          {{ event.Status }}
+          {{ event.Status | eventStatus }}
         </div>
       </div>
 
@@ -48,14 +48,23 @@
       </div>
 
       <div class="event-actions">
-        <button class="btn-approve" *ngIf="event.Status !== 'PUBLISHED'" (click)="approveEvent(event)">
+        <!-- Nút duyệt / từ chối cho sự kiện PUBLIC (chờ duyệt lên sàn) -->
+        <button class="btn-approve" *ngIf="event.Status === 'PUBLIC'" (click)="approveEvent(event)">
           <i class="fa-solid fa-check"></i>
           Duyệt
         </button>
-        <button class="btn-reject" *ngIf="event.Status !== 'PUBLISHED'" (click)="rejectEvent(event)">
+        <button class="btn-reject" *ngIf="event.Status === 'PUBLIC'" (click)="rejectEvent(event)">
           <i class="fa-solid fa-xmark"></i>
           Từ chối
         </button>
+
+        <!-- Nút xem yêu cầu chỉnh sửa cho sự kiện REQUEST_EDIT -->
+        <button class="btn-edit-request" *ngIf="event.Status === 'REQUEST_EDIT'" (click)="openEditRequestDialog(event)"
+          style="padding: 8px 16px; border: none; border-radius: 8px; background: #f59e0b; color: white; cursor: pointer; font-weight: 600; display: inline-flex; align-items: center; gap: 6px;">
+          <i class="fa-solid fa-pen-to-square"></i>
+          Xem yêu cầu chỉnh sửa
+        </button>
+
         <button class="btn-details" (click)="viewDetails(event)">
           Chi tiết
         </button>
@@ -77,3 +86,52 @@
 
 <p-toast />
 <p-confirmDialog />
+
+<!-- Dialog Xem yêu cầu chỉnh sửa -->
+<p-dialog header="Yêu cầu chỉnh sửa sự kiện" [(visible)]="showEditRequestDialog" [modal]="true"
+  [style]="{ width: '550px' }" [closable]="true">
+  <div *ngIf="editRequestEvent">
+    <div style="margin-bottom: 16px;">
+      <p style="margin: 0 0 4px; color: #6b7280; font-size: 13px;">Sự kiện</p>
+      <p style="margin: 0; font-weight: 700; font-size: 16px;">{{ editRequestEvent.Title }}</p>
+    </div>
+    <div style="margin-bottom: 16px;">
+      <p style="margin: 0 0 4px; color: #6b7280; font-size: 13px;">Người tạo</p>
+      <p style="margin: 0; font-weight: 600;">{{ editRequestEvent.UserName }}</p>
+    </div>
+    <div style="background: #fffbeb; border-left: 4px solid #f59e0b; padding: 12px 16px; border-radius: 0 8px 8px 0; margin-bottom: 20px;">
+      <p style="margin: 0 0 4px; font-weight: 700; color: #92400e;">
+        <i class="fa-solid fa-comment-dots" style="margin-right: 6px;"></i>Lý do yêu cầu chỉnh sửa:
+      </p>
+      <p style="margin: 0; color: #78350f; white-space: pre-wrap;">{{ editRequestEvent.Reason || 'Không có lý do' }}</p>
+    </div>
+    <div style="display: flex; justify-content: flex-end; gap: 8px;">
+      <button (click)="openRejectEditDialog()"
+        style="padding: 8px 20px; border: 1px solid #ef4444; border-radius: 8px; background: white; color: #ef4444; cursor: pointer; font-weight: 600;">
+        <i class="fa-solid fa-xmark" style="margin-right: 4px;"></i>Từ chối
+      </button>
+      <button (click)="approveEditRequest()"
+        style="padding: 8px 20px; border: none; border-radius: 8px; background: #22c55e; color: white; cursor: pointer; font-weight: 600;">
+        <i class="fa-solid fa-check" style="margin-right: 4px;"></i>Duyệt (chuyển về bản nháp)
+      </button>
+    </div>
+  </div>
+</p-dialog>
+
+<!-- Dialog Nhập lý do từ chối -->
+<p-dialog header="Từ chối yêu cầu chỉnh sửa" [(visible)]="showRejectDialog" [modal]="true"
+  [style]="{ width: '500px' }" [closable]="true">
+  <div *ngIf="editRequestEvent">
+    <p style="margin: 0 0 12px;">Sự kiện: <strong>{{ editRequestEvent.Title }}</strong></p>
+    <label for="rejectReason" style="font-weight: 600; display: block; margin-bottom: 6px;">Lý do từ chối <span style="color: red;">*</span></label>
+    <textarea id="rejectReason" [(ngModel)]="rejectReason" rows="4"
+      style="width: 100%; border: 1px solid #d1d5db; border-radius: 8px; padding: 10px; font-size: 14px; resize: vertical;"
+      placeholder="Nhập lý do từ chối yêu cầu chỉnh sửa..."></textarea>
+    <div style="display: flex; justify-content: flex-end; gap: 8px; margin-top: 12px;">
+      <button (click)="showRejectDialog = false"
+        style="padding: 8px 20px; border: 1px solid #d1d5db; border-radius: 8px; background: white; cursor: pointer;">Hủy</button>
+      <button (click)="submitRejectEdit()"
+        style="padding: 8px 20px; border: none; border-radius: 8px; background: #ef4444; color: white; cursor: pointer; font-weight: 600;">Từ chối & Gửi email</button>
+    </div>
+  </div>
+</p-dialog>

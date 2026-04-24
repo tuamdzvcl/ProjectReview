@@ -28,6 +28,7 @@ namespace projectDemo.Service.EventService
             string keyWord
         );
         Task<PageResponse<EventTypeTickResponses>> GetPageWithTicketTypes(PageRequest query, bool isAdmin = false);
+        Task<PageResponse<EventTypeTickResponses>> GetAdminPendingEvents(PageRequest query);
         Task<PageResponse<EventTypeTickResponses>> GetPageWithTicketTypesbyId(
             Guid id,
             PageRequest query

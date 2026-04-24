@@ -9,6 +9,6 @@ namespace projectDemo.DTO.Request
 
         public string password { get; set; }
 
-        public string 
+       
     }
 }

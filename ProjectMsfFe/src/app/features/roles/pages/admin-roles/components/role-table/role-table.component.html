@@ -18,7 +18,7 @@
           <div class="role-name-cell">
             <span class="role-badge" [class.system]="role.IsSystem">
               <i class="fa-solid" [ngClass]="role.IsSystem ? 'fa-shield' : 'fa-user-tag'"></i>
-              {{ role.RoleName }}
+              {{ role.RoleName |roleName}}
             </span>
           </div>
         </td>

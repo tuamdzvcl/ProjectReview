@@ -25,7 +25,9 @@ SELECT
     o.Id AS OrderId,
     p.PaidDate AS PaidDate,
     (od.Price * od.Quantity) AS Revenue,
-    od.Quantity AS TicketQuantity
+    od.Quantity AS TicketQuantity,
+	e.Title as EventTitle
+
 FROM Orders o
 INNER JOIN Payment p ON p.OrderID = o.Id
 INNER JOIN OrderDetail od ON od.OrderID = o.Id
@@ -67,7 +69,9 @@ SELECT
     o.Id AS OrderId,
     p.PaidDate AS PaidDate,
     (od.Price * od.Quantity) AS Revenue,
-    od.Quantity AS TicketQuantity
+    od.Quantity AS TicketQuantity,
+	e.Title as EventTitle
+
 FROM Orders o
 INNER JOIN Payment p ON p.OrderID = o.Id
 INNER JOIN OrderDetail od ON od.OrderID = o.Id

@@ -114,7 +114,7 @@ namespace projectDemo.Repository
             var query = _dbSet
                 .Include(u => u.UserRoles)
                     .ThenInclude(ur => ur.Role)
-                .Where(x => x.IsDeleted == false && x.IsAdmin==false)
+                .Where(x => x.IsDeleted == false && x.IsAdmin==false && x.IsActive==true)
                 .AsQueryable();
 
             if (!string.IsNullOrEmpty(key))
