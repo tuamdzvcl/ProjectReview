@@ -33,7 +33,7 @@ namespace projectDemo.Controllers
         [AllowAnonymous]
         public async Task<IActionResult> Login([FromBody] LoginRequest request)
         {
-            var result = await _authService.AuthenCase(request);
+            var result = await _authService.Login(request);
 
             return Ok(result);
         }

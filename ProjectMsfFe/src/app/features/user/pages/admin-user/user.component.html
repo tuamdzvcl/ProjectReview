@@ -62,7 +62,7 @@
         [lazy]="true"
         (onPage)="pageChange($event)"
         [tableStyle]="{ 'min-width': '50rem' }"
-        [rowsPerPageOptions]="[5, 10, 20]"
+        [rowsPerPageOptions]="[10, 20]"
       >
         <ng-template pTemplate="header">
           <tr>
@@ -80,7 +80,7 @@
             <td>{{ user.LastName }} {{ user.FirstName }}</td>
             <td>
               <span *ngFor="let role of user.RoleName" class="role-badge">{{
-                role| roleName
+                role | roleName
               }}</span>
             </td>
 

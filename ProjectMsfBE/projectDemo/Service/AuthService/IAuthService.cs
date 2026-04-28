@@ -8,7 +8,7 @@ namespace projectDemo.Service.Auth
     public interface IAuthService
     {
         string GenerateRefreshToken();
-        Task<ApiResponse<LoginResponse>> AuthenCase(LoginRequest resquest);
+        Task<ApiResponse<LoginResponse>> Login(LoginRequest resquest);
         Task<ApiResponse<UserResponse>> Regiter(RegisterRequest resquest);
         Task<ApiResponse<string>> VerifyEmailAsync(VerifyEmailRequest request);
         Task<ApiResponse<string>> ResendVerificationEmailAsync(ResendVerificationRequest request);

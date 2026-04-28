@@ -59,7 +59,7 @@ namespace projectDemo.Service.Auth
         }
 
         //login->token/ accec
-        public async Task<ApiResponse<LoginResponse>> AuthenCase(LoginRequest resquest)
+        public async Task<ApiResponse<LoginResponse>> Login(LoginRequest resquest)
         {
             var user = await _authRepository.GetByEmailAsync(resquest.email);
             if (user == null)

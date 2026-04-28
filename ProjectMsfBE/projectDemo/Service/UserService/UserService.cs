@@ -208,7 +208,6 @@ namespace projectDemo.Service.UserService
             try
             {
                 var user = await _userReposiotry.GetUserByid(userid);
-
                 if (user == null)
                 {
                     return ApiResponse<UserResponse>.FailResponse(
@@ -216,6 +215,8 @@ namespace projectDemo.Service.UserService
                         "không tìm thấy user"
                     );
                 }
+
+
                 var passwordhash = BCrypt.Net.BCrypt.HashPassword("123456");
 
                 var entity = new User
