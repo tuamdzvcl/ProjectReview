@@ -4,6 +4,7 @@ import { UserDropdownComponent } from '../user-dropdown/user-dropdown.component'
 import { CommonModule } from '@angular/common';
 import { TokenService } from '../../../core/services/token.service';
 import { PermissionStoreService } from '../../../core/services/permission-store.service';
+import { NgModel } from '@angular/forms';
 
 @Component({
   selector: 'app-header',
@@ -29,7 +30,7 @@ export class HeaderComponent implements OnInit {
     this.isMenuOpen = false;
   }
 
-  constructor(private tokenService: TokenService) { }
+  constructor(private tokenService: TokenService) {}
 
   ngOnInit() {
     if (this.tokenService.getAccessToken() && !this.permissionStore.loaded()) {

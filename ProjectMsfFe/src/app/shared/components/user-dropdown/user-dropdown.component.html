@@ -6,7 +6,7 @@
   </div>
 
 
-  <div *ngIf="user">
+  <div style="width: 40px; height: 40px;" *ngIf="user">
     <img [src]="user.AvatarUrl | imageUrl" class="avatar" (click)="toggleDropdown()" />
 
     <div class="dropdown" *ngIf="isOpen">

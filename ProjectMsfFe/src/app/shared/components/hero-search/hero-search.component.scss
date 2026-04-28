@@ -34,11 +34,11 @@
     }
 }
 
-.search-box select {
+.search-box input {
     padding: 12px;
     border-radius: 6px;
     border: 1px solid #ddd;
-    width: 300px;
+    width: 610px;
     max-width: 100%;
 
     @media (max-width: 768px) {

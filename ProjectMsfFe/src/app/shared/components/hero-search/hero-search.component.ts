@@ -5,8 +5,8 @@ import { Component } from '@angular/core';
   standalone: true,
   imports: [],
   templateUrl: './hero-search.component.html',
-  styleUrl: './hero-search.component.scss'
+  styleUrl: './hero-search.component.scss',
 })
 export class HeroSearchComponent {
-
+  searchTitleEvent() {}
 }

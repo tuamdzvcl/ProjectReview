@@ -24,7 +24,7 @@ export class UserDropdownComponent implements OnInit {
     private userService: UserService,
     private router: Router,
     private cd: ChangeDetectorRef
-  ) { }
+  ) {}
 
   toggleDropdown() {
     this.isOpen = !this.isOpen;
@@ -49,7 +49,7 @@ export class UserDropdownComponent implements OnInit {
         this.user = user;
       },
       error: (err) => {
-        console.error('Lỗi khi lấy thông tin người dùng:', err);
+        console.error('lỗi', err);
       },
     });
     // this.user = this.authService.getUser();
