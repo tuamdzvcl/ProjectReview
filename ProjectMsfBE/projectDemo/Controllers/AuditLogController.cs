@@ -32,6 +32,7 @@ namespace projectDemo.Controllers
         {
             try
             {
+                Console.WriteLine("\n====Auditlog=====");
                 var query = _context.AuditLogs.AsQueryable();
 
                 if (!string.IsNullOrEmpty(username))
