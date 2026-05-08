@@ -33,6 +33,11 @@
         <span class="nav-item__icon"><i class="fa-regular fa-calendar"></i></span>
         <span class="nav-item__label">Sự kiện Của tôi</span>
       </button>
+      <button *ngIf="hasPermission('USER_VIEW_ORGANISATION')" class="nav-item" type="button"
+        routerLink="/admin/participants" routerLinkActive="nav-item--active">
+        <span class="nav-item__icon"><i class="fa-solid fa-users-viewfinder"></i></span>
+        <span class="nav-item__label">Người tham gia sự kiện của tôi </span>
+      </button>
 
       <!-- Approve Events -->
       <button *ngIf="hasPermission('EVENT_BROWSE')" class="nav-item" type="button" routerLink="/admin/approve-events"
@@ -49,11 +54,7 @@
       </button>
 
       <!-- Participants -->
-      <button *ngIf="hasPermission('USER_VIEW_ORGANISATION')" class="nav-item" type="button"
-        routerLink="/admin/participants" routerLinkActive="nav-item--active">
-        <span class="nav-item__icon"><i class="fa-solid fa-users-viewfinder"></i></span>
-        <span class="nav-item__label">Người tham gia</span>
-      </button>
+
 
       <!-- Promotions -->
       <button *ngIf="hasPermission('VIEW_KM')" class="nav-item" type="button" routerLink="/admin/promotions"
@@ -70,11 +71,7 @@
       </button>
 
       <!-- Audit Log -->
-      <button *ngIf="hasPermission('VIEW_AUDILOG')" class="nav-item" type="button" routerLink="/admin/audit-log"
-        routerLinkActive="nav-item--active">
-        <span class="nav-item__icon"><i class="fa-solid fa-chart-pie"></i></span>
-        <span class="nav-item__label">AuditLog</span>
-      </button>
+
 
       <!-- Membership -->
       <button *ngIf="hasPermission('VIEW_UPGRADE')" class="nav-item" type="button" routerLink="/admin/membership"
@@ -88,6 +85,11 @@
         routerLinkActive="nav-item--active">
         <span class="nav-item__icon"><i class="fa-solid fa-shield-halved"></i></span>
         <span class="nav-item__label">Phân quyền</span>
+      </button>
+      <button *ngIf="hasPermission('VIEW_AUDILOG')" class="nav-item" type="button" routerLink="/admin/audit-log"
+        routerLinkActive="nav-item--active">
+        <span class="nav-item__icon"><i class="fa-solid fa-chart-pie"></i></span>
+        <span class="nav-item__label">AuditLog</span>
       </button>
     </nav>
   </aside>

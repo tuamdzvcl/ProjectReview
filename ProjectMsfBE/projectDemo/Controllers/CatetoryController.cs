@@ -40,13 +40,15 @@ namespace projectDemo.Controllers
         }
 
         [HttpGet("{id}")]
+        [AllowAnonymous]
         public async Task<IActionResult> GetById(Guid id)
         {
             var result = await _catetoryService.Getbyid(id);
             return Ok(result);
         }
-
         [HttpGet("list-event")]
+        [AllowAnonymous]
+
         public async Task<IActionResult> GetCatetoryListEvent(
             [FromQuery] int pageSize,
             [FromQuery] int pageIndex,
@@ -58,6 +60,8 @@ namespace projectDemo.Controllers
         }
 
         [HttpGet]
+        [AllowAnonymous]
+
         public async Task<IActionResult> GetCatetory()
         {
             var result = await _catetoryService.GetCatetory();

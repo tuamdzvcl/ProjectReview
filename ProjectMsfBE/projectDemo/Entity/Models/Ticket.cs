@@ -7,6 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using EventTick.Model.asbtract;
 using EventTick.Model.Enum;
+using projectDemo.Common;
 
 namespace EventTick.Model.Models
 {
@@ -17,14 +18,15 @@ namespace EventTick.Model.Models
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
 
-        [Required]
-        [MaxLength(100)]
+        [TextValidation(ConfigValidation.MinLength, ConfigValidation.MaxLength)]
+
         public string TicketCode { get; set; } = null!;
 
         [Required]
         public string QRCode { get; set; } = null!;
 
-        [Required]
+        [TextValidation(ConfigValidation.MinLength, ConfigValidation.MaxLengthStatus)]
+
         public EnumStatusTick Status { get; set; }
 
         public DateTime? CheckInDate { get; set; }

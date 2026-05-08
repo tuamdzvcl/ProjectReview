@@ -7,8 +7,9 @@ import {
   OnInit,
 } from '@angular/core';
 import { AuthService } from '../../../features/auth/auth.service';
-import { ImageUrlPipe } from '../../pipes/image-url.pipe';
 import { UserService } from '../../../core/services/user.service';
+import { TokenService } from '../../../core/services/token.service';
+import { ImageUrlPipe } from '../../pipes/image-url.pipe';
 
 @Component({
   selector: 'app-user-dropdown',
@@ -20,10 +21,11 @@ import { UserService } from '../../../core/services/user.service';
 export class UserDropdownComponent implements OnInit {
   isOpen = false;
   constructor(
-    private authService: AuthService,
     private userService: UserService,
     private router: Router,
-    private cd: ChangeDetectorRef
+    private cd: ChangeDetectorRef,
+    private tokenService: TokenService,
+    private authService: AuthService
   ) {}
 
   toggleDropdown() {
@@ -43,16 +45,16 @@ export class UserDropdownComponent implements OnInit {
     return this.user ? `${this.user.FirstName} ${this.user.LastName}` : '';
   }
   ngOnInit(): void {
-    console.log('test');
-    this.userService.GetUserbyid().subscribe({
-      next: (user) => {
-        this.user = user;
-      },
-      error: (err) => {
-        console.error('lỗi', err);
-      },
-    });
-    // this.user = this.authService.getUser();
+    if (this.tokenService.getAccessToken()) {
+      this.userService.GetUserbyid().subscribe({
+        next: (user) => {
+          this.user = user;
+        },
+        error: (err) => {
+          console.error('lỗi', err);
+        },
+      });
+    }
   }
   hasRole(roles: string[]): boolean {
     return this.user?.RoleName?.some((r: string) => roles.includes(r)) ?? false;

@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -7,6 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using EventTick.Model.asbtract;
 using EventTick.Model.Enum;
+using projectDemo.Common;
 using projectDemo.Entity.Models;
 
 namespace EventTick.Model.Models
@@ -26,6 +27,7 @@ namespace EventTick.Model.Models
         public decimal TotalAmount { get; set; }
 
         [Required]
+        [MaxLength(ConfigValidation.MaxLengthStatus, ErrorMessage = "Không vượt quá {0} kí tự")]
         public EnumStatusOrder Status { get; set; }
         
         public string OrderType { get; set; } 

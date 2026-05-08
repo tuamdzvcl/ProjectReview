@@ -109,9 +109,8 @@ namespace projectDemo.Controllers
         [HttpGet("page-with-ticket-types")]
         [AllowAnonymous]
         public async Task<IActionResult> GetPageWithTicketTypes([FromQuery] PageRequest query)
-        {
-            var isAdmin = User.Identity.IsAuthenticated && User.IsInRole("ADMIN");
-            var result = await _eventService.GetPageWithTicketTypes(query, isAdmin);
+       {
+            var result = await _eventService.GetPageWithTicketTypes(query);
             return Ok(result);
         }
 

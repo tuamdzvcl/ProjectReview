@@ -44,15 +44,14 @@ namespace projectDemo.Repository
         public async Task<List<Event>> GetAllEvent()
         {
             return await _dbSet
-                .Where(e => e.Status != EnumStatusEvent.CANNEL && e.IsDeleted == false)
+                .Where(e => e.Status != EnumStatusEvent.CANNEL.ToString() && e.IsDeleted == false)
                 .AsNoTracking()
                 .ToListAsync();
         }
 
         //get event anh typeticj
         public async Task<PageResponse<EventTypeTickResponses>> GetAllWithTicketTypesAsync(
-            PageRequest request,
-            bool isAdmin = false
+            PageRequest request   
         )
         {
             try
@@ -61,17 +60,12 @@ namespace projectDemo.Repository
                 var pageSize = request.PageSize;
                 var now = DateTime.Now;
 
-                var query = _dbSet.AsNoTracking().Where(e => e.IsDeleted == false && e.Status != EnumStatusEvent.CANNEL);
-
-                if (isAdmin)
-                {
-                    query = query.Where(e => e.Status != EnumStatusEvent.DRAFT);
-                }
-                else
-                {
-                    query = query.Where(e => e.Status == EnumStatusEvent.PUBLISHED && e.SaleStartDate <= now && e.SaleEndDate >= now);
-                }
-
+                var query = _dbSet
+        .AsNoTracking()
+        .Where(e => e.IsDeleted== false &&
+                    e.Status == EnumStatusEvent.PUBLISHED.ToString() &&
+                    e.SaleStartDate <= now &&
+                    e.SaleEndDate >= now);
                 if (request.CategoryIds != null && request.CategoryIds.Any())
                 {
                     query = query.Where(e => request.CategoryIds.Contains(e.CatetoryID));
@@ -153,7 +147,7 @@ namespace projectDemo.Repository
                 var pageSize = request.PageSize;
 
                 var query = _dbSet.AsNoTracking().Where(e => e.IsDeleted == false && 
-                    (e.Status == EnumStatusEvent.PUBLIC || e.Status == EnumStatusEvent.REQUEST_EDIT));
+                    (e.Status == EnumStatusEvent.PUBLIC.ToString() || e.Status == EnumStatusEvent.REQUEST_EDIT.ToString() || e.Status== EnumStatusEvent.PUBLISHED.ToString()));
 
                 if (!string.IsNullOrWhiteSpace(request.key))
                 {
@@ -231,7 +225,7 @@ namespace projectDemo.Repository
                 var query = _dbSet
                     .AsNoTracking()
                     .Where(e =>
-                        e.IsDeleted == false && e.Status != EnumStatusEvent.CANNEL && e.UserID == id
+                        e.IsDeleted == false && e.Status != EnumStatusEvent.CANNEL.ToString() && e.UserID == id
                     );
 
                 if (request.CategoryIds != null && request.CategoryIds.Any())
@@ -314,7 +308,7 @@ namespace projectDemo.Repository
             try
             {
                 return await _dbSet.FirstOrDefaultAsync(e =>
-                        e.Id == eventId && e.Status != EnumStatusEvent.CANNEL
+                        e.Id == eventId && e.Status != EnumStatusEvent.CANNEL.ToString()
                     ) ?? new Event();
             }
             catch (Exception ex)

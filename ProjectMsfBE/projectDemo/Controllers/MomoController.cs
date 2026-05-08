@@ -32,6 +32,13 @@ namespace projectDemo.Controllers
             var result = await _momoService.MomoCallBack(model);
             return Redirect(result);
         }
+        //[HttpPost("order")]
+        //public async Task<IActionResult> CreateOrder([FromBody] MomoRequest request)
+        //{
+            
+        //    var result = await _momoService.CreatePaymentAsync(request);
+        //    return Ok(result);
+        //}
 
 
 

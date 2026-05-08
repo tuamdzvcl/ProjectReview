@@ -74,6 +74,7 @@ export class AuditLogComponent implements OnInit {
   }
 
   onFilter() {
+    this.first = 0; // Reset về trang đầu tiên
     this.loadLogs();
   }
 

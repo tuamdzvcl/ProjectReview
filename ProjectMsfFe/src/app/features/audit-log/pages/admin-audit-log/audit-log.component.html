@@ -4,14 +4,16 @@
             <div class="flex gap-2 flex-wrap">
                 <span class="p-input-icon-left">
                     <i class="pi pi-user"></i>
-                    <input pInputText type="text" [(ngModel)]="username" (input)="onFilter()"
+                    <input pInputText type="text" [(ngModel)]="username" (keyup.enter)="onFilter()"
                         placeholder="Tìm theo username..." class="p-inputtext-sm" />
                 </span>
                 <span class="p-input-icon-left">
                     <i class="pi pi-link"></i>
-                    <input pInputText type="text" [(ngModel)]="path" (input)="onFilter()" placeholder="/api/..."
+                    <input pInputText type="text" [(ngModel)]="path" (keyup.enter)="onFilter()" placeholder="/api/..."
                         class="p-inputtext-sm" />
                 </span>
+                <p-button icon="pi pi-search" severity="primary" (onClick)="onFilter()" label="Tìm kiếm"
+                    size="small"></p-button>
                 <p-button icon="pi pi-filter-slash" severity="secondary" (onClick)="clearFilter()" label="Xóa lọc"
                     size="small"></p-button>
             </div>

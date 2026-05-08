@@ -1,23 +1,18 @@
 @import "../../_variables.scss";
 
 :host {
+    display: block;
     width: 300px;
     flex-shrink: 0;
-}
 
-
-
-
-.profile-sidebar {
-    width: 300px;
-    flex-shrink: 0;
-    
-}
-
-@media (max-width: 768px) {
-    .profile-sidebar {
+    @media (max-width: 768px) {
         width: 100%;
     }
+}
+
+.profile-sidebar {
+    width: 100%;
+    height: 100%;
 }
 
 .profile-card {
@@ -30,6 +25,7 @@
     align-items: center;
     text-align: center;
     position: relative;
+    height: 100%;
 }
 
 .avatar-wrapper {
@@ -153,7 +149,8 @@
 }
 
 
-.btn-organisation, .btn-follow {
+.btn-organisation,
+.btn-follow {
     width: 100%;
     border: 1px solid $color-border;
     border-radius: 6px;

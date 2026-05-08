@@ -1,0 +1,4 @@
+- tách biệt controller riêng Service riêng Repository riêng 
+- viết code đúng nguyên tắc của SOLID
+- 
+- tách biệt các component riêng  

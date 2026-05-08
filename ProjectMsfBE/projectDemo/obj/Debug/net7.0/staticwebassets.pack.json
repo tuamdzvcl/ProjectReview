@@ -1,6 +1,10 @@
 {
   "Files": [
     {
+      "Id": "D:\\Msf\\ProjectMsfBE\\projectDemo\\wwwroot\\images\\02dcbab5-6a92-4b38-86d4-7e1cb4d2c5df.jpg",
+      "PackagePath": "staticwebassets\\images\\02dcbab5-6a92-4b38-86d4-7e1cb4d2c5df.jpg"
+    },
+    {
       "Id": "D:\\Msf\\ProjectMsfBE\\projectDemo\\wwwroot\\images\\05dd2500-e112-4cbc-886f-e233c0bf29ef.jpg",
       "PackagePath": "staticwebassets\\images\\05dd2500-e112-4cbc-886f-e233c0bf29ef.jpg"
     },
@@ -89,8 +93,20 @@
       "PackagePath": "staticwebassets\\images\\5dcf3d74-cb75-4a1e-91b6-d5ef104ee5e8.jpg"
     },
     {
+      "Id": "D:\\Msf\\ProjectMsfBE\\projectDemo\\wwwroot\\images\\61746486-12d2-4aee-b738-85818fb2ae66.jpg",
+      "PackagePath": "staticwebassets\\images\\61746486-12d2-4aee-b738-85818fb2ae66.jpg"
+    },
+    {
+      "Id": "D:\\Msf\\ProjectMsfBE\\projectDemo\\wwwroot\\images\\64b57559-5881-497e-80cd-284819393379.jpg",
+      "PackagePath": "staticwebassets\\images\\64b57559-5881-497e-80cd-284819393379.jpg"
+    },
+    {
       "Id": "D:\\Msf\\ProjectMsfBE\\projectDemo\\wwwroot\\images\\66f37822-2e1a-4975-b05c-c33c7b755d31.jpg",
       "PackagePath": "staticwebassets\\images\\66f37822-2e1a-4975-b05c-c33c7b755d31.jpg"
+    },
+    {
+      "Id": "D:\\Msf\\ProjectMsfBE\\projectDemo\\wwwroot\\images\\6d8fa579-4fdf-44eb-971a-07a793f7c1a0.jpg",
+      "PackagePath": "staticwebassets\\images\\6d8fa579-4fdf-44eb-971a-07a793f7c1a0.jpg"
     },
     {
       "Id": "D:\\Msf\\ProjectMsfBE\\projectDemo\\wwwroot\\images\\70265bec-56de-4025-bc88-2c48a2d305e0.jpg",
@@ -115,6 +131,10 @@
     {
       "Id": "D:\\Msf\\ProjectMsfBE\\projectDemo\\wwwroot\\images\\a046d52c-ba9f-499c-a2c1-1b3dc80ab827.png",
       "PackagePath": "staticwebassets\\images\\a046d52c-ba9f-499c-a2c1-1b3dc80ab827.png"
+    },
+    {
+      "Id": "D:\\Msf\\ProjectMsfBE\\projectDemo\\wwwroot\\images\\a4a91a38-5e89-4bd0-ae06-92071c33bafe.jpg",
+      "PackagePath": "staticwebassets\\images\\a4a91a38-5e89-4bd0-ae06-92071c33bafe.jpg"
     },
     {
       "Id": "D:\\Msf\\ProjectMsfBE\\projectDemo\\wwwroot\\images\\abc03026-32d2-4531-a5b0-ed0572680afb.jpg",
@@ -149,6 +169,10 @@
       "PackagePath": "staticwebassets\\images\\d6760936-c7ca-49ef-9cc2-5c43f5e5ca1b.jpg"
     },
     {
+      "Id": "D:\\Msf\\ProjectMsfBE\\projectDemo\\wwwroot\\images\\dc2fbe36-c8c5-4570-a705-87c89caed405.jpg",
+      "PackagePath": "staticwebassets\\images\\dc2fbe36-c8c5-4570-a705-87c89caed405.jpg"
+    },
+    {
       "Id": "D:\\Msf\\ProjectMsfBE\\projectDemo\\wwwroot\\images\\dc3e4aa1-e20a-43e9-bc35-5a090d666e32.jpg",
       "PackagePath": "staticwebassets\\images\\dc3e4aa1-e20a-43e9-bc35-5a090d666e32.jpg"
     },
@@ -181,12 +205,32 @@
       "PackagePath": "staticwebassets\\images\\eb88aa7e-5ae5-4c28-b06e-9a4339157800.jpg"
     },
     {
+      "Id": "D:\\Msf\\ProjectMsfBE\\projectDemo\\wwwroot\\images\\ee621893-10ff-4ec2-a6f6-84ba69e73524.jpg",
+      "PackagePath": "staticwebassets\\images\\ee621893-10ff-4ec2-a6f6-84ba69e73524.jpg"
+    },
+    {
+      "Id": "D:\\Msf\\ProjectMsfBE\\projectDemo\\wwwroot\\images\\events\\4eba2a13-1652-467f-8a48-18d65533c87e\\84318166-f9cc-4e1f-9e54-e8cb53f47f1f.jpg",
+      "PackagePath": "staticwebassets\\images\\events\\4eba2a13-1652-467f-8a48-18d65533c87e\\84318166-f9cc-4e1f-9e54-e8cb53f47f1f.jpg"
+    },
+    {
+      "Id": "D:\\Msf\\ProjectMsfBE\\projectDemo\\wwwroot\\images\\events\\7d18974a-dd49-417f-bc56-f248cd594c00\\3132b2b5-b702-4533-a50d-1b32880418a1.jpg",
+      "PackagePath": "staticwebassets\\images\\events\\7d18974a-dd49-417f-bc56-f248cd594c00\\3132b2b5-b702-4533-a50d-1b32880418a1.jpg"
+    },
+    {
       "Id": "D:\\Msf\\ProjectMsfBE\\projectDemo\\wwwroot\\images\\events\\a5d519ca-18bc-4683-9bd6-08bb619cecf4\\885e5d73-3ce5-45d4-bc06-00c356ef3537.jpg",
       "PackagePath": "staticwebassets\\images\\events\\a5d519ca-18bc-4683-9bd6-08bb619cecf4\\885e5d73-3ce5-45d4-bc06-00c356ef3537.jpg"
     },
     {
+      "Id": "D:\\Msf\\ProjectMsfBE\\projectDemo\\wwwroot\\images\\events\\ca7cf784-c7d2-49da-8fbe-282d708eaa26\\0afa997c-ff9b-4473-a042-a44b6ab7d45f.jpg",
+      "PackagePath": "staticwebassets\\images\\events\\ca7cf784-c7d2-49da-8fbe-282d708eaa26\\0afa997c-ff9b-4473-a042-a44b6ab7d45f.jpg"
+    },
+    {
       "Id": "D:\\Msf\\ProjectMsfBE\\projectDemo\\wwwroot\\images\\f01a2b1d-916d-497b-bfa5-70948167d188.jpg",
       "PackagePath": "staticwebassets\\images\\f01a2b1d-916d-497b-bfa5-70948167d188.jpg"
+    },
+    {
+      "Id": "D:\\Msf\\ProjectMsfBE\\projectDemo\\wwwroot\\images\\f1a96c4e-eae9-4449-8732-3d6a16eaec47.jpg",
+      "PackagePath": "staticwebassets\\images\\f1a96c4e-eae9-4449-8732-3d6a16eaec47.jpg"
     },
     {
       "Id": "D:\\Msf\\ProjectMsfBE\\projectDemo\\wwwroot\\images\\f6b76045-1674-4d16-a566-29181a2b5908.jpg",

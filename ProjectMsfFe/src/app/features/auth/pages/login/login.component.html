@@ -1,10 +1,11 @@
+<p-toast position="top-center" />
 <app-auth-layout topText="Bạn mới sử dụng hệ thống?" topLinkText="Đăng ký" [topLinkTo]="['/auth/signup']"
   title="Đăng nhập tài khoản">
   <form class="form" [formGroup]="form" (ngSubmit)="submit()">
     <div class="field">
       <label class="field__label" for="login-email">Email*</label>
       <input id="login-email" class="field__control" type="email" inputmode="email" autocomplete="email"
-        placeholder="Nhập email của bạn" formControlName="email" />
+        placeholder="Nhập email của bạn" formControlName="email" maxlength="255" />
       @if (form.controls.email.touched && form.controls.email.invalid) {
       <span class="field__error">Vui lòng nhập email hợp lệ.</span>
       }
@@ -15,7 +16,7 @@
         <label class="field__label" for="login-password">Mật khẩu*</label>
         <a class="link link--muted" routerLink="/auth/forgot-password" style="font-size: 0.875rem;">Quên mật khẩu?</a>
       </div>
-      <input id="login-password" class="field__control" type="password" autocomplete="current-password"
+      <input id="login-password" class="field__control" type="password" autocomplete="current-password" maxlength="255"
         placeholder="Nhập mật khẩu" formControlName="password" />
       @if (form.controls.password.touched && form.controls.password.invalid) {
       <span class="field__error">Mật khẩu phải có ít nhất 6 ký tự.</span>

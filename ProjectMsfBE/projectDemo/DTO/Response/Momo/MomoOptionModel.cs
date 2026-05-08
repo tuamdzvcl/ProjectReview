@@ -3,6 +3,7 @@
     public class MomoOptionModel
     {
         public string MomoApiUrl { get; set; }
+        public string UrlFontEnd { get; set; }
         public string SecretKey { get; set; }
         public string AccessKey { get; set; }
         public string ReturnUrl { get; set; }

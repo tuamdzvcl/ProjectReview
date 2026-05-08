@@ -22,6 +22,7 @@ public class EventOrder
     public DateTime? EventEndDate { get; set; }
 
     public string EventPosterUrl { get; set; }
+    public string EventStatus { get; set; } 
 
     public List<TypeTickOrder> ListTypeTicket { get; set; }
 }

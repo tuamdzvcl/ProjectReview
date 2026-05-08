@@ -48,7 +48,7 @@ namespace projectDemo.Repository
                         .ThenInclude(ur => ur.Role)
                     .Include(u =>
                         u.Events.Where(e =>
-                            e.IsDeleted == false && e.Status != EnumStatusEvent.CANNEL
+                            e.IsDeleted == false && e.Status != EnumStatusEvent.CANNEL.ToString()
                         )
                     )
                     .FirstOrDefaultAsync(u => u.Id == userID && u.IsDeleted == false);

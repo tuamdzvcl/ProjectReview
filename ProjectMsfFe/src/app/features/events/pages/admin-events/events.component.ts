@@ -16,6 +16,7 @@ import { ConfirmationService, MessageService } from 'primeng/api';
 import { ConfirmDialog } from 'primeng/confirmdialog';
 import { Toast } from 'primeng/toast';
 import { TokenService } from '../../../../core/services/token.service';
+import { EventStatus } from '../../../../core/enums/event-status.enum';
 import { FormsModule } from '@angular/forms';
 import { Dialog } from 'primeng/dialog';
 
@@ -133,7 +134,7 @@ export class EventsComponent implements OnInit {
       });
       return;
     }
-    this.eventService.UpdateEventStatus(this.requestEditEvent.Id, 6, this.requestEditReason).subscribe({
+    this.eventService.UpdateEventStatus(this.requestEditEvent.Id, EventStatus.REQUEST_EDIT, this.requestEditReason).subscribe({
       next: () => {
         this.showRequestEditDialog = false;
         this.messageService.add({
@@ -222,7 +223,7 @@ export class EventsComponent implements OnInit {
       acceptButtonStyleClass: 'p-button-info',
       rejectButtonStyleClass: 'p-button-text',
       accept: () => {
-        this.eventService.UpdateEventStatus(event.Id, 4).subscribe({
+        this.eventService.UpdateEventStatus(event.Id, EventStatus.PUBLIC).subscribe({
           next: () => {
             this.messageService.add({
               severity: 'success',
@@ -255,7 +256,7 @@ export class EventsComponent implements OnInit {
       acceptButtonStyleClass: 'p-button-success',
       rejectButtonStyleClass: 'p-button-text',
       accept: () => {
-        this.eventService.UpdateEventStatus(event.Id, 2).subscribe({
+        this.eventService.UpdateEventStatus(event.Id, EventStatus.PUBLISHED).subscribe({
           next: () => {
             this.messageService.add({
               severity: 'success',

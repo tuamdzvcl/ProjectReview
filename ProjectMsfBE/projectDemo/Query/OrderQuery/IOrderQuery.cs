@@ -1,6 +1,6 @@
 using projectDemo.DTO.Query;
 
-namespace projectDemo.Repository.OrderQuery
+namespace projectDemo.Query.OrderQuery
 {
     public interface IOrderQuery
     {

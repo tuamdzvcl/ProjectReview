@@ -1,4 +1,6 @@
 using Dapper;
+using EventTick.Model.Enum;
+using EventTick.Model.Models;
 using projectDemo.DTO.Query;
 using projectDemo.UnitOfWorks;
 
@@ -7,10 +9,13 @@ namespace projectDemo.Repository.ReportQuery
     public class ReportQuery : IReportQuery
     {
         private readonly IUnitOfWork _uow;
+        private readonly ILogger<RevenueReportFlatRow> _logger;
 
-        public ReportQuery(IUnitOfWork uow)
+        public ReportQuery(IUnitOfWork uow, ILogger<RevenueReportFlatRow>  logger)
         {
             _uow = uow;
+            _logger = logger;
+
         }
 
         public async Task<List<RevenueReportFlatRow>> GetRevenueRowsAsync(
@@ -50,11 +55,11 @@ ORDER BY p.PaidDate ASC;";
                     userId,
                     fromDate,
                     toDateExclusive,
-                    paidOrderStatus = 2,
-                    successPaymentStatus = 2,
+                    paidOrderStatus = EnumStatusOrder.PAID,
+                    successPaymentStatus = EnumStatusPayment.SUCCESS.ToString(),
                 }
             );
-
+            _logger.LogInformation( sql );
             return rows.ToList();
         }
 
@@ -92,8 +97,8 @@ ORDER BY p.PaidDate ASC;";
                 {
                     fromDate,
                     toDateExclusive,
-                    paidOrderStatus = 2,
-                    successPaymentStatus = 2,
+                    paidOrderStatus = EnumStatusOrder.PAID,
+                    successPaymentStatus = EnumStatusPayment.SUCCESS.ToString(),
                 }
             );
 

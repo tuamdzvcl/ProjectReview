@@ -77,36 +77,44 @@
               <span class="type-qty">×{{ detail.Quantity }}</span>
             </div>
 
-            <div class="tickets-grid">
-              <div *ngFor="let ticket of detail.Tickets; let i = index" class="premium-ticket-card">
-                <div class="ticket-left">
-                  <div class="ticket-stub">
-                    <span class="ticket-num">VÉ #{{ i + 1 }}</span>
-                    <h4 class="ticket-event-name">{{ order.EventName }}</h4>
-                    <p class="ticket-type-badge">{{ detail.TicketTypeName }}</p>
+            <ng-container *ngIf="detail.Tickets && detail.Tickets.length > 0; else noTickets">
+              <div class="tickets-grid">
+                <div *ngFor="let ticket of detail.Tickets; let i = index" class="premium-ticket-card">
+                  <div class="ticket-left">
+                    <div class="ticket-stub">
+                      <span class="ticket-num">VÉ #{{ i + 1 }}</span>
+                      <h4 class="ticket-event-name">{{ order.EventName }}</h4>
+                      <p class="ticket-type-badge">{{ detail.TicketTypeName }}</p>
+                    </div>
+                    <div class="ticket-footer">
+                      <span class="ticket-code">{{ ticket.TicketCode }}</span>
+                      <span class="status-indicator" [attr.data-status]="ticket.Status">
+                        <i class="fa-solid fa-circle"></i> {{ ticket.Status }}
+                      </span>
+                    </div>
                   </div>
-                  <div class="ticket-footer">
-                    <span class="ticket-code">{{ ticket.TicketCode }}</span>
-                    <span class="status-indicator" [attr.data-status]="ticket.Status">
-                      <i class="fa-solid fa-circle"></i> {{ ticket.Status }}
-                    </span>
-                  </div>
-                </div>
 
-                <div class="ticket-divider">
-                  <div class="notch top"></div>
-                  <div class="dash-line"></div>
-                  <div class="notch bottom"></div>
-                </div>
-
-                <div class="ticket-right">
-                  <div class="qr-wrapper">
-                    <img [src]="getQrCodeUrl(ticket.QRCode)" [alt]="'QR Code'" />
+                  <div class="ticket-divider">
+                    <div class="notch top"></div>
+                    <div class="dash-line"></div>
+                    <div class="notch bottom"></div>
                   </div>
-                  <span class="qr-label">QUÉT TẠI CỔNG</span>
+
+                  <div class="ticket-right">
+                    <div class="qr-wrapper">
+                      <img [src]="getQrCodeUrl(ticket.QRCode)" [alt]="'QR Code'" />
+                    </div>
+                    <span class="qr-label">QUÉT TẠI CỔNG</span>
+                  </div>
                 </div>
               </div>
-            </div>
+            </ng-container>
+            <ng-template #noTickets>
+              <div class="no-tickets-msg" style="padding: 1.5rem; text-align: center; background: rgba(255,255,255,0.05); border-radius: 8px; margin-top: 1rem; border: 1px dashed rgba(255,255,255,0.2);">
+                <i class="fa-solid fa-ticket-simple" style="font-size: 2rem; color: #888; margin-bottom: 0.5rem; display: block;"></i>
+                <p style="color: #ccc; margin: 0;">Không có vé nào</p>
+              </div>
+            </ng-template>
           </div>
         </div>
       </section>

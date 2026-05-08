@@ -1,16 +1,16 @@
 using System.ComponentModel.DataAnnotations;
 using EventTick.Model.Enum;
+using projectDemo.Common;
 
 namespace projectDemo.DTO.Request
 {
     public class UserRequest
     {
-        [Required]
-        [MaxLength(100,ErrorMessage ="Vượt quá kí tự cho phép")]
+        [TextValidation(ConfigValidation.MinLength, ConfigValidation.MaxLength)]
         [EmailAddress]
         public string Email { get; set; }
 
-        [Required]
+        [TextValidation(ConfigValidation.MinLength, ConfigValidation.MaxLength)]
         public string UserName { get; set; }
 
         [Required]

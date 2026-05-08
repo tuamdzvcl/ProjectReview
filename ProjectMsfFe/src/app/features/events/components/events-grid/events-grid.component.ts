@@ -13,11 +13,11 @@ import { EventCardComponent } from '../event-card/event-card.component';
 })
 export class EventsGridComponent implements OnInit, OnChanges {
   @Input() categoryIds: string[] = [];
+  @Input() key: string = '';
 
   events: EventModel[] = [];
   pageIndex: number = 1;
   pageSize: number = 10;
-  key: string = '';
   isLoading: boolean = false;
   hasMore: boolean = true;
 
@@ -28,7 +28,10 @@ export class EventsGridComponent implements OnInit, OnChanges {
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    if (changes['categoryIds'] && !changes['categoryIds'].firstChange) {
+    const categoryChanged = changes['categoryIds'] && !changes['categoryIds'].firstChange;
+    const keyChanged = changes['key'] && !changes['key'].firstChange;
+    
+    if (categoryChanged || keyChanged) {
       this.resetAndLoad();
     }
   }

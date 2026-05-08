@@ -53,7 +53,7 @@ $shadow-premium: 0 20px 40px -10px rgba(0, 0, 0, 0.08);
   position: relative;
   height: 380px;
   overflow: hidden;
-  margin-bottom: -100px; // Pull main content up
+  margin-bottom: 40px;
 
   .hero-bg {
     position: absolute;
@@ -237,7 +237,7 @@ $shadow-premium: 0 20px 40px -10px rgba(0, 0, 0, 0.08);
     font-size: 18px;
     font-weight: 800;
     margin: 0 0 24px 0;
-    color: white; // Visible against hero contrast
+    color: $color-text-main;
   }
 }
 

@@ -1,5 +1,6 @@
 using EventTick.Model.asbtract;
 using EventTick.Model.Models;
+using projectDemo.Common;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -11,12 +12,14 @@ namespace projectDemo.Entity.Models
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
-        [Required]
+        [TextValidation(ConfigValidation.MinLength, ConfigValidation.MaxLength)]
+
         public string TitleUpgrade {  get; set; }
 
         public string Description {  get; set; }
 
-        [MaxLength(50)]
+        [TextValidation(ConfigValidation.MinLength, ConfigValidation.MaxLengthStatus)]
+
         public string status { get; set; }
 
         public int DailyLimit { get; set; } // Giới hạn tạo event mỗi ngày

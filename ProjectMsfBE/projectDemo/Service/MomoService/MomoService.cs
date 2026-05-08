@@ -1,5 +1,8 @@
+using System.Data;
 using System.Security.Cryptography;
 using System.Text;
+using DocumentFormat.OpenXml.Drawing;
+using DocumentFormat.OpenXml.Office2016.Drawing.ChartDrawing;
 using EventTick.Model.Enum;
 using EventTick.Model.Models;
 using Microsoft.Extensions.Options;
@@ -13,6 +16,7 @@ using projectDemo.Entity.Models;
 using projectDemo.Repository.Ipml;
 using projectDemo.Repository.OrderRepository;
 using projectDemo.Repository.PaymentRepository;
+using projectDemo.Repository.TickRepository;
 using projectDemo.Repository.UserUpgradeRepository;
 using projectDemo.Service.EmailService;
 using projectDemo.Service.PaymetService;
@@ -25,6 +29,7 @@ namespace projectDemo.Service.MomoService
         private readonly IOptions<MomoOptionModel> _options;
         private readonly HttpClient _httpClient;
         private readonly IOrderRepository _orderRepository;
+        private readonly ITickRepository _ticketsRepositorys;
         private readonly IUnitOfWork _uow;
         private readonly IPaymentRepository _paymentRepository;
         private readonly IEmailService _emailService;
@@ -32,7 +37,9 @@ namespace projectDemo.Service.MomoService
         private readonly IUserReposiotry _userRepository;
 
         public MomoService(
+
             IPaymentRepository paymentRepository,
+            ITickRepository ticketsRepositorys,
             IUserReposiotry userReposiotry,
             IUnitOfWork uow,
             IOrderRepository orderRepository,
@@ -43,6 +50,7 @@ namespace projectDemo.Service.MomoService
         )
         {
             _paymentRepository = paymentRepository;
+            _ticketsRepositorys = ticketsRepositorys;
             _userRepository = userReposiotry;
             _uow = uow;
             _orderRepository = orderRepository;
@@ -151,6 +159,7 @@ namespace projectDemo.Service.MomoService
 
         public async Task<string> MomoCallBack(MomoIpnRequest request)
         {
+            
             var status = request.ResultCode;
             var orderId = Guid.Parse(request.OrderId);
 
@@ -163,7 +172,7 @@ namespace projectDemo.Service.MomoService
             if (payment == null)
                 return "Không tìm thấy Payment";
 
-            if (payment.Status == EnumStatusPayment.SUCCESS)
+            if (payment.Status == EnumStatusPayment.SUCCESS.ToString())
                 return "Vé đã được thanh toán";
 
             bool isSuccess = status == 0;
@@ -174,77 +183,11 @@ namespace projectDemo.Service.MomoService
 
                 if (isSuccess)
                 {
-                    order.Status = EnumStatusOrder.PAID;
-                    payment.Status = EnumStatusPayment.SUCCESS;
-                    payment.UpdatedDate = DateTime.Now;
-
-                    if (order.OrderType == EnumOrderType.TICKET.ToString())
-                    {
-                        foreach (var i in order.OrderDetails)
-                        {
-                            i.TicketTypes.SoldQuantity += i.Quantity;
-                            i.TicketTypes.ReservedQuantity -= i.Quantity;
-                        }
-                    }
-                    else if (
-                        order.OrderType == EnumOrderType.UPGRADE.ToString()
-                        && order.UserUpgradeId != null
-                    )
-                    {
-                        var userUpgrade = await _userUpgradeRepository.GetByIdWithUpgradeAsync(
-                            order.UserUpgradeId.Value
-                        );
-                        if (userUpgrade != null)
-                        {
-                            userUpgrade.Status = "ACTIVE";
-                            userUpgrade.UpdatedDate = DateTime.Now;
-                            userUpgrade.StartDate = DateTime.Now;
-                            // Quy định gói theo tháng
-                            userUpgrade.EndDate = userUpgrade.Upgrade.IsDailyPackage
-                                ? DateTime.Now.AddDays(1)
-                                : DateTime.Now.AddMonths(1);
-                            userUpgrade.CurrentDayUsageCount = 0;
-                            userUpgrade.LastUsageDate = DateTime.Now;
-                            var user = await _userRepository.GetUserByid(userUpgrade.UserId);
-                            if (user == null)
-                                return "User not found";
-                            user.UserRoles.Add(
-                                new UserRole
-                                {
-                                    UserId = user.Id,
-                                    RoleId = (int)EnumRoleName.ORGANIZER,
-                                }
-                            );
-                        }
-                    }
+                  await  HandleSuccessOrder(order, payment);
                 }
                 else
                 {
-                    order.Status = EnumStatusOrder.CANCELLED;
-                    payment.Status = EnumStatusPayment.FAILED;
-                    payment.UpdatedDate = DateTime.Now;
-
-                    if (order.OrderType == EnumOrderType.TICKET.ToString())
-                    {
-                        foreach (var i in order.OrderDetails)
-                        {
-                            i.TicketTypes.ReservedQuantity -= i.Quantity;
-                        }
-                    }
-                    else if (
-                        order.OrderType == EnumOrderType.UPGRADE.ToString()
-                        && order.UserUpgradeId != null
-                    )
-                    {
-                        var userUpgrade = await _userUpgradeRepository.GetByIdAsync(
-                            order.UserUpgradeId.Value
-                        );
-                        if (userUpgrade != null)
-                        {
-                            userUpgrade.Status = "FAILED";
-                            userUpgrade.UpdatedDate = DateTime.Now;
-                        }
-                    }
+                  await HandleFallOrder(order, payment);
                 }
 
                 await _uow.SaveChangesAsync();
@@ -261,9 +204,115 @@ namespace projectDemo.Service.MomoService
                 await SendBookingEmailAsync(orderId, isSuccess);
             }
 
-            return $"http://localhost:4200/payment?resultCode={status}&orderId={orderId}";
+            return $"{_options.Value.UrlFontEnd}/payment?resultCode={status}&orderId={orderId}";
         }
+        private string GenerateQrCode(TickCreateQrCode request)
+        {
+            // Bước 1: Chuyển payload thành JSON
+            string jsonString = System.Text.Json.JsonSerializer.Serialize(request);
 
+            // Bước 2: Mã hóa sang Base64
+            byte[] plainTextBytes = System.Text.Encoding.UTF8.GetBytes(jsonString);
+            string base64Payload = Convert.ToBase64String(plainTextBytes);
+
+            // Bước 3: Tạo chữ ký HMAC để chống fake
+            // Cần lấy SecretKey từ cấu hình, dùng HmacSha256Helper
+            string secretKey = _options.Value?.SecretKey  ?? throw new InvalidOperationException("SecretKey is not configured");
+            string signature = projectDemo.Common.HmacSha256Helper.ComputeHmacSha256(
+                base64Payload,
+                secretKey
+            );
+
+            // Bước 4: Ghép lại dạng Payload.Signature (gần giống JWT)
+            return $"{base64Payload}.{signature}";
+        }
+        private async Task HandleSuccessOrder(Order order,Payment payment)
+        {
+            order.Status = EnumStatusOrder.PAID;
+            payment.Status = EnumStatusPayment.SUCCESS.ToString();
+            payment.UpdatedDate = DateTime.Now;    
+            if(order.OrderType==EnumOrderType.TICKET.ToString())
+            {
+                foreach (var o in order.OrderDetails)
+                {
+                    o.TicketTypes.SoldQuantity += o.Quantity;
+                    o.TicketTypes.ReservedQuantity -= o.Quantity;
+
+                    var tickqr = new TickCreateQrCode
+                    {
+                        EventID = o.TicketTypes.EventID,
+                        OrderId = order.Id,
+                        TickTypeId = o.TicketTypeId,
+                        expiration = o.TicketTypes.Event.EndDate,
+                    };
+
+                    for (int i = 0; i < o.Quantity; i++)
+                    {
+                        var qrcode = GenerateQrCode(tickqr);
+                        var tick = new Ticket
+                        {
+                            TicketCode = Guid.NewGuid().ToString(),
+                            QRCode = qrcode,
+                            Status = EnumStatusTick.VALID,
+                            CreatedDate = DateTime.Now,
+                            OrderDetailID = o.Id,
+                        };
+                        await _ticketsRepositorys.CreateTicket(tick);
+                    }
+                }
+            }
+            else if(order.OrderType== EnumOrderType.UPGRADE.ToString())
+            {
+               
+                    var userUpgrade = await _userUpgradeRepository.GetByIdWithUpgradeAsync(order.UserUpgradeId.Value);
+                if (userUpgrade != null)
+                {
+                    userUpgrade.Status = "ACTIVE";
+                    userUpgrade.UpdatedDate = DateTime.Now;
+                    userUpgrade.StartDate = DateTime.Now;
+                    // Quy định gói theo tháng
+                    userUpgrade.EndDate = userUpgrade.Upgrade.IsDailyPackage
+                        ? DateTime.Now.AddDays(1)
+                        : DateTime.Now.AddMonths(1);
+                    userUpgrade.CurrentDayUsageCount = 0;
+                    userUpgrade.LastUsageDate = DateTime.Now;
+                    var user = await _userRepository.GetUserByid(userUpgrade.UserId);
+                    user.UserRoles.Add(
+                        new UserRole
+                        {
+                            UserId = user.Id,
+                            RoleId = (int)EnumRoleName.ORGANIZER,
+                        }
+                    );
+                }
+            }
+        }
+        private async Task HandleFallOrder (Order order,Payment payment)
+        {
+            order.Status = EnumStatusOrder.CANCELLED;
+            payment.Status = EnumStatusPayment.FAILED.ToString();
+            payment.UpdatedDate = DateTime.Now;
+
+            if (order.OrderType == EnumOrderType.TICKET.ToString())
+            {
+                foreach (var i in order.OrderDetails)
+                {
+                    i.TicketTypes.ReservedQuantity -= i.Quantity;
+                }
+            }
+            else if (
+                order.OrderType == EnumOrderType.UPGRADE.ToString()
+                && order.UserUpgradeId != null
+            )
+            {
+                var userUpgrade = await _userUpgradeRepository.GetByIdAsync(order.UserUpgradeId.Value);
+                if (userUpgrade != null)
+                {
+                    userUpgrade.Status = "FAILED";
+                    userUpgrade.UpdatedDate = DateTime.Now;
+                }
+            }
+        }
         private async Task SendBookingEmailAsync(Guid orderId, bool isSuccess)
         {
             var order = await _orderRepository.GetOrderForEmailAsync(orderId);

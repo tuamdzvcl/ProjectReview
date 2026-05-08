@@ -9,6 +9,7 @@ namespace projectDemo.DTO.Query
         public DateTime? CreatedDate { get; set; }
         public int Status { get; set; }
         public Guid? EventId { get; set; }
+        public string? EventStatus { get; set; }
         public string? EventTitle { get; set; }
         public string? EventDescription { get; set; }
         public string? EventLocation { get; set; }

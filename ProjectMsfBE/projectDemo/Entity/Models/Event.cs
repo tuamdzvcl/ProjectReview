@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -7,6 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using EventTick.Model.asbtract;
 using EventTick.Model.Enum;
+using projectDemo.Common;
 using projectDemo.Entity.Models;
 
 namespace EventTick.Model.Models
@@ -18,7 +19,8 @@ namespace EventTick.Model.Models
         public Guid Id { get; set; }
 
         [Required]
-        [MaxLength(255)]
+        [MaxLength(ConfigValidation.MaxLength,ErrorMessage ="Không được vượt quá {0} kí tự")]
+        [MinLength(ConfigValidation.MinLength,ErrorMessage ="Không được ít hơn {0} kí tự")]
         public string Title { get; set; } = null!;
 
         public string? Description { get; set; }
@@ -41,7 +43,8 @@ namespace EventTick.Model.Models
         public string PosterUrl { get; set; }
 
         [Required]
-        public EnumStatusEvent Status { get; set; }
+        [MaxLength(ConfigValidation.MaxLengthStatus,ErrorMessage ="Không vượt quá {0} kí tự")]
+        public string Status { get; set; }
 
         [Required]
         public Guid UserID { get; set; }

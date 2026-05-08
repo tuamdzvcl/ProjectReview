@@ -3,6 +3,7 @@ import { CanActivateFn, Router } from '@angular/router';
 import { TokenService } from '../services/token.service';
 import { AuthService } from '../../features/auth/auth.service';
 import { PermissionStoreService } from '../services/permission-store.service';
+import { firstValueFrom } from 'rxjs';
 
 export const authGuard: CanActivateFn = async (route, state) => {
   const tokenService = inject(TokenService);
@@ -14,19 +15,41 @@ export const authGuard: CanActivateFn = async (route, state) => {
   if (!requiresAuth) return true;
 
   const accessToken = tokenService.getAccessToken();
-  if (!accessToken || authService.checkTokenExpired()) {
+
+  if (!accessToken) {
     tokenService.clear();
     return router.createUrlTree(['/auth/login'], {
       queryParams: { returnUrl: state.url },
     });
   }
 
-  // Load permissions nếu chưa load
+  const isExpired = authService.checkTokenExpired();
+
+  if (isExpired) {
+
+    const refreshToken = tokenService.getRefreshToken();
+
+    if (!refreshToken) {
+      tokenService.clear();
+      return router.createUrlTree(['/auth/login'], {
+        queryParams: { returnUrl: state.url, sessionExpired: true },
+      });
+    }
+
+    try {
+      await firstValueFrom(authService.refreshToken(refreshToken));
+    } catch (err) {
+      tokenService.clear();
+      return router.createUrlTree(['/auth/login'], {
+        queryParams: { returnUrl: state.url, sessionExpired: true },
+      });
+    }
+  }
+
   if (!permissionStore.loaded()) {
     await permissionStore.loadPermissions();
   }
 
-  // Check permissions nếu route có khai báo
   const requiredPermissions: string[] = route.data?.['permissions'];
   if (requiredPermissions && requiredPermissions.length > 0) {
     if (!permissionStore.hasAnyPermission(requiredPermissions)) {

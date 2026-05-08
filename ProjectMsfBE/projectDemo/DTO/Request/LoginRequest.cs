@@ -1,12 +1,15 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using projectDemo.Common;
+using System.ComponentModel.DataAnnotations;
 
 namespace projectDemo.DTO.Request
 {
     public class LoginRequest
     {
-        [EmailAddress]
+        [TextValidation(ConfigValidation.MinLength, ConfigValidation.MaxLength)]
+        [EmailAddress ]
         public string email { get; set; }
 
+        [TextValidation(ConfigValidation.MinLength, ConfigValidation.MaxLength)]
         public string password { get; set; }
 
        

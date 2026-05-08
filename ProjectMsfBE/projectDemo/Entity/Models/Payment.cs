@@ -32,7 +32,7 @@ namespace EventTick.Model.Models
         public string RequestId { get; set; }
 
         [Required]
-        public EnumStatusPayment Status { get; set; }
+        public string Status { get; set; }
 
         public DateTime? PaidDate { get; set; }
 

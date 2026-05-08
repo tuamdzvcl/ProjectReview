@@ -2,6 +2,7 @@
 using System.ComponentModel.DataAnnotations.Schema;
 using EventTick.Model.asbtract;
 using EventTick.Model.Models;
+using projectDemo.Common;
 
 namespace projectDemo.Entity.Models
 {
@@ -20,6 +21,7 @@ namespace projectDemo.Entity.Models
 
         [MaxLength(10)]
         public string? IpAddress { get; set; }
+        [MaxLength(ConfigValidation.MaxLength,ErrorMessage ="Không được vượt quá {0} kí tự")]
         public string Username { get; set; }
 
         public Guid UserId { get; set; }

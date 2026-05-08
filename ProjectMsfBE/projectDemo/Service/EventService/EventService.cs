@@ -93,8 +93,8 @@ namespace projectDemo.Service.EventService
                 .context.Set<Event>()
                 .Where(e =>
                     e.IsDeleted == false
-                    && e.Status != EnumStatusEvent.CANNEL
-                    && e.Status != EnumStatusEvent.ENDED
+                    && e.Status != EnumStatusEvent.CANNEL.ToString()
+                    && e.Status != EnumStatusEvent.ENDED.ToString()
                     && e.EndDate.HasValue
                     && e.EndDate.Value <= now
                 )
@@ -105,7 +105,7 @@ namespace projectDemo.Service.EventService
 
             foreach (var item in expiredEvents)
             {
-                item.Status = EnumStatusEvent.ENDED;
+                item.Status = EnumStatusEvent.ENDED.ToString();
                 item.UpdatedDate = now;
             }
 
@@ -118,10 +118,10 @@ namespace projectDemo.Service.EventService
             if (!IsEventEnded(events, now))
                 return;
 
-            if (events.Status == EnumStatusEvent.CANNEL || events.Status == EnumStatusEvent.ENDED)
+            if (events.Status == EnumStatusEvent.CANNEL.ToString() || events.Status == EnumStatusEvent.ENDED.ToString())
                 return;
 
-            events.Status = EnumStatusEvent.ENDED;
+            events.Status = EnumStatusEvent.ENDED.ToString();
             events.UpdatedDate = now;
             await _uow.SaveChangesAsync();
         }
@@ -315,7 +315,7 @@ namespace projectDemo.Service.EventService
                     Id = Guid.NewGuid(),
                     UserID = userId,
                     Title = request.Title,
-                    Status = EnumStatusEvent.DRAFT,
+                    Status = EnumStatusEvent.DRAFT.ToString(),
                     PosterUrl = imageUrl,
                     StartDate = request.StartDate,
                     EndDate = request.EndDate,
@@ -420,23 +420,27 @@ namespace projectDemo.Service.EventService
                         "Không tìm thấy event"
                     );
                 }
-                if (!isAdmin)
+                if (events.Status == EnumStatusEvent.PUBLISHED.ToString())
                 {
-                    return ApiResponse<string>.FailResponse(
-                                           Entity.Enum.EnumStatusCode.BAD_REQUEST,
-                                           "Có phải admin không mà đòi xóa"
-                                       );
+                    if (!isAdmin)
+                    {
+                        return ApiResponse<string>.FailResponse(
+                                               Entity.Enum.EnumStatusCode.BAD_REQUEST,
+                                               "Có phải admin không mà đòi xóa"
+                                           );
+                    }
                 }
+               
                 await EnsureEventEndedStatusAsync(events);
 
-                if (events.Status == EnumStatusEvent.PUBLIC)
+                if (events.Status == EnumStatusEvent.PUBLISHED.ToString())
                 {
                     return ApiResponse<string>.FailResponse(
                         Entity.Enum.EnumStatusCode.UNAUTHORIZED,
                         "Sự kiện đã được công bố không thu hồi được"
                     );
                 }
-                events.Status = EnumStatusEvent.CANNEL;
+                events.Status = EnumStatusEvent.CANNEL.ToString();
                 events.IsDeleted = true;
                 await _uow.SaveChangesAsync();
                 return ApiResponse<string>.SuccessResponse(
@@ -550,7 +554,7 @@ namespace projectDemo.Service.EventService
                     );
 
                 await EnsureEventEndedStatusAsync(events);
-                if (events.Status == EnumStatusEvent.ENDED)
+                if (events.Status == EnumStatusEvent.ENDED.ToString())
                 {
                     return ApiResponse<string>.FailResponse(
                         Entity.Enum.EnumStatusCode.BAD_REQUEST,
@@ -740,7 +744,7 @@ namespace projectDemo.Service.EventService
                     Id = Guid.NewGuid(),
                     UserID = originalEvent.UserID,
                     Title = originalEvent.Title + " - nhân bản",
-                    Status = EnumStatusEvent.DRAFT,
+                    Status = EnumStatusEvent.DRAFT.ToString(),
                     PosterUrl = originalEvent.PosterUrl,
                     StartDate = null,
                     EndDate = null,
@@ -815,7 +819,7 @@ namespace projectDemo.Service.EventService
             try
             {
                 await SyncEndedEventsAsync();
-                if (request == null || !request.Status.HasValue)
+                if (request == null )
                 {
                     return ApiResponse<string>.FailResponse(
                         Entity.Enum.EnumStatusCode.BAD_REQUEST,
@@ -833,7 +837,7 @@ namespace projectDemo.Service.EventService
                 }
 
                 await EnsureEventEndedStatusAsync(events);
-                if (events.Status == EnumStatusEvent.ENDED)
+                if (events.Status == EnumStatusEvent.ENDED.ToString())
                 {
                     return ApiResponse<string>.FailResponse(
                         Entity.Enum.EnumStatusCode.BAD_REQUEST,
@@ -850,14 +854,14 @@ namespace projectDemo.Service.EventService
                     );
                 }
 
-                events.Status = request.Status.Value;
+                events.Status = request.Status;
                 events.Reason = request.Reason;
                 events.UpdatedDate = DateTime.Now;
 
                 await _uow.SaveChangesAsync();
 
                 // Gửi email thông báo khi Admin từ chối yêu cầu chỉnh sửa
-                if (request.Status.Value == EnumStatusEvent.PUBLISHED && !string.IsNullOrEmpty(request.Reason))
+                if (request.Status == EnumStatusEvent.PUBLISHED.ToString() && !string.IsNullOrEmpty(request.Reason))
                 {
                     try
                     {
@@ -892,7 +896,7 @@ namespace projectDemo.Service.EventService
                 }
 
                 // Gửi email khi Admin duyệt yêu cầu chỉnh sửa (chuyển về DRAFT)
-                if (request.Status.Value == EnumStatusEvent.DRAFT)
+                if (request.Status == EnumStatusEvent.DRAFT.ToString())
                 {
                     try
                     {
@@ -936,8 +940,7 @@ namespace projectDemo.Service.EventService
         }
 
         public async Task<PageResponse<EventTypeTickResponses>> GetPageWithTicketTypes(
-            PageRequest query,
-            bool isAdmin = false
+            PageRequest query
         )
         {
             await SyncEndedEventsAsync();
@@ -946,7 +949,7 @@ namespace projectDemo.Service.EventService
             if (query.PageSize <= 0)
                 query.PageSize = 10;
 
-            return await _eventRepository.GetAllWithTicketTypesAsync(query, isAdmin);
+            return await _eventRepository.GetAllWithTicketTypesAsync(query);
         }
 
         public async Task<PageResponse<EventTypeTickResponses>> GetPageWithTicketTypesbyId(

@@ -1,9 +1,15 @@
-<div class="events-grid">
+<div class="events-grid" *ngIf="events.length > 0">
   <app-event-card *ngFor="let event of events" [eventmodel]="event">
   </app-event-card>
 </div>
 
-<div class="page">
+<!-- Thêm thông báo khi không tìm thấy sự kiện -->
+<div class="empty-state" *ngIf="events.length === 0 && !isLoading">
+
+  <p class="empty-text">Không tìm thấy sự kiện nào tên "{{ key }}"</p>
+</div>
+
+<div class="page" *ngIf="events.length > 0">
   <button *ngIf="hasMore" type="button" class="btn-loadmode" (click)="loadMore()">
     Load more
   </button>

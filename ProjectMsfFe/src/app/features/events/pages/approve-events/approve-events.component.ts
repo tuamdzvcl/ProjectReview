@@ -15,6 +15,7 @@ import { ConfirmDialog } from 'primeng/confirmdialog';
 import { Toast } from 'primeng/toast';
 import { TokenService } from '../../../../core/services/token.service';
 import { PermissionStoreService } from '../../../../core/services/permission-store.service';
+import { EventStatus } from '../../../../core/enums/event-status.enum';
 import { FormsModule } from '@angular/forms';
 import { Dialog } from 'primeng/dialog';
 
@@ -83,6 +84,7 @@ export class ApproveEventsComponent implements OnInit {
         this.totalRecords = res.totalRecords;
       },
       error: (err) => {
+        this.messageService.add({ severity: 'error', summary: 'Lỗi', detail: err.message });
         console.error('Error fetching admin pending events:', err);
       },
     });
@@ -103,7 +105,7 @@ export class ApproveEventsComponent implements OnInit {
       rejectLabel: 'Hủy',
       acceptButtonStyleClass: 'p-button-success',
       accept: () => {
-        this.eventService.UpdateEventStatus(event.Id, 2).subscribe({
+        this.eventService.UpdateEventStatus(event.Id, EventStatus.PUBLISHED).subscribe({
           next: () => {
             this.messageService.add({
               severity: 'success',
@@ -114,7 +116,7 @@ export class ApproveEventsComponent implements OnInit {
           },
           error: (err: any) => {
             console.error('Lỗi khi duyệt:', err);
-            this.messageService.add({ severity: 'error', summary: 'Lỗi', detail: 'Không thể duyệt sự kiện.' });
+            this.messageService.add({ severity: 'error', summary: 'Lỗi', detail: err.message });
           },
         });
       },
@@ -130,7 +132,7 @@ export class ApproveEventsComponent implements OnInit {
       rejectLabel: 'Hủy',
       acceptButtonStyleClass: 'p-button-danger',
       accept: () => {
-        this.eventService.UpdateEventStatus(event.Id, 3).subscribe({
+        this.eventService.UpdateEventStatus(event.Id, EventStatus.CANNEL).subscribe({
           next: () => {
             this.messageService.add({
               severity: 'info',
@@ -141,7 +143,7 @@ export class ApproveEventsComponent implements OnInit {
           },
           error: (err: any) => {
             console.error('Lỗi khi từ chối:', err);
-            this.messageService.add({ severity: 'error', summary: 'Lỗi', detail: 'Không thể từ chối sự kiện.' });
+            this.messageService.add({ severity: 'error', summary: 'Lỗi', detail: err.message });
           },
         });
       },
@@ -157,7 +159,7 @@ export class ApproveEventsComponent implements OnInit {
 
   // Admin duyệt yêu cầu chỉnh sửa -> chuyển sự kiện về DRAFT (1)
   approveEditRequest() {
-    this.eventService.UpdateEventStatus(this.editRequestEvent.Id, 1).subscribe({
+    this.eventService.UpdateEventStatus(this.editRequestEvent.Id, EventStatus.DRAFT).subscribe({
       next: () => {
         this.showEditRequestDialog = false;
         this.messageService.add({
@@ -169,7 +171,7 @@ export class ApproveEventsComponent implements OnInit {
       },
       error: (err: any) => {
         console.error('Lỗi khi duyệt yêu cầu chỉnh sửa:', err);
-        this.messageService.add({ severity: 'error', summary: 'Lỗi', detail: 'Không thể duyệt yêu cầu chỉnh sửa.' });
+        this.messageService.add({ severity: 'error', summary: 'Lỗi', detail: err.message });
       },
     });
   }
@@ -191,7 +193,7 @@ export class ApproveEventsComponent implements OnInit {
       });
       return;
     }
-    this.eventService.UpdateEventStatus(this.editRequestEvent.Id, 2, this.rejectReason).subscribe({
+    this.eventService.UpdateEventStatus(this.editRequestEvent.Id, EventStatus.PUBLISHED, this.rejectReason).subscribe({
       next: () => {
         this.showRejectDialog = false;
         this.messageService.add({
@@ -203,7 +205,7 @@ export class ApproveEventsComponent implements OnInit {
       },
       error: (err: any) => {
         console.error('Lỗi khi từ chối yêu cầu chỉnh sửa:', err);
-        this.messageService.add({ severity: 'error', summary: 'Lỗi', detail: 'Không thể từ chối yêu cầu chỉnh sửa.' });
+        this.messageService.add({ severity: 'error', summary: 'Lỗi', detail: err.message });
       },
     });
   }
@@ -228,7 +230,7 @@ export class ApproveEventsComponent implements OnInit {
           },
           error: (err: any) => {
             console.error('Lỗi khi xóa:', err);
-            this.messageService.add({ severity: 'error', summary: 'Lỗi', detail: 'Không thể xóa sự kiện.' });
+            this.messageService.add({ severity: 'error', summary: 'Lỗi', detail: err.message });
           },
         });
       },

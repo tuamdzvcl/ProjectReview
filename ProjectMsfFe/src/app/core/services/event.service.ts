@@ -114,7 +114,7 @@ export class EventService extends BaseApiService {
   UpdateEvent(id: string, data: FormData) {
     return this.put<ApiResponse<EventModel>>(`event/${id}`, data);
   }
-  UpdateEventStatus(id: string, status: number, reason?: string) {
+  UpdateEventStatus(id: string, status: string, reason?: string) {
     const body: any = { Status: status };
     if (reason) {
       body.Reason = reason;

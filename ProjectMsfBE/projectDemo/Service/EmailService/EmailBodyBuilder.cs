@@ -351,7 +351,7 @@ namespace projectDemo.Service.EmailService
                                     🎫 {ticket.TicketTypeName}
                                 </p>
                                 <p style=""margin:0 0 2px; font-size:13px; color:#666;"">
-                                    Mã vé: <strong style=""font-family:monospace;"">tesst</strong>
+                                    Mã vé: <strong style=""font-family:monospace;"">{ticket.TicketCode}</strong>
                                 </p>
                                 <p style=""margin:0 0 2px; font-size:13px; color:#666;"">
                                     Giá: <strong>{ticket.Price:N0} VNĐ</strong>

@@ -2,7 +2,7 @@ using Dapper;
 using projectDemo.DTO.Query;
 using projectDemo.UnitOfWorks;
 
-namespace projectDemo.Repository.OrderQuery
+namespace projectDemo.Query.OrderQuery
 {
     public class OrderQuery : IOrderQuery
     {
@@ -39,6 +39,7 @@ WITH PagedOrders AS
     SELECT o.Id, o.CreatedDate
     FROM Orders o
     WHERE o.UserID = @userId
+    and o.status != 1
       AND o.IsDeleted = 0
     ORDER BY o.CreatedDate DESC
     OFFSET @skip ROWS FETCH NEXT @pageSize ROWS ONLY
@@ -51,6 +52,7 @@ SELECT
     CAST(o.Status AS INT) AS Status,
     e.Id AS EventId,
     e.Title AS EventTitle,
+    e.Status As EventStatus,
     e.Description AS EventDescription,
     e.Location AS EventLocation,
     e.StartDate AS EventStartDate,

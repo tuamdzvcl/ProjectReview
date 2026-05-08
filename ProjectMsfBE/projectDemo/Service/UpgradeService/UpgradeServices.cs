@@ -310,7 +310,7 @@ namespace projectDemo.Service.UpgradeService
                     Amount = totalAmount,
                     PaymentMethod = "MOMO",
                     TransactionCode = "PENDING_" + order.OrderCode,
-                    Status = EnumStatusPayment.PENDING,
+                    Status = EnumStatusPayment.PENDING.ToString(),
                     CreatedDate = DateTime.UtcNow,
                 };
                 await _paymentRepository.Create(payment);

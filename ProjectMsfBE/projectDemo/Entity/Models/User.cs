@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using EventTick.Model.asbtract;
+using projectDemo.Common;
 using projectDemo.Entity.Models;
 
 namespace EventTick.Model.Models
@@ -21,11 +22,12 @@ namespace EventTick.Model.Models
         [MaxLength(255)]
         public string Email { get; set; } = null!;
 
-        [Required]
-        [MaxLength(255)]
+        [TextValidation(ConfigValidation.MinLength, ConfigValidation.MaxLengthStatus)]
+
         public string Username { get; set; }
 
-        [MaxLength(500)]
+        [TextValidation(ConfigValidation.MinLength, ConfigValidation.MaxLengthHashcode)]
+
         public string? PasswordHash { get; set; } = null!;
 
         [Required]
@@ -34,12 +36,12 @@ namespace EventTick.Model.Models
         [Required]
         public bool IsActive { get; set; }
 
-        [Required]
-        [MaxLength(100)]
+        [TextValidation(ConfigValidation.MinLength, ConfigValidation.FirstNameMaxLength)]
+
         public string FirstName { get; set; } = null!;
 
-        [Required]
-        [MaxLength(100)]
+        [TextValidation(ConfigValidation.MinLength, ConfigValidation.LastNameMaxLength)]
+
         public string LastName { get; set; } = null!;
 
         [MaxLength(500)]

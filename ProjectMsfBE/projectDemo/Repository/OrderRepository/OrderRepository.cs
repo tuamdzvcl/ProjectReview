@@ -51,8 +51,9 @@ namespace projectDemo.Repository.OrderRepository
             return await _dbSet
                 .Include(x => x.OrderDetails)
                     .ThenInclude(x => x.TicketTypes)
-                    .Include(o => o.OrderDetails)
-    .ThenInclude(od => od.Ticket)
+                    .ThenInclude(tt=>tt.Event)
+                .Include(o => o.OrderDetails)
+                .ThenInclude(od => od.Ticket)
                 .Include(x => x.Payment)
                 .Include(x => x.User)
                 .FirstOrDefaultAsync(x => x.Id == orderID && x.IsDeleted == false);

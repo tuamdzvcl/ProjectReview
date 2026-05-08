@@ -28,6 +28,14 @@ namespace projectDemo.Repository
                 .FirstOrDefaultAsync(x => x.Email == email);
         }
 
+        public async Task<User?> GetByIdWithRolesAsync(Guid userId)
+        {
+            return await _dbSet
+                .Include(x => x.UserRoles)
+                    .ThenInclude(x => x.Role)
+                .FirstOrDefaultAsync(x => x.Id == userId);
+        }
+
         public async Task<Guid> InsertAsync(User user)
         {
             _dbSet.Add(user);
@@ -50,11 +58,6 @@ namespace projectDemo.Repository
                 .ToListAsync();
 
             return result;
-        }
-
-        public async Task AddAsync()
-        {
-            await _dbSet.AddRangeAsync();
         }
 
         public async Task<List<PermissionResponse>> GetPermissionsbyRoleName(string roleName)

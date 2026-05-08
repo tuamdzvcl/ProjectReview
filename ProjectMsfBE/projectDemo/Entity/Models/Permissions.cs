@@ -1,6 +1,7 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using EventTick.Model.asbtract;
+using projectDemo.Common;
 
 namespace projectDemo.Entity.Models
 {
@@ -11,12 +12,11 @@ namespace projectDemo.Entity.Models
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
 
-        [Required]
-        [StringLength(50)]
+        [TextValidation(ConfigValidation.MinLength, ConfigValidation.MaxLength)]
+
         public string PermissonsName { get; set; }
 
-        [Required]
-        [StringLength(255)]
+        [TextValidation(ConfigValidation.MinLength, ConfigValidation.MaxLength)]
         public string PermissonsDescription { get; set; }
 
         public virtual ICollection<RolePermissions> RolePermissions { get; set; }

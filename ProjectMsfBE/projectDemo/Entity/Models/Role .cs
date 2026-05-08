@@ -7,6 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using EventTick.Model.asbtract;
 using EventTick.Model.Enum;
+using projectDemo.Common;
 using projectDemo.Entity.Models;
 
 namespace EventTick.Model.Models
@@ -18,7 +19,7 @@ namespace EventTick.Model.Models
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
 
-        [Required]
+        [TextValidation(ConfigValidation.MinLength, ConfigValidation.MaxLength)]
         public string RoleName { get; set; }
 
         public bool IsSystem { get; set; }

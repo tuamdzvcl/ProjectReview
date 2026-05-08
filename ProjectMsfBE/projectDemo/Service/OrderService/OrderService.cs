@@ -6,6 +6,7 @@ using EventTick.Model.Enum;
 using EventTick.Model.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
+using projectDemo.Common;
 using projectDemo.Data;
 using projectDemo.DTO.Request;
 using projectDemo.DTO.Respone;
@@ -14,8 +15,8 @@ using projectDemo.DTO.Response.Momo;
 using projectDemo.DTO.Response.Tick;
 using projectDemo.DTO.UpdateRequest;
 using projectDemo.Entity.Enum;
+using projectDemo.Query.OrderQuery;
 using projectDemo.Repository.Ipml;
-using projectDemo.Repository.OrderQuery;
 using projectDemo.Repository.OrderRepository;
 using projectDemo.Repository.PaymentRepository;
 using projectDemo.Repository.TickRepository;
@@ -75,26 +76,7 @@ namespace projectDemo.Service.OrderService
             return Guid.NewGuid().ToString("N").Substring(0, 8).ToUpper();
         }
 
-        private string GenerateQrCode(TickCreateQrCode request)
-        {
-            // Bước 1: Chuyển payload thành JSON
-            string jsonString = System.Text.Json.JsonSerializer.Serialize(request);
-
-            // Bước 2: Mã hóa sang Base64
-            byte[] plainTextBytes = System.Text.Encoding.UTF8.GetBytes(jsonString);
-            string base64Payload = Convert.ToBase64String(plainTextBytes);
-
-            // Bước 3: Tạo chữ ký HMAC để chống fake
-            // Cần lấy SecretKey từ cấu hình, dùng HmacSha256Helper
-            string secretKey = _options.Value?.SecretKey ?? "default_secret_key_if_not_configured";
-            string signature = projectDemo.Common.HmacSha256Helper.ComputeHmacSha256(
-                base64Payload,
-                secretKey
-            );
-
-            // Bước 4: Ghép lại dạng Payload.Signature (gần giống JWT)
-            return $"{base64Payload}.{signature}";
-        }
+        
 
         //chuyển từ enum sang string
         public static EnumStatusOrder ConvertStatus(string status)
@@ -176,28 +158,28 @@ namespace projectDemo.Service.OrderService
                     };
                     order.OrderDetails.Add(detail);
                     TotalAmount += typeTicket.Price * item.Quantity;
-                    var tickqr = new TickCreateQrCode
-                    {
-                        EventID = typeTicket.EventID,
-                        OrderId = order.Id,
-                        TickTypeId = typeTicket.Id,
-                        expiration = typeTicket.Event.EndDate,
-                    };
+                    //var tickqr = new TickCreateQrCode
+                    //{
+                    //    EventID = typeTicket.EventID,
+                    //    OrderId = order.Id,
+                    //    TickTypeId = typeTicket.Id,
+                    //    expiration = typeTicket.Event.EndDate,
+                    //};
 
-                    // For each item in the quantity, create a unique ticket
-                    for (int i = 0; i < item.Quantity; i++)
-                    {
-                        var qrcode = GenerateQrCode(tickqr);
-                        var tick = new Ticket
-                        {
-                            TicketCode = Guid.NewGuid().ToString(),
-                            QRCode = qrcode,
-                            Status = EnumStatusTick.VALID,
-                            CreatedDate = DateTime.Now,
-                            OrderDetailID = detail.Id,
-                        };
-                        await _ticketsRepositorys.CreateTicket(tick);
-                    }
+                    //// For each item in the quantity, create a unique ticket
+                    //for (int i = 0; i < item.Quantity; i++)
+                    //{
+                    //    var qrcode = GenerateQrCode(tickqr);
+                    //    var tick = new Ticket
+                    //    {
+                    //        TicketCode = Guid.NewGuid().ToString(),
+                    //        QRCode = qrcode,
+                    //        Status = EnumStatusTick.VALID,
+                    //        CreatedDate = DateTime.Now,
+                    //        OrderDetailID = detail.Id,
+                    //    };
+                    //    await _ticketsRepositorys.CreateTicket(tick);
+                    //}
                 }
                 order.TotalAmount = TotalAmount;
                 await _orderRepository.CreateOrder(order);
@@ -210,9 +192,9 @@ namespace projectDemo.Service.OrderService
                     OrderID = order.Id,
                     PaidDate = DateTime.Now,
                     PaymentMethod = "MOMO",
-                    Status = EnumStatusPayment.PENDING,
-                    TransactionCode = EnumStatusPayment.PENDING.ToString(),
-                    RequestId = EnumStatusPayment.PENDING.ToString(),
+                    Status = EnumStatusPayment.PENDING.ToString(),
+                    TransactionCode = user.Id.ToString(),
+                    RequestId = order.Id.ToString(),
                 };
 
                 await _paymentRepository.Create(payment);
@@ -312,6 +294,7 @@ namespace projectDemo.Service.OrderService
                                     EventStartDate = eventRow.EventStartDate ?? DateTime.MinValue,
                                     EventEndDate = eventRow.EventEndDate ?? DateTime.MinValue,
                                     EventPosterUrl = eventRow.EventPosterUrl ?? string.Empty,
+                                    EventStatus = eventRow.EventStatus ?? string.Empty,
                                     ListTypeTicket = g.Where(x =>
                                             x.OrderDetailId.HasValue && x.TicketTypeId.HasValue
                                         )

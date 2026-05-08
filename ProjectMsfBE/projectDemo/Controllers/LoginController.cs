@@ -123,5 +123,26 @@ namespace projectDemo.Controllers
 
             return BadRequest(result);
         }
+
+        [HttpPost("refresh-token")]
+        [AllowAnonymous]
+        public async Task<IActionResult> RefreshToken([FromBody] RefreshRequest request)
+        {
+            var result = await _authService.RefreshTokenAsync(request.RefreshToken);
+            if (result.StatusCode == Entity.Enum.EnumStatusCode.SUCCESS)
+                return Ok(result);
+
+            return BadRequest(result);
+        }
+
+        [HttpPost("logout")]
+        public async Task<IActionResult> Logout([FromBody] RefreshRequest request)
+        {
+            var result = await _authService.Logout(request.RefreshToken);
+            if (result.StatusCode == Entity.Enum.EnumStatusCode.SUCCESS)
+                return Ok(result);
+
+            return BadRequest(result);
+        }
     }
 }

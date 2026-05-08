@@ -1,4 +1,5 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
 import { HeroSearchComponent } from '../../../../shared/components/hero-search/hero-search.component';
 import { FilterTabsComponent } from '../../../../shared/components/filter-tabs/filter-tabs.component';
 import { EventsGridComponent } from '../../components/events-grid/events-grid.component';
@@ -12,8 +13,18 @@ import { UserDropdownComponent } from '../../../../shared/components/user-dropdo
   templateUrl: './events-page.component.html',
   styleUrl: './events-page.component.scss'
 })
-export class EventsPageComponent {
+export class EventsPageComponent implements OnInit {
   selectedCategoryIds: string[] = [];
+  searchKeyword: string = '';
+
+  constructor(private route: ActivatedRoute) {}
+
+  ngOnInit() {
+    // Đọc query parameters từ URL mỗi khi URL thay đổi
+    this.route.queryParams.subscribe(params => {
+      this.searchKeyword = params['keyword'] || '';
+    });
+  }
 
   onCategoryChange(categoryIds: string[]) {
     this.selectedCategoryIds = categoryIds;

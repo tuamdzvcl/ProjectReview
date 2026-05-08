@@ -1,5 +1,4 @@
 using System.IdentityModel.Tokens.Jwt;
-using System.Net.WebSockets;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
@@ -8,13 +7,14 @@ using EventTick.Model.Models;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.IdentityModel.Tokens;
 using projectDemo.Common;
-using projectDemo.Data;
 using projectDemo.DTO.Request;
 using projectDemo.DTO.Respone;
 using projectDemo.DTO.Response;
 using projectDemo.Entity.Enum;
 using projectDemo.Entity.Models;
+using projectDemo.Repository.EmailVerificationTokenRepository;
 using projectDemo.Repository.Ipml;
+using projectDemo.Repository.RefreshRepository;
 using projectDemo.Service.EmailService;
 using projectDemo.UnitOfWorks;
 
@@ -22,43 +22,42 @@ namespace projectDemo.Service.Auth
 {
     public class AutheService : IAuthService
     {
-        private readonly int HASHPASSWORD = 10;
-        private readonly int ExpirationMinutes = 1;
         private readonly IConfiguration _configuration;
-        private readonly EventTickDbContext _context;
         private readonly IAuthRepository _authRepository;
-        private readonly IRoleRepository _roleRepo;
         private readonly IUserLoginRepository _loginRepo;
         private readonly IUserRoleRepository _userRoleRepo;
+        private readonly IRefreshTokenRepository _refreshTokenRepo;
+        private readonly IEmailVerificationTokenRepository _emailTokenRepo;
         private readonly IMemoryCache _cache;
         private readonly IEmailService _emailService;
         private readonly IUnitOfWork _uow;
 
+        private readonly int REFRESH_TOKEN_DAYS = 7;
+        private int JwtExpMinutes => int.Parse(_configuration.GetSection("JwtSettings")["ExpirationMinutes"]!);
+
         public AutheService(
             IConfiguration configuration,
             IAuthRepository authRepository,
-            IAuthRepository userRepo,
-            IRoleRepository roleRepo,
             IUserLoginRepository loginRepo,
             IUserRoleRepository userRoleRepo,
+            IRefreshTokenRepository refreshTokenRepo,
+            IEmailVerificationTokenRepository emailTokenRepo,
             IUnitOfWork uow,
-            EventTickDbContext context,
             IMemoryCache cache,
             IEmailService emailService
         )
         {
             _configuration = configuration;
             _uow = uow;
-            _context = context;
             _authRepository = authRepository;
-            _roleRepo = roleRepo;
             _loginRepo = loginRepo;
             _userRoleRepo = userRoleRepo;
+            _refreshTokenRepo = refreshTokenRepo;
+            _emailTokenRepo = emailTokenRepo;
             _cache = cache;
             _emailService = emailService;
         }
 
-        //login->token/ accec
         public async Task<ApiResponse<LoginResponse>> Login(LoginRequest resquest)
         {
             var user = await _authRepository.GetByEmailAsync(resquest.email);
@@ -92,13 +91,12 @@ namespace projectDemo.Service.Auth
             if (!isPasswordValid)
             {
                 user.Isfalse = user.Isfalse + 1;
-                Console.WriteLine(user.Isfalse);
                 if (user.Isfalse >= 5)
                 {
                     user.DateLock = DateTime.UtcNow.AddMinutes(5);
                     user.Isfalse = 0;
                 }
-                await _authRepository.AddAsync();
+                await _uow.SaveChangesAsync();
 
                 return ApiResponse<LoginResponse>.FailResponse(
                     EnumStatusCode.PASSNOTFOUD,
@@ -108,34 +106,30 @@ namespace projectDemo.Service.Auth
 
             user.Isfalse = 0;
             user.DateLock = null;
+            await _uow.SaveChangesAsync();
 
-            await _authRepository.AddAsync();
             var permission = await _authRepository.GetPermissionNameAsyncByUserId(user.Id);
-            var roleNames = user.UserRoles.Select(ur => ur.Role.RoleName).ToList();
-            List<string> roles = new List<string>();
-            foreach (var roleName in roleNames)
-            {
-                roles.Add(roleName.ToString().ToUpper());
-            }
+            var roles = GetRoleNames(user);
 
             var token = GenerateToken(user, permission);
+            var refreshTokenStr = GenerateRefreshToken();
 
-            var userResponse = new UserResponse
+            var refreshToken = new RefreshToken
             {
-                Username = user.Username,
-                FirstName = user.FirstName,
-                LastName = user.LastName,
-                Email = user.Email,
-                ID = user.Id,
-                RoleName = roles,
+                Token = refreshTokenStr,
+                UserId = user.Id,
+                ExpiryDate = DateTime.UtcNow.AddDays(REFRESH_TOKEN_DAYS),
+                IsRevoked = false,
             };
+            await _refreshTokenRepo.AddAsync(refreshToken);
+            await _uow.SaveChangesAsync();
 
             var loginResponse = new LoginResponse
             {
                 AccessToken = token,
-                RefreshToken = GenerateRefreshToken(),
-                ExpiredAt = DateTime.UtcNow.AddMinutes(2),
-                User = userResponse,
+                RefreshToken = refreshTokenStr,
+                ExpiredAt = DateTime.UtcNow.AddMinutes(JwtExpMinutes),
+                User = MapToUserResponse(user, roles),
             };
             return ApiResponse<LoginResponse>.SuccessResponse(
                 EnumStatusCode.SUCCESS,
@@ -143,7 +137,6 @@ namespace projectDemo.Service.Auth
             );
         }
 
-        //reder token
         public string GenerateToken(User user, List<PermissionResponse> permissions)
         {
             var jwt = _configuration.GetSection("JwtSettings");
@@ -163,7 +156,6 @@ namespace projectDemo.Service.Auth
             }
 
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwt["SecretKey"]!));
-
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
             var token = new JwtSecurityToken(
@@ -176,7 +168,6 @@ namespace projectDemo.Service.Auth
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
 
-        //reder refreshtoken
         public string GenerateRefreshToken()
         {
             var randomNumber = new byte[32];
@@ -187,13 +178,10 @@ namespace projectDemo.Service.Auth
             }
         }
 
-        //đăng kí thông tin user đăng kí
         public async Task<ApiResponse<UserResponse>> Regiter(RegisterRequest resquest)
         {
             ValidationHelper.NormalizeAllStrings(resquest);
-            if (
-                ValidationHelper.HasSpecialCharactersInAny(resquest.FirstName,resquest.LastName)
-            )
+            if (ValidationHelper.HasSpecialCharactersInAny(resquest.FirstName, resquest.LastName))
             {
                 return ApiResponse<UserResponse>.FailResponse(
                     EnumStatusCode.BAD_REQUEST,
@@ -212,6 +200,7 @@ namespace projectDemo.Service.Auth
                         "Email đã tồn tại"
                     );
                 }
+
                 var password = BCrypt.Net.BCrypt.HashPassword(resquest.password);
 
                 var user = new User
@@ -233,7 +222,7 @@ namespace projectDemo.Service.Auth
 
                 var ur = new UserRole { UserId = user.Id, RoleId = (int)EnumRoleName.CUSTOMER };
                 await _userRoleRepo.InsertAsync(ur);
-                var passwordHash = BCrypt.Net.BCrypt.HashPassword(resquest.password);
+
                 var ul = new UserLogin
                 {
                     UserId = user.Id,
@@ -243,7 +232,7 @@ namespace projectDemo.Service.Auth
                 };
                 await _loginRepo.InsertAsync(ul);
 
-                await _context.SaveChangesAsync();
+                await _uow.SaveChangesAsync();
 
                 var verificationToken = new EmailVerificationToken
                 {
@@ -253,12 +242,11 @@ namespace projectDemo.Service.Auth
                     ExpiryDate = DateTime.UtcNow.AddMinutes(15),
                     IsUsed = false,
                 };
-                await _context.Set<EmailVerificationToken>().AddAsync(verificationToken);
-                await _context.SaveChangesAsync();
+                await _emailTokenRepo.AddAsync(verificationToken);
+                await _uow.SaveChangesAsync();
 
                 await _uow.CommitAsync();
 
-                // Send Email Verification
                 var verifyLink =
                     $"http://localhost:4200/auth/verify-email?token={verificationToken.Token}";
                 var subject = "Xác thực tài khoản TickEvent của bạn";
@@ -272,7 +260,6 @@ namespace projectDemo.Service.Auth
                 ";
 
                 await _emailService.SendEmailAsync(user.Email, subject, body);
-                List<string> roleString = new List<string>();
 
                 var response = new UserResponse
                 {
@@ -296,9 +283,7 @@ namespace projectDemo.Service.Auth
 
         public async Task<ApiResponse<string>> VerifyEmailAsync(VerifyEmailRequest request)
         {
-            var tokenEntity = _context
-                .Set<EmailVerificationToken>()
-                .FirstOrDefault(t => t.Token == request.Token);
+            var tokenEntity = await _emailTokenRepo.GetByTokenAsync(request.Token);
 
             if (tokenEntity == null)
             {
@@ -324,7 +309,7 @@ namespace projectDemo.Service.Auth
                 );
             }
 
-            var user = await _context.User.FindAsync(tokenEntity.UserId);
+            var user = await _authRepository.GetByIdWithRolesAsync(tokenEntity.UserId);
             if (user == null)
             {
                 return ApiResponse<string>.FailResponse(
@@ -336,7 +321,7 @@ namespace projectDemo.Service.Auth
             user.IsActive = true;
             tokenEntity.IsUsed = true;
 
-            await _context.SaveChangesAsync();
+            await _uow.SaveChangesAsync();
 
             return ApiResponse<string>.SuccessResponse(
                 EnumStatusCode.SUCCESS,
@@ -365,11 +350,7 @@ namespace projectDemo.Service.Auth
                 );
             }
 
-            // Xóa các token chưa dùng cũ
-            var oldTokens = _context
-                .Set<EmailVerificationToken>()
-                .Where(t => t.UserId == user.Id && !t.IsUsed);
-            _context.Set<EmailVerificationToken>().RemoveRange(oldTokens);
+            await _emailTokenRepo.RemoveUnusedByUserIdAsync(user.Id);
 
             var verificationToken = new EmailVerificationToken
             {
@@ -379,8 +360,8 @@ namespace projectDemo.Service.Auth
                 ExpiryDate = DateTime.UtcNow.AddMinutes(15),
                 IsUsed = false,
             };
-            await _context.Set<EmailVerificationToken>().AddAsync(verificationToken);
-            await _context.SaveChangesAsync();
+            await _emailTokenRepo.AddAsync(verificationToken);
+            await _uow.SaveChangesAsync();
 
             var verifyLink =
                 $"http://localhost:4200/auth/verify-email?token={verificationToken.Token}";
@@ -417,7 +398,6 @@ namespace projectDemo.Service.Auth
             var user = await _authRepository.GetByEmailAsync(email);
             if (user == null || user.IsDeleted == true)
             {
-                // We always return success to avoid email enumeration
                 return ApiResponse<string>.SuccessResponse(
                     EnumStatusCode.SUCCESS,
                     "Email không tồn tại hoặc đã quá hạn sử dụng liên hệ admin để được hỗ trợ"
@@ -468,8 +448,7 @@ namespace projectDemo.Service.Auth
             }
 
             user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(request.NewPassword);
-
-            await _context.SaveChangesAsync();
+            await _uow.SaveChangesAsync();
 
             _cache.Remove($"forgot_pwd_{request.Email}");
 
@@ -477,6 +456,112 @@ namespace projectDemo.Service.Auth
                 EnumStatusCode.SUCCESS,
                 "Đặt lại mật khẩu thành công."
             );
+        }
+
+        public async Task<ApiResponse<LoginResponse>> RefreshTokenAsync(string refreshToken)
+        {
+            var storedToken = await _refreshTokenRepo.GetByTokenAsync(refreshToken);
+
+            if (storedToken == null)
+                return ApiResponse<LoginResponse>.FailResponse(
+                    EnumStatusCode.BAD_REQUEST,
+                    "Refresh token không hợp lệ."
+                );
+
+            if (storedToken.IsRevoked)
+                return ApiResponse<LoginResponse>.FailResponse(
+                    EnumStatusCode.BAD_REQUEST,
+                    "Refresh token đã bị thu hồi."
+                );
+
+            if (storedToken.ExpiryDate <= DateTime.UtcNow)
+            {
+                storedToken.IsRevoked = true;
+                await _uow.SaveChangesAsync();
+                return ApiResponse<LoginResponse>.FailResponse(
+                    EnumStatusCode.BAD_REQUEST,
+                    "Refresh token đã hết hạn."
+                );
+            }
+
+            var user = await _authRepository.GetByIdWithRolesAsync(storedToken.UserId);
+            if (user == null || user.IsLock || user.IsDeleted == true)
+                return ApiResponse<LoginResponse>.FailResponse(
+                    EnumStatusCode.BAD_REQUEST,
+                    "Người dùng không tồn tại hoặc đã bị khóa."
+                );
+
+            storedToken.IsRevoked = true;
+
+            var permission = await _authRepository.GetPermissionNameAsyncByUserId(user.Id);
+            var roles = GetRoleNames(user);
+
+            var newAccessToken = GenerateToken(user, permission);
+            var newRefreshTokenStr = GenerateRefreshToken();
+
+            var newRefreshToken = new RefreshToken
+            {
+                Token = newRefreshTokenStr,
+                UserId = user.Id,
+                ExpiryDate = DateTime.UtcNow.AddDays(REFRESH_TOKEN_DAYS),
+                IsRevoked = false,
+            };
+            await _refreshTokenRepo.AddAsync(newRefreshToken);
+            await _uow.SaveChangesAsync();
+
+            var loginResponse = new LoginResponse
+            {
+                AccessToken = newAccessToken,
+                RefreshToken = newRefreshTokenStr,
+                ExpiredAt = DateTime.UtcNow.AddMinutes(JwtExpMinutes),
+                User = MapToUserResponse(user, roles),
+            };
+
+            return ApiResponse<LoginResponse>.SuccessResponse(
+                EnumStatusCode.SUCCESS,
+                loginResponse
+            );
+        }
+
+        public async Task<ApiResponse<string>> Logout(string refreshToken)
+        {
+            var storedToken = await _refreshTokenRepo.GetByTokenAsync(refreshToken);
+
+            if (storedToken == null)
+                return ApiResponse<string>.FailResponse(
+                    EnumStatusCode.BAD_REQUEST,
+                    "Refresh token không hợp lệ."
+                );
+
+            storedToken.IsRevoked = true;
+            await _uow.SaveChangesAsync();
+
+            return ApiResponse<string>.SuccessResponse(
+                EnumStatusCode.SUCCESS,
+                "Đăng xuất thành công."
+            );
+        }
+
+        // === Private Helper Methods ===
+
+        private List<string> GetRoleNames(User user)
+        {
+            return user.UserRoles
+                .Select(ur => ur.Role.RoleName.ToString().ToUpper())
+                .ToList();
+        }
+
+        private UserResponse MapToUserResponse(User user, List<string> roles)
+        {
+            return new UserResponse
+            {
+                Username = user.Username,
+                FirstName = user.FirstName,
+                LastName = user.LastName,
+                Email = user.Email,
+                ID = user.Id,
+                RoleName = roles,
+            };
         }
     }
 }

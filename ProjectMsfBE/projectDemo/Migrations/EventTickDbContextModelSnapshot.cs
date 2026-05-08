@@ -71,8 +71,10 @@ namespace projectDemo.Migrations
                     b.Property<DateTime?>("StartDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<int>("Status")
-                        .HasColumnType("int");
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
 
                     b.Property<string>("Title")
                         .IsRequired()
@@ -124,6 +126,7 @@ namespace projectDemo.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("Status")
+                        .HasMaxLength(50)
                         .HasColumnType("int");
 
                     b.Property<decimal>("TotalAmount")
@@ -214,8 +217,9 @@ namespace projectDemo.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("Status")
-                        .HasColumnType("int");
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("TransactionCode")
                         .IsRequired()
@@ -280,7 +284,7 @@ namespace projectDemo.Migrations
                         new
                         {
                             Id = 1,
-                            CreatedDate = new DateTime(2026, 4, 24, 7, 20, 28, 723, DateTimeKind.Utc).AddTicks(6624),
+                            CreatedDate = new DateTime(2026, 5, 7, 10, 0, 3, 794, DateTimeKind.Utc).AddTicks(7758),
                             IsAdmin = true,
                             IsDeleted = false,
                             IsSystem = true,
@@ -289,7 +293,7 @@ namespace projectDemo.Migrations
                         new
                         {
                             Id = 2,
-                            CreatedDate = new DateTime(2026, 4, 24, 7, 20, 28, 723, DateTimeKind.Utc).AddTicks(6631),
+                            CreatedDate = new DateTime(2026, 5, 7, 10, 0, 3, 794, DateTimeKind.Utc).AddTicks(7770),
                             IsAdmin = false,
                             IsDeleted = false,
                             IsSystem = true,
@@ -298,7 +302,7 @@ namespace projectDemo.Migrations
                         new
                         {
                             Id = 3,
-                            CreatedDate = new DateTime(2026, 4, 24, 7, 20, 28, 723, DateTimeKind.Utc).AddTicks(6633),
+                            CreatedDate = new DateTime(2026, 5, 7, 10, 0, 3, 794, DateTimeKind.Utc).AddTicks(7772),
                             IsAdmin = false,
                             IsDeleted = false,
                             IsSystem = true,
@@ -339,8 +343,7 @@ namespace projectDemo.Migrations
 
                     b.Property<string>("TicketCode")
                         .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("UpdatedBy")
                         .HasMaxLength(255)
@@ -441,8 +444,7 @@ namespace projectDemo.Migrations
 
                     b.Property<string>("FirstName")
                         .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<bool>("IsActive")
                         .HasColumnType("bit");
@@ -461,12 +463,10 @@ namespace projectDemo.Migrations
 
                     b.Property<string>("LastName")
                         .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("PasswordHash")
-                        .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("UpdatedBy")
                         .HasMaxLength(255)
@@ -477,8 +477,7 @@ namespace projectDemo.Migrations
 
                     b.Property<string>("Username")
                         .IsRequired()
-                        .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
@@ -495,7 +494,7 @@ namespace projectDemo.Migrations
                             IsDeleted = false,
                             IsLock = false,
                             LastName = "admin",
-                            PasswordHash = "$2a$11$Jjawr85fB4zt8nZ0nKO.6OF3ProsnIy4ZESvMVB9SFBXUzBJIV8g.",
+                            PasswordHash = "$2a$11$cwQ0Xqir2QTSV9fy5P4i7uLl6halAASEbPxkGePOoz7aj5mF3ILMS",
                             Username = "admin"
                         });
                 });
@@ -616,7 +615,8 @@ namespace projectDemo.Migrations
 
                     b.Property<string>("Username")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
 
                     b.HasKey("Id");
 
@@ -676,7 +676,8 @@ namespace projectDemo.Migrations
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
 
                     b.HasKey("Id");
 
@@ -872,13 +873,11 @@ namespace projectDemo.Migrations
 
                     b.Property<string>("PermissonsDescription")
                         .IsRequired()
-                        .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("PermissonsName")
                         .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("UpdatedBy")
                         .HasMaxLength(255)
@@ -1065,8 +1064,7 @@ namespace projectDemo.Migrations
 
                     b.Property<string>("Code")
                         .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("CreatedBy")
                         .HasMaxLength(255)
@@ -1077,8 +1075,7 @@ namespace projectDemo.Migrations
 
                     b.Property<string>("Description")
                         .IsRequired()
-                        .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("DiscountType")
                         .IsRequired()
@@ -1498,8 +1495,7 @@ namespace projectDemo.Migrations
 
                     b.Property<string>("status")
                         .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 

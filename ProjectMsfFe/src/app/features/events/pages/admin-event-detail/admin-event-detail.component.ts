@@ -11,6 +11,7 @@ import { Toast } from 'primeng/toast';
 import { ConfirmDialog } from 'primeng/confirmdialog';
 import { AppShellComponent } from '../../../../layouts/app-shell/app-shell.component';
 import { EventStatusPipe } from '../../../../shared/pipes/event-status.pipe';
+import { EventStatus } from '../../../../core/enums/event-status.enum';
 
 @Component({
   selector: 'app-admin-event-detail',
@@ -83,7 +84,7 @@ export class AdminEventDetailComponent implements OnInit {
         if (!this.event) return;
 
 
-        this.eventService.UpdateEventStatus(this.event.Id.toString(), 4).subscribe({
+        this.eventService.UpdateEventStatus(this.event.Id.toString(), EventStatus.PUBLISHED).subscribe({
           next: () => {
             if (this.event) this.event.Status = 'PUBLISHED';
             this.messageService.add({

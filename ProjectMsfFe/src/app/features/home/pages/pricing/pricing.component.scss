@@ -100,7 +100,7 @@ $text-muted: #5a6b5a;
           color: #1a2e1a;
           border: none;
           box-shadow: 0 10px 20px rgba(129, 233, 121, 0.3);
-          
+
           &:hover {
             transform: scale(1.02);
             box-shadow: 0 15px 30px rgba(129, 233, 121, 0.4);
@@ -119,7 +119,7 @@ $text-muted: #5a6b5a;
           font-weight: 700;
           font-size: 0.8rem;
           text-transform: uppercase;
-          box-shadow: 0 5px 10px rgba(0,0,0,0.1);
+          box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
         }
       }
 
@@ -214,6 +214,7 @@ $text-muted: #5a6b5a;
     opacity: 0;
     transform: translateY(-30px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -225,7 +226,7 @@ $text-muted: #5a6b5a;
     .pricing-header h1 {
       font-size: 2.5rem;
     }
-    
+
     .pricing-cards .card.highlight {
       transform: scale(1);
     }

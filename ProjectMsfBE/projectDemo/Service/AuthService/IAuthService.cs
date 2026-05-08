@@ -12,10 +12,11 @@ namespace projectDemo.Service.Auth
         Task<ApiResponse<UserResponse>> Regiter(RegisterRequest resquest);
         Task<ApiResponse<string>> VerifyEmailAsync(VerifyEmailRequest request);
         Task<ApiResponse<string>> ResendVerificationEmailAsync(ResendVerificationRequest request);
-
-
         string GenerateToken(User user, List<PermissionResponse> perResponse);
         Task<ApiResponse<string>> ForgotPasswordAsync(string email);
         Task<ApiResponse<string>> ResetPasswordAsync(ResetPasswordRequest request);
+        Task<ApiResponse<LoginResponse>> RefreshTokenAsync(string refreshToken);
+        Task<ApiResponse<string>> Logout(string refreshToken);
+
     }
 }

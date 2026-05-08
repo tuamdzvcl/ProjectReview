@@ -7,6 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using EventTick.Model.asbtract;
 using EventTick.Model.Enum;
+using projectDemo.Common;
 using projectDemo.Entity.Enum;
 
 namespace EventTick.Model.Models
@@ -32,7 +33,8 @@ namespace EventTick.Model.Models
 
         public int ReservedQuantity { get; set; }
 
-        [Required]
+        [TextValidation(ConfigValidation.MinLength, ConfigValidation.MaxLengthStatus)]
+
         public EnumStatusTickType Status { get; set; }
 
         public Guid EventID { get; set; }

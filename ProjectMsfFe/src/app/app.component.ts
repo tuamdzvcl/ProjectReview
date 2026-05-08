@@ -11,9 +11,9 @@ import { Router, RouterOutlet } from '@angular/router';
 })
 export class AppComponent {
   constructor(
-    private authService: AuthService, 
-    private router: Router 
-  ) {}
+    private authService: AuthService,
+    private router: Router
+  ) { }
 
   ngOnInit() {
     const accessToken = localStorage.getItem('access_token');

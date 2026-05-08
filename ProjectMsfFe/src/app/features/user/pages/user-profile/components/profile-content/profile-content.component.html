@@ -101,8 +101,9 @@
 
   <!-- Order list in My Orders tab -->
   <div *ngIf="activeTab === 'orders' && userOrders.length > 0" class="order-list">
-    <div *ngFor="let order of userOrders" class="order-card" [routerLink]="['/order', order.OrderId]"
-      style="cursor: pointer;">
+    <div *ngFor="let order of userOrders" class="order-card"
+      [routerLink]="order.Status === 'PAID' ? ['/order', order.OrderId] : null"
+      [style.cursor]="order.Status === 'PAID' ? 'pointer' : 'default'">
       <!-- Header: mã đơn + trạng thái -->
       <div class="order-header">
         <div class="order-header-left">
