@@ -11,7 +11,7 @@ namespace projectDemo.Entity.Models
         [Key]
         public Guid Id { get; set; }
         [Required(ErrorMessage = "Không được để trống")]
-        [MaxLength(ConfigValidation.CatetoryMaxLength, ErrorMessage = "Không được vượt quá khí tự cho phép")]
+        [MaxLength(ConfigValidation.MaxLength, ErrorMessage = "Không được vượt quá khí tự cho phép")]
         [MinLength(ConfigValidation.MinLength, ErrorMessage = "Không được ít hơn {0} kí tự")]
         public string Name { get; set; }
 

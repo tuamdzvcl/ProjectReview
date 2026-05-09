@@ -247,8 +247,9 @@ namespace projectDemo.Service.Auth
 
                 await _uow.CommitAsync();
 
+                var frontendUrl = _configuration.GetValue<string>("FrontendUrl") ?? "http://localhost:4200";
                 var verifyLink =
-                    $"http://localhost:4200/auth/verify-email?token={verificationToken.Token}";
+                    $"{frontendUrl}/auth/verify-email?token={verificationToken.Token}";
                 var subject = "Xác thực tài khoản TickEvent của bạn";
                 var body =
                     $@"
@@ -363,8 +364,9 @@ namespace projectDemo.Service.Auth
             await _emailTokenRepo.AddAsync(verificationToken);
             await _uow.SaveChangesAsync();
 
+            var frontendUrl = _configuration.GetValue<string>("FrontendUrl") ?? "http://localhost:4200";
             var verifyLink =
-                $"http://localhost:4200/auth/verify-email?token={verificationToken.Token}";
+                $"{frontendUrl}/auth/verify-email?token={verificationToken.Token}";
             var subject = "Xác thực tài khoản TickEvent của bạn (Gửi lại)";
             var body =
                 $@"
@@ -407,8 +409,9 @@ namespace projectDemo.Service.Auth
             var token = Guid.NewGuid().ToString();
             _cache.Set($"forgot_pwd_{email}", token, TimeSpan.FromMinutes(15));
 
+            var frontendUrl = _configuration.GetValue<string>("FrontendUrl") ?? "http://localhost:4200";
             var resetLink =
-                $"http://localhost:4200/auth/reset-password?email={Uri.EscapeDataString(email)}&token={token}";
+                $"{frontendUrl}/auth/reset-password?email={Uri.EscapeDataString(email)}&token={token}";
             var subject = "Đặt lại mật khẩu của bạn - TickEvent";
             var body =
                 $@"

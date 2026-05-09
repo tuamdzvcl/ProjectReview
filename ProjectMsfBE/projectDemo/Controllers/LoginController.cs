@@ -17,16 +17,19 @@ namespace projectDemo.Controllers
         private readonly IAuthService _authService;
         private readonly GoogleAuthService _googleAuthService;
         private readonly IMemoryCache _cache;
+        private readonly IConfiguration _configuration;
 
         public AuthController(
             IAuthService authService,
             GoogleAuthService googleAuthService,
-            IMemoryCache cache
+            IMemoryCache cache,
+            IConfiguration configuration
         )
         {
             _authService = authService;
             _googleAuthService = googleAuthService;
             _cache = cache;
+            _configuration = configuration;
         }
 
         [HttpPost("login")]
@@ -85,7 +88,8 @@ namespace projectDemo.Controllers
 
             _cache.Set(key, result, TimeSpan.FromMinutes(5));
 
-            var frontendUrl = $"http://localhost:4200/login-success?key={key}";
+            var baseUrl = _configuration.GetValue<string>("FrontendUrl") ?? "http://localhost:4200";
+            var frontendUrl = $"{baseUrl}/login-success?key={key}";
             return Redirect(frontendUrl);
         }
 

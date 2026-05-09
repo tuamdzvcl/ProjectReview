@@ -18,17 +18,18 @@ namespace EventTick.Model.Models
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
+        [TextValidation(ConfigValidation.MinLength, ConfigValidation.MaxLengthStatus)]
 
         public string Name { get; set; }
 
-        [Required]
+        [Required(ErrorMessage ="không được để trống")]
         [Column(TypeName = "decimal(18,2)")]
         public decimal Price { get; set; }
 
-        [Required]
+        [TextValidation(1, 3,ErrorMessage ="Không được vượt quá số cho phép")]
         public int TotalQuantity { get; set; }
 
-        [Required]
+        [TextValidation(1, 3, ErrorMessage = "Không được vượt quá số cho phép")]
         public int SoldQuantity { get; set; }
 
         public int ReservedQuantity { get; set; }

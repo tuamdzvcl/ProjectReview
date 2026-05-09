@@ -11,7 +11,7 @@
         <label class="font-semibold"
           >Họ <span style="color: red">(*)</span>
         </label>
-        <input pInputText formControlName="firstName" />
+        <input pInputText formControlName="firstName" [maxlength]="configService.validation?.User?.FirstName?.Max" />
         <small
           *ngIf="
             form.get('firstName')?.hasError('required') &&
@@ -30,13 +30,16 @@
         >
           <span style="color: red">Họ không hợp lệ</span>
         </small>
+        <small *ngIf="form.get('firstName')?.hasError('minlength')" class="p-error">
+          <span style="color: red">Họ phải có ít nhất {{ configService.validation?.User?.FirstName?.Min }} ký tự</span>
+        </small>
       </div>
 
       <div class="col-6 field">
         <label class="font-semibold"
           >Tên <span style="color: red">(*)</span></label
         >
-        <input pInputText formControlName="lastName" />
+        <input pInputText formControlName="lastName" [maxlength]="configService.validation?.User?.LastName?.Max" />
         <small
           *ngIf="
             form.get('lastName')?.hasError('required') &&
@@ -55,6 +58,9 @@
         >
           <span style="color: red">Tên không hợp lệ</span>
         </small>
+        <small *ngIf="form.get('lastName')?.hasError('minlength')" class="p-error">
+          <span style="color: red">Tên phải có ít nhất {{ configService.validation?.User?.LastName?.Min }} ký tự</span>
+        </small>
       </div>
     </div>
 
@@ -62,7 +68,7 @@
       <label class="font-semibold"
         >Email<span style="color: red">(*)</span></label
       >
-      <input pInputText formControlName="email" />
+      <input pInputText formControlName="email" [maxlength]="configService.validation?.User?.Email?.Max" />
       <small
         *ngIf="form.get('email')?.invalid && form.get('email')?.touched"
         class="p-error"

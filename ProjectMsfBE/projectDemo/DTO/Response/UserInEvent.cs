@@ -7,6 +7,7 @@ namespace projectDemo.DTO.Response
         public string Email { get; set; }
         public string UserName { get; set; }
 
+        
         public string FirstName { get; set; }
         public string LastName { get; set; }
         public Guid ID { get; set; }
@@ -24,6 +25,7 @@ namespace projectDemo.DTO.Response
     public class EventInfo
     {
         public string EventTitle { get; set; }
+        public Guid EventID { get; set; }
         public List<TicketInfo> Tickets { get; set; }
     }
 }

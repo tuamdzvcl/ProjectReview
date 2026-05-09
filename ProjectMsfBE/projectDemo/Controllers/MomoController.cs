@@ -32,10 +32,19 @@ namespace projectDemo.Controllers
             var result = await _momoService.MomoCallBack(model);
             return Redirect(result);
         }
+        [HttpPost("webhook")]
+        public IActionResult Webhook([FromBody] object body)
+        {
+            return Ok(new
+            {
+                error = 0,
+                message = "success"
+            });
+        }
         //[HttpPost("order")]
         //public async Task<IActionResult> CreateOrder([FromBody] MomoRequest request)
         //{
-            
+
         //    var result = await _momoService.CreatePaymentAsync(request);
         //    return Ok(result);
         //}

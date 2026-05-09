@@ -1,4 +1,4 @@
 export const environment = {
   production: true,
-  apiBaseUrl: 'https://fightable-impedible-roy.ngrok-free.dev',
+  apiBaseUrl: 'https://envethub-api.tuananhday.id.vn/',
 };

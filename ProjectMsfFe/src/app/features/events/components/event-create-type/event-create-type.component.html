@@ -24,7 +24,6 @@
             <h3>{{ t.name }} - {{ t.price | vndCurrency }}</h3>
             <p>{{ t.date }}</p>
 
-
             <div class="summary-details mt-3">
               <div class="summary-item">
                 <div class="icon-box"><i class="fa-solid fa-ticket"></i></div>
@@ -75,18 +74,81 @@
   <div class="flex flex-column gap-3 py-2">
     <div class="flex flex-column gap-1">
       <label for="name" class="font-semibold block mb-2">Tên vé *</label>
-      <input pInputText id="name" [(ngModel)]="ticket.name" placeholder="Nhập tên loại vé" class="w-full" />
+      <input pInputText id="name" [(ngModel)]="ticket.name" name="name" #nameModel="ngModel" required
+        [minlength]="configService.validation?.Default?.Min || 5"
+        [maxlength]="configService.validation?.Default?.Max || 100" [ngClass]="{
+          'ng-invalid ng-dirty':
+            nameModel.invalid && (nameModel.dirty || nameModel.touched)
+        }" placeholder="Nhập tên loại vé" class="w-full" />
+      <div *ngIf="nameModel.invalid && (nameModel.dirty || nameModel.touched)" class="p-error">
+        <!-- <small *ngIf="nameModel.errors?.['required']">Tên vé không được để trống.</small> -->
+        <small *ngIf="nameModel.errors?.['minlength']">Tên vé phải có ít nhất
+          {{ configService.validation?.Default?.Min || 5 }} ký tự.</small>
+        <small *ngIf="
+            ticket.name.length >=
+            (configService.validation?.Default?.Max || 100)
+          ">Đã đạt giới hạn tối đa
+          {{ configService.validation?.Default?.Max || 100 }} ký tự.</small>
+      </div>
     </div>
 
     <div class="grid flex mt-3">
       <div class="col-6 flex flex-column gap-1">
         <label for="price" class="font-semibold block mb-2">Giá vé (đ) *</label>
-        <p-inputNumber id="price" [(ngModel)]="ticket.price" mode="currency" currency="VND" locale="vi-VN"
-          styleClass="w-full"></p-inputNumber>
+        <p-inputNumber id="price" [min]="1000" [max]="configService.validation?.Default?.MaxNumber || 99999999"
+          [(ngModel)]="ticket.price" #priceModel="ngModel" mode="currency" currency="VND" locale="vi-VN"
+          styleClass="w-full" [ngClass]="{
+            'ng-invalid ng-dirty':
+              ticket.price === null ||
+              ticket.price === undefined ||
+              ticket.price < 1000 ||
+              ticket.price >=
+                (configService.validation?.Default?.MaxNumber || 9999999999)
+          }"></p-inputNumber>
+        <div *ngIf="ticket.price === null || ticket.price === undefined" class="p-error">
+          <small>Vui lòng nhập giá vé.</small>
+        </div>
+        <div *ngIf="
+            ticket.price !== null &&
+            ticket.price !== undefined &&
+            ticket.price < 1000
+          " class="p-error">
+          <small>Giá vé tối thiểu là 1,000 đ.</small>
+        </div>
+        <div *ngIf="
+            ticket.price >=
+            (configService.validation?.Default?.MaxNumber || 999999999)
+          " class="p-error">
+          <small>Giá vé đã đạt giới hạn tối đa.</small>
+        </div>
       </div>
       <div class="col-6 flex flex-column gap-1">
         <label for="quantity" class="font-semibold block mb-2">Số lượng *</label>
-        <p-inputNumber id="quantity" [(ngModel)]="ticket.quantity" styleClass="w-full"></p-inputNumber>
+        <p-inputNumber id="quantity" [min]="1" [max]="configService.validation?.Default?.MaxQuantity || 9999999"
+          [(ngModel)]="ticket.quantity" #quantityModel="ngModel" styleClass="w-full" [ngClass]="{
+            'ng-invalid ng-dirty':
+              ticket.quantity === null ||
+              ticket.quantity === undefined ||
+              ticket.quantity < 1 ||
+              ticket.quantity >=
+                (configService.validation?.Default?.MaxQuantity || 99999999)
+          }"></p-inputNumber>
+        <div *ngIf="ticket.quantity === null || ticket.quantity === undefined" class="p-error">
+          <small>Vui lòng nhập số lượng.</small>
+        </div>
+        <div *ngIf="
+            ticket.quantity !== null &&
+            ticket.quantity !== undefined &&
+            ticket.quantity < 1
+          " class="p-error">
+          <small>Số lượng tối thiểu là 1.</small>
+        </div>
+        <div *ngIf="
+            ticket.quantity >=
+            (configService.validation?.Default?.MaxQuantity || 99999999)
+          " class="p-error">
+          <small>Số lượng đã đạt giới hạn tối đa.</small>
+        </div>
       </div>
     </div>
 
@@ -122,7 +184,20 @@
     <div class="flex justify-content-end gap-2 mt-4">
       <button pButton label="Hủy" icon="pi pi-times" class="p-button-text p-button-secondary"
         (click)="showDialog = false"></button>
-      <button pButton label="Lưu vé" icon="pi pi-check" (click)="saveTicket()" [disabled]="!ticket.name"></button>
+      <button pButton label="Lưu vé" icon="pi pi-check" (click)="saveTicket()" [disabled]="
+          !ticket.name ||
+          nameModel.invalid ||
+          ticket.price === null ||
+          ticket.price === undefined ||
+          ticket.price < 1000 ||
+          ticket.price >=
+            (configService.validation?.Default?.MaxNumber || 9999999999) ||
+          ticket.quantity === null ||
+          ticket.quantity === undefined ||
+          ticket.quantity < 1 ||
+          ticket.quantity >=
+            (configService.validation?.Default?.MaxQuantity || 99999999)
+        "></button>
     </div>
   </ng-template>
 </p-dialog>

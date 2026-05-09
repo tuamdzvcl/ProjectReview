@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using EventTick.Model.asbtract;
@@ -13,11 +13,11 @@ namespace projectDemo.Entity.Models
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
 
-        [TextValidation(ConfigValidation.MinLength, ConfigValidation.MaxLengthStatus)]
+        [TextValidation(ConfigValidation.MinLength, ConfigValidation.MaxLengthStatus, ErrorMessage = "quá số kí tự rồi")]
 
         public string Code { get; set; }
 
-        [TextValidation(ConfigValidation.MinLength, ConfigValidation.MaxLength)]
+        [TextValidation(ConfigValidation.MinLength, ConfigValidation.MaxLengthStatus, ErrorMessage = "quá số kí tự rồi")]
 
         public string Description { get; set; }
 

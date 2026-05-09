@@ -9,6 +9,7 @@ import {
   HostListener,
 } from '@angular/core';
 import { RolePermissionService } from '../../../../core/services/role-permission.service';
+import { ConfigService } from '../../../../core/services/config.service';
 import {
   FormBuilder,
   Validators,
@@ -45,6 +46,7 @@ export class UserFormComponent implements OnChanges, OnInit {
   @Output() submitForm = new EventEmitter<any>();
 
   private fb = inject(FormBuilder);
+  public configService = inject(ConfigService);
 
   form = this.fb.group({
     id: [null],
@@ -52,6 +54,12 @@ export class UserFormComponent implements OnChanges, OnInit {
       '',
       [
         Validators.required,
+        Validators.minLength(
+          this.configService.validation?.User?.FirstName?.Min ?? 3
+        ),
+        Validators.maxLength(
+          this.configService.validation?.User?.FirstName?.Max ?? 20
+        ),
         Validators.pattern('^(?=.*[a-zA-ZÀ-ỹ])[a-zA-ZÀ-ỹ\\s]+$'),
       ],
     ],
@@ -59,10 +67,25 @@ export class UserFormComponent implements OnChanges, OnInit {
       '',
       [
         Validators.required,
+        Validators.minLength(
+          this.configService.validation?.User?.LastName?.Min ?? 3
+        ),
+        Validators.maxLength(
+          this.configService.validation?.User?.LastName?.Max ?? 20
+        ),
         Validators.pattern('^(?=.*[a-zA-ZÀ-ỹ])[a-zA-ZÀ-ỹ\\s]+$'),
       ],
     ],
-    email: ['', [Validators.required, Validators.email]],
+    email: [
+      '',
+      [
+        Validators.required,
+        Validators.email,
+        Validators.maxLength(
+          this.configService.validation?.User?.Email?.Max ?? 50
+        ),
+      ],
+    ],
     role: [[] as number[], Validators.required],
   });
 

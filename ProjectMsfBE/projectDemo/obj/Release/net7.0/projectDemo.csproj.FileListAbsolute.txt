@@ -91,3 +91,11 @@ D:\Msf\ProjectMsfBE\projectDemo\obj\Release\net7.0\refint\projectDemo.dll
 D:\Msf\ProjectMsfBE\projectDemo\obj\Release\net7.0\projectDemo.pdb
 D:\Msf\ProjectMsfBE\projectDemo\obj\Release\net7.0\projectDemo.genruntimeconfig.cache
 D:\Msf\ProjectMsfBE\projectDemo\obj\Release\net7.0\ref\projectDemo.dll
+D:\Msf\ProjectMsfBE\projectDemo\bin\Release\net7.0\ClosedXML.dll
+D:\Msf\ProjectMsfBE\projectDemo\bin\Release\net7.0\ClosedXML.Parser.dll
+D:\Msf\ProjectMsfBE\projectDemo\bin\Release\net7.0\DocumentFormat.OpenXml.dll
+D:\Msf\ProjectMsfBE\projectDemo\bin\Release\net7.0\DocumentFormat.OpenXml.Framework.dll
+D:\Msf\ProjectMsfBE\projectDemo\bin\Release\net7.0\ExcelNumberFormat.dll
+D:\Msf\ProjectMsfBE\projectDemo\bin\Release\net7.0\RBush.dll
+D:\Msf\ProjectMsfBE\projectDemo\bin\Release\net7.0\SixLabors.Fonts.dll
+D:\Msf\ProjectMsfBE\projectDemo\bin\Release\net7.0\System.IO.Packaging.dll

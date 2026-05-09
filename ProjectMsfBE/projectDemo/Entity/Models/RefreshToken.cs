@@ -1,4 +1,4 @@
-using EventTick.Model.Models;
+﻿using EventTick.Model.Models;
 using projectDemo.Common;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -10,7 +10,7 @@ namespace projectDemo.Entity.Models
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
-        [TextValidation(ConfigValidation.MinLength, ConfigValidation.MaxLength)]
+        [TextValidation(ConfigValidation.MinLength, ConfigValidation.MaxLengthStatus, ErrorMessage = "quá số kí tự rồi")]
 
         public string Token { get; set; }
         public DateTime ExpiryDate { get; set; }

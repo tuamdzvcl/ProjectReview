@@ -10,11 +10,18 @@ import { environment } from '../../../environments/environment';
 export class BaseApiService {
   protected baseUrl = environment.apiBaseUrl;
 
-  constructor(protected http: HttpClient) { }
+  constructor(protected http: HttpClient) {}
 
   private handleError(error: HttpErrorResponse) {
     if (error.error && error.error.StatusCode) {
-      return throwError(() => new ApiError(error.error.StatusCode, error.error.Message || 'Có lỗi xảy ra', error.error.Errors));
+      return throwError(
+        () =>
+          new ApiError(
+            error.error.StatusCode,
+            error.error.Message || 'Có lỗi xảy ra',
+            error.error.Errors
+          )
+      );
     }
     return throwError(() => error);
   }
@@ -27,7 +34,7 @@ export class BaseApiService {
         }
         return res.Data;
       }),
-      catchError((err) => this.handleError(err))
+      catchError((err) => this.handleError(err.messger))
     );
   }
 

@@ -43,6 +43,7 @@ using projectDemo.Service.TickService;
 using projectDemo.Service.UserService;
 using projectDemo.UnitOfWork;
 using projectDemo.UnitOfWorks;
+using projectDemo.Service.ConfigService;
 
 namespace projectDemo
 {
@@ -96,7 +97,7 @@ namespace projectDemo
 
                     var response = DTO.Respone.ApiResponse<object>.FailResponse(
                         Entity.Enum.EnumStatusCode.BAD_REQUEST,
-                        "Xem Lại các trường thông tin còn để trống",
+                        "Lỗi hệ thống",
                         errors
                     );
 
@@ -207,7 +208,7 @@ namespace projectDemo
                     policy =>
                     {
                         policy
-                            .WithOrigins("http://localhost:4200")
+                            .WithOrigins(builder.Configuration["FrontendUrl"] ?? "http://localhost:4200")
                             .AllowAnyHeader()
                             .AllowAnyMethod();
                     }
@@ -346,6 +347,7 @@ namespace projectDemo
             builder.Services.AddScoped<IImageService, ImageService>();
             builder.Services.AddHttpClient();
             builder.Services.AddScoped<GoogleAuthService>();
+            builder.Services.AddScoped<ISystemConfigService, SystemConfigService>();
             builder.Services.AddScoped<IEmailService, EmailService>();
             builder.Services.AddScoped<RestRepository>();
             builder.Services.AddSingleton<IAuthorizationPolicyProvider, PermissionPolicyProvider>();

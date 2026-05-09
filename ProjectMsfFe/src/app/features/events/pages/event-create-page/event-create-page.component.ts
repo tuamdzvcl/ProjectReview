@@ -9,6 +9,7 @@ import { EventDraftService } from '../../../../core/services/event-draft.service
 import { environment } from '../../../../../environments/environment';
 import { Toast } from 'primeng/toast';
 import { MessageService } from 'primeng/api';
+import { ApiErrorHandler } from '../../../../core/utils/api-error-handler.util';
 
 @Component({
   selector: 'app-event-create-page',
@@ -97,9 +98,16 @@ export class EventCreatePageComponent {
       description: eventData.Description || '',
       location: eventData.Location || '',
       selectedCategory: eventData.CatetoryName || null,
-      eventDate: eventData.StartDate ? new Date(eventData.StartDate) : undefined,
-      eventTime: eventData.StartDate ? new Date(eventData.StartDate) : undefined,
-      duration: (eventData.StartDate && eventData.EndDate) ? this.calcDurationHours(eventData.StartDate, eventData.EndDate) : 1,
+      eventDate: eventData.StartDate
+        ? new Date(eventData.StartDate)
+        : undefined,
+      eventTime: eventData.StartDate
+        ? new Date(eventData.StartDate)
+        : undefined,
+      duration:
+        eventData.StartDate && eventData.EndDate
+          ? this.calcDurationHours(eventData.StartDate, eventData.EndDate)
+          : 1,
       previewUrl: finalPreviewUrl,
       tickets: mappedTickets,
       isImmediateStart: false,
@@ -160,12 +168,17 @@ export class EventCreatePageComponent {
     const draft = this.draftService.load();
     const file = this.draftService.selectedFile;
 
-    if (!this.isFormDataValid(draft)) {
+    const validation = this.isFormDataValid(draft);
+    if (!validation.isValid) {
+      this.focusElement(validation.fieldId, validation.step);
       return;
     }
 
     const { startDate, endDate } = this.calculateEventDates(draft);
-    const { saleStartDate, saleEndDate } = this.calculateSaleDates(draft, startDate);
+    const { saleStartDate, saleEndDate } = this.calculateSaleDates(
+      draft,
+      startDate
+    );
 
     const categoryName = draft.selectedCategory || '';
 
@@ -183,65 +196,153 @@ export class EventCreatePageComponent {
     console.log('formdate ', formData);
   }
 
-  private isFormDataValid(draft: any): boolean {
+  private focusElement(fieldId: string | undefined, step: number) {
+    if (fieldId) {
+      // Chuyển bước nếu cần
+      if (this.activeIndex !== step) {
+        this.onStepClick(step);
+      }
+
+      // Đợi view render xong rồi focus
+      setTimeout(() => {
+        const element = document.getElementById(fieldId);
+        if (element) {
+          element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+          // Thêm class tô đỏ
+          element.classList.add('validation-error-focus');
+
+          // Xóa class sau 3 giây
+          setTimeout(() => {
+            element.classList.remove('validation-error-focus');
+          }, 3000);
+
+          // Thử focus trực tiếp hoặc tìm input bên trong (cho PrimeNG)
+          const input = element.querySelector(
+            'input, textarea, .ql-editor'
+          ) as HTMLElement;
+          if (input) {
+            input.focus();
+          } else {
+            element.focus();
+          }
+        }
+      }, 300);
+    }
+  }
+
+  private isFormDataValid(draft: any): {
+    isValid: boolean;
+    fieldId?: string;
+    step: number;
+  } {
     const textOnly = (html: string) => {
-      if (!html) return "";
+      if (!html) return '';
       const doc = new DOMParser().parseFromString(html, 'text/html');
-      return doc.body.textContent || "";
+      return doc.body.textContent || '';
     };
 
     const hasSpecialChars = (str: string) => {
       if (!str) return false;
       const regex = /[!@#$%^&*()_+={}\[\]|\\:;"'<>\/?]+/;
       return regex.test(str);
-    }
+    };
 
+    // Step 0: Chi tiết
     if (!draft.title || draft.title.trim().length <= 5) {
-       this.messageService.add({severity:'warn', summary:'Lỗi thông tin', detail:'Tên sự kiện phải lớn hơn 5 ký tự.'});
-       return false;
+      this.messageService.add({
+        severity: 'warn',
+        summary: 'Lỗi thông tin',
+        detail: 'Tên sự kiện phải lớn hơn 5 ký tự.',
+      });
+      return { isValid: false, fieldId: 'titleInput', step: 0 };
     }
     if (hasSpecialChars(draft.title)) {
-       this.messageService.add({severity:'warn', summary:'Lỗi thông tin', detail:'Tên sự kiện không được chứa ký tự đặc biệt (!@#$...).'});
-       return false;
+      this.messageService.add({
+        severity: 'warn',
+        summary: 'Lỗi thông tin',
+        detail: 'Tên sự kiện không được chứa ký tự đặc biệt (!@#$...).',
+      });
+      return { isValid: false, fieldId: 'titleInput', step: 0 };
+    }
+
+    if (!draft.selectedCategory) {
+      this.messageService.add({
+        severity: 'warn',
+        summary: 'Lỗi thông tin',
+        detail: 'Vui lòng chọn danh mục sự kiện.',
+      });
+      return { isValid: false, fieldId: 'categorySelect', step: 0 };
+    }
+
+    if (!draft.eventDate) {
+      this.messageService.add({
+        severity: 'warn',
+        summary: 'Lỗi thông tin',
+        detail: 'Ngày sự kiện không được để trống.',
+      });
+      return { isValid: false, fieldId: 'datePicker', step: 0 };
     }
 
     if (!draft.location || draft.location.trim().length <= 5) {
-       this.messageService.add({severity:'warn', summary:'Lỗi thông tin', detail:'Địa điểm sự kiện phải lớn hơn 5 ký tự.'});
-       return false;
+      this.messageService.add({
+        severity: 'warn',
+        summary: 'Lỗi thông tin',
+        detail: 'Địa điểm sự kiện phải lớn hơn 5 ký tự.',
+      });
+      return { isValid: false, fieldId: 'locationInput', step: 0 };
     }
     if (hasSpecialChars(draft.location)) {
-       this.messageService.add({severity:'warn', summary:'Lỗi thông tin', detail:'Địa điểm không được chứa ký tự đặc biệt (!@#$...).'});
-       return false;
+      this.messageService.add({
+        severity: 'warn',
+        summary: 'Lỗi thông tin',
+        detail: 'Địa điểm không được chứa ký tự đặc biệt (!@#$...).',
+      });
+      return { isValid: false, fieldId: 'locationInput', step: 0 };
     }
 
     const descText = textOnly(draft.description);
     if (!descText || descText.trim().length <= 5) {
-       this.messageService.add({severity:'warn', summary:'Lỗi thông tin', detail:'Mô tả sự kiện phải lớn hơn 5 ký tự.'});
-       return false;
+      this.messageService.add({
+        severity: 'warn',
+        summary: 'Lỗi thông tin',
+        detail: 'Mô tả sự kiện phải lớn hơn 5 ký tự.',
+      });
+      return { isValid: false, fieldId: 'descriptionEditor', step: 0 };
     }
 
+    // Step 1: Vé
     if (draft.tickets && draft.tickets.length > 0) {
-       for (let i = 0; i < draft.tickets.length; i++) {
-          const tName = draft.tickets[i].name;
-          if (!tName || tName.trim().length <= 5) {
-             this.messageService.add({severity:'warn', summary:'Lỗi thông tin', detail:`Tên vé "${tName || '#' + (i+1)}" phải lớn hơn 5 ký tự.`});
-             return false;
-          }
-          if (hasSpecialChars(tName)) {
-             this.messageService.add({severity:'warn', summary:'Lỗi thông tin', detail:`Tên vé "${tName}" không được chứa ký tự đặc biệt.`});
-             return false;
-          }
-       }
+      for (let i = 0; i < draft.tickets.length; i++) {
+        const tName = draft.tickets[i].name;
+        if (!tName || tName.trim().length <= 5) {
+          this.messageService.add({
+            severity: 'warn',
+            summary: 'Lỗi thông tin',
+            detail: `Tên vé "${tName || '#' + (i + 1)}" phải lớn hơn 5 ký tự.`,
+          });
+          return { isValid: false, step: 1 };
+        }
+        if (hasSpecialChars(tName)) {
+          this.messageService.add({
+            severity: 'warn',
+            summary: 'Lỗi thông tin',
+            detail: `Tên vé "${tName}" không được chứa ký tự đặc biệt.`,
+          });
+          return { isValid: false, step: 1 };
+        }
+      }
+    } else {
+      this.messageService.add({
+        severity: 'warn',
+        summary: 'Lỗi thông tin',
+        detail: 'Vui lòng tạo ít nhất một loại vé.',
+      });
+      return { isValid: false, step: 1 };
     }
 
-    if (!draft.eventDate) {
-       this.messageService.add({severity:'warn', summary:'Lỗi thông tin', detail:'Ngày sự kiện không được để trống.'});
-       return false;
-    }
-
-    return true;
+    return { isValid: true, step: 0 };
   }
-
 
   private calculateEventDates(draft: any) {
     const startDate = new Date(draft.eventDate);
@@ -263,7 +364,6 @@ export class EventCreatePageComponent {
     } else {
       saleStartDate = new Date(`${draft.saleStartDate}T${draft.saleStartTime}`);
     }
-
 
     let saleEndDate: Date;
     if (draft.isAutoEnd) {
@@ -325,7 +425,10 @@ export class EventCreatePageComponent {
         `TicketTypes[${index}].TotalQuantity`,
         ticket.quantity.toString()
       );
-      formData.append(`TicketTypes[${index}].Status`, ticket.active ? 'active' : 'stop');
+      formData.append(
+        `TicketTypes[${index}].Status`,
+        ticket.active ? 'active' : 'stop'
+      );
       if (ticket.id) {
         formData.append(`TicketTypes[${index}].Id`, ticket.id);
       }
@@ -340,11 +443,14 @@ export class EventCreatePageComponent {
     request$.subscribe({
       next: (result) => {
         this.isSaving = false;
+        console.log(result);
+
         this.messageService.add({
           severity: 'success',
           summary: 'Thành công',
-          detail: `Sự kiện đã được ${this.eventId ? 'cập nhật' : 'tạo'
-            } thành công!`,
+          detail: `Sự kiện đã được ${
+            this.eventId ? 'cập nhật' : 'tạo'
+          } thành công!`,
         });
         this.draftService.clear();
         setTimeout(() => {
@@ -352,20 +458,7 @@ export class EventCreatePageComponent {
         }, 1500);
       },
       error: (err) => {
-        let errorMessage = 'Có lỗi xảy ra khi lưu sự kiện. Vui lòng thử lại!';
-
-        if (err.error && err.error.Message) {
-          errorMessage = err.error.Message;
-        } else if (err.message) {
-          errorMessage = err.message;
-        }
-
-        this.messageService.add({
-          severity: 'error',
-          summary: 'Lỗi',
-          detail: errorMessage,
-        });
-        console.error('Lỗi API:', err);
+        ApiErrorHandler.handleError(err, 'Thông báo hệ thống');
         this.isSaving = false;
       },
     });

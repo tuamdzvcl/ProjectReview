@@ -4,8 +4,8 @@ https://go.microsoft.com/fwlink/?LinkID=208121.
 -->
 <Project>
   <PropertyGroup>
-    <_PublishTargetUrl>C:\Users\phamn\OneDrive\Máy tính\ProjectDemoPublish</_PublishTargetUrl>
-    <History>True|2026-04-14T04:30:08.7172805Z;</History>
+    <_PublishTargetUrl>C:\Users\phamn\OneDrive\Máy tính\ProjectDemoPublishAPI</_PublishTargetUrl>
+    <History>True|2026-05-08T03:53:55.4431999Z;True|2026-05-08T10:34:19.4185152+07:00;True|2026-05-08T10:11:02.0485003+07:00;True|2026-04-14T11:30:08.7172805+07:00;</History>
     <LastFailureDetails />
   </PropertyGroup>
 </Project>

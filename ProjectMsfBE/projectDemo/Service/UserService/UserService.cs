@@ -503,7 +503,7 @@ namespace projectDemo.Service.UserService
                     FirstName = userRows.First().FirstName,
                     LastName = userRows.First().LastName,
                     Avarta = userRows.First().AvatarUrl ?? "null",
-                    Events = userRows.GroupBy(x => x.EventTitle)
+                    Events = userRows.GroupBy(x => x.EventID)
                         .Select(eg => new EventInfo
                         {
                             EventTitle = eg.First().EventTitle ?? "null",

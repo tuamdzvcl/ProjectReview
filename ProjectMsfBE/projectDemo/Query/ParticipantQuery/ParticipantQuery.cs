@@ -42,6 +42,7 @@ namespace projectDemo.Repository.ParticipantQuery
                     u.FirstName, 
                     u.LastName, 
                     u.AvatarUrl,
+                    e.Id as EventID,
                     e.Title AS EventTitle,
                     tt.Name AS TicketName,
                     o.TotalAmount,

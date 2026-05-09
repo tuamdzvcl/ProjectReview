@@ -4,7 +4,7 @@ namespace projectDemo.Service.EmailService
 {
     public static class EmailBodyBuilder
     {
-        public static string BuildBookingSuccessBody(BookingEmailData data)
+        public static string BuildBookingSuccessBody(BookingEmailData data, string frontendUrl)
         {
             var ticketRows = BuildTicketListHtml(data.Tickets, isSuccess: true);
 
@@ -142,7 +142,7 @@ namespace projectDemo.Service.EmailService
                     <!-- CTA BUTTON -->
                     <tr>
                         <td style=""padding:28px 40px; text-align:center;"">
-                            <a href=""http://localhost:4200/my-ticket"" 
+                            <a href=""{frontendUrl}/my-ticket"" 
                                style=""display:inline-block; background:linear-gradient(135deg, #4CAF50 0%, #2E7D32 100%); color:#ffffff; padding:14px 36px; text-decoration:none; border-radius:8px; font-size:15px; font-weight:600; letter-spacing:0.3px;"">
                                 🎫 Xem vé của tôi
                             </a>
@@ -167,7 +167,7 @@ namespace projectDemo.Service.EmailService
 </html>";
         }
 
-        public static string BuildBookingFailedBody(BookingEmailData data)
+        public static string BuildBookingFailedBody(BookingEmailData data, string frontendUrl)
         {
             var ticketRows = BuildTicketListHtml(data.Tickets, isSuccess: false);
 
@@ -303,7 +303,7 @@ namespace projectDemo.Service.EmailService
                     <!-- CTA BUTTON -->
                     <tr>
                         <td style=""padding:28px 40px; text-align:center;"">
-                            <a href=""http://localhost:4200"" 
+                            <a href=""{frontendUrl}"" 
                                style=""display:inline-block; background:linear-gradient(135deg, #1976d2 0%, #0d47a1 100%); color:#ffffff; padding:14px 36px; text-decoration:none; border-radius:8px; font-size:15px; font-weight:600; letter-spacing:0.3px;"">
                                 🔄 Thử đặt vé lại
                             </a>

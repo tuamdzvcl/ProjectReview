@@ -7,7 +7,6 @@ namespace projectDemo.DTO.Request
     {
         [TextValidation(ConfigValidation.MinLength, ConfigValidation.MaxLength)]
         public string PermissonsName { get; set; }
-        [TextValidation(ConfigValidation.MinLength, ConfigValidation.MaxLength)]
 
         public string PermissonsDescription { get; set; }
     }

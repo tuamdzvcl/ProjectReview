@@ -64,22 +64,7 @@ namespace projectDemo.Service.EventService
             _emailService = emailService;
         }
 
-        private static TimeZoneInfo GetVietnamTimeZone()
-        {
-            try
-            {
-                return TimeZoneInfo.FindSystemTimeZoneById("SE Asia Standard Time");
-            }
-            catch (TimeZoneNotFoundException)
-            {
-                return TimeZoneInfo.FindSystemTimeZoneById("Asia/Ho_Chi_Minh");
-            }
-        }
-
-        private static DateTime GetVietnamNow()
-        {
-            return TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, GetVietnamTimeZone());
-        }
+        
 
         private static bool IsEventEnded(Event events, DateTime now)
         {
@@ -88,7 +73,7 @@ namespace projectDemo.Service.EventService
 
         private async Task SyncEndedEventsAsync()
         {
-            var now = GetVietnamNow();
+            var now = ConfigTimeZone.GetVietnamNow();
             var expiredEvents = await _uow
                 .context.Set<Event>()
                 .Where(e =>
@@ -114,7 +99,7 @@ namespace projectDemo.Service.EventService
 
         private async Task EnsureEventEndedStatusAsync(Event events)
         {
-            var now = GetVietnamNow();
+            var now = ConfigTimeZone.GetVietnamNow();
             if (!IsEventEnded(events, now))
                 return;
 
@@ -130,7 +115,7 @@ namespace projectDemo.Service.EventService
         public bool checkVadidate(EventRequest request)
         {
             // Lấy thời gian hiện tại theo múi giờ Việt Nam (GMT+7)
-            var now = GetVietnamNow();
+            var now = ConfigTimeZone.GetVietnamNow();
 
             var hasAnyDate =
                 request.StartDate.HasValue

@@ -71,7 +71,11 @@
               "buildTarget": "TicketEvent:build:development"
             }
           },
-          "defaultConfiguration": "development"
+          "defaultConfiguration": "development",
+          "options": {
+            "host": "0.0.0.0",
+            "allowedHosts": ["event-booking.tuananhday.id.vn"]
+          }
         },
         "extract-i18n": {
           "builder": "@angular-devkit/build-angular:extract-i18n"

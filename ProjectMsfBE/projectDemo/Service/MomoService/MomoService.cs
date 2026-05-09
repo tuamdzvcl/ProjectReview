@@ -353,8 +353,8 @@ namespace projectDemo.Service.MomoService
                 : $"❌ Đặt vé không thành công - {emailData.EventName}";
 
             var htmlBody = isSuccess
-                ? EmailBodyBuilder.BuildBookingSuccessBody(emailData)
-                : EmailBodyBuilder.BuildBookingFailedBody(emailData);
+                ? EmailBodyBuilder.BuildBookingSuccessBody(emailData, _options.Value.UrlFontEnd)
+                : EmailBodyBuilder.BuildBookingFailedBody(emailData, _options.Value.UrlFontEnd);
 
             await _emailService.SendEmailAsync(emailData.Email, subject, htmlBody);
         }

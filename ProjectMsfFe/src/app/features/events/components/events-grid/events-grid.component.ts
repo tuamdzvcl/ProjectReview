@@ -1,5 +1,11 @@
 import { CommonModule } from '@angular/common';
-import { Component, Input, OnChanges, OnInit, SimpleChanges } from '@angular/core';
+import {
+  Component,
+  Input,
+  OnChanges,
+  OnInit,
+  SimpleChanges,
+} from '@angular/core';
 import { EventService } from '../../../../core/services/event.service';
 import { EventModel } from '../../../../core/model/response/event.model';
 import { EventCardComponent } from '../event-card/event-card.component';
@@ -17,20 +23,21 @@ export class EventsGridComponent implements OnInit, OnChanges {
 
   events: EventModel[] = [];
   pageIndex: number = 1;
-  pageSize: number = 10;
+  pageSize: number = 8;
   isLoading: boolean = false;
   hasMore: boolean = true;
 
-  constructor(private eventService: EventService) { }
+  constructor(private eventService: EventService) {}
 
   ngOnInit(): void {
     this.loadEvents();
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    const categoryChanged = changes['categoryIds'] && !changes['categoryIds'].firstChange;
+    const categoryChanged =
+      changes['categoryIds'] && !changes['categoryIds'].firstChange;
     const keyChanged = changes['key'] && !changes['key'].firstChange;
-    
+
     if (categoryChanged || keyChanged) {
       this.resetAndLoad();
     }
@@ -48,10 +55,14 @@ export class EventsGridComponent implements OnInit, OnChanges {
     this.isLoading = true;
 
     this.eventService
-      .GetEventswithTypeticket(this.pageIndex, this.pageSize, this.key, this.categoryIds)
+      .GetEventswithTypeticket(
+        this.pageIndex,
+        this.pageSize,
+        this.key,
+        this.categoryIds
+      )
       .subscribe({
         next: (res) => {
-
           const filteredEvents = res.items.filter(
             (event: any) => event.Status === 'PUBLISHED'
           );

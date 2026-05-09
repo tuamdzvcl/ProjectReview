@@ -10,7 +10,6 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 
-
 import { StepsModule } from 'primeng/steps';
 import { InputTextModule } from 'primeng/inputtext';
 import { DropdownModule } from 'primeng/dropdown';
@@ -22,15 +21,12 @@ import { EditorModule } from 'primeng/editor';
 import { DatePickerModule } from 'primeng/datepicker';
 import { SelectModule } from 'primeng/select';
 
-
-
 import { CatetoryService } from '../../../../core/services/catetory.service';
 
 import { EventDraftService } from '../../../../core/services/event-draft.service';
-
+import { ConfigService } from '../../../../core/services/config.service';
 
 import { environment } from '../../../../../environments/environment';
-
 
 @Component({
   selector: 'app-create-venue-event',
@@ -56,6 +52,7 @@ export class CreateEventComponent implements OnInit, OnDestroy {
   private route = inject(ActivatedRoute);
   private categoryService = inject(CatetoryService);
   private draftService = inject(EventDraftService);
+  public configService = inject(ConfigService);
 
   @ViewChild('fileInput') fileInput!: ElementRef<HTMLInputElement>;
 
@@ -72,6 +69,24 @@ export class CreateEventComponent implements OnInit, OnDestroy {
   selectedFile: File | null = null;
   previewUrl: string | null = null;
 
+  descriptionLength: number = 0;
+
+  @ViewChild('editor') editor: any;
+
+  onDescriptionChange(event: any): void {
+    const max = this.configService.validation?.Event?.Description?.Max || 2000;
+    const quill = this.editor.getQuill();
+    const text = quill.getText().trim();
+
+    if (text.length > max) {
+      // Chặn và cắt bỏ phần thừa
+      quill.deleteText(max, text.length - max);
+      this.descriptionLength = max;
+    } else {
+      this.descriptionLength = text.length;
+    }
+  }
+
   durations = [
     { label: '1 giờ', value: 1 },
     { label: '2 giờ', value: 2 },
@@ -87,7 +102,6 @@ export class CreateEventComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    
     this.saveFormToDraft();
   }
 
@@ -102,8 +116,6 @@ export class CreateEventComponent implements OnInit, OnDestroy {
     });
   }
 
-
-  
   private saveFormToDraft(): void {
     this.draftService.save(
       {
@@ -121,7 +133,6 @@ export class CreateEventComponent implements OnInit, OnDestroy {
     );
   }
 
-  
   private isValidDate(d: any): boolean {
     if (!d || d === 'null' || d === 'undefined') return false;
     const date = new Date(d);
@@ -135,18 +146,25 @@ export class CreateEventComponent implements OnInit, OnDestroy {
 
     this.title = draft.title;
     this.description = draft.description;
+    // Update length when restoring
+    const doc = new DOMParser().parseFromString(
+      this.description || '',
+      'text/html'
+    );
+    this.descriptionLength = (doc.body.textContent || '').trim().length;
     this.location = draft.location;
     this.selectedCategory = draft.selectedCategory;
-    this.eventDate = this.isValidDate(draft.eventDate) ? new Date(draft.eventDate as any) : undefined;
-    this.eventTime = this.isValidDate(draft.eventTime) ? new Date(draft.eventTime as any) : undefined;
+    this.eventDate = this.isValidDate(draft.eventDate)
+      ? new Date(draft.eventDate as any)
+      : undefined;
+    this.eventTime = this.isValidDate(draft.eventTime)
+      ? new Date(draft.eventTime as any)
+      : undefined;
     this.duration = draft.duration;
     this.previewUrl = draft.previewUrl;
     this.selectedFile = this.draftService.selectedFile;
   }
 
-
-
-  
   triggerFileInput(): void {
     this.fileInput.nativeElement.click();
   }

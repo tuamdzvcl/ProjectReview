@@ -11,6 +11,7 @@ import { Calendar } from 'primeng/calendar';
 import { VndCurrencyPipe } from '../../../../shared/pipes/vnd-currency.pipe';
 import { EventDraftService } from '../../../../core/services/event-draft.service';
 import { ToastModule } from 'primeng/toast';
+import { ConfigService } from '../../../../core/services/config.service';
 
 @Component({
   selector: 'app-event-create-type',
@@ -25,14 +26,15 @@ import { ToastModule } from 'primeng/toast';
     MenuModule,
     Calendar,
     VndCurrencyPipe,
-    ToastModule
+    ToastModule,
   ],
   templateUrl: './event-create-type.component.html',
-  styleUrl: './event-create-type.component.scss'
+  styleUrl: './event-create-type.component.scss',
 })
 export class EventCreateTypeComponent implements OnInit, OnDestroy {
   private draftService = inject(EventDraftService);
   private messageService = inject(MessageService);
+  public configService = inject(ConfigService);
 
   showDialog: boolean = false;
   isEditMode: boolean = false;
@@ -44,12 +46,11 @@ export class EventCreateTypeComponent implements OnInit, OnDestroy {
     quantity: 0,
     active: true,
     limit: 1,
-    discount: 0
+    discount: 0,
   };
 
   tickets: any[] = [];
 
-  
   ticketMenuItems: MenuItem[] = [];
   selectedTicketIndex: number = -1;
 
@@ -77,20 +78,27 @@ export class EventCreateTypeComponent implements OnInit, OnDestroy {
       {
         label: 'Sửa',
         icon: 'pi pi-pencil',
-        command: () => this.editTicket(this.selectedTicketIndex)
+        command: () => this.editTicket(this.selectedTicketIndex),
       },
       {
         label: 'Xóa',
         icon: 'pi pi-trash',
-        command: () => this.deleteTicket(this.selectedTicketIndex)
-      }
+        command: () => this.deleteTicket(this.selectedTicketIndex),
+      },
     ];
   }
 
   openNew() {
     this.isEditMode = false;
     this.editingIndex = -1;
-    this.ticket = { name: '', price: 0, quantity: 0, active: true, limit: 1, discount: 0 };
+    this.ticket = {
+      name: '',
+      price: 0,
+      quantity: 0,
+      active: true,
+      limit: 1,
+      discount: 0,
+    };
     this.showDialog = true;
   }
 
@@ -108,32 +116,102 @@ export class EventCreateTypeComponent implements OnInit, OnDestroy {
 
   saveTicket() {
     if (!this.ticket.name || this.ticket.name.trim().length <= 5) {
-      this.messageService.add({severity:'warn', summary:'Lỗi thông tin', detail:'Tên vé phải lớn hơn 5 ký tự.'});
+      this.messageService.add({
+        severity: 'warn',
+        summary: 'Lỗi thông tin',
+        detail: 'Tên vé phải lớn hơn 5 ký tự.',
+      });
       return;
     }
 
     const regex = /[!@#$%^&*()_+={}\[\]|\\:;"'<>\/?]+/;
     if (regex.test(this.ticket.name)) {
-      this.messageService.add({severity:'warn', summary:'Lỗi thông tin', detail:'Tên vé không được chứa ký tự đặc biệt (!@#$...).'});
+      this.messageService.add({
+        severity: 'warn',
+        summary: 'Lỗi thông tin',
+        detail: 'Tên vé không được chứa ký tự đặc biệt (!@#$...).',
+      });
+      return;
+    }
+
+    const minPrice = 1000;
+    const maxPrice =
+      this.configService.validation?.Default?.MaxNumber || 9999999999;
+    if (this.ticket.price === null || this.ticket.price === undefined) {
+      this.messageService.add({
+        severity: 'warn',
+        summary: 'Lỗi thông tin',
+        detail: 'Vui lòng nhập giá vé.',
+      });
+      return;
+    }
+    if (this.ticket.price < minPrice) {
+      this.messageService.add({
+        severity: 'warn',
+        summary: 'Lỗi thông tin',
+        detail: `Giá vé tối thiểu là ${minPrice.toLocaleString('vi-VN')} đ.`,
+      });
+      return;
+    }
+    if (this.ticket.price >= maxPrice) {
+      this.messageService.add({
+        severity: 'warn',
+        summary: 'Lỗi thông tin',
+        detail: `Giá vé không được vượt quá ${maxPrice.toLocaleString(
+          'vi-VN'
+        )} đ.`,
+      });
+      return;
+    }
+
+    const minQuantity = 1;
+    const maxQuantity =
+      this.configService.validation?.Default?.MaxQuantity || 99999999;
+    if (this.ticket.quantity === null || this.ticket.quantity === undefined) {
+      this.messageService.add({
+        severity: 'warn',
+        summary: 'Lỗi thông tin',
+        detail: 'Vui lòng nhập số lượng.',
+      });
+      return;
+    }
+    if (this.ticket.quantity < minQuantity) {
+      this.messageService.add({
+        severity: 'warn',
+        summary: 'Lỗi thông tin',
+        detail: `Số lượng tối thiểu là ${minQuantity.toLocaleString('vi-VN')}.`,
+      });
+      return;
+    }
+    if (this.ticket.quantity >= maxQuantity) {
+      this.messageService.add({
+        severity: 'warn',
+        summary: 'Lỗi thông tin',
+        detail: `Số lượng không được vượt quá ${maxQuantity.toLocaleString(
+          'vi-VN'
+        )}.`,
+      });
       return;
     }
 
     if (this.isEditMode && this.editingIndex !== -1) {
-      
       this.tickets[this.editingIndex] = {
         ...this.tickets[this.editingIndex],
-        ...this.ticket
+        ...this.ticket,
       };
     } else {
-      
       this.tickets.push({
         ...this.ticket,
-        date: new Date().toLocaleDateString('vi-VN', { month: 'short', day: 'numeric', year: 'numeric' }),
-        active: true
+        date: new Date().toLocaleDateString('vi-VN', {
+          month: 'short',
+          day: 'numeric',
+          year: 'numeric',
+        }),
+        active: true,
       });
     }
 
     this.showDialog = false;
-    this.saveToDraft(); 
+    this.saveToDraft();
   }
 }

@@ -19,7 +19,7 @@ namespace EventTick.Model.Models
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
 
-        [TextValidation(ConfigValidation.MinLength, ConfigValidation.MaxLength)]
+        [TextValidation(ConfigValidation.MinLength, ConfigValidation.MaxLengthStatus, ErrorMessage = "quá số kí tự rồi")]
         public string RoleName { get; set; }
 
         public bool IsSystem { get; set; }

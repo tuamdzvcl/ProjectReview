@@ -6,23 +6,98 @@
   <div class="border"></div>
 
   <div class="field">
-    <label>Hãy đặt tên cho sự kiện của bạn *</label>
+    <div class="flex justify-content-between align-items-center">
+      <label>Hãy đặt tên cho sự kiện của bạn *</label>
+      <small
+        [ngClass]="{
+          'text-red-500':
+            title.length > (configService.validation?.Event?.Title?.Max || 100)
+        }"
+      >
+      </small>
+    </div>
     <small class="desc">
       Xem tên sự kiện của bạn hiển thị như thế nào trên trang sự kiện và danh
       sách.
     </small>
 
-    <input pInputText class="w-full" placeholder="Nhập tên sự kiện tại đây" [(ngModel)]="title" />
+    <input
+      id="titleInput"
+      pInputText
+      class="w-full"
+      #titleModel="ngModel"
+      required
+      [minlength]="configService.validation?.Event?.Title?.Min"
+      [maxlength]="configService.validation?.Event?.Title?.Max"
+      [ngClass]="{
+        'ng-invalid ng-dirty':
+          titleModel.invalid && (titleModel.dirty || titleModel.touched)
+      }"
+      placeholder="Nhập tên sự kiện tại đây"
+      [(ngModel)]="title"
+      name="title"
+    />
+
+    <div
+      *ngIf="titleModel.invalid && (titleModel.dirty || titleModel.touched)"
+      class="p-error mt-1"
+    >
+      <small *ngIf="titleModel.errors?.['required']"
+        >Tên sự kiện không được để trống.</small
+      >
+      <small style="color: red" *ngIf="titleModel.errors?.['minlength']"
+        >Tên sự kiện phải có ít nhất
+        {{ configService.validation?.Event?.Title?.Min }} ký tự.</small
+      >
+    </div>
   </div>
 
   <div class="field">
-    <label>Hãy chọn một danh mục cho sự kiện của bạn *</label>
+    <div class="flex justify-content-between align-items-center">
+      <label>Hãy chọn một danh mục cho sự kiện của bạn *</label>
+      <small
+        [ngClass]="{
+          'text-red-500':
+            selectedCategory?.length >
+            (configService.validation?.Event?.Category?.Max || 50)
+        }"
+      >
+      </small>
+    </div>
     <small class="desc">
       Việc lựa chọn danh mục phù hợp giúp tăng khả năng hiển thị sự kiện.
     </small>
 
-    <p-dropdown [options]="categories" optionLabel="Name" optionValue="Name" [editable]="true" placeholder="Chọn danh mục"
-      class="w-full" [(ngModel)]="selectedCategory"></p-dropdown>
+    <p-dropdown
+      id="categorySelect"
+      [options]="categories"
+      optionLabel="Name"
+      optionValue="Name"
+      [editable]="true"
+      #categoryModel="ngModel"
+      required
+      [ngClass]="{
+        'ng-invalid ng-dirty':
+          categoryModel.invalid &&
+          (categoryModel.dirty || categoryModel.touched)
+      }"
+      [maxlength]="configService.validation?.Event?.Category?.Max"
+      placeholder="Chọn danh mục"
+      class="w-full"
+      [(ngModel)]="selectedCategory"
+      name="category"
+    ></p-dropdown>
+
+    <div
+      *ngIf="
+        categoryModel.invalid && (categoryModel.dirty || categoryModel.touched)
+      "
+      class="p-error mt-1"
+    >
+      <small style="color: red" *ngIf="categoryModel.errors?.['required']"
+        >Vui lòng chọn hoặc nhập danh mục.</small
+      >
+    </div>
   </div>
 
   <div class="field">
@@ -32,24 +107,38 @@
     <div class="grid">
       <div class="col-6">
         <label>Ngày diễn ra</label>
-        <p-datepicker placeholder="MM/DD/YYYY" styleClass="w-full" [(ngModel)]="eventDate"></p-datepicker>
+        <p-datepicker
+          id="datePicker"
+          placeholder="MM/DD/YYYY"
+          styleClass="w-full"
+          [(ngModel)]="eventDate"
+        ></p-datepicker>
       </div>
 
       <div class="col-3">
         <label>Thời gian</label>
-        <p-datepicker timeOnly="true" styleClass="w-full" [(ngModel)]="eventTime"></p-datepicker>
+        <p-datepicker
+          timeOnly="true"
+          styleClass="w-full"
+          [(ngModel)]="eventTime"
+        ></p-datepicker>
       </div>
 
       <div class="col-3">
         <label>Khoảng thời gian</label>
-        <p-select [options]="durations" styleClass="w-full" placeholder="{{ duration }}"
-          [(ngModel)]="duration"></p-select>
+        <p-select
+          [options]="durations"
+          styleClass="w-full"
+          placeholder="{{ duration }}"
+          [(ngModel)]="duration"
+        ></p-select>
       </div>
     </div>
   </div>
 
   <div class="field">
-    <small class="desc">Tải lên những hình ảnh đầy màu sắc và sống động làm banner cho sự kiện
+    <small class="desc"
+      >Tải lên những hình ảnh đầy màu sắc và sống động làm banner cho sự kiện
       của bạn! Xem cách những hình ảnh đẹp mắt giúp trang chi tiết sự kiện của
       bạn nổi bật hơn
     </small>
@@ -58,32 +147,127 @@
       <p-toast />
 
       <div class="image-upload-area" (click)="triggerFileInput()">
-        <img *ngIf="previewUrl" [src]="previewUrl" alt="Banner preview" class="banner-preview" />
+        <img
+          *ngIf="previewUrl"
+          [src]="previewUrl"
+          alt="Banner preview"
+          class="banner-preview"
+        />
         <div *ngIf="!previewUrl" class="upload-placeholder">
           <i class="pi pi-image" style="font-size: 2.5rem; color: #aaa"></i>
           <p style="margin: 8px 0 0; color: #aaa">Nhấn để chọn ảnh banner</p>
         </div>
       </div>
-      <input #fileInput type="file" accept="image/*" style="display: none" (change)="onFileSelect($event)" />
+      <input
+        #fileInput
+        type="file"
+        accept="image/*"
+        style="display: none"
+        (change)="onFileSelect($event)"
+      />
       <div style="margin-top: 8px">
-        <button pButton type="button" icon="pi pi-upload" label="Chọn ảnh" class="p-button-outlined"
-          (click)="triggerFileInput()"></button>
-        <span *ngIf="selectedFile" style="margin-left: 12px; color: #555; font-size: 0.875rem">{{ selectedFile.name
-          }}</span>
+        <button
+          pButton
+          type="button"
+          icon="pi pi-upload"
+          label="Chọn ảnh"
+          class="p-button-outlined"
+          (click)="triggerFileInput()"
+        ></button>
+        <span
+          *ngIf="selectedFile"
+          style="margin-left: 12px; color: #555; font-size: 0.875rem"
+          >{{ selectedFile.name }}</span
+        >
       </div>
     </div>
 
     <div class="field m-2">
-      <small class="desc">Vui lòng mô tả sự kiện của bạn</small>
-      <p-editor [(ngModel)]="description" [style]="{ height: '320px' }" />
+      <div class="flex justify-content-between align-items-center">
+        <small class="desc">Vui lòng mô tả sự kiện của bạn *</small>
+        <small
+          [ngClass]="{
+            'text-red-500':
+              descriptionLength >
+              (configService.validation?.Event?.Description?.Max || 2000)
+          }"
+        >
+        </small>
+      </div>
+      <p-editor
+        #editor
+        id="descriptionEditor"
+        [(ngModel)]="description"
+        (onTextChange)="onDescriptionChange($event)"
+        [style]="{ height: '320px' }"
+      />
+      <div
+        *ngIf="
+          descriptionLength >
+          (configService.validation?.Event?.Description?.Max || 2000)
+        "
+        class="p-error mt-1"
+      >
+        <small style="color: red"
+          >Mô tả quá dài (tối đa
+          {{ configService.validation?.Event?.Description?.Max || 2000 }} ký
+          tự).</small
+        >
+      </div>
     </div>
     <div class="field m-2">
-      <label class="desc">Nhập địa điểm tổ chức sự kiện</label>
-      <input pInputText class="w-full" placeholder="Nhập địa điểm tại đây" [(ngModel)]="location" />
+      <div class="flex justify-content-between align-items-center">
+        <label class="desc">Nhập địa điểm tổ chức sự kiện *</label>
+        <small
+          [ngClass]="{
+            'text-red-500':
+              location.length > (configService.validation?.Default?.Max || 255)
+          }"
+        >
+        </small>
+      </div>
+      <input
+        id="locationInput"
+        pInputText
+        class="w-full"
+        #locationModel="ngModel"
+        required
+        [minlength]="configService.validation?.Default?.Min"
+        [maxlength]="50"
+        [ngClass]="{
+          'ng-invalid ng-dirty':
+            locationModel.invalid &&
+            (locationModel.dirty || locationModel.touched)
+        }"
+        placeholder="Nhập địa điểm tại đây"
+        [(ngModel)]="location"
+        name="location"
+      />
+
+      <div
+        *ngIf="
+          locationModel.invalid &&
+          (locationModel.dirty || locationModel.touched)
+        "
+        class="p-error mt-1"
+      >
+        <small style="color: red" *ngIf="locationModel.errors?.['required']"
+          >Địa điểm không được để trống.</small
+        >
+        <small style="color: red" *ngIf="locationModel.errors?.['minlength']"
+          >Địa điểm quá ngắn (tối thiểu
+          {{ configService.validation?.Default?.Min }} ký tự).</small
+        >
+      </div>
     </div>
     <iframe
       src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3724.3047583509274!2d105.76134447584121!3d21.02048848806156!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x31345574d20b8f67%3A0xb34019170665308c!2zU8OibiB24bqtbiDEkeG7mW5nIFF14buRYyBnaWEgTeG7uSDEkMOsbmg!5e0!3m2!1svi!2s!4v1776333541420!5m2!1svi!2s"
-      width="100%" height="450" style="border-radius: 20px" allowfullscreen="" loading="lazy"
-      referrerpolicy="no-referrer-when-downgrade"></iframe>
+      width="100%"
+      height="450"
+      style="border-radius: 20px"
+      allowfullscreen=""
+      loading="lazy"
+      referrerpolicy="no-referrer-when-downgrade"
+    ></iframe>
   </div>
 </div>
