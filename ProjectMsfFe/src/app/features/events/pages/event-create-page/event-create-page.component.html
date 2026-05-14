@@ -1,4 +1,13 @@
 <p-toast></p-toast>
+
+<!-- Loading overlay: chặn mọi tương tác khi đang gọi API -->
+<div class="loading-overlay" *ngIf="isSaving">
+  <div class="loading-spinner">
+    <i class="pi pi-spin pi-spinner"></i>
+    <span>{{ eventId ? 'Đang cập nhật sự kiện...' : 'Đang lưu sự kiện...' }}</span>
+  </div>
+</div>
+
 <div class="card text-3xl justify-center mt-2">
   <p-breadcrumb [model]="item" />
 </div>
@@ -6,8 +15,10 @@
   
   <div class="speet">
     <div class="custom-steps">
-      <div *ngFor="let step of steps; let i = index" class="step-item" [class.active]="i === activeIndex"
-        (click)="onStepClick(i)">
+      <div *ngFor="let step of steps; let i = index" class="step-item"
+        [class.active]="i === activeIndex"
+        [class.disabled]="isSaving"
+        (click)="!isSaving && onStepClick(i)">
         <div class="step-number">{{ i + 1 }}</div>
         <div class="step-label">{{ step.label }}</div>
       </div>
@@ -24,7 +35,7 @@
   </ng-template>
 </div>
 <div class="btn-save flex gap-3">
-  <button *ngIf="activeIndex > 0" class="btn-back" (click)="onBackStep()">Quay lại</button>
+  <button *ngIf="activeIndex > 0" class="btn-back" (click)="onBackStep()" [disabled]="isSaving">Quay lại</button>
 
   <button (click)="onNextStep()" [disabled]="isSaving" [class.opacity-50]="isSaving">
     <ng-container *ngIf="activeIndex < 2">Tiếp tục</ng-container>

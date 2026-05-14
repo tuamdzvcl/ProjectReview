@@ -7,5 +7,7 @@ namespace projectDemo.Common.PageRequest
         public string? key { get; set; } = null;
         public Guid categoryId { get; set; }
         public List<Guid>? CategoryIds { get; set; }
+        public DateTime? StartDate { get; set; }
+        public DateTime? EndDate { get; set; }
     }
 }

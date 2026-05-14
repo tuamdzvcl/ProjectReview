@@ -4,69 +4,231 @@
       <h1 class="topbar__title">Quản lý Khuyến mãi</h1>
     </div>
     <div class="page-header">
-      <button class="btn btn-primary">
-        <i class="fa-solid fa-plus"></i> Thêm khuyến mãi mới
-      </button>
+      <div class="header-actions">
+        <button class="btn btn-primary" (click)="showAddDialog()">
+          <i class="fa-solid fa-plus"></i> Tạo khuyến mãi mới
+        </button>
+        <div class="excel-actions">
+          <button class="btn btn-success" (click)="exportToExcel()">
+            <i class="fa-solid fa-file-export"></i> Xuất Excel
+          </button>
+          <button class="btn btn-info" (click)="downloadTemplate()">
+            <i class="fa-solid fa-file-download"></i> Tải Mẫu
+          </button>
+          <button class="btn btn-warning" (click)="triggerImport()">
+            <i class="fa-solid fa-file-import"></i> Nhập Excel
+          </button>
+          <input type="file" id="importFile" style="display: none" (change)="onFileSelected($event)"
+            accept=".xlsx, .xls" />
+        </div>
+      </div>
     </div>
+
+    <!-- Bộ lọc tìm kiếm -->
+    <app-data-filter [statusOptions]="statusOptions" placeholder="Tìm theo mã code..." (filterChange)="onFilter($event)"
+      (reset)="onReset()">
+    </app-data-filter>
 
     <div class="cards-grid">
-      <div class="promo-card">
+      @for (promo of promotions(); track promo.Id) {
+      <div class="promo-card" [class.highlight]="promo.IsActive">
         <div class="promo-header">
-          <span class="badge active">Đang diễn ra</span>
-          <h3>SUMMER2026</h3>
+          <div class="flex align-items-center gap-2">
+            <span class="badge" [ngClass]="{
+                active: promo.IsActive && !isExpired(promo.EndDate),
+                inactive: !promo.IsActive || isExpired(promo.EndDate),
+                upcoming: isUpcoming(promo.StartDate) && promo.IsActive
+              }">
+              {{
+              isExpired(promo.EndDate)
+              ? "Đã hết hạn"
+              : !promo.IsActive
+              ? "Ngừng hoạt động"
+              : isUpcoming(promo.StartDate)
+              ? "Sắp tới"
+              : "Đang diễn ra"
+              }}
+            </span>
+            <!-- <p-inputSwitch [ngModel]="promo.IsActive" (onChange)="toggleStatus(promo)"></p-inputSwitch> -->
+          </div>
+          <h3>{{ promo.Code }}</h3>
         </div>
         <div class="promo-body">
-          <div class="info-row">
-            <i class="fa-solid fa-percent"></i> <strong>Mức giảm:</strong>
-            <span>20%</span>
+          <p class="description" *ngIf="promo.Description">
+            {{ promo.Description }}
+          </p>
+          <div class="info-row" *ngIf="promo.AmountLimit">
+            <i class="fa-solid fa-cart-shopping"></i>
+            <strong>Đơn từ:</strong>
+            <span>{{ promo.AmountLimit | vndCurrency }}</span>
           </div>
-          <div class="info-row">
-            <i class="fa-regular fa-calendar"></i> <strong>Hết hạn:</strong>
-            <span>30/08/2026</span>
+          <div class="info-row" *ngIf="promo.DiscountAmount">
+            <i class="fa-solid fa-wallet"></i>
+            <strong>Giảm tối đa:</strong>
+            <span>{{ promo.DiscountAmount | vndCurrency }} </span>
           </div>
+
           <div class="info-row">
-            <i class="fa-solid fa-users"></i> <strong>Giới hạn:</strong>
-            <span>500 lượt dùng</span>
+            <i class="fa-solid" [ngClass]="
+                promo.DiscountType === 'Percentage'
+                  ? 'fa-percent'
+                  : 'fa-money-bill'
+              "></i>
+            <strong>Mức giảm:</strong>
+            <span>{{ promo.DiscountValue | number : "1.0-0"
+              }}{{ promo.DiscountType === "Percentage" ? "%" : " VNĐ" }}</span>
+          </div>
+
+          <div class="info-row">
+            <i class="fa-regular fa-calendar"></i>
+            <strong>Thời hạn:</strong>
+            <span>{{ promo.StartDate | date : "dd/MM/yyyy" }} -
+              {{ promo.EndDate | date : "dd/MM/yyyy" }}</span>
+          </div>
+
+          <div class="info-row">
+            <i class="fa-solid fa-users"></i>
+            <strong>Sử dụng:</strong>
+            <span>{{ promo.UsedCount }} / {{ promo.UsageLimit || "∞" }} lượt</span>
           </div>
         </div>
         <div class="promo-actions">
-          <button class="btn btn-icon edit">
+          <button class="btn-icon edit" (click)="showEditDialog(promo)">
             <i class="fa-solid fa-pen"></i> Sửa
           </button>
-          <button class="btn btn-icon delete">
+          <button class="btn-icon delete" (click)="deletePromotion(promo.Id)">
             <i class="fa-solid fa-trash"></i> Xóa
           </button>
         </div>
       </div>
+      }
+    </div>
 
-      <div class="promo-card">
-        <div class="promo-header">
-          <span class="badge inactive">Sắp tới</span>
-          <h3>NEWYEAR2027</h3>
-        </div>
-        <div class="promo-body">
-          <div class="info-row">
-            <i class="fa-solid fa-money-bill"></i> <strong>Mức giảm:</strong>
-            <span>50.000 VNĐ</span>
-          </div>
-          <div class="info-row">
-            <i class="fa-regular fa-calendar"></i> <strong>Hết hạn:</strong>
-            <span>01/01/2027</span>
-          </div>
-          <div class="info-row">
-            <i class="fa-solid fa-users"></i> <strong>Giới hạn:</strong>
-            <span>1000 lượt dùng</span>
-          </div>
-        </div>
-        <div class="promo-actions">
-          <button class="btn btn-icon edit">
-            <i class="fa-solid fa-pen"></i> Sửa
-          </button>
-          <button class="btn btn-icon delete">
-            <i class="fa-solid fa-trash"></i> Xóa
-          </button>
+    <!-- Phân trang -->
+    <app-pagination [totalItems]="totalElements" [pageSize]="pageSize" [currentPage]="pageNumber"
+      (pageChange)="onPageChange($event)">
+    </app-pagination>
+  </div>
+</div>
+
+<!-- Dialog thêm/sửa khuyến mãi -->
+<p-dialog [(visible)]="displayDialog" [header]="isEditMode ? 'Chỉnh sửa Khuyến mãi' : 'Tạo Khuyến mãi Mới'"
+  [modal]="true" [responsive]="true" [style]="{ width: '600px' }" [draggable]="false" [resizable]="false"
+  class="premium-dialog">
+  <div class="promo-form p-fluid">
+    <div class="grid">
+      <!-- Mã Code -->
+      <div class="col-12 md:col-6 field mb-4">
+        <label for="code" class="font-bold block mb-2">
+          <i class="fa-solid fa-tag mr-2 text-primary"></i> Mã Code
+        </label>
+        <input type="text" pInputText id="code" [(ngModel)]="selectedPromo.Code" placeholder="VD: SUMMER2026"
+          required />
+      </div>
+
+      <!-- Trạng thái -->
+      <div class="col-12 md:col-6 field mb-4">
+        <label class="font-bold block mb-2">
+          <i class="fa-solid fa-toggle-on mr-2 text-primary"></i> Trạng thái
+        </label>
+        <div class="flex align-items-center mt-2">
+          <p-inputSwitch [(ngModel)]="selectedPromo.IsActive"></p-inputSwitch>
+          <span class="ml-2">{{
+            selectedPromo.IsActive ? "Đang hoạt động" : "Tạm dừng"
+            }}</span>
         </div>
       </div>
     </div>
+
+    <!-- Loại giảm & Giá trị -->
+    <div class="grid">
+      <div class="col-12 md:col-6 field mb-4">
+        <label for="discountType" class="font-bold block mb-2">
+          <i class="fa-solid fa-list mr-2 text-primary"></i> Loại giảm
+        </label>
+        <p-dropdown [options]="discountTypeOptions" [(ngModel)]="selectedPromo.DiscountType" optionLabel="label"
+          optionValue="value" appendTo="body"></p-dropdown>
+      </div>
+      <div class="col-12 md:col-6 field mb-4">
+        <label for="discountValue" class="font-bold block mb-2">
+          <i class="fa-solid fa-hand-holding-dollar mr-2 text-primary"></i> Giá
+          trị giảm
+        </label>
+        <p-inputNumber id="discountValue" [(ngModel)]="selectedPromo.DiscountValue" [min]="0"
+          [suffix]="selectedPromo.DiscountType === 'Percentage' ? '%' : ' VNĐ'" placeholder="0"></p-inputNumber>
+      </div>
+    </div>
+
+    <!-- Ngày bắt đầu & Kết thúc -->
+    <div class="grid">
+      <div class="col-12 md:col-6 field mb-4">
+        <label for="startDate" class="font-bold block mb-2">
+          <i class="fa-solid fa-calendar-plus mr-2 text-primary"></i> Ngày bắt
+          đầu
+        </label>
+        <p-calendar id="startDate" [minDate]=" today" [(ngModel)]="startDateObj" dateFormat="dd/mm/yy" [showIcon]="true"
+          appendTo="body" placeholder="dd/mm/yyyy"></p-calendar>
+      </div>
+      <div class="col-12 md:col-6 field mb-4">
+        <label for="endDate" class="font-bold block mb-2">
+          <i class="fa-solid fa-calendar-minus mr-2 text-primary"></i> Ngày kết
+          thúc
+        </label>
+        <p-calendar id="endDate" [minDate]="startDateObj || today" [(ngModel)]="endDateObj" dateFormat="dd/mm/yy"
+          [showIcon]="true" appendTo="body" placeholder="dd/mm/yyyy"></p-calendar>
+      </div>
+    </div>
+
+    <!-- Giới hạn sử dụng -->
+    <div class="field mb-4">
+      <label for="usageLimit" class="font-bold block mb-2">
+        <i class="fa-solid fa-users mr-2 text-primary"></i> Giới hạn lượt dùng
+        (Để trống nếu không giới hạn)
+      </label>
+      <p-inputNumber id="usageLimit" [(ngModel)]="selectedPromo.UsageLimit" [min]="0"
+        placeholder="VD: 500"></p-inputNumber>
+    </div>
+
+    <!-- Số tiền giảm tối đa -->
+    <div class="grid">
+      <div class="col-12 md:col-6 field mb-4">
+        <label for="discountAmount" class="font-bold block mb-2">
+          <i class="fa-solid fa-wallet mr-2 text-primary"></i> Giảm tối đa
+        </label>
+        <p-inputNumber id="discountAmount" [(ngModel)]="selectedPromo.DiscountAmount" [min]="0" suffix=" VNĐ"
+          placeholder="Không giới hạn"></p-inputNumber>
+      </div>
+      <div class="col-12 md:col-6 field mb-4">
+        <label for="amountLimit" class="font-bold block mb-2">
+          <i class="fa-solid fa-cart-shopping mr-2 text-primary"></i> Đơn tối
+          thiểu
+        </label>
+        <p-inputNumber id="amountLimit" [(ngModel)]="selectedPromo.AmountLimit" [min]="0" suffix=" VNĐ"
+          placeholder="Không giới hạn"></p-inputNumber>
+      </div>
+    </div>
+
+    <!-- Mô tả -->
+    <!-- <div class="field mb-1">
+      <label for="description" class="font-bold block mb-2">
+        <i class="fa-solid fa-align-left mr-2 text-primary"></i> Mô tả khuyến mãi
+      </label>
+      <textarea
+        id="description"
+        pTextarea
+        [(ngModel)]="selectedPromo.Description"
+        rows="2"
+        placeholder="Nhập mô tả chi tiết chương trình..."
+      ></textarea>
+    </div> -->
   </div>
-</div>
+
+  <ng-template pTemplate="footer">
+    <div class="flex justify-content-end gap-2 pt-2">
+      <button pButton label="Hủy" icon="pi pi-times" class="p-button-text p-button-secondary"
+        (click)="displayDialog = false"></button>
+      <button pButton [label]="isEditMode ? 'Cập nhật' : 'Tạo mới'" [icon]="isEditMode ? 'pi pi-save' : 'pi pi-plus'"
+        class="p-button-primary px-4" (click)="savePromotion()"></button>
+    </div>
+  </ng-template>
+</p-dialog>

@@ -1,4 +1,5 @@
 ﻿using EventTick.Model.Enum;
+using projectDemo.AttributeConfig;
 using projectDemo.Common;
 using System.ComponentModel.DataAnnotations;
 

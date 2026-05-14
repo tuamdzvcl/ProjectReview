@@ -12,14 +12,14 @@
       <div class="day">{{ event.StartDate | date : "dd" }}</div>
     </div>
     <div class="header-info">
-      <h1>{{ event.Title }}</h1>
+      <h1 class="text-clamp-2 has-tooltip" [title]="event.Title">{{ event.Title }}</h1>
       <div class="meta-info">
         <span class="meta-item">
           <i class="material-icons">location_on</i> Venue Event
         </span>
         <span class="divider">•</span>
         <span class="meta-item">
-          Bắt đầu lúc {{ event.StartDate | date : "EEE, d MMM, y, h:mm a" }}
+          Bắt đầu lúc {{ event.StartDate | formatDate }}
         </span>
         <span class="divider">•</span>
         <span class="meta-item">

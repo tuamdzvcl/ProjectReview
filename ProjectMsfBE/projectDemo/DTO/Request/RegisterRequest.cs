@@ -1,4 +1,5 @@
-﻿using projectDemo.Common;
+﻿using projectDemo.AttributeConfig;
+using projectDemo.Common;
 using System.ComponentModel.DataAnnotations;
 
 namespace projectDemo.DTO.Request
@@ -13,6 +14,7 @@ namespace projectDemo.DTO.Request
         public string LastName { get; set; }
 
         [TextValidation(ConfigValidation.MinLength, ConfigValidation.MaxLength)]
+        [Gmail]
         [EmailAddress(ErrorMessage ="Không đúng định dạng của gmail")]
         public string Email { get; set; }
 

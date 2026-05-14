@@ -26,6 +26,12 @@ namespace EventTick.Model.Models
         [Column(TypeName = "decimal(18,2)")]
         public decimal TotalAmount { get; set; }
 
+        [Column(TypeName = "decimal(18,2)")]
+        public decimal DiscountAmount { get; set; }
+
+        [Column(TypeName = "decimal(18,2)")]
+        public decimal FinalAmount { get; set; }
+
         [Required]
         [MaxLength(ConfigValidation.MaxLengthStatus, ErrorMessage = "Không vượt quá {0} kí tự")]
         public EnumStatusOrder Status { get; set; }

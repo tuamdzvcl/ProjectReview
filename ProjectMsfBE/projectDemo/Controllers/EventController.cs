@@ -115,7 +115,7 @@ namespace projectDemo.Controllers
         }
 
         [HttpGet("page-with-ticket-types-byid")]
-        public async Task<IActionResult> GetPageWithTicketTypesbyId([FromQuery] PageRequest query)
+        public async Task<IActionResult> GetPageWithTicketTypesbyId([FromQuery] PageEventResquest query)
         {
             var userId = Guid.Parse(User.FindFirst("id").Value);
 

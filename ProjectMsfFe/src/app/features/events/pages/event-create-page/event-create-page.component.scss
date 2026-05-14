@@ -116,3 +116,49 @@
 .btn-save .btn-back:hover {
     background-color: #e2e8f0;
 }
+
+.btn-save button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+/* ── Loading Overlay ── */
+.loading-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    background: rgba(255, 255, 255, 0.7);
+    backdrop-filter: blur(2px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.loading-spinner {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    padding: 32px 48px;
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+
+    i {
+        font-size: 36px;
+        color: #2dbd26;
+    }
+
+    span {
+        font-size: 15px;
+        font-weight: 600;
+        color: #374151;
+    }
+}
+
+/* ── Disabled step khi đang saving ── */
+.step-item.disabled {
+    opacity: 0.5;
+    cursor: not-allowed !important;
+    pointer-events: none;
+}

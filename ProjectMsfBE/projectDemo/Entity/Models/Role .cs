@@ -7,6 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using EventTick.Model.asbtract;
 using EventTick.Model.Enum;
+using projectDemo.AttributeConfig;
 using projectDemo.Common;
 using projectDemo.Entity.Models;
 

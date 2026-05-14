@@ -939,7 +939,7 @@ namespace projectDemo.Service.EventService
 
         public async Task<PageResponse<EventTypeTickResponses>> GetPageWithTicketTypesbyId(
             Guid id,
-            PageRequest query
+            PageEventResquest query
         )
         {
             await SyncEndedEventsAsync();

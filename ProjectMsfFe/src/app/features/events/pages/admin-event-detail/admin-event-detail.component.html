@@ -98,6 +98,12 @@
         (click)="backToEventList()">
         <i class="fa-solid fa-arrow-left"></i> Quay lại
       </button>
+      
+      <!-- 1205/2026-thay đổi -->
+      <button class="btn btn-info" (click)="toggleParticipants()" style="background-color: #0dcaf0; color: white;">
+        <i class="fa-solid fa-users"></i> {{ showParticipants ? 'Ẩn người tham gia' : 'Xem người tham gia' }}
+      </button>
+
       <button class="btn btn-primary" (click)="editEvent()" *ngIf="event.Status === 'DRAFT'">
         <i class="fa-solid fa-pen"></i> Sửa sự kiện
       </button>
@@ -105,6 +111,9 @@
         <i class="fa-solid fa-globe"></i> Công khai
       </button>
     </div>
+
+    <!-- 1205/2026-thay đổi -->
+    <app-event-participants [eventId]="event.Id.toString()" *ngIf="showParticipants"></app-event-participants>
   </div>
 </div>
 

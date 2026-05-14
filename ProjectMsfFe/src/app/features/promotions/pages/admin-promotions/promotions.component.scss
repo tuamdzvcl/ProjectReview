@@ -9,16 +9,24 @@
 }
 
 .page-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
   margin-bottom: 2rem;
+
+  .header-actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    flex-wrap: wrap;
+    gap: 1rem;
+  }
+
+  .excel-actions {
+    display: flex;
+    gap: 0.75rem;
+  }
 }
 
-.btn-primary {
-  background-color: #81E979;
-  color: white;
-  border: none;
+.btn {
   padding: 0.6rem 1.2rem;
   border-radius: 8px;
   font-weight: 600;
@@ -26,11 +34,48 @@
   display: flex;
   align-items: center;
   gap: 0.5rem;
+  border: none;
   transition: all 0.3s;
+  font-family: inherit;
+}
+
+.btn-primary {
+  background-color: #81E979;
+  color: white;
 
   &:hover {
     background-color: #6bd063;
     box-shadow: 0 4px 10px rgba(129, 233, 121, 0.3);
+  }
+}
+
+.btn-success {
+  background-color: #27ae60;
+  color: white;
+
+  &:hover {
+    background-color: #219150;
+    box-shadow: 0 4px 10px rgba(39, 174, 96, 0.2);
+  }
+}
+
+.btn-info {
+  background-color: #3498db;
+  color: white;
+
+  &:hover {
+    background-color: #2980b9;
+    box-shadow: 0 4px 10px rgba(52, 152, 219, 0.2);
+  }
+}
+
+.btn-warning {
+  background-color: #f39c12;
+  color: white;
+
+  &:hover {
+    background-color: #e67e22;
+    box-shadow: 0 4px 10px rgba(243, 156, 18, 0.2);
   }
 }
 
@@ -48,34 +93,41 @@
   overflow: hidden;
   display: flex;
   flex-direction: column;
-  transition: transform 0.3s;
+  transition: all 0.3s;
+  position: relative;
 
   &:hover {
     transform: translateY(-5px);
     box-shadow: 0 8px 20px rgba(129, 233, 121, 0.15);
     border-color: #81E979;
   }
+
+  &.highlight {
+    border-left: 4px solid #81E979;
+  }
 }
 
 .promo-header {
   padding: 1.5rem;
   border-bottom: 1px solid #eee;
-  position: relative;
+  background: #fafafa;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
 
   h3 {
     margin: 0;
     font-size: 1.4rem;
     color: #2c3e50;
+    font-weight: 700;
   }
 
   .badge {
-    position: absolute;
-    top: 1rem;
-    right: 1.5rem;
-    padding: 4px 10px;
-    border-radius: 12px;
-    font-size: 0.75rem;
-    font-weight: 600;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
 
     &.active {
       background-color: rgba(129, 233, 121, 0.15);
@@ -83,8 +135,13 @@
     }
 
     &.inactive {
-      background-color: rgba(243, 156, 18, 0.15);
-      color: #f39c12;
+      background-color: rgba(231, 76, 60, 0.1);
+      color: #e74c3c;
+    }
+
+    &.upcoming {
+      background-color: rgba(52, 152, 219, 0.1);
+      color: #3498db;
     }
   }
 }
@@ -93,24 +150,34 @@
   padding: 1.5rem;
   flex-grow: 1;
 
+  .description {
+    color: #777;
+    font-size: 0.9rem;
+    margin-bottom: 1.2rem;
+    font-style: italic;
+  }
+
   .info-row {
     display: flex;
     align-items: center;
     margin-bottom: 0.8rem;
 
     i {
-      width: 20px;
+      width: 24px;
       color: #81E979;
       margin-right: 10px;
+      font-size: 1rem;
     }
 
     strong {
       color: #555;
-      margin-right: 5px;
+      margin-right: 8px;
+      font-size: 0.9rem;
     }
 
     span {
       color: #2c3e50;
+      font-weight: 600;
     }
   }
 }
@@ -126,11 +193,11 @@
     border: none;
     cursor: pointer;
     font-weight: 600;
-    transition: background-color 0.3s;
-
-    i {
-      margin-right: 5px;
-    }
+    transition: all 0.3s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
 
     &.edit {
       color: #3498db;
@@ -148,5 +215,30 @@
         background-color: rgba(231, 76, 60, 0.05);
       }
     }
+  }
+}
+
+// Dialog Form Styles
+.promo-form {
+  .field {
+    label {
+      color: #444;
+    }
+  }
+}
+
+:host ::v-deep {
+  .p-dialog-header {
+    background: #f8f9fa;
+    border-bottom: 1px solid #eee;
+    padding: 1.5rem;
+  }
+
+  .p-dialog-content {
+    padding: 1.5rem;
+  }
+
+  .p-inputswitch.p-inputswitch-checked .p-inputswitch-slider {
+    background: #81E979;
   }
 }

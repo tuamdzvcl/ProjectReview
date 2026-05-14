@@ -5,6 +5,7 @@ namespace projectDemo.DTO.Response
         public Guid OrderId { get; set; }
         public string OrderCode { get; set; }
         public decimal TotalAmount { get; set; }
+        public decimal DiscountAmount { get; set; }
         public DateTime? CreatedDate { get; set; }
         public string Status { get; set; }
         public EventOrder? Event { get; set; }

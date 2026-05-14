@@ -47,7 +47,8 @@ WITH PagedOrders AS
 SELECT
     o.Id AS OrderId,
     o.OrderCode AS OrderCode,
-    o.TotalAmount AS TotalAmount,
+    p.Amount AS TotalAmount,
+    o.DiscountAmount As DiscountAmount,
     o.CreatedDate AS CreatedDate,
     CAST(o.Status AS INT) AS Status,
     e.Id AS EventId,
@@ -67,6 +68,7 @@ INNER JOIN Orders o ON o.Id = po.Id
 LEFT JOIN OrderDetail od ON od.OrderID = o.Id
 LEFT JOIN TicketType tt ON tt.Id = od.TicketTypeId AND tt.IsDeleted = 0
 LEFT JOIN Event e ON e.Id = tt.EventID
+Left join Payment p on p.OrderID=o.Id
 ORDER BY po.CreatedDate DESC;";
 
             using var multi = await _uow.connection.QueryMultipleAsync(

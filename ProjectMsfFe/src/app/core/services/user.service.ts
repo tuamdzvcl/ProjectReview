@@ -3,7 +3,7 @@ import { Injectable } from '@angular/core';
 import { BaseApiService } from './base-api.service';
 import { HttpClient } from '@angular/common/http';
 import { PageResult } from '../model/base/api-page-response.model';
-import { Observable, map } from 'rxjs';
+import { Observable, map, of, shareReplay, tap } from 'rxjs';
 import { ApiResponse } from '../model/base/api-response.model';
 import { UserUpdata } from '../model/update/userupdate.model';
 import { UserRequest } from '../model/request/userRequest.model';
@@ -15,6 +15,8 @@ import { UserInEvent, ParticipantSummary } from '../model/response/participant.m
   providedIn: 'root',
 })
 export class UserService extends BaseApiService {
+  private currentUser$: Observable<UserResponse> | null = null;
+
   constructor(http: HttpClient) {
     super(http);
   }
@@ -62,7 +64,16 @@ export class UserService extends BaseApiService {
     return this.get<UserProfile>(url);
   }
   GetUserbyid() {
-    return this.get<UserResponse>('users/me');
+    if (!this.currentUser$) {
+      this.currentUser$ = this.get<UserResponse>('users/me').pipe(
+        shareReplay(1)
+      );
+    }
+    return this.currentUser$;
+  }
+
+  clearUserCache() {
+    this.currentUser$ = null;
   }
 
   GetParticipants(pageIndex: number, pageSize: number): Observable<{
@@ -97,5 +108,30 @@ export class UserService extends BaseApiService {
     const formData = new FormData();
     formData.append('file', file);
     return this.put<ApiResponse<string>>('users/avatar', formData);
+  }
+
+  // 1205/2026-thay đổi
+  GetParticipantsByEvent(eventId: string, pageIndex: number, pageSize: number): Observable<{
+    items: UserInEvent[];
+    pageIndex: number;
+    pageSize: number;
+    totalRecords: number;
+    totalPages: number;
+  }> {
+    const params: any = {
+      PageIndex: pageIndex,
+      PageSize: pageSize,
+    };
+    return this.getpage<UserInEvent>(`users/events/${eventId}/participants`, params).pipe(
+      map((res: PageResult<UserInEvent>) => {
+        return {
+          items: res.Items,
+          pageIndex: res.PageIndex,
+          pageSize: res.PageSize,
+          totalRecords: res.TotalRecords,
+          totalPages: res.TotalPages,
+        };
+      })
+    );
   }
 }

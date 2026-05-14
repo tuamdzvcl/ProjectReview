@@ -42,7 +42,6 @@ export class AuditLogComponent implements OnInit {
   constructor(private auditLogService: AuditLogService) { }
 
   ngOnInit() {
-    // onLazyLoad will trigger the initial load
   }
 
   loadLogs(event: any = null) {
@@ -74,7 +73,6 @@ export class AuditLogComponent implements OnInit {
   }
 
   onFilter() {
-    this.first = 0; // Reset về trang đầu tiên
     this.loadLogs();
   }
 

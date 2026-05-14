@@ -19,6 +19,7 @@ import { TokenService } from '../../../../core/services/token.service';
 import { EventStatus } from '../../../../core/enums/event-status.enum';
 import { FormsModule } from '@angular/forms';
 import { Dialog } from 'primeng/dialog';
+import { CountResponse } from '../../../../core/model/base/count-response.model';
 
 @Component({
   selector: 'app-events',
@@ -45,15 +46,20 @@ export class EventsComponent implements OnInit {
     private confirmationService: ConfirmationService,
     private messageService: MessageService,
     private tokenService: TokenService
-  ) { }
+  ) {}
 
   events: any[] = [];
   totalRecords = 0;
   pageIndex = 1;
   pageSize = 10;
   key = '';
+  Status: string = '';
   showDropdown: string | null = null;
   userRole: string | null = null;
+  Counts: CountResponse = {
+    All: 0,
+    Items: {},
+  };
 
   // Request Edit Dialog
   showRequestEditDialog = false;
@@ -66,18 +72,21 @@ export class EventsComponent implements OnInit {
   }
 
   loadEvents() {
-    const serviceMethod =
-      this.eventService.GetEventswithTypeticketbyid(
-        this.pageIndex,
-        this.pageSize,
-        this.key
-      );
+    const serviceMethod = this.eventService.GetEventswithTypeticketbyid(
+      this.pageIndex,
+      this.pageSize,
+      this.key,
+      this.Status
+    );
 
     serviceMethod.subscribe({
       next: (res) => {
         console.log('DATA:', res);
         this.events = res.items;
         this.totalRecords = res.totalRecords;
+        if (res.Counts) {
+          this.Counts = res.Counts;
+        }
       },
       error: (err) => {
         console.error('ERROR:', err);
@@ -85,15 +94,13 @@ export class EventsComponent implements OnInit {
     });
   }
 
-  onSearch(event: any) {
-    const value = event.target.value;
-    this.key = value;
+  onSearch() {
     this.pageIndex = 1;
     this.loadEvents();
   }
 
-  onTabChange(filter: string) {
-    this.key = filter;
+  onTabChange(status: string) {
+    this.Status = status;
     this.pageIndex = 1;
     this.loadEvents();
   }
@@ -134,25 +141,31 @@ export class EventsComponent implements OnInit {
       });
       return;
     }
-    this.eventService.UpdateEventStatus(this.requestEditEvent.Id, EventStatus.REQUEST_EDIT, this.requestEditReason).subscribe({
-      next: () => {
-        this.showRequestEditDialog = false;
-        this.messageService.add({
-          severity: 'success',
-          summary: 'Thành công',
-          detail: 'Yêu cầu chỉnh sửa sự kiện đã được gửi thành công!',
-        });
-        this.loadEvents();
-      },
-      error: (err) => {
-        console.error('Lỗi khi yêu cầu chỉnh sửa:', err);
-        this.messageService.add({
-          severity: 'error',
-          summary: 'Lỗi',
-          detail: 'Có lỗi xảy ra khi yêu cầu chỉnh sửa sự kiện!',
-        });
-      },
-    });
+    this.eventService
+      .UpdateEventStatus(
+        this.requestEditEvent.Id,
+        EventStatus.REQUEST_EDIT,
+        this.requestEditReason
+      )
+      .subscribe({
+        next: () => {
+          this.showRequestEditDialog = false;
+          this.messageService.add({
+            severity: 'success',
+            summary: 'Thành công',
+            detail: 'Yêu cầu chỉnh sửa sự kiện đã được gửi thành công!',
+          });
+          this.loadEvents();
+        },
+        error: (err) => {
+          console.error('Lỗi khi yêu cầu chỉnh sửa:', err);
+          this.messageService.add({
+            severity: 'error',
+            summary: 'Lỗi',
+            detail: 'Có lỗi xảy ra khi yêu cầu chỉnh sửa sự kiện!',
+          });
+        },
+      });
   }
 
   get isEventEnded(): (event: any) => boolean {
@@ -160,8 +173,6 @@ export class EventsComponent implements OnInit {
       return event.Status === 'ENDED' || new Date(event.EndDate) < new Date();
     };
   }
-
-  
 
   getTotalTickets(event: any): number {
     if (!event.ListTypeTick || !event.ListTypeTick.length) return 0;
@@ -223,24 +234,26 @@ export class EventsComponent implements OnInit {
       acceptButtonStyleClass: 'p-button-info',
       rejectButtonStyleClass: 'p-button-text',
       accept: () => {
-        this.eventService.UpdateEventStatus(event.Id, EventStatus.PUBLIC).subscribe({
-          next: () => {
-            this.messageService.add({
-              severity: 'success',
-              summary: 'Thành công',
-              detail: `Sự kiện đã được chuyển sang trạng thái chờ duyệt!`,
-            });
-            this.loadEvents();
-          },
-          error: (err) => {
-            console.error('Lỗi khi công khai:', err);
-            this.messageService.add({
-              severity: 'error',
-              summary: 'Lỗi',
-              detail: 'Có lỗi xảy ra khi thay đổi trạng thái sự kiện!',
-            });
-          },
-        });
+        this.eventService
+          .UpdateEventStatus(event.Id, EventStatus.PUBLIC)
+          .subscribe({
+            next: () => {
+              this.messageService.add({
+                severity: 'success',
+                summary: 'Thành công',
+                detail: `Sự kiện đã được chuyển sang trạng thái chờ duyệt!`,
+              });
+              this.loadEvents();
+            },
+            error: (err) => {
+              console.error('Lỗi khi công khai:', err);
+              this.messageService.add({
+                severity: 'error',
+                summary: 'Lỗi',
+                detail: 'Có lỗi xảy ra khi thay đổi trạng thái sự kiện!',
+              });
+            },
+          });
       },
     });
   }
@@ -256,24 +269,26 @@ export class EventsComponent implements OnInit {
       acceptButtonStyleClass: 'p-button-success',
       rejectButtonStyleClass: 'p-button-text',
       accept: () => {
-        this.eventService.UpdateEventStatus(event.Id, EventStatus.PUBLISHED).subscribe({
-          next: () => {
-            this.messageService.add({
-              severity: 'success',
-              summary: 'Thành công',
-              detail: `Sự kiện "${event.Title}" đã được duyệt thành công!`,
-            });
-            this.loadEvents();
-          },
-          error: (err) => {
-            console.error('Lỗi khi duyệt sự kiện:', err);
-            this.messageService.add({
-              severity: 'error',
-              summary: 'Lỗi',
-              detail: 'Có lỗi xảy ra khi duyệt sự kiện. Vui lòng thử lại!',
-            });
-          },
-        });
+        this.eventService
+          .UpdateEventStatus(event.Id, EventStatus.PUBLISHED)
+          .subscribe({
+            next: () => {
+              this.messageService.add({
+                severity: 'success',
+                summary: 'Thành công',
+                detail: `Sự kiện "${event.Title}" đã được duyệt thành công!`,
+              });
+              this.loadEvents();
+            },
+            error: (err) => {
+              console.error('Lỗi khi duyệt sự kiện:', err);
+              this.messageService.add({
+                severity: 'error',
+                summary: 'Lỗi',
+                detail: 'Có lỗi xảy ra khi duyệt sự kiện. Vui lòng thử lại!',
+              });
+            },
+          });
       },
     });
   }
@@ -308,6 +323,53 @@ export class EventsComponent implements OnInit {
         });
       },
     });
+  }
+
+  get totalPages(): number {
+    return Math.ceil(this.totalRecords / this.pageSize);
+  }
+
+  goToPage(page: number) {
+    if (page < 1 || page > this.totalPages || page === this.pageIndex) return;
+    this.pageIndex = page;
+    this.loadEvents();
+  }
+
+  getVisiblePages(): number[] {
+    const total = this.totalPages;
+    const current = this.pageIndex;
+    const pages: number[] = [];
+
+    if (total <= 7) {
+      for (let i = 1; i <= total; i++) {
+        pages.push(i);
+      }
+      return pages;
+    }
+
+    // Always show first page
+    pages.push(1);
+
+    if (current > 3) {
+      pages.push(-1); // ellipsis
+    }
+
+    // Show pages around current
+    const start = Math.max(2, current - 1);
+    const end = Math.min(total - 1, current + 1);
+
+    for (let i = start; i <= end; i++) {
+      pages.push(i);
+    }
+
+    if (current < total - 2) {
+      pages.push(-1); // ellipsis
+    }
+
+    // Always show last page
+    pages.push(total);
+
+    return pages;
   }
 
   viewDetails(event: any) {

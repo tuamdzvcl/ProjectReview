@@ -6,7 +6,9 @@ using Dapper;
 using EventTick.Model.Enum;
 using EventTick.Model.Models;
 using Microsoft.EntityFrameworkCore;
+using projectDemo.Common;
 using projectDemo.Common.PageRequest;
+using projectDemo.DTO.Request;
 using projectDemo.DTO.Respone;
 using projectDemo.DTO.Response;
 using projectDemo.DTO.UpdateRequest;
@@ -212,43 +214,53 @@ namespace projectDemo.Repository
             }
         }
 
-        public async Task<PageResponse<EventTypeTickResponses>> GetAllWithTicketTypesAsyncbyid(
+        public async Task<PageResponseCount<EventTypeTickResponses,EnumStatusEvent>> GetAllWithTicketTypesAsyncbyid(
             Guid id,
-            PageRequest request
+            PageEventResquest request
         )
         {
             try
             {
                 var pageIndex = request.PageIndex;
                 var pageSize = request.PageSize;
-
+                
                 var query = _dbSet
                     .AsNoTracking()
                     .Where(e =>
                         e.IsDeleted == false && e.Status != EnumStatusEvent.CANNEL.ToString() && e.UserID == id
                     );
 
-                if (request.CategoryIds != null && request.CategoryIds.Any())
+                var counts = await query
+                .GroupBy(u => u.Status)
+                .Select(g => new { Status = g.Key, Count = g.Count() })
+                .ToListAsync();
+                var count = new CountBase<EnumStatusEvent>
                 {
-                    query = query.Where(e => request.CategoryIds.Contains(e.CatetoryID));
-                }
-                else if (request.categoryId != Guid.Empty)
-                {
-                    query = query.Where(e => e.CatetoryID == request.categoryId);
-                }
+                    All = query.Count(),
+                    Items = counts.ToDictionary(x => EnumHelper.ToEnumValue<EnumStatusEvent>(x.Status), x => x.Count),
+                };
 
                 if (!string.IsNullOrWhiteSpace(request.key))
                 {
                     var key = request.key.Trim();
                     query = query.Where(e =>
                         e.Title.Contains(key)
-                        || e.Location.Contains(key)
-                        || e.Catetory.Name.Contains(key)
+                        
                     );
+                }
+
+                if (!string.IsNullOrWhiteSpace(request.Status))
+                {
+                    var KeyStatus = request.Status.Trim();
+                    query = query.Where(e =>
+                        e.Status == KeyStatus
+                    ); ;
                 }
                 var totolRecords = await query.CountAsync();
 
-                var items = await query
+
+
+                var items =  await query
                     .OrderByDescending(e => e.CreatedDate)
                     .Skip((pageIndex - 1) * pageSize)
                     .Take(pageSize)
@@ -284,8 +296,11 @@ namespace projectDemo.Repository
                             .ToList(),
                     })
                     .ToListAsync();
+                   
+                    
+                    
 
-                return new PageResponse<EventTypeTickResponses>
+                return new PageResponseCount<EventTypeTickResponses, EnumStatusEvent>
                 {
                     Items = items,
                     PageIndex = pageIndex,
@@ -293,13 +308,15 @@ namespace projectDemo.Repository
                     TotalRecords = totolRecords,
                     TotalPages = (int)Math.Ceiling((double)totolRecords / pageSize),
                     Success = true,
+                    Counts =count,
                     Message = "Lấy danh sách event thành công",
                 };
             }
             catch (Exception ex)
             {
                 Console.WriteLine($"Lỗi {ex.ToString()}");
-                return new PageResponse<EventTypeTickResponses> { Message = ex.ToString() };
+                
+                return new PageResponseCount<EventTypeTickResponses, EnumStatusEvent> { Message = ex.ToString() };
             }
         }
 

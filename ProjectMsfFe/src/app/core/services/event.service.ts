@@ -31,6 +31,7 @@ export class EventService extends BaseApiService {
           pageSize: res.PageSize,
           totalRecords: res.TotalRecords,
           totalPages: res.TotalPages,
+          Counts: res.Counts,
         };
       })
     );
@@ -75,7 +76,7 @@ export class EventService extends BaseApiService {
     pageIndex: number,
     pageSize: number,
     key: string,
-    categoryIds: string[] = []
+    Status: string
   ) {
     const params: any = {
       pageIndex: pageIndex,
@@ -84,8 +85,8 @@ export class EventService extends BaseApiService {
     if (key) {
       params.key = key;
     }
-    if (categoryIds && categoryIds.length > 0) {
-      params.categoryIds = categoryIds;
+    if (Status) {
+      params.status = Status;
     }
     return this.getpage<EventModel>(
       'event/page-with-ticket-types-byid',
@@ -99,11 +100,12 @@ export class EventService extends BaseApiService {
           pageSize: res.PageSize,
           totalRecords: res.TotalRecords,
           totalPages: res.TotalPages,
+          Counts: res.Counts,
         };
       })
     );
   }
-  
+
   GetEventId(id: string) {
     return this.get<EventModel>(`event/${id}`).pipe(
       map((res: EventModel) => {
@@ -130,11 +132,7 @@ export class EventService extends BaseApiService {
     return this.post<ApiResponse<any>>(`event/${id}/duplicate`, null);
   }
 
-  GetAdminPendingEvents(
-    pageIndex: number,
-    pageSize: number,
-    key: string
-  ) {
+  GetAdminPendingEvents(pageIndex: number, pageSize: number, key: string) {
     const params: any = {
       pageIndex: pageIndex,
       pageSize: pageSize,
@@ -142,10 +140,7 @@ export class EventService extends BaseApiService {
     if (key) {
       params.key = key;
     }
-    return this.getpage<EventModel>(
-      'event/admin-pending-events',
-      params
-    ).pipe(
+    return this.getpage<EventModel>('event/admin-pending-events', params).pipe(
       map((res: PageResult<EventModel>) => {
         return {
           items: res.Items,

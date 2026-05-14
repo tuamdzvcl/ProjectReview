@@ -12,6 +12,12 @@ import { ConfirmDialog } from 'primeng/confirmdialog';
 import { AppShellComponent } from '../../../../layouts/app-shell/app-shell.component';
 import { EventStatusPipe } from '../../../../shared/pipes/event-status.pipe';
 import { EventStatus } from '../../../../core/enums/event-status.enum';
+import { UserService } from '../../../../core/services/user.service';
+import { UserInEvent } from '../../../../core/model/response/participant.model';
+import { TableModule } from 'primeng/table';
+import { ButtonModule } from 'primeng/button';
+import { TooltipModule } from 'primeng/tooltip';
+import { EventParticipantsComponent } from '../../components/event-participants/event-participants.component';
 
 @Component({
   selector: 'app-admin-event-detail',
@@ -25,6 +31,10 @@ import { EventStatus } from '../../../../core/enums/event-status.enum';
     ConfirmDialog,
     AppShellComponent,
     EventStatusPipe,
+    TableModule,
+    ButtonModule,
+    TooltipModule,
+    EventParticipantsComponent, // 1205/2026-thay đổi
   ],
   templateUrl: './admin-event-detail.component.html',
   styleUrl: './admin-event-detail.component.scss',
@@ -34,10 +44,14 @@ export class AdminEventDetailComponent implements OnInit {
   event: EventModel | null = null;
   loading = true;
 
+  // 1205/2026-thay đổi
+  showParticipants = false;
+
   constructor(
     private route: ActivatedRoute,
     private router: Router,
     private eventService: EventService,
+    private userService: UserService,
     private messageService: MessageService,
     private confirmationService: ConfirmationService
   ) { }
@@ -108,5 +122,10 @@ export class AdminEventDetailComponent implements OnInit {
 
   backToEventList() {
     this.router.navigate(['/admin/events']);
+  }
+
+  // 1205/2026-thay đổi
+  toggleParticipants() {
+    this.showParticipants = !this.showParticipants;
   }
 }

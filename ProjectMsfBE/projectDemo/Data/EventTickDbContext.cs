@@ -37,10 +37,21 @@ namespace projectDemo.Data
         public DbSet<MenuPermissions> MenuPermissions { get; set; }
         public DbSet<Promotion> Promotions { get; set; }
         public DbSet<EmailSetting> EmailSettings { get; set; }
+        public DbSet<UserPromotion> UserPromotions { get; set; }
         public DbSet<SystemSetting> Settings { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            modelBuilder.Entity<UserPromotion>()
+                .HasOne(up => up.User)
+                .WithMany(u => u.UserPromotions)
+                .HasForeignKey(up => up.UserId);
+
+            modelBuilder.Entity<UserPromotion>()
+                .HasOne(up => up.Promotion)
+                .WithMany(p => p.UserPromotions)
+                .HasForeignKey(up => up.PromotionId);
+
             modelBuilder
                 .Entity<UserUpgrade>()
                 .HasOne(uu => uu.User)

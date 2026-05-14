@@ -7,6 +7,7 @@ namespace projectDemo.DTO.Query
         public decimal TotalAmount { get; set; }
         public decimal TicketPrice { get; set; }
         public DateTime? CreatedDate { get; set; }
+        public decimal DiscountAmount { get; set; }
         public int Status { get; set; }
         public Guid? EventId { get; set; }
         public string? EventStatus { get; set; }

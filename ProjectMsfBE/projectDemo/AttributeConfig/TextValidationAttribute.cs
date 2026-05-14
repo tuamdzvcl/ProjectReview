@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace projectDemo.Common
+namespace projectDemo.AttributeConfig
 {
     public class TextValidationAttribute : ValidationAttribute
     {

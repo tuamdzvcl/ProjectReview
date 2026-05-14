@@ -139,6 +139,26 @@
 
 
 /* ======================================================
+   GUEST VIEW (khi chưa đăng nhập)
+   ====================================================== */
+
+.guest-events-section {
+    .section-title {
+        font-size: 18px;
+        font-weight: 700;
+        color: #1f2937;
+        margin: 0 0 16px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+
+        i {
+            color: #69c043;
+        }
+    }
+}
+
+/* ======================================================
    DANH SÁCH SỰ KIỆN
    ====================================================== */
 
@@ -526,17 +546,51 @@
     background: linear-gradient(135deg, #f9fef6 0%, #f3f4f6 100%);
 }
 
-.order-total-label {
-    font-size: 13px;
-    font-weight: 500;
-    color: $color-text-muted;
-}
+.order-summary-details {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
 
-.order-total {
-    font-size: 17px;
-    font-weight: 700;
-    color: $color-primary;
-    margin: 0;
+    .summary-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-size: 13px;
+
+        .label {
+            color: $color-text-muted;
+            font-weight: 500;
+        }
+
+        .value {
+            color: $color-text-dark;
+            font-weight: 600;
+        }
+
+        &.discount {
+            .value {
+                color: #e53e3e; // Màu đỏ cho giảm giá
+            }
+        }
+
+        &.total {
+            margin-top: 4px;
+            padding-top: 8px;
+            border-top: 1px dashed rgba($color-primary, 0.2);
+
+            .label {
+                font-weight: 700;
+                color: $color-text-dark;
+            }
+
+            .value {
+                font-size: 17px;
+                font-weight: 700;
+                color: $color-primary;
+            }
+        }
+    }
 }
 
 /* --- Responsive --- */

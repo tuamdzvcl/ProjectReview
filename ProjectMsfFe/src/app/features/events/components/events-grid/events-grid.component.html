@@ -6,7 +6,7 @@
 <!-- Thêm thông báo khi không tìm thấy sự kiện -->
 <div class="empty-state" *ngIf="events.length === 0 && !isLoading">
 
-  <p class="empty-text">Không tìm thấy sự kiện nào tên "{{ key }}"</p>
+  <p class="empty-text">Không có sự kiện nào </p>
 </div>
 
 <div class="page" *ngIf="events.length > 0">

@@ -442,15 +442,13 @@ export class EventCreatePageComponent {
       : this.eventService.CreateEvent(formData);
     request$.subscribe({
       next: (result) => {
-        this.isSaving = false;
         console.log(result);
 
         this.messageService.add({
           severity: 'success',
           summary: 'Thành công',
-          detail: `Sự kiện đã được ${
-            this.eventId ? 'cập nhật' : 'tạo'
-          } thành công!`,
+          detail: `Sự kiện đã được ${this.eventId ? 'cập nhật' : 'tạo'
+            } thành công!`,
         });
         this.draftService.clear();
         setTimeout(() => {

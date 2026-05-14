@@ -182,6 +182,11 @@ export const routes: Routes = [
         data: { requiresAuth: true, permissions: ['EVENT_BROWSE'] },
       },
       {
+        path: 'approve-events/:id',
+        component: AdminEventDetailComponent,
+        data: { requiresAuth: true, permissions: ['EVENT_BROWSE'] },
+      },
+      {
         path: 'events/:id',
         component: AdminEventDetailComponent,
         data: { requiresAuth: true, permissions: ['EVENT_VIEW_DETIAL'] },

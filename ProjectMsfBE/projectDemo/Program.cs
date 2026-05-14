@@ -44,6 +44,10 @@ using projectDemo.Service.UserService;
 using projectDemo.UnitOfWork;
 using projectDemo.UnitOfWorks;
 using projectDemo.Service.ConfigService;
+using projectDemo.BackGroupJob;
+using projectDemo.Repository.PromotionRepository;
+using projectDemo.Service.PromotionService;
+using projectDemo.BaseInit.Excel;
 
 namespace projectDemo
 {
@@ -326,6 +330,7 @@ namespace projectDemo
             builder.Services.AddScoped<IPaymentService, PaymentService>();
             builder.Services.AddScoped<ICatetoryService, CatetoryService>();
             builder.Services.AddScoped<ITickService, TickService>();
+            builder.Services.AddHostedService<GmailExpireJob>();
             builder.Services.AddScoped<ITickRepository, TickRepository>();
             builder.Services.AddScoped<
                 projectDemo.Repository.UserUpgradeRepository.IUserUpgradeRepository,
@@ -343,6 +348,9 @@ namespace projectDemo
                 projectDemo.Service.UpgradeService.IUpgradeService,
                 projectDemo.Service.UpgradeService.UpgradeServices
             >();
+            builder.Services.AddScoped<IPromotionRepository, PromotionRepository>();
+            builder.Services.AddScoped<IPromotionService, PromotionServices>();
+            builder.Services.AddScoped<IExcelService, ExcelService>();
 
             builder.Services.AddScoped<IImageService, ImageService>();
             builder.Services.AddHttpClient();

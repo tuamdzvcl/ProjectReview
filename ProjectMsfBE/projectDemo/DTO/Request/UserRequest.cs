@@ -1,5 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using EventTick.Model.Enum;
+using projectDemo.AttributeConfig;
 using projectDemo.Common;
 
 namespace projectDemo.DTO.Request
@@ -7,7 +8,7 @@ namespace projectDemo.DTO.Request
     public class UserRequest
     {
         [TextValidation(ConfigValidation.MinLength, ConfigValidation.MaxLength)]
-        [EmailAddress]
+        [Gmail]
         public string Email { get; set; }
 
         [TextValidation(ConfigValidation.MinLength, ConfigValidation.MaxLength)]

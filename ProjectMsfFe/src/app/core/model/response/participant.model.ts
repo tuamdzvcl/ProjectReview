@@ -7,6 +7,7 @@ export interface TicketInfo {
 export interface EventInfo {
   EventTitle: string;
   Tickets: TicketInfo[];
+
 }
 
 export interface UserInEvent {
@@ -16,6 +17,7 @@ export interface UserInEvent {
   FirstName: string;
   LastName: string;
   Avarta?: string;
+  TotalAmount: number;
   Events: EventInfo[];
 }
 

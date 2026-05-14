@@ -11,7 +11,7 @@ export class ImageUrlPipe implements PipeTransform {
 
   transform(path: string | null | undefined): string {
     if (!path) {
-      return 'cat.jpg';
+      return '/cat.jpg';
     }
 
     if (path.startsWith('http')) {

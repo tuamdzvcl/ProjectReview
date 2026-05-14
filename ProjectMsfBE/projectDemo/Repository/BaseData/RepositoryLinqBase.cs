@@ -1,4 +1,5 @@
 ﻿using System.Linq.Expressions;
+using DocumentFormat.OpenXml.Bibliography;
 using Microsoft.EntityFrameworkCore;
 using projectDemo.UnitOfWorks;
 
@@ -13,6 +14,7 @@ namespace projectDemo.Repository.BaseData
 
         public RepositoryLinqBase(IUnitOfWork uow)
         {
+
             _dbContext = uow.context;
             _dbSet = _dbContext.Set<TEntity>();
             _uow = uow;
@@ -25,6 +27,8 @@ namespace projectDemo.Repository.BaseData
 
         public virtual async Task<List<TEntity>> GetAllAsync()
         {
+            var result = await _dbSet.ToListAsync();
+            Console.WriteLine($"GetAll{result}");
             return await _dbSet.ToListAsync();
         }
 

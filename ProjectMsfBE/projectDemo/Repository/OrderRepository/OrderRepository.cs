@@ -70,6 +70,7 @@ namespace projectDemo.Repository.OrderRepository
                         .ThenInclude(x => x.Event)
                 .Include(x => x.OrderDetails)
                     .ThenInclude(x => x.Ticket)
+                .Include(x=>x.Payment)
                 .FirstOrDefaultAsync(x => x.Id == orderID && x.IsDeleted == false);
         }
 

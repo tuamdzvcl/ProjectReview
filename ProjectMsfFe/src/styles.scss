@@ -78,6 +78,7 @@ body {
 .swal2-container {
   z-index: 999999 !important;
 }
+
 .validation-error-focus {
   border-color: #ef4444 !important;
   box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.2) !important;
@@ -88,4 +89,103 @@ body {
 .validation-error-focus .ql-container,
 .validation-error-focus .ql-toolbar {
   border-color: #ef4444 !important;
+}
+
+/* ======================================================
+   TEXT TRUNCATION UTILITIES
+   Dùng global: chỉ cần thêm class vào bất kỳ element nào.
+
+   Cách dùng:
+     .text-truncate    → cắt 1 dòng + dấu ...
+     .text-clamp-2     → cắt 2 dòng + dấu ...
+     .text-clamp-3     → cắt 3 dòng + dấu ...
+   ====================================================== */
+
+// 1 dòng: overflow ellipsis
+.text-clamp-1 {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+// Nhiều dòng: dùng -webkit-line-clamp
+.text-clamp-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.text-clamp-3 {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ── Tooltip chú thích khi hover ──
+   Cách dùng trong HTML:
+   <h3 class="text-clamp-2 has-tooltip" [title]="event.Title">{{ event.Title }}</h3>
+   ──────────────────────────────── */
+.has-tooltip {
+  position: relative;
+  cursor: default;
+
+  // Tooltip box
+  &::after {
+    content: attr(title);
+    position: absolute;
+    left: 0;
+    top: calc(100% + 8px);
+    z-index: 1000;
+
+    max-width: 360px;
+    min-width: 120px;
+    width: max-content;
+    padding: 8px 12px;
+
+    background: #1f2937;
+    color: #fff;
+    font-size: 13px;
+    font-weight: 500;
+    line-height: 1.5;
+    border-radius: 6px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+    white-space: normal;
+    word-break: break-word;
+
+    // Hidden by default
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(4px);
+    transition: opacity 0.2s ease, transform 0.2s ease, visibility 0.2s;
+    pointer-events: none;
+  }
+
+  // Arrow
+  &::before {
+    content: '';
+    position: absolute;
+    left: 16px;
+    top: calc(100% + 2px);
+    z-index: 1001;
+
+    border: 6px solid transparent;
+    border-bottom-color: #1f2937;
+
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.2s ease, visibility 0.2s;
+    pointer-events: none;
+  }
+
+  // Show on hover
+  &:hover::after,
+  &:hover::before {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+  }
 }

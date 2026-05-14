@@ -1,3 +1,4 @@
+using EventTick.Model.Enum;
 using EventTick.Model.Models;
 using projectDemo.Common.PageRequest;
 using projectDemo.DTO.Request;
@@ -17,9 +18,9 @@ namespace projectDemo.Repository.Ipml
         Task<PageResponse<EventResponse>> GetPageEvent(int pageIndex, int pageSize, string key);
         Task<PageResponse<EventTypeTickResponses>> GetAllWithTicketTypesAsync(PageRequest request);
         Task<PageResponse<EventTypeTickResponses>> GetAdminPendingEventsAsync(PageRequest request);
-        Task<PageResponse<EventTypeTickResponses>> GetAllWithTicketTypesAsyncbyid(
+        Task<PageResponseCount<EventTypeTickResponses,EnumStatusEvent>> GetAllWithTicketTypesAsyncbyid(
             Guid id,
-            PageRequest request
+            PageEventResquest request
         );
         Task<EventTypeTickResponses?> GetEventDetailById(Guid eventId);
     }

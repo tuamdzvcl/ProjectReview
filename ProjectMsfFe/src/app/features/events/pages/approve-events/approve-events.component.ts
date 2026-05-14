@@ -238,6 +238,6 @@ export class ApproveEventsComponent implements OnInit {
   }
 
   viewDetails(event: any) {
-    this.router.navigate(['/admin/events', event.Id]);
+    this.router.navigate(['/admin/approve-events', event.Id]);
   }
 }

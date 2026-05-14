@@ -15,10 +15,12 @@ using projectDemo.DTO.Response.Momo;
 using projectDemo.DTO.Response.Tick;
 using projectDemo.DTO.UpdateRequest;
 using projectDemo.Entity.Enum;
+using projectDemo.Entity.Models;
 using projectDemo.Query.OrderQuery;
 using projectDemo.Repository.Ipml;
 using projectDemo.Repository.OrderRepository;
 using projectDemo.Repository.PaymentRepository;
+using projectDemo.Repository.PromotionRepository;
 using projectDemo.Repository.TickRepository;
 using projectDemo.Repository.TickTypeRepository;
 using projectDemo.Service.MomoService;
@@ -39,6 +41,7 @@ namespace projectDemo.Service.OrderService
         private readonly IUnitOfWork _uow;
         private readonly IPaymentRepository _paymentRepository;
         private readonly IMomoService _momoservice;
+        private readonly IPromotionRepository _promotionRepository;
         private readonly IOptions<TickOption> _options;
 
         public OrderService(
@@ -53,9 +56,11 @@ namespace projectDemo.Service.OrderService
             IEventRepository eventRepository,
             IMapper mapper,
             IOrderRepository order,
+            IPromotionRepository promotionRepository,
             IOrderQuery orderQuery
         )
         {
+            _promotionRepository= promotionRepository;
             _momoservice = momoService;
             _options = options;
             _paymentRepository = paymentRepository;
@@ -95,6 +100,7 @@ namespace projectDemo.Service.OrderService
         }
 
         //tạo order rồi tạo orderdetail
+        #region Tạo Order 
         public async Task<ApiResponse<MomoCreatePaymentResponseModel>> CreateOrder(
             CreateOrderRequest request,
             Guid userid
@@ -158,6 +164,7 @@ namespace projectDemo.Service.OrderService
                     };
                     order.OrderDetails.Add(detail);
                     TotalAmount += typeTicket.Price * item.Quantity;
+                    #region Generate Ticket 
                     //var tickqr = new TickCreateQrCode
                     //{
                     //    EventID = typeTicket.EventID,
@@ -180,13 +187,33 @@ namespace projectDemo.Service.OrderService
                     //    };
                     //    await _ticketsRepositorys.CreateTicket(tick);
                     //}
+                    #endregion
                 }
+                var vorchour = await _promotionRepository.GetByIdAsync(request.PromotionId);
+                if( vorchour == null ) 
+                {
+                    return ApiResponse<MomoCreatePaymentResponseModel>.FailResponse(
+                        EnumStatusCode.NOT_FOUND,
+                        "vourchour không tồn tại"
+                    );
+                }
+                if(vorchour.AmountLimit> TotalAmount)
+                {
+                    return ApiResponse<MomoCreatePaymentResponseModel>.FailResponse(
+                       EnumStatusCode.NOT_FOUND,
+                       "đơn hàng không đủ điều kiện để sử dụng vourchour này"
+                   );
+                }
+                var discount = ApplyVouchour(TotalAmount, vorchour);
+                order.DiscountAmount = discount;
+                var finalAmount = TotalAmount - discount;
+                order.FinalAmount = finalAmount;
                 order.TotalAmount = TotalAmount;
                 await _orderRepository.CreateOrder(order);
 
                 var payment = new Payment
                 {
-                    Amount = TotalAmount,
+                    Amount = finalAmount,
                     CreatedDate = DateTime.Now,
                     CreatedBy = user.Username,
                     OrderID = order.Id,
@@ -204,7 +231,7 @@ namespace projectDemo.Service.OrderService
                     new MomoRequest
                     {
                         OrderId = order.Id.ToString("D"),
-                        Amount = TotalAmount,
+                        Amount = finalAmount,
                         FullName = request.User.fullName,
                         OrderInfor = $"Thanh toan don hang {order.OrderCode}",
                     }
@@ -225,8 +252,39 @@ namespace projectDemo.Service.OrderService
                 );
             }
         }
+        #endregion tạo 
 
         //xóa order
+
+        private  decimal ApplyVouchour(decimal totalAmount, Promotion vouchour)
+        {
+           if(vouchour== null || vouchour.IsActive == false)
+            {
+                return 0;
+            }
+           if(totalAmount< vouchour.AmountLimit)
+            {
+                return 0;
+            }
+            decimal discount = 0;
+            if (vouchour.DiscountType == EnumDiscountType.Percentage.ToString())
+            {
+                discount = totalAmount * vouchour.DiscountValue.Value / 100;
+                if (vouchour.AmountLimit.HasValue)
+                {
+                    discount= Math.Min(discount, vouchour.AmountLimit.Value);
+                }
+            }
+            else if(vouchour.DiscountType==EnumDiscountType.Percentage.ToString())
+            {
+                discount =  vouchour.DiscountValue.Value;
+                if(vouchour.AmountLimit.HasValue)
+                {
+                    discount = Math.Min(discount, vouchour.AmountLimit.Value);
+                }
+            }
+            return discount;
+        }
         public async Task<ApiResponse<string>> DeleteOrder(Guid OrderID)
         {
             var order = await _orderRepository.GetOrderbyID(OrderID);
@@ -281,6 +339,7 @@ namespace projectDemo.Service.OrderService
                         OrderCode = first.OrderCode,
                         TotalAmount = first.TotalAmount,
                         CreatedDate = first.CreatedDate,
+                        DiscountAmount=first.DiscountAmount,
                         Status = ((EnumStatusOrder)first.Status).ToString(),
                         Event =
                             eventRow?.EventId == null
@@ -364,7 +423,7 @@ namespace projectDemo.Service.OrderService
                     OrderCode = order.OrderCode,
                     Status = order.Status.ToString(),
                     FullName = order.User != null ? $"{order.User.FirstName} {order.User.LastName}" : "Unknown",
-                    TotalAmount = order.TotalAmount,
+                    TotalAmount = order.Payment.Amount,
 
                     // Event info from the first detail's ticket type
                     EventName = eventInfo?.Title ?? "",

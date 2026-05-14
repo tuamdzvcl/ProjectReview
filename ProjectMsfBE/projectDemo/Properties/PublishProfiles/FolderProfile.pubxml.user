@@ -8,4 +8,12 @@ https://go.microsoft.com/fwlink/?LinkID=208121.
     <History>True|2026-05-08T03:53:55.4431999Z;True|2026-05-08T10:34:19.4185152+07:00;True|2026-05-08T10:11:02.0485003+07:00;True|2026-04-14T11:30:08.7172805+07:00;</History>
     <LastFailureDetails />
   </PropertyGroup>
+  <ItemGroup>
+    <File Include="AttributeConfig/GmailAttribute.cs">
+      <publishTime>05/13/2026 15:31:14</publishTime>
+    </File>
+    <File Include="AttributeConfig/TextValidationAttribute.cs">
+      <publishTime>05/12/2026 14:12:44</publishTime>
+    </File>
+  </ItemGroup>
 </Project>

@@ -512,7 +512,7 @@ namespace projectDemo.Service.UserService
                             {
                                 TicketName = t.Key,
                                 Quantity =t.Sum(x => x.TicketQuantity),
-                                Price = t.Sum(x => x.TotalAmount),
+                                Price = t.First().TickPrice,
                             }).ToList()
                         }).ToList()
                 };
@@ -573,6 +573,67 @@ namespace projectDemo.Service.UserService
         public Task<PageResponse<UserInEvent>> GetParticipantsByOrganizer(Guid organizerId, PageRequest request)
         {
             throw new NotImplementedException();
+        }
+
+        // 1205/2026-thay đổi
+        public async Task<PageResponse<UserInEvent>> GetParticipantsByEvent(Guid organizerId, Guid eventId, PageRequest request)
+        {
+            try
+            {
+                if (request.PageIndex <= 0)
+                    request.PageIndex = 1;
+                if (request.PageSize <= 0)
+                    request.PageSize = 10;
+
+                var (rawData, totalCount) = await _participantQuery.GetParticipantsByEventAsync(
+                    organizerId,
+                    eventId,
+                    request.PageIndex,
+                    request.PageSize
+                );
+
+                var items = rawData.GroupBy(x => x.Id).Select(ug => new UserInEvent
+                {
+                    UserName = ug.First().Username,
+                    Email = ug.First().Email,
+                    FirstName = ug.First().FirstName,
+                    LastName = ug.First().LastName,
+                    Avarta = ug.First().AvatarUrl ,
+                    TotalAmount = ug.Sum(x=>x.TotalAmount),
+                    
+                    Events = ug.GroupBy(x => x.EventID).Select(eg => new EventInfo
+                    {
+                        EventTitle = eg.First().EventTitle,
+                        Tickets = eg.GroupBy(tg=>tg.TicketName)
+                        .Select(t => new TicketInfo
+                        {
+                            TicketName = t.Key,
+                            Quantity = t.Sum(x=>x.TicketQuantity),
+                            Price =t.First().TickPrice
+                        }).ToList()
+                    }).ToList()
+                }).ToList();
+
+                return new PageResponse<UserInEvent>
+                {
+                    Items = items,
+                    PageIndex = request.PageIndex,
+                    PageSize = request.PageSize,
+                    TotalRecords = totalCount,
+                    TotalPages = (int)Math.Ceiling((double)totalCount / request.PageSize),
+                    Success = true,
+                    Message = "Lấy danh sách người tham gia theo sự kiện thành công",
+                };
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.ToString());
+                return new PageResponse<UserInEvent>
+                {
+                    Success = false,
+                    Message = "Có lỗi xảy ra khi lấy danh sách người tham gia theo sự kiện",
+                };
+            }
         }
     }
 }

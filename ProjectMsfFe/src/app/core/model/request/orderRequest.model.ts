@@ -4,4 +4,5 @@ import { UserOrder } from './userOrder.model';
 export interface CreateOrderRequest {
   User: UserOrder;
   Items: OrderItemRequest[];
+  PromotionId?: number;
 }

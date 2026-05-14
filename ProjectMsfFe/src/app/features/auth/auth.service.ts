@@ -6,10 +6,16 @@ import { TokenService } from '../../core/services/token.service';
 import { AuthData } from '../../core/model/response/auth-data.model';
 import { jwtDecode } from 'jwt-decode';
 import { PermissionStoreService } from '../../core/services/permission-store.service';
+import { UserService } from '../../core/services/user.service';
 
 @Injectable({ providedIn: 'root' })
 export class AuthService extends BaseApiService {
-  constructor(http: HttpClient, private tokenService: TokenService, private permissionStore: PermissionStoreService) {
+  constructor(
+    http: HttpClient,
+    private tokenService: TokenService,
+    private permissionStore: PermissionStoreService,
+    private userService: UserService
+  ) {
     super(http);
   }
 
@@ -63,6 +69,7 @@ export class AuthService extends BaseApiService {
 
     this.tokenService.clear();
     this.permissionStore.clear();
+    this.userService.clearUserCache();
   }
 
   getUser() {

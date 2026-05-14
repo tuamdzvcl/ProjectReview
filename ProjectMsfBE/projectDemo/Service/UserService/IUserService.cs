@@ -20,5 +20,7 @@ namespace projectDemo.Service.UserService
         Task<PageResponse<ParticipantSummaryResponse>> GetParticipantsSummaryByOrganizer(Guid organizerId, projectDemo.Common.PageRequest.PageRequest request);
         Task<ApiResponse<UserInEvent>> GetParticipantDetail(Guid organizerId, Guid userId);
         Task<ApiResponse<string>> UpdateAvatarAsync(Guid userId, IFormFile file);
+        // 1205/2026-thay đổi
+        Task<PageResponse<UserInEvent>> GetParticipantsByEvent(Guid organizerId, Guid eventId, projectDemo.Common.PageRequest.PageRequest request);
     }
 }

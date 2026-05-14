@@ -19,4 +19,5 @@ export interface EventModel {
   ListTypeTick: Array<TypeTickResponse>;
   Reason?: string;
   isfaslse?: boolean;
+  
 }

@@ -1,4 +1,5 @@
-﻿using projectDemo.Common;
+﻿using projectDemo.AttributeConfig;
+using projectDemo.Common;
 using System.ComponentModel.DataAnnotations;
 
 namespace projectDemo.DTO.Request

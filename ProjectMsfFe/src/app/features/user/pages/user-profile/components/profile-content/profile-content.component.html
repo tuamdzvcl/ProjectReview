@@ -1,4 +1,5 @@
 <main class="profile-content">
+  <!-- ═══ OWNER VIEW: Full tabs ═══ -->
   <nav class="primary-tabs" *ngIf="isOwner">
     <button class="tab-item" [class.active]="activeTab === 'home'" (click)="activeTab = 'home'">
       <i class="fa-solid fa-house"></i> Home
@@ -6,18 +7,13 @@
     <button class="tab-item" [class.active]="activeTab === 'about'" (click)="activeTab = 'about'">
       <i class="fa-solid fa-circle-info"></i> About
     </button>
-
-
-    <ng-container *ngIf="isOwner">
-      <button class="tab-item" [class.active]="activeTab === 'setting'" (click)="activeTab = 'setting'">
-        <i class="fa-solid fa-gear"></i> Setting
-      </button>
-      <button class="tab-item" [class.active]="activeTab === 'orders'" (click)="activeTab = 'orders'">
-        <i class="fa-solid fa-box"></i> My Orders
-      </button>
-    </ng-container>
+    <button class="tab-item" [class.active]="activeTab === 'setting'" (click)="activeTab = 'setting'">
+      <i class="fa-solid fa-gear"></i> Setting
+    </button>
+    <button class="tab-item" [class.active]="activeTab === 'orders'" (click)="activeTab = 'orders'">
+      <i class="fa-solid fa-box"></i> My Orders
+    </button>
   </nav>
-
 
   <div class="secondary-tabs" *ngIf="isOwner && activeTab === 'home'">
     <button *ngIf="isOwner" class="sub-tab" [class.active]="activeSubTab === 'saved'" (click)="activeSubTab = 'saved'">
@@ -35,8 +31,8 @@
     </button>
   </div>
 
-
-  <div *ngIf="activeTab === 'home' && activeSubTab === 'saved'" class="event-list">
+  <!-- Owner: Saved events -->
+  <div *ngIf="isOwner && activeTab === 'home' && activeSubTab === 'saved'" class="event-list">
     <div *ngFor="let event of savedEvents" class="event-card">
       <div class="event-image">
         <img [src]="event.PosterUrl" [alt]="event.Title" />
@@ -56,8 +52,8 @@
     </div>
   </div>
 
-
-  <div *ngIf="activeTab === 'home' && activeSubTab === 'attending'" class="event-list">
+  <!-- Owner: Attending events -->
+  <div *ngIf="isOwner && activeTab === 'home' && activeSubTab === 'attending'" class="event-list">
     <div *ngFor="let event of attendingEvents" class="event-card">
       <div class="event-image">
         <img [src]="event.PosterUrl | imageUrl" [alt]="event.Title" />
@@ -77,8 +73,8 @@
     </div>
   </div>
 
-
-  <div *ngIf="activeTab === 'home' && activeSubTab === 'organised'" class="event-list">
+  <!-- Owner: Organised events -->
+  <div *ngIf="isOwner && activeTab === 'home' && activeSubTab === 'organised'" class="event-list">
     <div *ngFor="let event of events" class="event-card">
       <div class="event-image">
         <img [src]="event.PosterUrl | imageUrl" [alt]="event.Title" />
@@ -95,6 +91,33 @@
           </button>
         </div>
       </div>
+    </div>
+  </div>
+
+  <!-- ═══ GUEST VIEW: Show organised events directly ═══ -->
+  <div *ngIf="!isOwner" class="guest-events-section">
+    <h3 class="section-title">
+      <i class="fa-solid fa-calendar-days"></i> Sự kiện đã tổ chức ({{ events.length }})
+    </h3>
+    <div class="event-list" *ngIf="events.length > 0">
+      <div *ngFor="let event of events" class="event-card">
+        <div class="event-image">
+          <img [src]="event.PosterUrl | imageUrl" [alt]="event.Title" />
+        </div>
+        <div class="event-body">
+          <h3 class="event-title">{{ event.Title }}</h3>
+          <p class="event-date">{{ event.StartDate | formatDate }}</p>
+          <div class="event-actions">
+            <button class="btn-view">
+              <i class="fa-solid fa-arrow-up-right-from-square"></i> Xem chi tiết
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div *ngIf="events.length === 0" class="empty-state">
+      <i class="fa-regular fa-calendar-xmark"></i>
+      <p>Người dùng này chưa tổ chức sự kiện nào.</p>
     </div>
   </div>
 
@@ -154,10 +177,18 @@
         </div>
       </div>
 
-      <!-- Footer: tổng tiền -->
+      <!-- Footer: chi tiết thanh toán -->
       <div class="order-footer">
-        <span class="order-total-label">Tổng cộng</span>
-        <span class="order-total">{{ order.TotalAmount | vndCurrency }}</span>
+        <div class="order-summary-details">
+          <div class="summary-row discount" *ngIf="order.DiscountAmount > 0">
+            <span class="label">Giảm giá:</span>
+            <span class="value">-{{ order.DiscountAmount | vndCurrency }}</span>
+          </div>
+          <div class="summary-row total">
+            <span class="label">Tổng cộng:</span>
+            <span class="value">{{ order.TotalAmount | vndCurrency }}</span>
+          </div>
+        </div>
       </div>
     </div>
   </div>

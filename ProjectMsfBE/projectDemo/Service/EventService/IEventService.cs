@@ -31,7 +31,7 @@ namespace projectDemo.Service.EventService
         Task<PageResponse<EventTypeTickResponses>> GetAdminPendingEvents(PageRequest query);
         Task<PageResponse<EventTypeTickResponses>> GetPageWithTicketTypesbyId(
             Guid id,
-            PageRequest query
+            PageEventResquest query
         );
         //Task<ApiResponse<EventResponse>> CreateEvent(EventRequest resquest,Guid Userid);
     }

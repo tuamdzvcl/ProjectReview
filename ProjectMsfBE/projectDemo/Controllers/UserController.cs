@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using projectDemo.Common.PageRequest;
 using projectDemo.config;
 using projectDemo.DTO.Request;
 using projectDemo.DTO.UpdateRequest;
@@ -37,6 +38,7 @@ namespace projectDemo.Controllers
             return Ok(result);
         }
         [HttpGet("events/{userId}")]
+        [AllowAnonymous]
         public async Task<IActionResult> GetEventByUserId(Guid userId)
         {
             var result = await _userService.GetListEventByUserIDCreate(userId);
@@ -94,6 +96,14 @@ namespace projectDemo.Controllers
         {
             var userId = Guid.Parse(User.FindFirstValue("id") ?? "Null");
             var result = await _userService.UpdateAvatarAsync(userId, file);
+            return Ok(result);
+        }
+        // 1205/2026-thay đổi
+        [HttpGet("events/{eventId}/participants")]
+        public async Task<IActionResult> GetParticipantsByEvent(Guid eventId, [FromQuery] PageRequest request)
+        {
+            var userId = Guid.Parse(User.FindFirstValue("id") ?? "Null");
+            var result = await _userService.GetParticipantsByEvent(userId, eventId, request);
             return Ok(result);
         }
         

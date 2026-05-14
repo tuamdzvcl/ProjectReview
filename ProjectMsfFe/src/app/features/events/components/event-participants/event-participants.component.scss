@@ -1,0 +1,171 @@
+// 1205/2026-thay đổi
+.participants-section {
+  animation: slideDown 0.3s ease-out;
+  
+  h3 {
+    font-size: 18px;
+    font-weight: 600;
+    color: #333;
+  }
+
+  ::v-deep .p-datatable {
+    .p-datatable-thead > tr > th {
+      background: #f8fafc;
+      color: #475569;
+      font-weight: 600;
+      font-size: 14px;
+    }
+
+    .p-datatable-tbody > tr {
+      font-size: 14px;
+      color: #1e293b;
+    }
+  }
+}
+
+@keyframes slideDown {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.participant-details-modal {
+  padding: 10px;
+
+  .user-profile-header {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid #f1f5f9;
+
+    .avatar-container {
+      .large-avatar {
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        object-fit: cover;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        border: 3px solid #fff;
+      }
+    }
+
+    .user-info-text {
+      h3 {
+        margin: 0 0 5px 0;
+        font-size: 22px;
+        font-weight: 700;
+        color: #1e293b;
+      }
+      p {
+        margin: 0;
+        font-size: 14px;
+        display: flex;
+        align-items: center;
+        
+        i {
+          font-size: 14px;
+          color: #64748b;
+        }
+      }
+    }
+  }
+
+  .tickets-section {
+    margin-top: 24px;
+
+    h4 {
+      font-size: 16px;
+      font-weight: 600;
+      color: #334155;
+    }
+
+    .ticket-card {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 15px;
+      margin-bottom: 12px;
+      background: #f8fafc;
+      border-radius: 12px;
+      border: 1px solid #e2e8f0;
+      transition: all 0.2s ease;
+
+      &:hover {
+        background: #f1f5f9;
+        transform: translateX(4px);
+      }
+
+      .ticket-info {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+
+        .ticket-name {
+          font-weight: 600;
+          font-size: 15px;
+          color: #0f172a;
+        }
+
+        .ticket-quantity {
+          font-size: 13px;
+          color: #64748b;
+          strong {
+            color: #3b82f6;
+          }
+        }
+      }
+
+      .ticket-price-info {
+        text-align: right;
+        display: flex;
+        flex-direction: column;
+
+        .ticket-unit-price {
+          font-size: 12px;
+        }
+
+        .ticket-total-price {
+          font-weight: 700;
+          font-size: 16px;
+          color: #10b981;
+        }
+      }
+    }
+
+    .total-amount-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-top: 2px dashed #e2e8f0;
+      
+      .total-label {
+        font-size: 16px;
+        font-weight: 600;
+        color: #475569;
+      }
+
+      .total-value {
+        font-size: 20px;
+        font-weight: 800;
+        color: #10b981;
+      }
+    }
+  }
+}
+
+.text-muted {
+  color: #64748b !important;
+}
+
+.mr-2 {
+  margin-right: 8px;
+}
+
+.pb-2 {
+  padding-bottom: 8px;
+}
+
+.border-bottom {
+  border-bottom: 1px solid #e2e8f0;
+}
+

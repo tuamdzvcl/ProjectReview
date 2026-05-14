@@ -1,6 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using EventTick.Model.asbtract;
+using projectDemo.AttributeConfig;
 using projectDemo.Common;
 
 namespace projectDemo.Entity.Models

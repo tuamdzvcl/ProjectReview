@@ -113,6 +113,12 @@ namespace projectDemo.Migrations
                     b.Property<DateTime?>("CreatedDate")
                         .HasColumnType("datetime2");
 
+                    b.Property<decimal>("DiscountAmount")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("FinalAmount")
+                        .HasColumnType("decimal(18,2)");
+
                     b.Property<bool?>("IsDeleted")
                         .HasColumnType("bit");
 
@@ -284,7 +290,7 @@ namespace projectDemo.Migrations
                         new
                         {
                             Id = 1,
-                            CreatedDate = new DateTime(2026, 5, 7, 10, 0, 3, 794, DateTimeKind.Utc).AddTicks(7758),
+                            CreatedDate = new DateTime(2026, 5, 14, 4, 5, 47, 315, DateTimeKind.Utc).AddTicks(510),
                             IsAdmin = true,
                             IsDeleted = false,
                             IsSystem = true,
@@ -293,7 +299,7 @@ namespace projectDemo.Migrations
                         new
                         {
                             Id = 2,
-                            CreatedDate = new DateTime(2026, 5, 7, 10, 0, 3, 794, DateTimeKind.Utc).AddTicks(7770),
+                            CreatedDate = new DateTime(2026, 5, 14, 4, 5, 47, 315, DateTimeKind.Utc).AddTicks(518),
                             IsAdmin = false,
                             IsDeleted = false,
                             IsSystem = true,
@@ -302,7 +308,7 @@ namespace projectDemo.Migrations
                         new
                         {
                             Id = 3,
-                            CreatedDate = new DateTime(2026, 5, 7, 10, 0, 3, 794, DateTimeKind.Utc).AddTicks(7772),
+                            CreatedDate = new DateTime(2026, 5, 14, 4, 5, 47, 315, DateTimeKind.Utc).AddTicks(521),
                             IsAdmin = false,
                             IsDeleted = false,
                             IsSystem = true,
@@ -494,7 +500,7 @@ namespace projectDemo.Migrations
                             IsDeleted = false,
                             IsLock = false,
                             LastName = "admin",
-                            PasswordHash = "$2a$11$cwQ0Xqir2QTSV9fy5P4i7uLl6halAASEbPxkGePOoz7aj5mF3ILMS",
+                            PasswordHash = "$2a$11$Ns.wTobzzXWthZygP2qDoeE04mvTaOFUtfLlMMz0ae6vWIitVC3Ua",
                             Username = "admin"
                         });
                 });
@@ -676,8 +682,8 @@ namespace projectDemo.Migrations
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
 
                     b.HasKey("Id");
 
@@ -1062,6 +1068,9 @@ namespace projectDemo.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<decimal?>("AmountLimit")
+                        .HasColumnType("decimal(18,2)");
+
                     b.Property<string>("Code")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -1074,15 +1083,17 @@ namespace projectDemo.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Description")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<decimal?>("DiscountAmount")
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<string>("DiscountType")
                         .IsRequired()
                         .HasMaxLength(20)
                         .HasColumnType("nvarchar(20)");
 
-                    b.Property<decimal>("DiscountValue")
+                    b.Property<decimal?>("DiscountValue")
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<DateTime>("EndDate")
@@ -1092,6 +1103,9 @@ namespace projectDemo.Migrations
                         .HasColumnType("bit");
 
                     b.Property<bool?>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsSystem")
                         .HasColumnType("bit");
 
                     b.Property<DateTime>("StartDate")
@@ -1502,6 +1516,52 @@ namespace projectDemo.Migrations
                     b.ToTable("Upgrade");
                 });
 
+            modelBuilder.Entity("projectDemo.Entity.Models.UserPromotion", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("CreatedBy")
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<DateTime?>("CreatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool?>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsUsed")
+                        .HasColumnType("bit");
+
+                    b.Property<int>("PromotionId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("UpdatedBy")
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<DateTime?>("UpdatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("UsedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("PromotionId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("UserPromotion");
+                });
+
             modelBuilder.Entity("projectDemo.Entity.Models.UserUpgrade", b =>
                 {
                     b.Property<Guid>("Id")
@@ -1749,6 +1809,25 @@ namespace projectDemo.Migrations
                     b.Navigation("Role");
                 });
 
+            modelBuilder.Entity("projectDemo.Entity.Models.UserPromotion", b =>
+                {
+                    b.HasOne("projectDemo.Entity.Models.Promotion", "Promotion")
+                        .WithMany("UserPromotions")
+                        .HasForeignKey("PromotionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("EventTick.Model.Models.User", "User")
+                        .WithMany("UserPromotions")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Promotion");
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("projectDemo.Entity.Models.UserUpgrade", b =>
                 {
                     b.HasOne("projectDemo.Entity.Models.Upgrade", "Upgrade")
@@ -1808,6 +1887,8 @@ namespace projectDemo.Migrations
 
                     b.Navigation("UserLogins");
 
+                    b.Navigation("UserPromotions");
+
                     b.Navigation("UserRoles");
 
                     b.Navigation("UserUpgrades");
@@ -1828,6 +1909,11 @@ namespace projectDemo.Migrations
                     b.Navigation("MenuPermissions");
 
                     b.Navigation("RolePermissions");
+                });
+
+            modelBuilder.Entity("projectDemo.Entity.Models.Promotion", b =>
+                {
+                    b.Navigation("UserPromotions");
                 });
 
             modelBuilder.Entity("projectDemo.Entity.Models.Upgrade", b =>

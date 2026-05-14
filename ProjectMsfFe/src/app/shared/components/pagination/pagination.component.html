@@ -1,0 +1,52 @@
+<div class="pagination-container" *ngIf="totalPages > 1">
+  <div class="pagination-info">
+    Hiển thị {{ (currentPage - 1) * pageSize + 1 }} - {{ Math.min(currentPage * pageSize, totalItems) }} trong số {{ totalItems }}
+  </div>
+  
+  <ul class="pagination-list">
+    <li class="pagination-item">
+      <button 
+        class="pagination-btn nav-btn" 
+        [disabled]="currentPage === 1"
+        (click)="prevPage()"
+        aria-label="Previous page">
+        <i class="pi pi-chevron-left"></i>
+      </button>
+    </li>
+
+    <li *ngIf="pages[0] > 1" class="pagination-item">
+      <button class="pagination-btn" (click)="changePage(1)">1</button>
+    </li>
+    
+    <li *ngIf="pages[0] > 2" class="pagination-item dots">
+      <span>...</span>
+    </li>
+
+    <li *ngFor="let page of pages" class="pagination-item">
+      <button 
+        class="pagination-btn" 
+        [class.active]="page === currentPage"
+        (click)="changePage(page)">
+        {{ page }}
+      </button>
+    </li>
+
+    <li *ngIf="pages[pages.length - 1] < totalPages - 1" class="pagination-item dots">
+      <span>...</span>
+    </li>
+
+    <li *ngIf="pages[pages.length - 1] < totalPages" class="pagination-item">
+      <button class="pagination-btn" (click)="changePage(totalPages)">{{ totalPages }}</button>
+    </li>
+
+    <li class="pagination-item">
+      <button 
+        class="pagination-btn nav-btn" 
+        [disabled]="currentPage === totalPages"
+        (click)="nextPage()"
+        aria-label="Next page">
+        <i class="pi pi-chevron-right"></i>
+      </button>
+    </li>
+  </ul>
+</div>

@@ -1,0 +1,42 @@
+<div class="filter-container p-4 mb-4">
+  <div class="filter-grid">
+    <!-- Keyword Search -->
+    <div class="filter-item search-field">
+      <label class="filter-label">Từ khóa</label>
+      <span class="p-input-icon-left w-full">
+        <i class="pi pi-search"></i>
+        <input type="text" pInputText [(ngModel)]="filter.keyword" [placeholder]="placeholder"
+          (keyup.enter)="onFilter()" class="w-full" />
+      </span>
+    </div>
+
+    <!-- Start Date -->
+    <div class="filter-item">
+      <label class="filter-label">Ngày bắt đầu</label>
+      <p-datepicker [(ngModel)]="filter.startDate" [showIcon]="false" [showButtonBar]="true" placeholder="Từ ngày"
+        dateFormat="dd/mm/yy" styleClass="w-full" appendTo="body"></p-datepicker>
+    </div>
+
+    <!-- End Date -->
+    <div class="filter-item">
+      <label class="filter-label">Ngày kết thúc</label>
+      <p-datepicker [(ngModel)]="filter.endDate" [showIcon]="false" [showButtonBar]="true" placeholder="Đến ngày"
+        dateFormat="dd/mm/yy" styleClass="w-full" appendTo="body" [minDate]="filter.startDate"></p-datepicker>
+    </div>
+
+    <!-- Status -->
+    <div class="filter-item">
+      <label class="filter-label">Trạng thái</label>
+      <p-dropdown [(ngModel)]="filter.status" [options]="statusOptions" [placeholder]="statusPlaceholder"
+        [showClear]="true" optionLabel="label" optionValue="value" styleClass="w-full" appendTo="body"></p-dropdown>
+    </div>
+
+    <!-- Actions -->
+    <div class="filter-actions">
+      <button pButton type="button" label="Lọc" icon="pi pi-filter" (click)="onFilter()"
+        class="filter-btn primary"></button>
+      <button pButton type="button" label="Làm mới" icon="pi pi-refresh" (click)="onReset()"
+        class="filter-btn secondary"></button>
+    </div>
+  </div>
+</div>

@@ -109,8 +109,31 @@
           </div>
 
           <div class="total-line">
+            <span>Tạm tính</span>
+            <span>{{ bookingData.totalPrice | vndCurrency }}</span>
+          </div>
+
+          <div class="voucher-section">
+            <button class="voucher-btn" (click)="openVoucherPopup()">
+              <i class="material-icons">local_offer</i>
+              <span>{{
+                selectedVoucher
+                  ? selectedVoucher.Code
+                  : "Chọn hoặc nhập mã giảm giá"
+              }}</span>
+              <i class="material-icons">chevron_right</i>
+            </button>
+            <div class="selected-voucher-info" *ngIf="selectedVoucher">
+              <span class="discount-label">Giảm giá:</span>
+              <span class="discount-value"
+                >-{{ discountAmount | vndCurrency }}</span
+              >
+            </div>
+          </div>
+
+          <div class="total-line grand-total">
             <span>Tổng cộng</span>
-            <strong>{{ bookingData.totalPrice | vndCurrency }}</strong>
+            <strong>{{ finalTotal | vndCurrency }}</strong>
           </div>
         </div>
 
@@ -125,5 +148,81 @@
         </p>
       </div>
     </aside>
+  </div>
+
+  <!-- Voucher Popup -->
+  <div
+    class="voucher-modal"
+    *ngIf="showVoucherPopup"
+    (click)="closeVoucherPopup()"
+  >
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3>Chọn voucher</h3>
+        <button class="close-btn" (click)="closeVoucherPopup()">
+          <i class="material-icons">close</i>
+        </button>
+      </div>
+
+      <div class="search-box">
+        <input
+          type="text"
+          placeholder="Nhập mã giảm giá..."
+          [(ngModel)]="searchTerm"
+          (keyup.enter)="onSearchVoucher()"
+        />
+        <button (click)="onSearchVoucher()">Áp dụng</button>
+      </div>
+
+      <div class="voucher-list" (scroll)="onScrollVouchers($event)">
+        <div
+          class="voucher-item"
+          *ngFor="let v of vouchers"
+          [class.selected]="selectedVoucher?.Id === v.Id"
+          [class.disabled]="isVoucherDisabled(v)"
+          (click)="selectVoucher(v)"
+        >
+          <div class="voucher-icon">
+            <i class="material-icons">local_offer</i>
+          </div>
+          <div class="voucher-details">
+            <div class="voucher-header">
+              <span class="voucher-name"
+                >{{ v.Code }} - Giảm {{ v.DiscountValue }}%</span
+              >
+              <div class="selection-indicator">
+                <i class="material-icons">{{
+                  selectedVoucher?.Id === v.Id
+                    ? "check_circle"
+                    : "radio_button_unchecked"
+                }}</i>
+              </div>
+            </div>
+            <p class="voucher-desc">{{ v.Description }}</p>
+            <div class="voucher-footer">
+              <span class="expiry">HSD: {{ v.EndDate | formatDate }}</span>
+              <span class="quantity"
+                >Số lượng:
+                {{
+                  v.UsageLimit ? v.UsageLimit - v.UsedCount : "Không giới hạn"
+                }}</span
+              >
+            </div>
+          </div>
+        </div>
+
+        <div class="loading-indicator" *ngIf="loadingVouchers">
+          <div class="spinner"></div>
+          <span>Đang tải thêm...</span>
+        </div>
+
+        <div
+          class="no-vouchers"
+          *ngIf="!loadingVouchers && vouchers.length === 0"
+        >
+          <p>Không tìm thấy voucher nào phù hợp.</p>
+        </div>
+      </div>
+    </div>
   </div>
 </div>

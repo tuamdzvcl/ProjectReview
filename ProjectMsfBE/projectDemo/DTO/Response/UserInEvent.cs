@@ -7,7 +7,10 @@ namespace projectDemo.DTO.Response
         public string Email { get; set; }
         public string UserName { get; set; }
 
-        
+        public decimal? TotalAmount { get; set; }
+
+
+
         public string FirstName { get; set; }
         public string LastName { get; set; }
         public Guid ID { get; set; }

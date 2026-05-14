@@ -53,16 +53,34 @@ export class UserProfileComponent implements OnInit, OnChanges {
   }
   determineOwnership(urlId: string | null) {
     const currentUserId = this.tokenService.getUserId();
-    if (!urlId) {
+    if (!urlId && currentUserId) {
+      // Logged in user viewing their own profile (/profile)
+      this.isOwner = true;
+    } else if (urlId && currentUserId === urlId) {
+      // Logged in user viewing their own profile (/profile/:id)
       this.isOwner = true;
     } else {
-      this.isOwner = currentUserId === urlId;
+      // Guest or viewing another user's profile
+      this.isOwner = false;
     }
   }
 
   loadUserProfile(id?: string) {
-    if (id && !this.isOwner) {
-      // Viewing another user's profile
+    const isLoggedIn = !!this.tokenService.getUserId();
+
+    if (this.isOwner && isLoggedIn) {
+      // Owner viewing own profile → use authenticated API
+      this.userService.getUserEvents().subscribe({
+        next: (res: UserEventsResponse) => {
+          this.user = res.User;
+          this.events = res.Events;
+          if (this.user.AvatarUrl) {
+            this.profileImageUrl = this.user.AvatarUrl;
+          }
+        },
+      });
+    } else if (id) {
+      // Guest or other user viewing profile → use public API
       this.userService.getUserProfile(id).subscribe({
         next: (res: UserProfile) => {
           this.user = {
@@ -80,17 +98,8 @@ export class UserProfileComponent implements OnInit, OnChanges {
           }
         },
       });
-    } else {
-      this.userService.getUserEvents().subscribe({
-        next: (res: UserEventsResponse) => {
-          this.user = res.User;
-          this.events = res.Events;
-          if (this.user.AvatarUrl) {
-            this.profileImageUrl = this.user.AvatarUrl;
-          }
-        },
-      });
     }
+    // If no id and not logged in → nothing to load
   }
 
   onCoverChange(file: File) {

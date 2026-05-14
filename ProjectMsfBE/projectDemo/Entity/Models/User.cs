@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using EventTick.Model.asbtract;
+using projectDemo.AttributeConfig;
 using projectDemo.Common;
 using projectDemo.Entity.Models;
 
@@ -65,5 +66,6 @@ namespace EventTick.Model.Models
         public virtual ICollection<ApiLog> ApiLogs { get; set; }
 
         public virtual ICollection<UserUpgrade> UserUpgrades { get; set; }
+        public virtual ICollection<UserPromotion> UserPromotions { get; set; }
     }
 }
