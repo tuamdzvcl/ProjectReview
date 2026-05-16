@@ -70,7 +70,7 @@ namespace projectDemo.Service.TicketTypeService
         //xóa loại vé
         public async Task<ApiResponse<string>> DeleteTypeTicket(int TypeTickectID)
         {
-            var typeticket = _ticketRepositorys.GetTicketTypebyId(TypeTickectID);
+            var typeticket = await _ticketRepositorys.GetTicketTypebyId(TypeTickectID);
             if (typeticket == null)
             {
                 return ApiResponse<string>.FailResponse(
@@ -154,7 +154,7 @@ namespace projectDemo.Service.TicketTypeService
                 );
             }
 
-            var typeticket = _ticketRepositorys.GetTicketTypebyId(TypeTickectID);
+            var typeticket = await _ticketRepositorys.GetTicketTypebyId(TypeTickectID);
             if (typeticket == null)
             {
                 return ApiResponse<TypeTickResponse>.FailResponse(

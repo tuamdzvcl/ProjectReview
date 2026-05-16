@@ -406,6 +406,11 @@ export class EventCreatePageComponent {
     return formData;
   }
 
+  private formatToUtC(data: Date): string {
+    console.log(data.toISOString());
+    return data.toISOString();
+  }
+
   private formatToLocalISO(date: Date): string {
     const pad = (num: number) => num.toString().padStart(2, '0');
     const YYYY = date.getFullYear();
@@ -447,8 +452,9 @@ export class EventCreatePageComponent {
         this.messageService.add({
           severity: 'success',
           summary: 'Thành công',
-          detail: `Sự kiện đã được ${this.eventId ? 'cập nhật' : 'tạo'
-            } thành công!`,
+          detail: `Sự kiện đã được ${
+            this.eventId ? 'cập nhật' : 'tạo'
+          } thành công!`,
         });
         this.draftService.clear();
         setTimeout(() => {

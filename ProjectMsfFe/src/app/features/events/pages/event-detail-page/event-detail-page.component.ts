@@ -10,7 +10,9 @@ import { ImageUrlPipe } from '../../../../shared/pipes/image-url.pipe';
 import { VndCurrencyPipe } from '../../../../shared/pipes/vnd-currency.pipe';
 import { EventsGridComponent } from '../../components/events-grid/events-grid.component';
 import { FormatDatePipe } from '../../../../shared/pipes/format-date.pipe';
+import { SignalrService } from '../../../../core/services/SignalrService/SignalrService.service';
 import Swal from 'sweetalert2';
+// Trigger Angular recompile
 
 @Component({
   selector: 'app-event-detail-page',
@@ -22,23 +24,21 @@ import Swal from 'sweetalert2';
     EventsGridComponent,
     RouterLink,
     FormatDatePipe,
-    FormsModule
+    FormsModule,
   ],
   templateUrl: './event-detail-page.component.html',
-  styleUrls: ['./event-detail-page.component.scss']
+  styleUrls: ['./event-detail-page.component.scss'],
 })
 export class EventDetailPageComponent implements OnInit, OnDestroy {
   event: EventModel | null = null;
   loading = true;
   error: string | null = null;
-
-
+  availableQuantity: number = 0;
   days = 0;
   hours = 0;
   minutes = 0;
   seconds = 0;
   private timerSubscription: Subscription | null = null;
-
 
   selectedTickets: { [key: number]: number } = {};
   ticketErrors: { [key: number]: string | null } = {};
@@ -49,18 +49,75 @@ export class EventDetailPageComponent implements OnInit, OnDestroy {
     private router: Router,
     private eventService: EventService,
     private bookingService: BookingService,
+    private signalrService: SignalrService,
     private cdr: ChangeDetectorRef
   ) { }
 
   ngOnInit(): void {
-    this.route.paramMap.subscribe(params => {
+    this.route.paramMap.subscribe((params) => {
       const eventId = params.get('id');
       if (eventId) {
         this.loadEvent(eventId);
+        this.initSignalR(eventId);
       } else {
         this.error = 'Event ID not found';
         this.loading = false;
       }
+    });
+  }
+
+  initSignalR(eventId: string): void {
+    this.signalrService.startConnection();
+
+    // Đợi một chút để kết nối ổn định rồi join group
+    setTimeout(() => {
+      this.signalrService.joinEvent(eventId);
+    }, 1000);
+
+    this.signalrService.ticketUpdate$.subscribe({
+      next: (data: any) => {
+        const ticketTypeId = data.ticketTypeId;
+        const availableQuantity = data.availableQuantity;
+        if (ticketTypeId === undefined || availableQuantity === undefined) {
+          console.error(
+            'BUG: Không tìm thấy thuộc tính TicketTypeId hoặc AvailableQuantity trong data!',
+            data
+          );
+          return;
+        }
+        if (this.event?.ListTypeTick) {
+          const ticket = this.event.ListTypeTick.find(
+            (t) => t.Id === data.ticketTypeId
+          );
+          console.log(ticket);
+          if (ticket) {
+            ticket.AvailableQuantity = availableQuantity;
+            console.log(
+              `Cập nhật vé [${ticket.Name}]: Còn lại ${availableQuantity}`
+            );
+            ticket.SoldQuantity = ticket.TotalQuantity - availableQuantity;
+            console.log(ticket.SoldQuantity);
+            if (this.selectedTickets[ticket.Id] > availableQuantity) {
+              this.selectedTickets[ticket.Id] = Math.max(0, availableQuantity);
+              this.calculateTotal();
+              Swal.fire({
+                title: 'Số lượng vé thay đổi',
+                text: `Loại vé "${ticket.Name}" hiện chỉ còn ${availableQuantity} vé.`,
+                icon: 'info',
+                toast: true,
+                position: 'top-end',
+                timer: 3000,
+              });
+            }
+            this.cdr.detectChanges();
+          } else {
+            console.warn(
+              `Không tìm thấy loại vé có Id: ${ticketTypeId} trong danh sách hiện tại.`
+            );
+          }
+        }
+      },
+      error: (err) => console.error('SignalR Subscription Error:', err),
     });
   }
 
@@ -94,7 +151,7 @@ export class EventDetailPageComponent implements OnInit, OnDestroy {
         console.error('Error loading event', err);
         this.error = 'Failed to load event details';
         this.loading = false;
-      }
+      },
     });
   }
 
@@ -131,7 +188,9 @@ export class EventDetailPageComponent implements OnInit, OnDestroy {
       }
 
       this.days = Math.floor(distance / (1000 * 60 * 60 * 24));
-      this.hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+      this.hours = Math.floor(
+        (distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)
+      );
       this.minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
       this.seconds = Math.floor((distance % (1000 * 60)) / 1000);
       this.cdr.markForCheck();
@@ -169,11 +228,9 @@ export class EventDetailPageComponent implements OnInit, OnDestroy {
     if (ticket) {
       const maxAvailable = ticket.TotalQuantity - ticket.SoldQuantity;
       if (newQty > maxAvailable) {
-
         newQty = maxAvailable;
         event.target.value = newQty;
         this.ticketErrors[ticketId] = 'error';
-
 
         Swal.fire({
           toast: true,
@@ -186,7 +243,7 @@ export class EventDetailPageComponent implements OnInit, OnDestroy {
           timerProgressBar: true,
           background: '#fff',
           color: '#111827',
-          iconColor: '#f59e0b'
+          iconColor: '#f59e0b',
         });
       } else {
         this.ticketErrors[ticketId] = null;
@@ -200,30 +257,39 @@ export class EventDetailPageComponent implements OnInit, OnDestroy {
   calculateTotal(): void {
     if (!this.event?.ListTypeTick) return;
 
-    this.totalPrice = this.event.ListTypeTick.reduce((acc: number, ticket: any) => {
-      const qty = this.selectedTickets[ticket.Id] || 0;
-      const maxAvailable = ticket.TotalQuantity - ticket.SoldQuantity;
-      const validQty = Math.min(qty, maxAvailable);
-      return acc + (ticket.Price * validQty);
-    }, 0);
+    this.totalPrice = this.event.ListTypeTick.reduce(
+      (acc: number, ticket: any) => {
+        const qty = this.selectedTickets[ticket.Id] || 0;
+        const maxAvailable = ticket.TotalQuantity - ticket.SoldQuantity;
+        const validQty = Math.min(qty, maxAvailable);
+        return acc + ticket.Price * validQty;
+      },
+      0
+    );
   }
-
 
   get totalTicketCount(): number {
     if (!this.event?.ListTypeTick) return 0;
     return this.event.ListTypeTick.reduce((acc: number, ticket: any) => {
       const qty = this.selectedTickets[ticket.Id] || 0;
-      const maxAvailable = Math.max(0, ticket.TotalQuantity - ticket.SoldQuantity);
+      const maxAvailable = Math.max(
+        0,
+        ticket.TotalQuantity - ticket.SoldQuantity
+      );
       return acc + Math.min(qty, maxAvailable);
     }, 0);
   }
 
   get hasErrors(): boolean {
-    return Object.values(this.ticketErrors).some(error => error !== null);
+    return Object.values(this.ticketErrors).some((error) => error !== null);
   }
 
   get activeTickets(): any[] {
-    return this.event?.ListTypeTick.filter((t: any) => t.Status?.toLowerCase() === 'active') || [];
+    return (
+      this.event?.ListTypeTick.filter(
+        (t: any) => t.Status?.toLowerCase() === 'active'
+      ) || []
+    );
   }
   onBookNow(): void {
     if (this.totalTicketCount === 0 || this.hasErrors) return;
@@ -231,7 +297,7 @@ export class EventDetailPageComponent implements OnInit, OnDestroy {
     this.bookingService.setBooking({
       event: this.event,
       selectedTickets: this.selectedTickets,
-      totalPrice: this.totalPrice
+      totalPrice: this.totalPrice,
     });
 
     this.router.navigate(['/checkout']);

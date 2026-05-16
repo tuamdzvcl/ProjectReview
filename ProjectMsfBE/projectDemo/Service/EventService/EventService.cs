@@ -23,7 +23,7 @@ using projectDemo.UnitOfWorks;
 
 namespace projectDemo.Service.EventService
 {
-    public class EventService : IEventService
+    public class EventService : IEventService 
     {
         private readonly IEventRepository _eventRepository;
         private readonly IImageService _imageService;
@@ -907,6 +907,8 @@ namespace projectDemo.Service.EventService
                         Console.WriteLine($"Lỗi gửi email thông báo: {emailEx.Message}");
                     }
                 }
+
+                //call sigra(trajng thái notifig- call cho người chỉ định- userID ) => messger()
 
                 return ApiResponse<string>.SuccessResponse(
                     Entity.Enum.EnumStatusCode.SUCCESS,

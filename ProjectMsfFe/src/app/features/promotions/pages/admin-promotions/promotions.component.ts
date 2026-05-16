@@ -169,8 +169,6 @@ export class PromotionsComponent implements OnInit {
       return;
     }
 
-    // Update ISO strings from Date objects
-    // Update ISO strings from Date objects, setting time to 00:00:00
     if (this.startDateObj) {
       this.startDateObj.setUTCHours(0, 0, 0, 0);
       this.selectedPromo.StartDate = this.startDateObj.toISOString();
@@ -180,7 +178,7 @@ export class PromotionsComponent implements OnInit {
 
     if (this.endDateObj) {
       this.endDateObj.setUTCHours(0, 0, 0, 0);
-      this.selectedPromo.EndDate = this.endDateObj.toISOString();
+      this.selectedPromo.EndDate = this.endDateObj.toISOString()
     } else {
       this.selectedPromo.EndDate = '';
     }

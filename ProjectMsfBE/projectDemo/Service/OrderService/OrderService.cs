@@ -1,9 +1,11 @@
 using System.Collections.Generic;
 using System.Net.WebSockets;
+using System.Text.RegularExpressions;
 using AutoMapper;
 using Azure;
 using EventTick.Model.Enum;
 using EventTick.Model.Models;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using projectDemo.Common;
@@ -24,6 +26,7 @@ using projectDemo.Repository.PromotionRepository;
 using projectDemo.Repository.TickRepository;
 using projectDemo.Repository.TickTypeRepository;
 using projectDemo.Service.MomoService;
+using projectDemo.SignalR;
 using projectDemo.UnitOfWorks;
 
 namespace projectDemo.Service.OrderService
@@ -43,8 +46,12 @@ namespace projectDemo.Service.OrderService
         private readonly IMomoService _momoservice;
         private readonly IPromotionRepository _promotionRepository;
         private readonly IOptions<TickOption> _options;
+        private readonly IHubContext<OrderHub> _hub;
+        private readonly ILogger<OrderService> _logger;
 
         public OrderService(
+            ILogger<OrderService> logger,
+            IHubContext<OrderHub> hub,
             IMomoService momoService,
             IOptions<TickOption> options,
             IPaymentRepository paymentRepository,
@@ -60,6 +67,8 @@ namespace projectDemo.Service.OrderService
             IOrderQuery orderQuery
         )
         {
+            _logger = logger;
+            _hub = hub;
             _promotionRepository= promotionRepository;
             _momoservice = momoService;
             _options = options;
@@ -93,11 +102,7 @@ namespace projectDemo.Service.OrderService
         }
 
         // lấy giá của event theo loại vé
-        public decimal GetPriceTypeTick(int TypeTicketID)
-        {
-            var TypeTick = _ticketRepositorys.GetTicketTypebyId(TypeTicketID);
-            return TypeTick.Price;
-        }
+       
 
         //tạo order rồi tạo orderdetail
         #region Tạo Order 
@@ -107,8 +112,11 @@ namespace projectDemo.Service.OrderService
         )
         {
             await _uow.BeginTransactionAsync();
+
             try
             {
+                var realtime = new List<RealTime>();
+
                 var user = await _userReposiotry.GetUserByid(userid);
                 if (user == null)
                 {
@@ -130,9 +138,10 @@ namespace projectDemo.Service.OrderService
                     IsDeleted = false,
                     OrderDetails = new List<OrderDetail>(),
                 };
+                
                 foreach (var item in request.Items)
                 {
-                    var typeTicket = _ticketRepositorys.GetTicketTypebyId(item.TicketTypeId);
+                    var typeTicket =  await _ticketRepositorys.GetTicketTypebyId(item.TicketTypeId);
                     if (typeTicket == null)
                     {
                         return ApiResponse<MomoCreatePaymentResponseModel>.FailResponse(
@@ -188,23 +197,41 @@ namespace projectDemo.Service.OrderService
                     //    await _ticketsRepositorys.CreateTicket(tick);
                     //}
                     #endregion
+                    realtime.Add(new RealTime
+                    {
+                        EventId = typeTicket.EventID,
+                        TicketTypeId = typeTicket.Id,
+                        Quantity = typeTicket.TotalQuantity - typeTicket.SoldQuantity - typeTicket.ReservedQuantity,
+                    });
                 }
-                var vorchour = await _promotionRepository.GetByIdAsync(request.PromotionId);
-                if( vorchour == null ) 
+                var remainvouchour = 0;
+                var vourchour = new Promotion();
+                decimal discount = 0.00m ;
+
+                if (request.PromotionId.HasValue)
                 {
-                    return ApiResponse<MomoCreatePaymentResponseModel>.FailResponse(
-                        EnumStatusCode.NOT_FOUND,
-                        "vourchour không tồn tại"
-                    );
+                     vourchour = await _promotionRepository.GetByIdAsync(request.PromotionId ?? 0);
+                    if (vourchour == null)
+                    {
+                        return ApiResponse<MomoCreatePaymentResponseModel>.FailResponse(
+                            EnumStatusCode.NOT_FOUND,
+                            "vourchour không tồn tại"
+                        );
+                    }
+                    if (vourchour.AmountLimit > TotalAmount)
+                    {
+                        return ApiResponse<MomoCreatePaymentResponseModel>.FailResponse(
+                           EnumStatusCode.NOT_FOUND,
+                           "đơn hàng không đủ điều kiện để sử dụng vourchour này"
+                       );
+                    }
+
+                    discount = ApplyVouchour(TotalAmount, vourchour);
+                    vourchour.ReservedQuantity += 1;
+                     remainvouchour =  vourchour.UsageLimit - vourchour.ReservedQuantity - vourchour.UsedCount ?? 0;
+
                 }
-                if(vorchour.AmountLimit> TotalAmount)
-                {
-                    return ApiResponse<MomoCreatePaymentResponseModel>.FailResponse(
-                       EnumStatusCode.NOT_FOUND,
-                       "đơn hàng không đủ điều kiện để sử dụng vourchour này"
-                   );
-                }
-                var discount = ApplyVouchour(TotalAmount, vorchour);
+
                 order.DiscountAmount = discount;
                 var finalAmount = TotalAmount - discount;
                 order.FinalAmount = finalAmount;
@@ -227,9 +254,13 @@ namespace projectDemo.Service.OrderService
                 await _paymentRepository.Create(payment);
                 await _uow.SaveChangesAsync();
                 await _uow.CommitAsync();
+
+               
+
                 var momoResponse = await _momoservice.CreatePaymentAsync(
                     new MomoRequest
                     {
+                        promotionId = request.PromotionId,
                         OrderId = order.Id.ToString("D"),
                         Amount = finalAmount,
                         FullName = request.User.fullName,
@@ -237,10 +268,34 @@ namespace projectDemo.Service.OrderService
                     }
                 );
 
+                
+
+                foreach (var item in realtime)
+                {
+                    await _hub.Clients
+                        .Group($"event_{item.EventId}")
+                        .SendAsync(
+                            "Tickquantity",
+                            new { TicketTypeId = item.TicketTypeId, AvailableQuantity = item.Quantity, Messager="Dây là dữ liệu sai"}
+                        );
+                    _logger.LogWarning($"{item.TicketTypeId} - AvailableQuantity { item.Quantity}");
+                }
+                if (remainvouchour > 0)
+                {
+                    await _hub.Clients
+                        .Group($"voucher_{vourchour.Id}")
+                        .SendAsync(
+                            "VouchourQuantity",
+                            remainvouchour
+                        );
+                }
+
                 return ApiResponse<MomoCreatePaymentResponseModel>.SuccessResponse(
                     EnumStatusCode.SUCCESS,
                     momoResponse
                 );
+
+               
             }
             catch (Exception ex)
             {
@@ -262,7 +317,7 @@ namespace projectDemo.Service.OrderService
             {
                 return 0;
             }
-           if(totalAmount< vouchour.AmountLimit)
+           if(totalAmount < vouchour.AmountLimit)
             {
                 return 0;
             }
@@ -270,7 +325,7 @@ namespace projectDemo.Service.OrderService
             if (vouchour.DiscountType == EnumDiscountType.Percentage.ToString())
             {
                 discount = totalAmount * vouchour.DiscountValue.Value / 100;
-                if (vouchour.AmountLimit.HasValue)
+                if (vouchour.AmountLimit.HasValue && discount>vouchour.AmountLimit)
                 {
                     discount= Math.Min(discount, vouchour.AmountLimit.Value);
                 }
@@ -278,7 +333,7 @@ namespace projectDemo.Service.OrderService
             else if(vouchour.DiscountType==EnumDiscountType.Percentage.ToString())
             {
                 discount =  vouchour.DiscountValue.Value;
-                if(vouchour.AmountLimit.HasValue)
+                if(vouchour.AmountLimit.HasValue && discount > vouchour.AmountLimit)
                 {
                     discount = Math.Min(discount, vouchour.AmountLimit.Value);
                 }

@@ -8,5 +8,7 @@
         public string OrderInfor { get; set; }
 
         public decimal Amount { get; set; }
+
+        public int? promotionId { get; set; }
     }
 }

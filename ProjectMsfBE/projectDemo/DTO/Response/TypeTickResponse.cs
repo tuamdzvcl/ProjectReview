@@ -12,6 +12,7 @@ namespace projectDemo.DTO.Response
 
         public int TotalQuantity { get; set; }
         public int SoldQuantity { get; set; }
+        public int ReservedQuantity { get; set; }
         public string Status { get; set; }
     }
 }

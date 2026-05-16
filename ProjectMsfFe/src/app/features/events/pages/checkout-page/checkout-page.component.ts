@@ -17,7 +17,6 @@ import { OrderService } from '../../../../core/services/order.service';
 import { CreateOrderRequest } from '../../../../core/model/request/orderRequest.model';
 import { PromotionService } from '../../../../core/services/promotion.service';
 import { PromotionResponse } from '../../../../core/model/response/promotion.model';
-import { ApiError } from '../../../../core/model/base/ApiError.model';
 import { ApiErrorHandler } from '../../../../core/utils/api-error-handler.util';
 
 @Component({
@@ -37,7 +36,7 @@ import { ApiErrorHandler } from '../../../../core/utils/api-error-handler.util';
 export class CheckoutPageComponent implements OnInit {
   bookingData: BookingState | null = null;
   userProfile: UserResponse | null = null;
-
+  priceLimit = 0;
   customerName = '';
   customerEmail = '';
   phoneNumber = '';
@@ -86,7 +85,7 @@ export class CheckoutPageComponent implements OnInit {
     private orderService: OrderService,
     private promotionService: PromotionService,
     public router: Router
-  ) { }
+  ) {}
 
   ngOnInit(): void {
     this.bookingData = this.bookingService.getBooking();
@@ -113,8 +112,9 @@ export class CheckoutPageComponent implements OnInit {
         this.userProfile = res.User;
 
         if (this.userProfile) {
-          this.customerName = `${this.userProfile.FirstName || ''} ${this.userProfile.LastName || ''
-            }`.trim();
+          this.customerName = `${this.userProfile.FirstName || ''} ${
+            this.userProfile.LastName || ''
+          }`.trim();
           this.customerEmail = this.userProfile.Email || '';
         }
       },
@@ -166,22 +166,24 @@ export class CheckoutPageComponent implements OnInit {
       pageSize: this.pageSize,
       search: this.searchTerm,
     };
-
     this.promotionService.getAll(params).subscribe({
       next: (res) => {
         if (res.Items && res.Items.length > 0) {
           const now = new Date();
-          const filteredItems = res.Items.filter(v => {
+          const filteredItems = res.Items.filter((v) => {
             const startDate = new Date(v.StartDate);
             const endDate = new Date(v.EndDate);
             return startDate <= now && endDate >= now;
           });
-          
+
           this.vouchers = [...this.vouchers, ...filteredItems];
           this.totalRecords = res.TotalRecords;
           this.page++;
-          
-          if (this.vouchers.length >= res.TotalRecords || res.Items.length < this.pageSize) {
+
+          if (
+            this.vouchers.length >= res.TotalRecords ||
+            res.Items.length < this.pageSize
+          ) {
             this.hasMoreVouchers = false;
           }
         } else {
@@ -190,7 +192,7 @@ export class CheckoutPageComponent implements OnInit {
         this.loadingVouchers = false;
       },
       error: (err) => {
-        ApiErrorHandler.handleError(err)
+        ApiErrorHandler.handleError(err);
         console.error('Error loading vouchers', err);
         this.loadingVouchers = false;
       },
@@ -211,13 +213,47 @@ export class CheckoutPageComponent implements OnInit {
   }
 
   isVoucherDisabled(voucher: PromotionResponse): boolean {
-    if (!this.bookingData || voucher.AmountLimit === null) return false;
-    return voucher.AmountLimit > this.bookingData.totalPrice;
+    if (!this.bookingData) return true;
+
+    // Check minimum order amount
+    if (
+      voucher.DiscountAmount !== null &&
+      voucher.DiscountAmount > this.bookingData.totalPrice
+    ) {
+      return true;
+    }
+
+    // Check usage limit
+    if (
+      voucher.UsageLimit !== null &&
+      voucher.UsedCount >= voucher.UsageLimit
+    ) {
+      return true;
+    }
+
+    return false;
+  }
+
+  getDisabledReason(voucher: PromotionResponse): string {
+    if (!this.bookingData) return '';
+    if (
+      voucher.DiscountAmount !== null &&
+      voucher.DiscountAmount > this.bookingData.totalPrice
+    ) {
+      return `Chưa đạt giá trị đơn tối thiểu (từ ${voucher.DiscountAmount.toLocaleString()}đ)`;
+    }
+    if (
+      voucher.UsageLimit !== null &&
+      voucher.UsedCount >= voucher.UsageLimit
+    ) {
+      return 'Voucher đã hết lượt sử dụng';
+    }
+    return '';
   }
 
   selectVoucher(voucher: PromotionResponse): void {
     if (this.isVoucherDisabled(voucher)) return;
-    
+
     if (this.selectedVoucher?.Id === voucher.Id) {
       this.selectedVoucher = null;
     } else {
@@ -242,7 +278,14 @@ export class CheckoutPageComponent implements OnInit {
       this.discountAmount = this.selectedVoucher.DiscountValue;
     }
 
-    // Ensure discount doesn't exceed total price
+    // Capping discount amount at AmountLimit if set (Max Discount)
+    if (
+      this.selectedVoucher.AmountLimit !== null &&
+      this.discountAmount > this.selectedVoucher.AmountLimit
+    ) {
+      this.discountAmount = this.selectedVoucher.AmountLimit;
+    }
+
     if (this.discountAmount > basePrice) {
       this.discountAmount = basePrice;
     }
@@ -295,7 +338,9 @@ export class CheckoutPageComponent implements OnInit {
         this.orderService.createOrder(orderData).subscribe({
           next: (response) => {
             this.bookingService.clearBooking();
-            window.location.href = response.PayUrl;
+            console.log(response);
+
+            // window.location.href = response.PayUrl;
           },
           error: (err) => {
             Swal.fire({

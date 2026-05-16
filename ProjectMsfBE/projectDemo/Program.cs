@@ -48,6 +48,7 @@ using projectDemo.BackGroupJob;
 using projectDemo.Repository.PromotionRepository;
 using projectDemo.Service.PromotionService;
 using projectDemo.BaseInit.Excel;
+using projectDemo.SignalR;
 
 namespace projectDemo
 {
@@ -56,6 +57,12 @@ namespace projectDemo
         public static void Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
+
+
+            builder.Services.AddSignalR();
+
+
+
             // Add services to the container.
             builder.Services.AddControllers();
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
@@ -214,11 +221,14 @@ namespace projectDemo
                         policy
                             .WithOrigins(builder.Configuration["FrontendUrl"] ?? "http://localhost:4200")
                             .AllowAnyHeader()
-                            .AllowAnyMethod();
+                            .AllowAnyMethod()
+                            .AllowCredentials();
+
                     }
                 );
             });
 
+            #region author
             builder.Services.AddAuthorization(options =>
             {
                 //user
@@ -294,6 +304,8 @@ namespace projectDemo
                     policy => policy.RequireClaim("permission", "event.getTotalTickByUser")
                 );
             });
+            #endregion
+
 
             builder.Services.AddMemoryCache();
 
@@ -360,7 +372,7 @@ namespace projectDemo
             builder.Services.AddScoped<RestRepository>();
             builder.Services.AddSingleton<IAuthorizationPolicyProvider, PermissionPolicyProvider>();
             builder.Services.AddAuthorization();
-            var app = builder.Build();
+         var app = builder.Build();
             // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())
             {
@@ -369,6 +381,8 @@ namespace projectDemo
             }
 
             app.UseCors("AllowAngular");
+            app.MapHub<OrderHub>("/orderHub");
+
 
             app.UseMiddleware<ExceptionMiddleware>();
             app.UseStaticFiles();

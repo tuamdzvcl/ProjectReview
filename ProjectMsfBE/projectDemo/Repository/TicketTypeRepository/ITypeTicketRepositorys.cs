@@ -12,6 +12,6 @@ public interface ITypeTicketRepositorys
     Task<List<TicketType>> GetByEventIdAsync(Guid eventId);
     TicketType UpdateTicket(TicketType ticketType);
     string DeleteTicket(TicketType ticketType);
-    TicketType? GetTicketTypebyId(int tickettype);
+    Task<TicketType?> GetTicketTypebyId(int tickettype);
     Task<(EventProjection?, int statuss, string messager)> GetListTypeTickByEventID(Guid eventID);
 }

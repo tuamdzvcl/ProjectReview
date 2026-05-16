@@ -34,7 +34,7 @@ namespace projectDemo.Repository.PromotionRepository
 
         public async Task<Promotion?> GetByIdAsync(int id)
         {
-            return await _dbSet.FirstAsync(x => x.Id == id);
+            return await _dbSet.FirstOrDefaultAsync(x => x.Id == id);
             
         }
 

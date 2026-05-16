@@ -69,13 +69,13 @@ namespace projectDemo.Service.PromotionService
             // 4. Filter StartDate
             if (query.StartDate.HasValue)
             {
-                promotions = promotions.Where(x => x.StartDate >= query.StartDate).ToList();
+                promotions = promotions.Where(x => x.StartDate <= query.StartDate).ToList();
             }
 
             // 5. Filter EndDate
             if (query.EndDate.HasValue)
             {
-                promotions = promotions.Where(x => x.EndDate <= query.EndDate).ToList();
+                promotions = promotions.Where(x => x.EndDate >= query.EndDate).ToList();
             }
             var totalRecords = promotions.Count;
 
@@ -192,7 +192,7 @@ namespace projectDemo.Service.PromotionService
                 return ApiResponse<PromotionResponse>.FailResponse(EnumStatusCode.NOT_FOUND,"Không được trùng codeName  bạn ơi");
 
             }
-            var des = $"Mã giảm giá {request.Code} chỉ tồn tại từ ngày {request.StartDate} đến hết ngày{request.EndDate} tối đa {request.UsageLimit} lượt dùng, giảm tối đa {request.DiscountAmount}";
+            var des = $"Mã giảm giá {request.Code} chỉ tồn tại từ ngày {request.StartDate:dd/MM/yyyy} đến hết ngày{request.EndDate:dd/MM/yyyy} tối đa {request.UsageLimit} lượt dùng, giảm tối đa {request.DiscountAmount}";
             var promotion = new Promotion
             {
                 Code = request.Code,
@@ -202,8 +202,8 @@ namespace projectDemo.Service.PromotionService
                 AmountLimit = request.AmountLimit,
                 DiscountValue = request.DiscountValue,
                 DiscountType = request.DiscountType,
-                StartDate = request.StartDate,
-                EndDate = request.EndDate,
+                StartDate = request.StartDate.AddDays(1),
+                EndDate = request.EndDate.AddDays(1),
                 IsActive = request.IsActive,
                 UsageLimit = request.UsageLimit,
                 UsedCount = 0,
@@ -243,7 +243,7 @@ namespace projectDemo.Service.PromotionService
                 return ApiResponse<PromotionResponse>.FailResponse(EnumStatusCode.NOT_FOUND, "Không tìm thấy mã giảm giá");
             }
 
-            var des = $"Mã giảm giá {request.Code} chỉ tồn tại từ ngày {request.StartDate} đến hết ngày {request.EndDate} tối đa {request.UsageLimit} lượt dùng, giảm tối đa {request.DiscountAmount} đơn hàng lớn hơn {request.AmountLimit}";
+            var des = $"Mã giảm giá {request.Code} chỉ tồn tại từ ngày {request.StartDate:dd/MM/yyyy} đến hết ngày {request.EndDate:dd/MM/yyyy} tối đa {request.UsageLimit} lượt dùng, giảm tối đa {request.DiscountAmount} đơn hàng lớn hơn {request.AmountLimit}";
 
 
             existingPromotion.Code = request.Code;
@@ -251,8 +251,8 @@ namespace projectDemo.Service.PromotionService
             existingPromotion.Description = des;
             existingPromotion.DiscountValue = request.DiscountValue;
             existingPromotion.DiscountType = request.DiscountType;
-            existingPromotion.StartDate = request.StartDate;
-            existingPromotion.EndDate = request.EndDate;
+            existingPromotion.StartDate = request.StartDate.AddDays(1);
+            existingPromotion.EndDate = request.EndDate.AddDays(1);
             existingPromotion.AmountLimit= request.AmountLimit;
             existingPromotion.IsActive = request.IsActive;
             existingPromotion.UsageLimit = request.UsageLimit;

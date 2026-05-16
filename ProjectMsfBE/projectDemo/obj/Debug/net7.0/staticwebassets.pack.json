@@ -49,6 +49,10 @@
       "PackagePath": "staticwebassets\\images\\18bfcc19-537e-448c-b495-772af5fb0fe0.jpg"
     },
     {
+      "Id": "D:\\Msf\\ProjectMsfBE\\projectDemo\\wwwroot\\images\\1dbc2be0-bffd-4b7b-afc5-d76ece6d4607.jpg",
+      "PackagePath": "staticwebassets\\images\\1dbc2be0-bffd-4b7b-afc5-d76ece6d4607.jpg"
+    },
+    {
       "Id": "D:\\Msf\\ProjectMsfBE\\projectDemo\\wwwroot\\images\\1dde0b28-6776-4b9a-afc2-6066e7f958c2.jpg",
       "PackagePath": "staticwebassets\\images\\1dde0b28-6776-4b9a-afc2-6066e7f958c2.jpg"
     },
@@ -73,12 +77,20 @@
       "PackagePath": "staticwebassets\\images\\370e12ce-06d0-4812-9ec8-1901b32bb5dd.jpg"
     },
     {
+      "Id": "D:\\Msf\\ProjectMsfBE\\projectDemo\\wwwroot\\images\\391869fd-9eb0-478c-9147-5138944656e3.jpg",
+      "PackagePath": "staticwebassets\\images\\391869fd-9eb0-478c-9147-5138944656e3.jpg"
+    },
+    {
       "Id": "D:\\Msf\\ProjectMsfBE\\projectDemo\\wwwroot\\images\\3b1ecd08-1c66-4a55-8bf6-9c65bb106f87.jpg",
       "PackagePath": "staticwebassets\\images\\3b1ecd08-1c66-4a55-8bf6-9c65bb106f87.jpg"
     },
     {
       "Id": "D:\\Msf\\ProjectMsfBE\\projectDemo\\wwwroot\\images\\3d4d556d-ebd5-41f8-a2eb-5b90d117c7b8.jpg",
       "PackagePath": "staticwebassets\\images\\3d4d556d-ebd5-41f8-a2eb-5b90d117c7b8.jpg"
+    },
+    {
+      "Id": "D:\\Msf\\ProjectMsfBE\\projectDemo\\wwwroot\\images\\3ff94107-c756-45cf-8590-843883250d94.jpg",
+      "PackagePath": "staticwebassets\\images\\3ff94107-c756-45cf-8590-843883250d94.jpg"
     },
     {
       "Id": "D:\\Msf\\ProjectMsfBE\\projectDemo\\wwwroot\\images\\41cc4a61-7ac3-4d7e-9aab-1c892f561370.jpg",
@@ -189,8 +201,16 @@
       "PackagePath": "staticwebassets\\images\\bea1eedf-73b0-45bd-b958-90d675ae60c5.jpg"
     },
     {
+      "Id": "D:\\Msf\\ProjectMsfBE\\projectDemo\\wwwroot\\images\\bee7867e-614a-4fd3-aa6a-aba2944a7648.jpg",
+      "PackagePath": "staticwebassets\\images\\bee7867e-614a-4fd3-aa6a-aba2944a7648.jpg"
+    },
+    {
       "Id": "D:\\Msf\\ProjectMsfBE\\projectDemo\\wwwroot\\images\\bf4af42e-4355-4749-a699-f8d5bf7750ee.jpg",
       "PackagePath": "staticwebassets\\images\\bf4af42e-4355-4749-a699-f8d5bf7750ee.jpg"
+    },
+    {
+      "Id": "D:\\Msf\\ProjectMsfBE\\projectDemo\\wwwroot\\images\\c35894cb-71fc-4139-aa31-291c5a2c0a03.jpg",
+      "PackagePath": "staticwebassets\\images\\c35894cb-71fc-4139-aa31-291c5a2c0a03.jpg"
     },
     {
       "Id": "D:\\Msf\\ProjectMsfBE\\projectDemo\\wwwroot\\images\\c35a590b-acce-4b87-9b5c-eff5d2b587b8.jpg",
@@ -219,6 +239,10 @@
     {
       "Id": "D:\\Msf\\ProjectMsfBE\\projectDemo\\wwwroot\\images\\df477ea6-dea8-4526-b590-121e09ddc1a0.jpg",
       "PackagePath": "staticwebassets\\images\\df477ea6-dea8-4526-b590-121e09ddc1a0.jpg"
+    },
+    {
+      "Id": "D:\\Msf\\ProjectMsfBE\\projectDemo\\wwwroot\\images\\e2db82c4-ccf5-4d2a-98fa-aa2c10f39a8f.jpg",
+      "PackagePath": "staticwebassets\\images\\e2db82c4-ccf5-4d2a-98fa-aa2c10f39a8f.jpg"
     },
     {
       "Id": "D:\\Msf\\ProjectMsfBE\\projectDemo\\wwwroot\\images\\e2f3a21d-2bf5-469c-8001-a54065c41fa1.jpg",
@@ -253,8 +277,20 @@
       "PackagePath": "staticwebassets\\images\\events\\23bac76b-8cea-443c-8a3d-932ca27c9db0\\109d444d-c806-4429-88fe-f10ee289f826.jpg"
     },
     {
+      "Id": "D:\\Msf\\ProjectMsfBE\\projectDemo\\wwwroot\\images\\events\\2ef0630c-6d9d-4331-9576-0a2a19a6f297\\017c3ed8-fdf1-4028-ae3d-76f20e3c9571.jpg",
+      "PackagePath": "staticwebassets\\images\\events\\2ef0630c-6d9d-4331-9576-0a2a19a6f297\\017c3ed8-fdf1-4028-ae3d-76f20e3c9571.jpg"
+    },
+    {
+      "Id": "D:\\Msf\\ProjectMsfBE\\projectDemo\\wwwroot\\images\\events\\3c762997-9ae2-4705-b621-92d8bb87b6f2\\57929f0d-8965-4777-b1ae-1e063d30dd2d.jpg",
+      "PackagePath": "staticwebassets\\images\\events\\3c762997-9ae2-4705-b621-92d8bb87b6f2\\57929f0d-8965-4777-b1ae-1e063d30dd2d.jpg"
+    },
+    {
       "Id": "D:\\Msf\\ProjectMsfBE\\projectDemo\\wwwroot\\images\\events\\481742db-0a4f-47a7-9ec8-5f2655114c4d\\5fa1ccd1-5b75-436a-b70e-9202b0edeb61.jpg",
       "PackagePath": "staticwebassets\\images\\events\\481742db-0a4f-47a7-9ec8-5f2655114c4d\\5fa1ccd1-5b75-436a-b70e-9202b0edeb61.jpg"
+    },
+    {
+      "Id": "D:\\Msf\\ProjectMsfBE\\projectDemo\\wwwroot\\images\\events\\49f8dbdc-3789-41ef-bf5d-63d20579faf4\\9edce404-d526-4459-84ba-735a4a6e7f82.jpg",
+      "PackagePath": "staticwebassets\\images\\events\\49f8dbdc-3789-41ef-bf5d-63d20579faf4\\9edce404-d526-4459-84ba-735a4a6e7f82.jpg"
     },
     {
       "Id": "D:\\Msf\\ProjectMsfBE\\projectDemo\\wwwroot\\images\\events\\4eaf871f-b6d8-475b-b777-8008255d6f07\\9c71af4f-1695-47c4-8951-fef3b7f19c42.jpg",
@@ -263,6 +299,10 @@
     {
       "Id": "D:\\Msf\\ProjectMsfBE\\projectDemo\\wwwroot\\images\\events\\4eba2a13-1652-467f-8a48-18d65533c87e\\84318166-f9cc-4e1f-9e54-e8cb53f47f1f.jpg",
       "PackagePath": "staticwebassets\\images\\events\\4eba2a13-1652-467f-8a48-18d65533c87e\\84318166-f9cc-4e1f-9e54-e8cb53f47f1f.jpg"
+    },
+    {
+      "Id": "D:\\Msf\\ProjectMsfBE\\projectDemo\\wwwroot\\images\\events\\5df6acf1-eaa8-492f-a277-915f72dd810b\\0f0adb55-a625-4432-ad56-f1eafcc486cc.jpg",
+      "PackagePath": "staticwebassets\\images\\events\\5df6acf1-eaa8-492f-a277-915f72dd810b\\0f0adb55-a625-4432-ad56-f1eafcc486cc.jpg"
     },
     {
       "Id": "D:\\Msf\\ProjectMsfBE\\projectDemo\\wwwroot\\images\\events\\5e433ac8-d31e-45d6-ab17-f5cca037dd49\\ad447ff5-3eae-4f77-af49-35f81885af08.jpg",
@@ -339,6 +379,10 @@
     {
       "Id": "D:\\Msf\\ProjectMsfBE\\projectDemo\\wwwroot\\images\\f1a96c4e-eae9-4449-8732-3d6a16eaec47.jpg",
       "PackagePath": "staticwebassets\\images\\f1a96c4e-eae9-4449-8732-3d6a16eaec47.jpg"
+    },
+    {
+      "Id": "D:\\Msf\\ProjectMsfBE\\projectDemo\\wwwroot\\images\\f508a178-32fc-4ef9-a44e-589ae5d3d2fe.jpg",
+      "PackagePath": "staticwebassets\\images\\f508a178-32fc-4ef9-a44e-589ae5d3d2fe.jpg"
     },
     {
       "Id": "D:\\Msf\\ProjectMsfBE\\projectDemo\\wwwroot\\images\\f6b76045-1674-4d16-a566-29181a2b5908.jpg",

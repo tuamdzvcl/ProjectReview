@@ -16,10 +16,12 @@ using projectDemo.Entity.Models;
 using projectDemo.Repository.Ipml;
 using projectDemo.Repository.OrderRepository;
 using projectDemo.Repository.PaymentRepository;
+using projectDemo.Repository.PromotionRepository;
 using projectDemo.Repository.TickRepository;
 using projectDemo.Repository.UserUpgradeRepository;
 using projectDemo.Service.EmailService;
 using projectDemo.Service.PaymetService;
+using projectDemo.UnitOfWork;
 using projectDemo.UnitOfWorks;
 
 namespace projectDemo.Service.MomoService
@@ -35,6 +37,8 @@ namespace projectDemo.Service.MomoService
         private readonly IEmailService _emailService;
         private readonly IUserUpgradeRepository _userUpgradeRepository;
         private readonly IUserReposiotry _userRepository;
+        private readonly IPromotionRepository _promotionRepository;
+        private readonly ILogger<MomoService> _logger;
 
         public MomoService(
 
@@ -45,10 +49,15 @@ namespace projectDemo.Service.MomoService
             IOrderRepository orderRepository,
             IOptions<MomoOptionModel> options,
             HttpClient httpClient,
+            IPromotionRepository promotionRepository,
             IEmailService emailService,
-            IUserUpgradeRepository userUpgradeRepository
+            IUserUpgradeRepository userUpgradeRepository,
+            ILogger<MomoService> logger
+
+
         )
         {
+            _promotionRepository = promotionRepository;
             _paymentRepository = paymentRepository;
             _ticketsRepositorys = ticketsRepositorys;
             _userRepository = userReposiotry;
@@ -58,6 +67,7 @@ namespace projectDemo.Service.MomoService
             _httpClient = httpClient;
             _emailService = emailService;
             _userUpgradeRepository = userUpgradeRepository;
+            _logger = logger;
         }
 
         public async Task<MomoCreatePaymentResponseModel> CreatePaymentAsync(MomoRequest req)
@@ -68,7 +78,7 @@ namespace projectDemo.Service.MomoService
             var extraData = "";
             var orderInfo = $"Khach hang: {req.FullName}. Noi dung: {req.OrderInfor}";
             var amount = decimal.ToInt64(req.Amount);
-
+            var promotionid = $"vouchour_{req.promotionId??0}";
             var rawData =
                 $"accessKey={_options.Value.AccessKey}"
                 + $"&amount={amount}"
@@ -78,7 +88,7 @@ namespace projectDemo.Service.MomoService
                 + $"&orderInfo={orderInfo}"
                 + $"&partnerCode={_options.Value.PartnerCode}"
                 + $"&redirectUrl={_options.Value.ReturnUrl}"
-                + $"&requestId={requestId}"
+                + $"&requestId={promotionid}"
                 + $"&requestType={requestType}";
 
             var signature = HmacSha256Helper.ComputeHmacSha256(rawData, _options.Value.SecretKey);
@@ -86,7 +96,7 @@ namespace projectDemo.Service.MomoService
             var requestData = new
             {
                 partnerCode = _options.Value.PartnerCode,
-                requestId = requestId,
+                requestId = promotionid,
                 amount = req.Amount,
                 orderId = orderId,
                 orderInfo = orderInfo,
@@ -159,12 +169,26 @@ namespace projectDemo.Service.MomoService
 
         public async Task<string> MomoCallBack(MomoIpnRequest request)
         {
-            
+            await _uow.BeginTransactionAsync();
             var status = request.ResultCode;
+            var promotionString = request.RequestId.Split("_");
+
+            var promotionid = Int32.Parse(promotionString[1]);
+            _logger.LogInformation($"promotionid {promotionid}");
             var orderId = Guid.Parse(request.OrderId);
 
             var order = await _orderRepository.GetOrderbyID(orderId);
             var payment = await _paymentRepository.FindByOrderId(orderId);
+            var promotion = new Promotion();
+            if (promotionid>0)
+            {
+                 promotion = await _promotionRepository.GetByIdAsync(promotionid);
+                if (promotion == null)
+                {
+                    return "Không tìm thấy Vouchour";
+                }
+            }
+               
 
             if (order == null)
                 return "Không tìm thấy order";
@@ -179,15 +203,13 @@ namespace projectDemo.Service.MomoService
 
             try
             {
-                await _uow.BeginTransactionAsync();
-
                 if (isSuccess)
                 {
-                  await  HandleSuccessOrder(order, payment);
+                  await  HandleSuccessOrder(order, payment, promotion);
                 }
                 else
                 {
-                  await HandleFallOrder(order, payment);
+                  await HandleFallOrder(order, payment, promotion);
                 }
 
                 await _uow.SaveChangesAsync();
@@ -226,13 +248,18 @@ namespace projectDemo.Service.MomoService
             // Bước 4: Ghép lại dạng Payload.Signature (gần giống JWT)
             return $"{base64Payload}.{signature}";
         }
-        private async Task HandleSuccessOrder(Order order,Payment payment)
+        private async Task HandleSuccessOrder(Order order,Payment payment, Promotion promotion)
         {
             order.Status = EnumStatusOrder.PAID;
             payment.Status = EnumStatusPayment.SUCCESS.ToString();
             payment.UpdatedDate = DateTime.Now;    
             if(order.OrderType==EnumOrderType.TICKET.ToString())
             {
+                if(promotion!= null)
+                {
+                    promotion.UsedCount = +1;
+                    promotion.ReservedQuantity -= 1;
+                }    
                 foreach (var o in order.OrderDetails)
                 {
                     o.TicketTypes.SoldQuantity += o.Quantity;
@@ -287,7 +314,7 @@ namespace projectDemo.Service.MomoService
                 }
             }
         }
-        private async Task HandleFallOrder (Order order,Payment payment)
+        private async Task HandleFallOrder (Order order,Payment payment,Promotion promotion)
         {
             order.Status = EnumStatusOrder.CANCELLED;
             payment.Status = EnumStatusPayment.FAILED.ToString();
@@ -299,6 +326,8 @@ namespace projectDemo.Service.MomoService
                 {
                     i.TicketTypes.ReservedQuantity -= i.Quantity;
                 }
+                if(promotion!=null)
+                promotion.ReservedQuantity -= 1;
             }
             else if (
                 order.OrderType == EnumOrderType.UPGRADE.ToString()

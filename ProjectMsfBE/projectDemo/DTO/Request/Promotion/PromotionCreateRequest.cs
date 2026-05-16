@@ -8,7 +8,7 @@ namespace projectDemo.DTO.Request.Promotion
         [Required]
         public string Code { get; set; }
 
-        public string Description { get; set; }
+        public string? Description { get; set; }
 
         public decimal DiscountValue { get; set; }
         public decimal? AmountLimit { get; set; }

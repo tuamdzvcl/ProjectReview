@@ -180,4 +180,6 @@ export class CreateEventComponent implements OnInit, OnDestroy {
     };
     reader.readAsDataURL(this.selectedFile);
   }
+
+  
 }

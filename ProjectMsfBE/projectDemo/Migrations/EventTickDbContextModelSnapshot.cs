@@ -113,7 +113,7 @@ namespace projectDemo.Migrations
                     b.Property<DateTime?>("CreatedDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<decimal>("DiscountAmount")
+                    b.Property<decimal?>("DiscountAmount")
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<decimal>("FinalAmount")
@@ -290,7 +290,7 @@ namespace projectDemo.Migrations
                         new
                         {
                             Id = 1,
-                            CreatedDate = new DateTime(2026, 5, 14, 4, 5, 47, 315, DateTimeKind.Utc).AddTicks(510),
+                            CreatedDate = new DateTime(2026, 5, 16, 0, 57, 16, 239, DateTimeKind.Utc).AddTicks(7705),
                             IsAdmin = true,
                             IsDeleted = false,
                             IsSystem = true,
@@ -299,7 +299,7 @@ namespace projectDemo.Migrations
                         new
                         {
                             Id = 2,
-                            CreatedDate = new DateTime(2026, 5, 14, 4, 5, 47, 315, DateTimeKind.Utc).AddTicks(518),
+                            CreatedDate = new DateTime(2026, 5, 16, 0, 57, 16, 239, DateTimeKind.Utc).AddTicks(7714),
                             IsAdmin = false,
                             IsDeleted = false,
                             IsSystem = true,
@@ -308,7 +308,7 @@ namespace projectDemo.Migrations
                         new
                         {
                             Id = 3,
-                            CreatedDate = new DateTime(2026, 5, 14, 4, 5, 47, 315, DateTimeKind.Utc).AddTicks(521),
+                            CreatedDate = new DateTime(2026, 5, 16, 0, 57, 16, 239, DateTimeKind.Utc).AddTicks(7717),
                             IsAdmin = false,
                             IsDeleted = false,
                             IsSystem = true,
@@ -500,7 +500,7 @@ namespace projectDemo.Migrations
                             IsDeleted = false,
                             IsLock = false,
                             LastName = "admin",
-                            PasswordHash = "$2a$11$Ns.wTobzzXWthZygP2qDoeE04mvTaOFUtfLlMMz0ae6vWIitVC3Ua",
+                            PasswordHash = "$2a$11$PVCeAJJwTcxPytqsAU7XfuFFeXvI4a9Fz5ZOPX1Uic.8Gldfo4ukq",
                             Username = "admin"
                         });
                 });
@@ -1107,6 +1107,9 @@ namespace projectDemo.Migrations
 
                     b.Property<bool>("IsSystem")
                         .HasColumnType("bit");
+
+                    b.Property<int?>("ReservedQuantity")
+                        .HasColumnType("int");
 
                     b.Property<DateTime>("StartDate")
                         .HasColumnType("datetime2");

@@ -141,7 +141,7 @@
             </div>
             <div class="ticket-desc">
               Còn lại
-              {{ ticket.TotalQuantity - ticket.SoldQuantity }} vé
+              {{ ticket.AvailableQuantity||(ticket.TotalQuantity - ticket.SoldQuantity -ticket.ReservedQuantity)}} vé
             </div>
           </div>
         </div>

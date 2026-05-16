@@ -89,11 +89,11 @@ namespace projectDemo.Repository.TickTypeRepository
             }
         }
 
-        public TicketType? GetTicketTypebyId(int tickettype)
+        public async Task<TicketType?> GetTicketTypebyId(int tickettype)
         {
-            return Find(x => x.Id == tickettype)
+            return await Find(x => x.Id == tickettype)
                 .Include(x=>x.Event)
-                .FirstOrDefault();
+                .FirstOrDefaultAsync();
         }
 
         public async Task<TicketType?> GetTypeTickectByEventID(Guid EventID)

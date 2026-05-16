@@ -199,6 +199,10 @@
               </div>
             </div>
             <p class="voucher-desc">{{ v.Description }}</p>
+            <p class="voucher-status" *ngIf="isVoucherDisabled(v)">
+              <i class="material-icons" style="font-size: 1rem">info</i>
+              {{ getDisabledReason(v) }}
+            </p>
             <div class="voucher-footer">
               <span class="expiry">HSD: {{ v.EndDate | formatDate }}</span>
               <span class="quantity"

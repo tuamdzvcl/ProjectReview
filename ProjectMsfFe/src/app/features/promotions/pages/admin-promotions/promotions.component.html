@@ -57,15 +57,15 @@
           <p class="description" *ngIf="promo.Description">
             {{ promo.Description }}
           </p>
-          <div class="info-row" *ngIf="promo.AmountLimit">
+          <div class="info-row" *ngIf="promo.DiscountAmount">
             <i class="fa-solid fa-cart-shopping"></i>
             <strong>Đơn từ:</strong>
-            <span>{{ promo.AmountLimit | vndCurrency }}</span>
+            <span>{{ promo.DiscountAmount | vndCurrency }}</span>
           </div>
-          <div class="info-row" *ngIf="promo.DiscountAmount">
+          <div class="info-row" *ngIf="promo.AmountLimit">
             <i class="fa-solid fa-wallet"></i>
             <strong>Giảm tối đa:</strong>
-            <span>{{ promo.DiscountAmount | vndCurrency }} </span>
+            <span>{{ promo.AmountLimit | vndCurrency }} </span>
           </div>
 
           <div class="info-row">
@@ -192,18 +192,18 @@
     <!-- Số tiền giảm tối đa -->
     <div class="grid">
       <div class="col-12 md:col-6 field mb-4">
-        <label for="discountAmount" class="font-bold block mb-2">
+        <label for="amountLimit" class="font-bold block mb-2">
           <i class="fa-solid fa-wallet mr-2 text-primary"></i> Giảm tối đa
         </label>
-        <p-inputNumber id="discountAmount" [(ngModel)]="selectedPromo.DiscountAmount" [min]="0" suffix=" VNĐ"
+        <p-inputNumber id="amountLimit" [(ngModel)]="selectedPromo.AmountLimit" [min]="0" suffix=" VNĐ"
           placeholder="Không giới hạn"></p-inputNumber>
       </div>
       <div class="col-12 md:col-6 field mb-4">
-        <label for="amountLimit" class="font-bold block mb-2">
+        <label for="discountAmount" class="font-bold block mb-2">
           <i class="fa-solid fa-cart-shopping mr-2 text-primary"></i> Đơn tối
           thiểu
         </label>
-        <p-inputNumber id="amountLimit" [(ngModel)]="selectedPromo.AmountLimit" [min]="0" suffix=" VNĐ"
+        <p-inputNumber id="discountAmount" [(ngModel)]="selectedPromo.DiscountAmount" [min]="0" suffix=" VNĐ"
           placeholder="Không giới hạn"></p-inputNumber>
       </div>
     </div>

@@ -26,6 +26,8 @@ namespace projectDemo.Controllers
         public async Task<IActionResult> GetProfile()
         {
             var userId = Guid.Parse(User.FindFirstValue("id") ?? "Null");
+            if (userId == null)
+                return BadRequest(401);
             var result = await _userService.GetByid(userId);
             return Ok(result);
         }

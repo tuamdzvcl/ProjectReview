@@ -576,6 +576,47 @@
         }
       }
 
+      &.disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+        background: #f8fafc;
+        border-color: #e2e8f0;
+        filter: grayscale(0.8);
+        
+        &:hover {
+          border-color: #e2e8f0;
+          background: #f8fafc;
+        }
+
+        .voucher-icon {
+          background: #f1f5f9;
+          color: #94a3b8;
+        }
+
+        .voucher-details {
+          .voucher-header .voucher-name {
+            color: #94a3b8;
+          }
+        }
+
+        .voucher-status {
+          color: #ef4444;
+          font-weight: 600;
+        }
+
+        .selection-indicator i {
+          color: #e2e8f0 !important;
+        }
+      }
+
+      .voucher-status {
+        font-size: 0.85rem;
+        margin-bottom: 0.8rem;
+        display: flex;
+        align-items: center;
+        gap: 0.4rem;
+      }
+
       .voucher-icon {
         width: 44px;
         height: 44px;

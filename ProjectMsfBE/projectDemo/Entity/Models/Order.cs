@@ -27,7 +27,7 @@ namespace EventTick.Model.Models
         public decimal TotalAmount { get; set; }
 
         [Column(TypeName = "decimal(18,2)")]
-        public decimal DiscountAmount { get; set; }
+        public decimal? DiscountAmount { get; set; }
 
         [Column(TypeName = "decimal(18,2)")]
         public decimal FinalAmount { get; set; }

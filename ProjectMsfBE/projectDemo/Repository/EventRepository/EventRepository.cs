@@ -117,6 +117,7 @@ namespace projectDemo.Repository
                                 Price = t.Price,
                                 TotalQuantity = t.TotalQuantity,
                                 SoldQuantity = t.SoldQuantity,
+                                ReservedQuantity= t.ReservedQuantity,
                                 Status = t.Status.ToString(),
                             })
                             .ToList(),
@@ -366,6 +367,7 @@ namespace projectDemo.Repository
                             Price = t.Price,
                             TotalQuantity = t.TotalQuantity,
                             SoldQuantity = t.SoldQuantity,
+                            ReservedQuantity=t.ReservedQuantity,
                             Status = t.Status.ToString(),
                         })
                         .ToList(),

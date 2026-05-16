@@ -24,6 +24,7 @@ namespace projectDemo.Entity.Models
 
         [Column(TypeName = "decimal(18,2)")]
         public decimal? DiscountValue { get; set; }
+        public int ? ReservedQuantity { get; set; }
 
         [Column(TypeName = "decimal(18,2)")]
         public decimal? DiscountAmount { get; set; }
