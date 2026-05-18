@@ -12,10 +12,10 @@ import { FormsModule } from '@angular/forms';
 export class ChildComponent {
   @Input() prodouct: any;
 
-  @Output() onBuy = new EventEmitter<string>();
+  @Output() onBuy = new EventEmitter<any>();
 
   buyProdouct() {
-    this.onBuy.emit(this.prodouct.name);
+    this.onBuy.emit(this.prodouct);
     console.log('đã thêm');
   }
 }

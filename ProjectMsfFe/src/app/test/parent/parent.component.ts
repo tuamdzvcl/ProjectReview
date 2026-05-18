@@ -16,10 +16,23 @@ export class ParentComponent {
     { id: 3, name: 'Lục trà dâu', price: 40000 },
   ];
 
-  cart: string[] = [];
+  cart: any[] = [];
 
-  addtoCart(productName: string) {
-    this.cart.push(productName);
+  addtoCart(product: any) {
+    const ex = this.cart.find((x) => x.name === product.name);
+    if (ex) {
+      ex.quantity++;
+    }
+    else {
+      this.cart.push({ name: product.name, price: product.price, quantity: 1 });
+    }
     console.log('giỏ hàng hiện tại');
+  }
+  getTotalPrice() {
+    let pricesum = 0;
+    for (let i of this.cart) {
+      pricesum += (i.price * i.quantity)
+    }
+    return pricesum;
   }
 }
