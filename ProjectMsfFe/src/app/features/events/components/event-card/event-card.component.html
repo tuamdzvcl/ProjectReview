@@ -1,15 +1,18 @@
-<div class="event-card" [routerLink]="['/event', eventmodel.Id]">
-  
+<div class="event-card">
   <div class="card-image">
     <img [src]="eventmodel.PosterUrl | imageUrl" />
 
-    <button class="bookmark">
-      <i class="icon"><i class="fa-solid fa-bookmark"></i></i>
+    <button class="bookmark" (click)="bookmark($event)" [class.active]="isfavorite">
+      <div *ngIf="isfavorite">
+        <i class="icon" style="color: #ff4d4f;"><i class="fa-solid fa-bookmark"></i></i>
+      </div>
+      <div *ngIf="!isfavorite">
+        <i class="icon" style="color: #ffffff;"><i class="fa-regular fa-bookmark"></i></i>
+      </div>
     </button>
   </div>
 
-  
-  <div class="card-content">
+  <div class="card-content" [routerLink]="['/event', eventmodel.Id]">
     <h3 class="title" [title]="eventmodel.Title">
       {{ eventmodel.Title }}
     </h3>
@@ -19,7 +22,6 @@
     </div>
   </div>
 
-  
   <div class="card-footer">
     <div class="date">
       <i class="fa-regular fa-calendar-days"></i>

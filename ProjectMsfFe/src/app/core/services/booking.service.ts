@@ -13,6 +13,7 @@ export interface BookingState {
 })
 export class BookingService {
   private readonly STORAGE_KEY = 'msf_booking_data';
+  
   private bookingState: BehaviorSubject<BookingState>;
 
   bookingState$;

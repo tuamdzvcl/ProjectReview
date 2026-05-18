@@ -9,6 +9,7 @@ import {
 import { EventService } from '../../../../core/services/event.service';
 import { EventModel } from '../../../../core/model/response/event.model';
 import { EventCardComponent } from '../event-card/event-card.component';
+import { FaviriteService } from '../../../../core/services/favorite-event.service';
 
 @Component({
   selector: 'app-events-grid',
@@ -20,6 +21,7 @@ import { EventCardComponent } from '../event-card/event-card.component';
 export class EventsGridComponent implements OnInit, OnChanges {
   @Input() categoryIds: string[] = [];
   @Input() key: string = '';
+  @Input() showFavorites: boolean = false;
 
   events: EventModel[] = [];
   pageIndex: number = 1;
@@ -27,7 +29,17 @@ export class EventsGridComponent implements OnInit, OnChanges {
   isLoading: boolean = false;
   hasMore: boolean = true;
 
-  constructor(private eventService: EventService) {}
+  constructor(
+    private eventService: EventService,
+    private favoriteService: FaviriteService
+  ) {}
+
+  get displayedEvents(): EventModel[] {
+    if (this.showFavorites) {
+      return this.events.filter(event => this.favoriteService.isFavorite(event.Id.toString()));
+    }
+    return this.events;
+  }
 
   ngOnInit(): void {
     this.loadEvents();
