@@ -2,7 +2,7 @@ import { TypeTickResponse } from './TypeTickResponse';
 
 export interface EventModel {
   Id: number;
-  EventID?: number;
+  EventID?: number |string;
   Title: string;
   Description: string;
   PosterUrl: string;
