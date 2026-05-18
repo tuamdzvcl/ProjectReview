@@ -1,0 +1,44 @@
+/* Làm mờ màn hình phía sau */
+.popup-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(0, 0, 0, 0.5);
+    /* Nền đen mờ 50% */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    /* Đảm bảo popup luôn nằm trên cùng */
+}
+
+/* Hộp nội dung popup trắng ở giữa */
+.popup-content {
+    background: white;
+    padding: 20px 30px;
+    border-radius: 8px;
+    min-width: 350px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+
+    h3 {
+        margin-top: 0;
+        color: #333;
+    }
+
+    button {
+        margin-top: 20px;
+        padding: 8px 16px;
+        background-color: #ef4444;
+        /* Màu đỏ cho nút đóng */
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+
+        &:hover {
+            background-color: #dc2626;
+        }
+    }
+}

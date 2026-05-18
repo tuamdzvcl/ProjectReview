@@ -1,0 +1,34 @@
+<h1>hiển thị dữ liệu của event</h1>
+<div *ngIf="isLoaing">
+  <p>đang tải dữ liệu</p>
+</div>
+<div *ngIf="!isLoaing">
+  <button (click)="OpenAddPopUp()">thêm sự kiện mới</button>
+
+  <ul>
+    <li *ngFor="let event of eventData">
+      <p>{{ event.Location }}</p>
+      <p>{{ event.Title }}</p>
+      <button (click)="OpenEditPopup(event)">Sửa</button>
+      <button (click)="OpenPopUp(event)">Xem</button>
+    </li>
+  </ul>
+</div>
+
+<div class="popup-overlay" *ngIf="isPopUpOpen">
+  <div class="popup-content">
+    <h3>Chi tiết sự kiện</h3>
+
+    <div *ngIf="popUpMod === 'view' && selectedEvent">
+      <p><strong>Tiêu đề:</strong> {{ selectedEvent.Title }}</p>
+      <p><strong>Địa điểm:</strong> {{ selectedEvent.Location }}</p>
+    </div>
+    <div *ngIf="popUpMod !== 'view'">
+      <label for="">Tiêu đề</label>
+      <input type="text" [(ngModel)]="eventForm.Title" />
+      <input type="text" [(ngModel)]="eventForm.Location" />
+    </div>
+    <button *ngIf="popUpMod !== 'view'" (click)="SaveEvent()">Lưu lại</button>
+    <button (click)="ClosePopUp()">Đóng</button>
+  </div>
+</div>

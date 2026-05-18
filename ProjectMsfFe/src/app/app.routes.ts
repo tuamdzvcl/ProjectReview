@@ -40,10 +40,11 @@ import { ResetPasswordComponent } from './features/auth/pages/reset-password/res
 import { VerifyEmailComponent } from './features/auth/pages/verify-email/verify-email.component';
 import { RegisterSuccessComponent } from './features/auth/pages/register-success/register-success.component';
 import { RoleComponent } from './features/roles/pages/admin-roles/role.component';
+import { TestComponent } from './test/test.component';
 
 export const routes: Routes = [
   { path: 'header', component: HeaderComponent },
-
+  { path: 'test', component: TestComponent },
   {
     path: '',
     component: MainLayoutComponent,
