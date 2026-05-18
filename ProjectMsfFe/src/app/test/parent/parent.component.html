@@ -1,0 +1,13 @@
+<p>parent works!</p>
+<app-child
+  *ngFor="let item of menu"
+  [prodouct]="item"
+  (onBuy)="addtoCart($event)"
+>
+</app-child>
+<h2>giỏ hàng của bạn là {{ cart.length }}</h2>
+<ul>
+  <li *ngFor="let tenmon of cart">
+    {{ tenmon }}
+  </li>
+</ul>
