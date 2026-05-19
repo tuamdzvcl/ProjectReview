@@ -17,12 +17,10 @@ export class FilterTabsComponent implements OnInit {
 
   @Output() categoryChange = new EventEmitter<string[]>();
   @Output() filterFavorites = new EventEmitter<boolean>();
-  
+
   showFavorites: boolean = false;
 
-  constructor(
-    private catetoryService: CatetoryService
-  ) {}
+  constructor(private catetoryService: CatetoryService) { }
 
   ngOnInit(): void {
     this.loadCategories();
@@ -61,11 +59,16 @@ export class FilterTabsComponent implements OnInit {
   }
 
   favorites() {
+    console.log('test');
+
     this.showFavorites = !this.showFavorites;
     if (this.showFavorites) {
       this.selectedCategoryIds = [];
       this.categoryChange.emit(this.selectedCategoryIds);
     }
     this.filterFavorites.emit(this.showFavorites);
+    // TODO: Toggle the showFavorites state
+    // TODO: If showFavorites is true, reset selectedCategoryIds to empty array and emit categoryChange
+    // TODO: Emit the filterFavorites event with the updated showFavorites value
   }
 }

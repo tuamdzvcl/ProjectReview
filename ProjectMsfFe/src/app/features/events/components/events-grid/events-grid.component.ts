@@ -22,11 +22,13 @@ export class EventsGridComponent implements OnInit, OnChanges {
   @Input() categoryIds: string[] = [];
   @Input() key: string = '';
   @Input() showFavorites: boolean = false;
+  @Input() relatedEventId: string | null = null;
 
   events: EventModel[] = [];
   pageIndex: number = 1;
   pageSize: number = 8;
   isLoading: boolean = false;
+  isNotCount: boolean = false;
   hasMore: boolean = true;
 
   constructor(
@@ -36,7 +38,9 @@ export class EventsGridComponent implements OnInit, OnChanges {
 
   get displayedEvents(): EventModel[] {
     if (this.showFavorites) {
-      return this.events.filter(event => this.favoriteService.isFavorite(event.Id.toString()));
+      return this.events.filter((event) =>
+        this.favoriteService.isFavorite(event.Id.toString())
+      );
     }
     return this.events;
   }
@@ -66,34 +70,41 @@ export class EventsGridComponent implements OnInit, OnChanges {
     if (this.isLoading || !this.hasMore) return;
     this.isLoading = true;
 
-    this.eventService
-      .GetEventswithTypeticket(
-        this.pageIndex,
-        this.pageSize,
-        this.key,
-        this.categoryIds
-      )
-      .subscribe({
-        next: (res) => {
-          const filteredEvents = res.items.filter(
-            (event: any) => event.Status === 'PUBLISHED'
-          );
+    const request = this.relatedEventId
+      ? this.eventService.GetEventCatetoryPageEvent(
+          this.relatedEventId,
+          this.pageIndex,
+          this.pageSize,
+          ''
+        )
+      : this.eventService.GetEventswithTypeticket(
+          this.pageIndex,
+          this.pageSize,
+          this.key,
+          this.categoryIds
+        );
 
-          this.events = [...this.events, ...filteredEvents];
+    request.subscribe({
+      next: (res) => {
+        debugger;
+        const filteredEvents = res.items.filter(
+          (event: any) => event.Status === 'PUBLISHED'
+        );
 
-          if (res.items.length < this.pageSize) {
-            this.hasMore = false;
-          }
-        },
-        error: (err) => {
-          console.error('ERROR:', err);
-        },
-        complete: () => {
-          this.isLoading = false;
-        },
-      });
+        this.events = [...this.events, ...filteredEvents];
+
+        if (res.items.length < this.pageSize) {
+          this.hasMore = false;
+        }
+        if (res.totalRecords == 0) {
+          this.isNotCount = true;
+        }
+      },
+      error: (err) => {
+        console.error('ERROR:', err);
+      },
+    });
   }
-
   loadMore() {
     this.pageIndex++;
     this.loadEvents();

@@ -30,11 +30,13 @@ export class EventCardComponent implements OnInit {
   constructor(private favrrite: FaviriteService) {}
 
   ngOnInit(): void {
-    this.favrrite.favoritesState$.subscribe(() => {
-      if (this.eventmodel) {
-        this.isfavorite = this.favrrite.isFavorite(this.eventmodel.Id.toString());
+
+    this.favrrite.favoritesState$.subscribe(()=>{
+      if(this.eventmodel){
+        this.isfavorite = this.favrrite.isFavorite(this.eventmodel.Id.toString())
       }
-    });
+    })
+
   }
   
   firstPrice(): number {
@@ -42,8 +44,9 @@ export class EventCardComponent implements OnInit {
   }
 
   bookmark(event: Event): void {
-    event.stopPropagation();
     event.preventDefault();
-    this.favrrite.toggleFavorite(this.eventmodel.Id.toString());
+    event.stopPropagation();
+    this.favrrite.toggleFavorite(this.eventmodel.Id.toString())
+  
   }
 }

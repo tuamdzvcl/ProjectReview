@@ -113,6 +113,7 @@ export class EventService extends BaseApiService {
       })
     );
   }
+
   UpdateEvent(id: string, data: FormData) {
     return this.put<ApiResponse<EventModel>>(`event/${id}`, data);
   }
@@ -148,6 +149,35 @@ export class EventService extends BaseApiService {
           pageSize: res.PageSize,
           totalRecords: res.TotalRecords,
           totalPages: res.TotalPages,
+        };
+      })
+    );
+  }
+
+  GetEventCatetoryPageEvent(
+    id: string,
+    pageIndex: number = 1,
+    pageSize: number = 4,
+    key: string
+  ) {
+    const params: any = {
+      index: pageIndex,
+      take: pageSize,
+    };
+    if(key){
+      params.key = key
+    }
+    return this.getpage<EventModel>(`event/show/${id}/related`, params).pipe(
+      map((res: PageResult<EventModel>) => {
+        console.log(res);
+
+        return {
+          items: res.Items,
+          pageIndex: res.PageIndex,
+          pageSize: res.PageSize,
+          totalRecords: res.TotalRecords,
+          totalPages: res.TotalPages,
+          Counts: res.Counts,
         };
       })
     );
