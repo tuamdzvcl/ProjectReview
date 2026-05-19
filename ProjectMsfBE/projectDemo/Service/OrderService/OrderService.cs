@@ -28,6 +28,7 @@ using projectDemo.Repository.TickTypeRepository;
 using projectDemo.Service.MomoService;
 using projectDemo.SignalR;
 using projectDemo.UnitOfWorks;
+using Remotion.Logging;
 
 namespace projectDemo.Service.OrderService
 {
@@ -85,12 +86,13 @@ namespace projectDemo.Service.OrderService
         }
 
         //reder orderCode
+        #region reder orderCode
         public static string GenerateCode()
         {
             return Guid.NewGuid().ToString("N").Substring(0, 8).ToUpper();
         }
+        #endregion
 
-        
 
         //chuyển từ enum sang string
         public static EnumStatusOrder ConvertStatus(string status)
@@ -544,6 +546,43 @@ namespace projectDemo.Service.OrderService
                 Entity.Enum.EnumStatusCode.SUCCESS,
                 "Sửa thành công "
             );
+        }
+
+        public async Task<bool> ListOrderBackJob()
+        {
+            var orders = await _orderRepository.GetListOrderPedding();
+            if (orders == null || !orders.Any())
+            {
+                return false;
+            }
+
+            var expiredOrder = orders.Where(x => x.CreatedDate <= DateTime.Now.AddMinutes(-15)).ToList();
+
+            if (!expiredOrder.Any())
+            {
+                return false;
+
+            }
+            foreach (var order in expiredOrder)
+            {
+                order.Status = EnumStatusOrder.CANCELLED;
+                order.UpdatedDate = DateTime.Now;
+                foreach (var orderDetail in order.OrderDetails)
+                {
+                    var quantity = orderDetail.TicketTypes.ReservedQuantity -= orderDetail.Quantity;
+
+                    if (quantity < 0)
+                    {
+                        orderDetail.TicketTypes.ReservedQuantity = 0;
+                    }
+
+                }
+
+            }
+            await _uow.SaveChangesAsync();
+
+            _logger.LogInformation($"order {orders}");
+            return true;
         }
     }
 }

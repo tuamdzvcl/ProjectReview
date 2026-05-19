@@ -342,7 +342,9 @@ namespace projectDemo
             builder.Services.AddScoped<IPaymentService, PaymentService>();
             builder.Services.AddScoped<ICatetoryService, CatetoryService>();
             builder.Services.AddScoped<ITickService, TickService>();
+            // đăng kí job
             builder.Services.AddHostedService<GmailExpireJob>();
+            builder.Services.AddHostedService<BookingJob>();
             builder.Services.AddScoped<ITickRepository, TickRepository>();
             builder.Services.AddScoped<
                 projectDemo.Repository.UserUpgradeRepository.IUserUpgradeRepository,

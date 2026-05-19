@@ -963,5 +963,16 @@ namespace projectDemo.Service.EventService
 
             return await _eventRepository.GetAdminPendingEventsAsync(query);
         }
+
+        public async Task<PageResponse<EventTypeTickResponses>> GetEventbyCatetoryPage(Guid eventid, PageEventRequestCatetory query)
+        {
+            if (query.index < 0)
+                query.index = 1;
+            if(query.take<0)
+                query.take = 4;
+            if(query.take >=8)
+                query.take = 8;
+            return await _eventRepository.GetEventCatetoryPage(eventid, query);
+        }
     }
 }

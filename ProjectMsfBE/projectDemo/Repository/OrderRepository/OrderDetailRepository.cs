@@ -1,4 +1,5 @@
 ﻿using EventTick.Model.Models;
+using Microsoft.EntityFrameworkCore;
 using projectDemo.Repository.BaseData;
 using projectDemo.UnitOfWorks;
 
@@ -26,10 +27,20 @@ namespace projectDemo.Repository.OrderRepository
             return 1;
         }
 
+        public async Task<List<OrderDetail>> GetlistdetailbyOderId(Guid orderId)
+        {
+            return await _dbSet.Where(x => x.OrderID == orderId).ToListAsync();
+        }
+
         public int UpdateOrderdetail(OrderDetail orderDetail)
         {
             Update(orderDetail);
             return 1;
+        }
+
+        Task<OrderDetail> IOrderDetailRepository.GetlistdetailbyOderId(Guid orderId)
+        {
+            throw new NotImplementedException();
         }
     }
 }

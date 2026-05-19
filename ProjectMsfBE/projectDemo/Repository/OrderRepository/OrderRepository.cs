@@ -5,6 +5,7 @@ using EventTick.Model.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using projectDemo.DTO.Projection;
+using projectDemo.DTO.Response;
 using projectDemo.Repository.BaseData;
 using projectDemo.UnitOfWorks;
 
@@ -51,7 +52,7 @@ namespace projectDemo.Repository.OrderRepository
             return await _dbSet
                 .Include(x => x.OrderDetails)
                     .ThenInclude(x => x.TicketTypes)
-                    .ThenInclude(tt=>tt.Event)
+                    .ThenInclude(tt => tt.Event)
                 .Include(o => o.OrderDetails)
                 .ThenInclude(od => od.Ticket)
                 .Include(x => x.Payment)
@@ -59,7 +60,7 @@ namespace projectDemo.Repository.OrderRepository
                 .FirstOrDefaultAsync(x => x.Id == orderID && x.IsDeleted == false);
         }
 
-     
+
         public async Task<Order?> GetOrderForEmailAsync(Guid orderID)
         {
             return await _dbSet
@@ -70,7 +71,7 @@ namespace projectDemo.Repository.OrderRepository
                         .ThenInclude(x => x.Event)
                 .Include(x => x.OrderDetails)
                     .ThenInclude(x => x.Ticket)
-                .Include(x=>x.Payment)
+                .Include(x => x.Payment)
                 .FirstOrDefaultAsync(x => x.Id == orderID && x.IsDeleted == false);
         }
 
@@ -121,5 +122,18 @@ namespace projectDemo.Repository.OrderRepository
             Update(order);
             return 1;
         }
+
+        public async Task<List<Order>> GetListOrderPedding()
+        {
+            return await
+                _dbSet
+                .Include(x=>x.OrderDetails)
+                .ThenInclude(x=>x.TicketTypes)
+                .Where(x => x.IsDeleted == false && x.Status==EnumStatusOrder.PENDING)
+                .ToListAsync();
+        }
+
+       
     }
+
 }
