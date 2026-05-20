@@ -17,7 +17,7 @@ namespace projectDemo.DTO.Response.Promotion
         public bool IsActive { get; set; }
         public int? UsageLimit { get; set; }
         public int UsedCount { get; set; }
-        public DateTime? CreatedAt { get; set; }
-        public DateTime? UpdatedAt { get; set; }
+        public DateTimeOffset? CreatedAt { get; set; }
+        public DateTimeOffset? UpdatedAt { get; set; }
     }
 }

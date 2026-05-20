@@ -391,10 +391,10 @@ export class EventCreatePageComponent {
     formData.append('Location', draft.location);
     formData.append('CatetoryName', categoryName);
 
-    formData.append('StartDate', this.formatToLocalISO(startDate));
-    formData.append('EndDate', this.formatToLocalISO(endDate));
-    formData.append('SaleStartDate', this.formatToLocalISO(saleStartDate));
-    formData.append('SaleEndDate', this.formatToLocalISO(saleEndDate));
+    formData.append('StartDate', this.formatToUtC(startDate));
+    formData.append('EndDate', this.formatToUtC(endDate));
+    formData.append('SaleStartDate', this.formatToUtC(saleStartDate));
+    formData.append('SaleEndDate', this.formatToUtC(saleEndDate));
 
     if (file) {
       formData.append('PosterUrl', file);

@@ -25,6 +25,7 @@ namespace projectDemo.Controllers
         }
 
         [HttpPost()]
+        [AllowAnonymous]
         public async Task<IActionResult> CreateEvent(
             [FromForm] CreateEventWithTicketTypesRequest resquest
         )
@@ -37,6 +38,7 @@ namespace projectDemo.Controllers
         }
 
         [HttpPut("{id}")]
+        [AllowAnonymous]
         public async Task<IActionResult> UpdateEvent(
             Guid id,
             [FromForm] EventUpdateRequest resquest
@@ -127,6 +129,14 @@ namespace projectDemo.Controllers
         public async Task<IActionResult> GetAdminPendingEvents([FromQuery] PageRequest query)
         {
             var result = await _eventService.GetAdminPendingEvents(query);
+            return Ok(result);
+        }
+
+        [HttpGet("show/{id}/related")]
+        [AllowAnonymous]
+        public async Task<IActionResult> GetEventByCaretory(Guid id, [FromQuery] PageEventRequestCatetory query)
+        {
+            var result = await _eventService.GetEventbyCatetoryPage(id, query);
             return Ok(result);
         }
     }

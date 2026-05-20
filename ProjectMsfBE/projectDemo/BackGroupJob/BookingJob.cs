@@ -8,13 +8,11 @@ namespace projectDemo.BackGroupJob
     {
         private readonly IServiceScopeFactory _serviceScopeFactory;
         private readonly ILogger<GmailExpireJob> _logger;
-        private readonly IOrderService _orderService;
 
-        public BookingJob(IOrderService orderService, IServiceScopeFactory serviceScopeFactory, ILogger<GmailExpireJob> logger)
+        public BookingJob( IServiceScopeFactory serviceScopeFactory, ILogger<GmailExpireJob> logger)
         {
             _serviceScopeFactory = serviceScopeFactory;
             _logger = logger;
-            _orderService = orderService;
 
         }
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
@@ -23,15 +21,15 @@ namespace projectDemo.BackGroupJob
             {
                 using var scope = _serviceScopeFactory.CreateScope();
 
-                var order = await _orderService.GetOrder();
-                //    order.Data.ForEach(x =>
-                //    {
-                //        x.Status==
-                //    });
-                //    if(order.StatusCode == EnumStatusOrder.PENDING) {
-                //    }
-                //}
-                //return Task.CompletedTask;
+                var sevice = scope.ServiceProvider.GetRequiredService<IOrderService>();
+
+                await sevice.ListOrderBackJob();
+                
+
+                    await Task.Delay(
+                        TimeSpan.FromMinutes(1), stoppingToken);
+                
+                _logger.LogInformation($"check:");
             }
         }
     }

@@ -57,6 +57,7 @@ export class EventDetailPageComponent implements OnInit, OnDestroy {
     this.route.paramMap.subscribe((params) => {
       const eventId = params.get('id');
       if (eventId) {
+        
         this.loadEvent(eventId);
         this.initSignalR(eventId);
       } else {
@@ -65,6 +66,7 @@ export class EventDetailPageComponent implements OnInit, OnDestroy {
       }
     });
   }
+  
 
   initSignalR(eventId: string): void {
     this.signalrService.startConnection();

@@ -9,8 +9,8 @@ namespace projectDemo.Service.EmailService
 
         public string EventName { get; set; } = string.Empty;
         public string EventLocation { get; set; } = string.Empty;
-        public DateTime EventStartDate { get; set; }
-        public DateTime EventEndDate { get; set; }
+        public DateTimeOffset EventStartDate { get; set; }
+        public DateTimeOffset EventEndDate { get; set; }
         public string EventPosterUrl { get; set; } = string.Empty;
 
         public List<TicketEmailItem> Tickets { get; set; } = new();

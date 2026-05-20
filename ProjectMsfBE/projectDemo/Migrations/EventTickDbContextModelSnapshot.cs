@@ -35,14 +35,14 @@ namespace projectDemo.Migrations
                         .HasMaxLength(255)
                         .HasColumnType("nvarchar(255)");
 
-                    b.Property<DateTime?>("CreatedDate")
-                        .HasColumnType("datetime2");
+                    b.Property<DateTimeOffset?>("CreatedDate")
+                        .HasColumnType("datetimeoffset");
 
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<DateTime?>("EndDate")
-                        .HasColumnType("datetime2");
+                    b.Property<DateTimeOffset?>("EndDate")
+                        .HasColumnType("datetimeoffset");
 
                     b.Property<bool?>("IsDeleted")
                         .HasColumnType("bit");
@@ -62,14 +62,14 @@ namespace projectDemo.Migrations
                     b.Property<string>("Reason")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<DateTime?>("SaleEndDate")
-                        .HasColumnType("datetime2");
+                    b.Property<DateTimeOffset?>("SaleEndDate")
+                        .HasColumnType("datetimeoffset");
 
-                    b.Property<DateTime?>("SaleStartDate")
-                        .HasColumnType("datetime2");
+                    b.Property<DateTimeOffset?>("SaleStartDate")
+                        .HasColumnType("datetimeoffset");
 
-                    b.Property<DateTime?>("StartDate")
-                        .HasColumnType("datetime2");
+                    b.Property<DateTimeOffset?>("StartDate")
+                        .HasColumnType("datetimeoffset");
 
                     b.Property<string>("Status")
                         .IsRequired()
@@ -85,8 +85,8 @@ namespace projectDemo.Migrations
                         .HasMaxLength(255)
                         .HasColumnType("nvarchar(255)");
 
-                    b.Property<DateTime?>("UpdatedDate")
-                        .HasColumnType("datetime2");
+                    b.Property<DateTimeOffset?>("UpdatedDate")
+                        .HasColumnType("datetimeoffset");
 
                     b.Property<Guid>("UserID")
                         .HasColumnType("uniqueidentifier");
@@ -110,8 +110,8 @@ namespace projectDemo.Migrations
                         .HasMaxLength(255)
                         .HasColumnType("nvarchar(255)");
 
-                    b.Property<DateTime?>("CreatedDate")
-                        .HasColumnType("datetime2");
+                    b.Property<DateTimeOffset?>("CreatedDate")
+                        .HasColumnType("datetimeoffset");
 
                     b.Property<decimal?>("DiscountAmount")
                         .HasColumnType("decimal(18,2)");
@@ -142,8 +142,8 @@ namespace projectDemo.Migrations
                         .HasMaxLength(255)
                         .HasColumnType("nvarchar(255)");
 
-                    b.Property<DateTime?>("UpdatedDate")
-                        .HasColumnType("datetime2");
+                    b.Property<DateTimeOffset?>("UpdatedDate")
+                        .HasColumnType("datetimeoffset");
 
                     b.Property<Guid>("UserID")
                         .HasColumnType("uniqueidentifier");
@@ -202,8 +202,8 @@ namespace projectDemo.Migrations
                         .HasMaxLength(255)
                         .HasColumnType("nvarchar(255)");
 
-                    b.Property<DateTime?>("CreatedDate")
-                        .HasColumnType("datetime2");
+                    b.Property<DateTimeOffset?>("CreatedDate")
+                        .HasColumnType("datetimeoffset");
 
                     b.Property<bool?>("IsDeleted")
                         .HasColumnType("bit");
@@ -236,8 +236,8 @@ namespace projectDemo.Migrations
                         .HasMaxLength(255)
                         .HasColumnType("nvarchar(255)");
 
-                    b.Property<DateTime?>("UpdatedDate")
-                        .HasColumnType("datetime2");
+                    b.Property<DateTimeOffset?>("UpdatedDate")
+                        .HasColumnType("datetimeoffset");
 
                     b.HasKey("Id");
 
@@ -259,8 +259,8 @@ namespace projectDemo.Migrations
                         .HasMaxLength(255)
                         .HasColumnType("nvarchar(255)");
 
-                    b.Property<DateTime?>("CreatedDate")
-                        .HasColumnType("datetime2");
+                    b.Property<DateTimeOffset?>("CreatedDate")
+                        .HasColumnType("datetimeoffset");
 
                     b.Property<bool>("IsAdmin")
                         .HasColumnType("bit");
@@ -279,8 +279,8 @@ namespace projectDemo.Migrations
                         .HasMaxLength(255)
                         .HasColumnType("nvarchar(255)");
 
-                    b.Property<DateTime?>("UpdatedDate")
-                        .HasColumnType("datetime2");
+                    b.Property<DateTimeOffset?>("UpdatedDate")
+                        .HasColumnType("datetimeoffset");
 
                     b.HasKey("Id");
 
@@ -290,7 +290,7 @@ namespace projectDemo.Migrations
                         new
                         {
                             Id = 1,
-                            CreatedDate = new DateTime(2026, 5, 16, 0, 57, 16, 239, DateTimeKind.Utc).AddTicks(7705),
+                            CreatedDate = new DateTimeOffset(new DateTime(2026, 5, 20, 3, 26, 46, 850, DateTimeKind.Unspecified).AddTicks(866), new TimeSpan(0, 0, 0, 0, 0)),
                             IsAdmin = true,
                             IsDeleted = false,
                             IsSystem = true,
@@ -299,7 +299,7 @@ namespace projectDemo.Migrations
                         new
                         {
                             Id = 2,
-                            CreatedDate = new DateTime(2026, 5, 16, 0, 57, 16, 239, DateTimeKind.Utc).AddTicks(7714),
+                            CreatedDate = new DateTimeOffset(new DateTime(2026, 5, 20, 3, 26, 46, 850, DateTimeKind.Unspecified).AddTicks(888), new TimeSpan(0, 0, 0, 0, 0)),
                             IsAdmin = false,
                             IsDeleted = false,
                             IsSystem = true,
@@ -308,7 +308,7 @@ namespace projectDemo.Migrations
                         new
                         {
                             Id = 3,
-                            CreatedDate = new DateTime(2026, 5, 16, 0, 57, 16, 239, DateTimeKind.Utc).AddTicks(7717),
+                            CreatedDate = new DateTimeOffset(new DateTime(2026, 5, 20, 3, 26, 46, 850, DateTimeKind.Unspecified).AddTicks(890), new TimeSpan(0, 0, 0, 0, 0)),
                             IsAdmin = false,
                             IsDeleted = false,
                             IsSystem = true,
@@ -331,8 +331,8 @@ namespace projectDemo.Migrations
                         .HasMaxLength(255)
                         .HasColumnType("nvarchar(255)");
 
-                    b.Property<DateTime?>("CreatedDate")
-                        .HasColumnType("datetime2");
+                    b.Property<DateTimeOffset?>("CreatedDate")
+                        .HasColumnType("datetimeoffset");
 
                     b.Property<bool?>("IsDeleted")
                         .HasColumnType("bit");
@@ -355,8 +355,8 @@ namespace projectDemo.Migrations
                         .HasMaxLength(255)
                         .HasColumnType("nvarchar(255)");
 
-                    b.Property<DateTime?>("UpdatedDate")
-                        .HasColumnType("datetime2");
+                    b.Property<DateTimeOffset?>("UpdatedDate")
+                        .HasColumnType("datetimeoffset");
 
                     b.HasKey("Id");
 
@@ -377,8 +377,8 @@ namespace projectDemo.Migrations
                         .HasMaxLength(255)
                         .HasColumnType("nvarchar(255)");
 
-                    b.Property<DateTime?>("CreatedDate")
-                        .HasColumnType("datetime2");
+                    b.Property<DateTimeOffset?>("CreatedDate")
+                        .HasColumnType("datetimeoffset");
 
                     b.Property<Guid>("EventID")
                         .HasColumnType("uniqueidentifier");
@@ -409,8 +409,8 @@ namespace projectDemo.Migrations
                         .HasMaxLength(255)
                         .HasColumnType("nvarchar(255)");
 
-                    b.Property<DateTime?>("UpdatedDate")
-                        .HasColumnType("datetime2");
+                    b.Property<DateTimeOffset?>("UpdatedDate")
+                        .HasColumnType("datetimeoffset");
 
                     b.HasKey("Id");
 
@@ -437,8 +437,8 @@ namespace projectDemo.Migrations
                         .HasMaxLength(255)
                         .HasColumnType("nvarchar(255)");
 
-                    b.Property<DateTime?>("CreatedDate")
-                        .HasColumnType("datetime2");
+                    b.Property<DateTimeOffset?>("CreatedDate")
+                        .HasColumnType("datetimeoffset");
 
                     b.Property<DateTime?>("DateLock")
                         .HasColumnType("datetime2");
@@ -478,8 +478,8 @@ namespace projectDemo.Migrations
                         .HasMaxLength(255)
                         .HasColumnType("nvarchar(255)");
 
-                    b.Property<DateTime?>("UpdatedDate")
-                        .HasColumnType("datetime2");
+                    b.Property<DateTimeOffset?>("UpdatedDate")
+                        .HasColumnType("datetimeoffset");
 
                     b.Property<string>("Username")
                         .IsRequired()
@@ -500,7 +500,7 @@ namespace projectDemo.Migrations
                             IsDeleted = false,
                             IsLock = false,
                             LastName = "admin",
-                            PasswordHash = "$2a$11$PVCeAJJwTcxPytqsAU7XfuFFeXvI4a9Fz5ZOPX1Uic.8Gldfo4ukq",
+                            PasswordHash = "$2a$11$0KbaziICfQ3BD.DaOp3uSuJg85PpXaywMMI0lEAMyziTHiWyLVHw6",
                             Username = "admin"
                         });
                 });
@@ -517,8 +517,8 @@ namespace projectDemo.Migrations
                         .HasMaxLength(255)
                         .HasColumnType("nvarchar(255)");
 
-                    b.Property<DateTime?>("CreatedDate")
-                        .HasColumnType("datetime2");
+                    b.Property<DateTimeOffset?>("CreatedDate")
+                        .HasColumnType("datetimeoffset");
 
                     b.Property<bool?>("IsDeleted")
                         .HasColumnType("bit");
@@ -535,8 +535,8 @@ namespace projectDemo.Migrations
                         .HasMaxLength(255)
                         .HasColumnType("nvarchar(255)");
 
-                    b.Property<DateTime?>("UpdatedDate")
-                        .HasColumnType("datetime2");
+                    b.Property<DateTimeOffset?>("UpdatedDate")
+                        .HasColumnType("datetimeoffset");
 
                     b.Property<Guid>("UserId")
                         .HasColumnType("uniqueidentifier");
@@ -589,8 +589,8 @@ namespace projectDemo.Migrations
                         .HasMaxLength(255)
                         .HasColumnType("nvarchar(255)");
 
-                    b.Property<DateTime?>("CreatedDate")
-                        .HasColumnType("datetime2");
+                    b.Property<DateTimeOffset?>("CreatedDate")
+                        .HasColumnType("datetimeoffset");
 
                     b.Property<string>("FuncName")
                         .IsRequired()
@@ -613,8 +613,8 @@ namespace projectDemo.Migrations
                         .HasMaxLength(255)
                         .HasColumnType("nvarchar(255)");
 
-                    b.Property<DateTime?>("UpdatedDate")
-                        .HasColumnType("datetime2");
+                    b.Property<DateTimeOffset?>("UpdatedDate")
+                        .HasColumnType("datetimeoffset");
 
                     b.Property<Guid>("UserId")
                         .HasColumnType("uniqueidentifier");
@@ -719,8 +719,8 @@ namespace projectDemo.Migrations
                         .HasMaxLength(255)
                         .HasColumnType("nvarchar(255)");
 
-                    b.Property<DateTime?>("CreatedDate")
-                        .HasColumnType("datetime2");
+                    b.Property<DateTimeOffset?>("CreatedDate")
+                        .HasColumnType("datetimeoffset");
 
                     b.Property<bool>("EnableSsl")
                         .HasColumnType("bit");
@@ -755,8 +755,8 @@ namespace projectDemo.Migrations
                         .HasMaxLength(255)
                         .HasColumnType("nvarchar(255)");
 
-                    b.Property<DateTime?>("UpdatedDate")
-                        .HasColumnType("datetime2");
+                    b.Property<DateTimeOffset?>("UpdatedDate")
+                        .HasColumnType("datetimeoffset");
 
                     b.HasKey("Id");
 
@@ -802,8 +802,8 @@ namespace projectDemo.Migrations
                         .HasMaxLength(255)
                         .HasColumnType("nvarchar(255)");
 
-                    b.Property<DateTime?>("CreatedDate")
-                        .HasColumnType("datetime2");
+                    b.Property<DateTimeOffset?>("CreatedDate")
+                        .HasColumnType("datetimeoffset");
 
                     b.Property<bool?>("IsDeleted")
                         .HasColumnType("bit");
@@ -828,8 +828,8 @@ namespace projectDemo.Migrations
                         .HasMaxLength(255)
                         .HasColumnType("nvarchar(255)");
 
-                    b.Property<DateTime?>("UpdatedDate")
-                        .HasColumnType("datetime2");
+                    b.Property<DateTimeOffset?>("UpdatedDate")
+                        .HasColumnType("datetimeoffset");
 
                     b.HasKey("Id");
 
@@ -871,8 +871,8 @@ namespace projectDemo.Migrations
                         .HasMaxLength(255)
                         .HasColumnType("nvarchar(255)");
 
-                    b.Property<DateTime?>("CreatedDate")
-                        .HasColumnType("datetime2");
+                    b.Property<DateTimeOffset?>("CreatedDate")
+                        .HasColumnType("datetimeoffset");
 
                     b.Property<bool?>("IsDeleted")
                         .HasColumnType("bit");
@@ -889,8 +889,8 @@ namespace projectDemo.Migrations
                         .HasMaxLength(255)
                         .HasColumnType("nvarchar(255)");
 
-                    b.Property<DateTime?>("UpdatedDate")
-                        .HasColumnType("datetime2");
+                    b.Property<DateTimeOffset?>("UpdatedDate")
+                        .HasColumnType("datetimeoffset");
 
                     b.HasKey("Id");
 
@@ -1079,8 +1079,8 @@ namespace projectDemo.Migrations
                         .HasMaxLength(255)
                         .HasColumnType("nvarchar(255)");
 
-                    b.Property<DateTime?>("CreatedDate")
-                        .HasColumnType("datetime2");
+                    b.Property<DateTimeOffset?>("CreatedDate")
+                        .HasColumnType("datetimeoffset");
 
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
@@ -1118,8 +1118,8 @@ namespace projectDemo.Migrations
                         .HasMaxLength(255)
                         .HasColumnType("nvarchar(255)");
 
-                    b.Property<DateTime?>("UpdatedDate")
-                        .HasColumnType("datetime2");
+                    b.Property<DateTimeOffset?>("UpdatedDate")
+                        .HasColumnType("datetimeoffset");
 
                     b.Property<int?>("UsageLimit")
                         .HasColumnType("int");
@@ -1172,8 +1172,8 @@ namespace projectDemo.Migrations
                         .HasMaxLength(255)
                         .HasColumnType("nvarchar(255)");
 
-                    b.Property<DateTime?>("CreatedDate")
-                        .HasColumnType("datetime2");
+                    b.Property<DateTimeOffset?>("CreatedDate")
+                        .HasColumnType("datetimeoffset");
 
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -1188,8 +1188,8 @@ namespace projectDemo.Migrations
                         .HasMaxLength(255)
                         .HasColumnType("nvarchar(255)");
 
-                    b.Property<DateTime?>("UpdatedDate")
-                        .HasColumnType("datetime2");
+                    b.Property<DateTimeOffset?>("UpdatedDate")
+                        .HasColumnType("datetimeoffset");
 
                     b.HasKey("RoleId", "PermissionId");
 
@@ -1436,8 +1436,8 @@ namespace projectDemo.Migrations
                         .HasMaxLength(255)
                         .HasColumnType("nvarchar(255)");
 
-                    b.Property<DateTime?>("CreatedDate")
-                        .HasColumnType("datetime2");
+                    b.Property<DateTimeOffset?>("CreatedDate")
+                        .HasColumnType("datetimeoffset");
 
                     b.Property<string>("Description")
                         .IsRequired()
@@ -1460,8 +1460,8 @@ namespace projectDemo.Migrations
                         .HasMaxLength(255)
                         .HasColumnType("nvarchar(255)");
 
-                    b.Property<DateTime?>("UpdatedDate")
-                        .HasColumnType("datetime2");
+                    b.Property<DateTimeOffset?>("UpdatedDate")
+                        .HasColumnType("datetimeoffset");
 
                     b.HasKey("Id");
 
@@ -1480,8 +1480,8 @@ namespace projectDemo.Migrations
                         .HasMaxLength(255)
                         .HasColumnType("nvarchar(255)");
 
-                    b.Property<DateTime?>("CreatedDate")
-                        .HasColumnType("datetime2");
+                    b.Property<DateTimeOffset?>("CreatedDate")
+                        .HasColumnType("datetimeoffset");
 
                     b.Property<int>("DailyLimit")
                         .HasColumnType("int");
@@ -1507,8 +1507,8 @@ namespace projectDemo.Migrations
                         .HasMaxLength(255)
                         .HasColumnType("nvarchar(255)");
 
-                    b.Property<DateTime?>("UpdatedDate")
-                        .HasColumnType("datetime2");
+                    b.Property<DateTimeOffset?>("UpdatedDate")
+                        .HasColumnType("datetimeoffset");
 
                     b.Property<string>("status")
                         .IsRequired()
@@ -1517,6 +1517,24 @@ namespace projectDemo.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Upgrade");
+                });
+
+            modelBuilder.Entity("projectDemo.Entity.Models.UserEventFavorite", b =>
+                {
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("EventId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreateDt")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("UserId", "EventId");
+
+                    b.HasIndex("EventId");
+
+                    b.ToTable("UserEventFavorite");
                 });
 
             modelBuilder.Entity("projectDemo.Entity.Models.UserPromotion", b =>
@@ -1531,8 +1549,8 @@ namespace projectDemo.Migrations
                         .HasMaxLength(255)
                         .HasColumnType("nvarchar(255)");
 
-                    b.Property<DateTime?>("CreatedDate")
-                        .HasColumnType("datetime2");
+                    b.Property<DateTimeOffset?>("CreatedDate")
+                        .HasColumnType("datetimeoffset");
 
                     b.Property<bool?>("IsDeleted")
                         .HasColumnType("bit");
@@ -1547,8 +1565,8 @@ namespace projectDemo.Migrations
                         .HasMaxLength(255)
                         .HasColumnType("nvarchar(255)");
 
-                    b.Property<DateTime?>("UpdatedDate")
-                        .HasColumnType("datetime2");
+                    b.Property<DateTimeOffset?>("UpdatedDate")
+                        .HasColumnType("datetimeoffset");
 
                     b.Property<DateTime?>("UsedDate")
                         .HasColumnType("datetime2");
@@ -1575,8 +1593,8 @@ namespace projectDemo.Migrations
                         .HasMaxLength(255)
                         .HasColumnType("nvarchar(255)");
 
-                    b.Property<DateTime?>("CreatedDate")
-                        .HasColumnType("datetime2");
+                    b.Property<DateTimeOffset?>("CreatedDate")
+                        .HasColumnType("datetimeoffset");
 
                     b.Property<int>("CurrentDayUsageCount")
                         .HasColumnType("int");
@@ -1605,8 +1623,8 @@ namespace projectDemo.Migrations
                         .HasMaxLength(255)
                         .HasColumnType("nvarchar(255)");
 
-                    b.Property<DateTime?>("UpdatedDate")
-                        .HasColumnType("datetime2");
+                    b.Property<DateTimeOffset?>("UpdatedDate")
+                        .HasColumnType("datetimeoffset");
 
                     b.Property<int>("UpgradeId")
                         .HasColumnType("int");
@@ -1812,6 +1830,25 @@ namespace projectDemo.Migrations
                     b.Navigation("Role");
                 });
 
+            modelBuilder.Entity("projectDemo.Entity.Models.UserEventFavorite", b =>
+                {
+                    b.HasOne("EventTick.Model.Models.Event", "Event")
+                        .WithMany("UserEventFvorites")
+                        .HasForeignKey("EventId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.HasOne("EventTick.Model.Models.User", "User")
+                        .WithMany("UserEventFvorites")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.Navigation("Event");
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("projectDemo.Entity.Models.UserPromotion", b =>
                 {
                     b.HasOne("projectDemo.Entity.Models.Promotion", "Promotion")
@@ -1853,6 +1890,8 @@ namespace projectDemo.Migrations
             modelBuilder.Entity("EventTick.Model.Models.Event", b =>
                 {
                     b.Navigation("TicketTypes");
+
+                    b.Navigation("UserEventFvorites");
                 });
 
             modelBuilder.Entity("EventTick.Model.Models.Order", b =>
@@ -1887,6 +1926,8 @@ namespace projectDemo.Migrations
                     b.Navigation("Events");
 
                     b.Navigation("Orders");
+
+                    b.Navigation("UserEventFvorites");
 
                     b.Navigation("UserLogins");
 

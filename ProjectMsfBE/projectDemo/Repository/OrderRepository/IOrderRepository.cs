@@ -13,7 +13,7 @@ namespace projectDemo.Repository.OrderRepository
         Task<Order?> GetOrderForEmailAsync(Guid orderID);
 
         Task<bool> HasOrderByUserId(Guid userId);
-
+        Task<List<Order>> GetListOrderPedding();
         Task<(OrderProjection?, int statuss, string messager)> GetOrderListOrderDetail(
             Guid orderID
         );

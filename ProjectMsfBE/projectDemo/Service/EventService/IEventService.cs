@@ -33,6 +33,7 @@ namespace projectDemo.Service.EventService
             Guid id,
             PageEventResquest query
         );
+        Task<PageResponse<EventTypeTickResponses>> GetEventbyCatetoryPage ( Guid eventid, PageEventRequestCatetory query );
         //Task<ApiResponse<EventResponse>> CreateEvent(EventRequest resquest,Guid Userid);
     }
 }

@@ -163,7 +163,7 @@
       <h2>Sự kiện tương tự</h2>
       <a routerLink="/" class="browse-all">Xem tất cả <i class="material-icons">east</i></a>
     </div>
-    <app-events-grid></app-events-grid>
+    <app-events-grid [relatedEventId]="event.Id.toString()"></app-events-grid>
   </section>
 </div>
 

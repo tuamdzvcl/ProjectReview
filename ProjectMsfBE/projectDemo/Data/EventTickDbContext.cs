@@ -52,6 +52,21 @@ namespace projectDemo.Data
                 .WithMany(p => p.UserPromotions)
                 .HasForeignKey(up => up.PromotionId);
 
+            modelBuilder.Entity<UserEventFavorite>(entity =>
+            {
+
+                entity.HasKey(f => new { f.UserId, f.EventId });
+                entity.HasOne(x => x.User)
+                        .WithMany(x=>x.UserEventFvorites)
+                         .HasForeignKey(x => x.UserId)
+                            .OnDelete(DeleteBehavior.NoAction);
+
+                entity.HasOne(x => x.Event)
+                                .WithMany(x=>x.UserEventFvorites)
+                                .HasForeignKey(x => x.EventId)
+                                .OnDelete(DeleteBehavior.NoAction);
+            });
+
             modelBuilder
                 .Entity<UserUpgrade>()
                 .HasOne(uu => uu.User)

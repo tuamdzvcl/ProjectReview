@@ -3,6 +3,7 @@ using System.Management;
 using AutoMapper;
 using AutoMapper.QueryableExtensions;
 using Dapper;
+using DocumentFormat.OpenXml.VariantTypes;
 using EventTick.Model.Enum;
 using EventTick.Model.Models;
 using Microsoft.EntityFrameworkCore;
@@ -22,12 +23,15 @@ namespace projectDemo.Repository
     {
         private readonly RepositoryProcBase _proc;
         private readonly IMapper _mapper;
+        private readonly ILogger<EventRepository> _logger;
 
-        public EventRepository(IUnitOfWork uow, IMapper mapper)
+        public EventRepository( IUnitOfWork uow, IMapper mapper, ILogger<EventRepository> logger)
             : base(uow)
         {
+
             _proc = new RepositoryProcBase(uow);
             _mapper = mapper;
+            _logger = logger;
         }
 
         //add event
@@ -60,7 +64,7 @@ namespace projectDemo.Repository
             {
                 var pageIndex = request.PageIndex;
                 var pageSize = request.PageSize;
-                var now = DateTime.Now;
+                var now = DateTime.UtcNow;
 
                 var query = _dbSet
         .AsNoTracking()
@@ -181,6 +185,82 @@ namespace projectDemo.Repository
                         SaleEndDate = e.SaleEndDate,
                         Status = e.Status.ToString(),
                         Reason = e.Reason, // Also include Reason
+                        isfaslse = e.Isfalse,
+                        UserName = e.User.Username,
+                        ListTypeTick = e
+                            .TicketTypes.Select(t => new TypeTickResponse
+                            {
+                                Id = t.Id,
+                                Name = t.Name.ToString(),
+                                Price = t.Price,
+                                TotalQuantity = t.TotalQuantity,
+                                SoldQuantity = t.SoldQuantity,
+                                Status = t.Status.ToString(),
+                            })
+                            .ToList(),
+                    })
+                    .ToListAsync();
+
+                return new PageResponse<EventTypeTickResponses>
+                {
+                    Items = items,
+                    PageIndex = pageIndex,
+                    PageSize = pageSize,
+                    TotalRecords = totolRecords,
+                    TotalPages = (int)Math.Ceiling((double)totolRecords / pageSize),
+                    Success = true,
+                    Message = "Lấy danh sách admin pending thành công",
+                };
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Lỗi {ex.ToString()}");
+                return new PageResponse<EventTypeTickResponses> { Message = ex.ToString() };
+            }
+        }
+
+        public async Task<PageResponse<EventTypeTickResponses>> GetEventCatetoryPage(Guid eventid, PageEventRequestCatetory request)
+        {
+            try
+            {
+                var pageIndex = request.index;
+                var pageSize = request.take;
+
+                var eventCatetory = _dbSet.FirstOrDefault(x=>x.Id==eventid);
+                var CatetoryEvent = eventCatetory.CatetoryID;
+
+                var query = _dbSet.AsNoTracking().Where(e => e.IsDeleted == false &&
+                    e.Status == EnumStatusEvent.PUBLISHED.ToString() && e.CatetoryID==CatetoryEvent && e.Id !=eventid);
+
+                if (!string.IsNullOrWhiteSpace(request.key))
+                {
+                    var key = request.key.Trim();
+                    query = query.Where(e =>
+                        e.Title.Contains(key)
+                        || e.Location.Contains(key)
+                        || e.Catetory.Name.Contains(key)
+                    );
+                }
+
+                var totolRecords = await query.CountAsync();
+
+                var items = await query
+                    .OrderBy(e => e.CreatedDate)
+                    .Skip((pageIndex - 1) * pageSize)
+                    .Take(pageSize)
+                    .Select(e => new EventTypeTickResponses
+                    {
+                        Id = e.Id,
+                        Title = e.Title,
+                        Location = e.Location,
+                        Description = e.Description,
+                        StartDate = e.StartDate,
+                        EndDate = e.EndDate,
+                        PosterUrl = e.PosterUrl,
+                        SaleStartDate = e.SaleStartDate,
+                        SaleEndDate = e.SaleEndDate,
+                        Status = e.Status.ToString(),
+                        Reason = e.Reason, 
                         isfaslse = e.Isfalse,
                         UserName = e.User.Username,
                         ListTypeTick = e
@@ -382,26 +462,70 @@ namespace projectDemo.Repository
             string key
         )
         {
-            var param = new DynamicParameters();
-            param.Add("@PageIndex", pageIndex);
-            param.Add("@PageSize", pageSize);
-            param.Add("@key", key);
-            param.Add("@totalRow", dbType: DbType.Int32, direction: ParameterDirection.Output);
-            var result = await _uow.connection.QueryAsync<EventResponse>(
-                "GetEventPaging",
-                param,
-                transaction: _uow.GetTransaction(),
-                commandType: CommandType.StoredProcedure
-            );
-            int totalRow = param.Get<int>("@totalRow");
+            var query =  _dbSet
+                .Where(x => x.IsDeleted == false);
+            if(!string.IsNullOrWhiteSpace(key))
+            {
+                query = query.Where(x =>x.Title.Contains(key));
+            }
+            var totalRecord = await query.CountAsync();
+            var item = await query
+                .OrderByDescending(x => x.CreatedDate)
+                .Skip((pageIndex - 1) * pageSize)
+                .Take(pageSize)
+                .Select(x => new EventResponse
+                {
+                    EventID =x.Id,
+                    Title = x.Title,
+                    Location = x.Location,
+                })
+                .ToListAsync();
             return new PageResponse<EventResponse>
             {
-                Items = result.ToList(),
-                TotalRecords = totalRow,
+                Items = item,
+                TotalRecords = totalRecord,
                 PageIndex = pageIndex,
                 PageSize = pageSize,
                 Success = true,
             };
+            #region
+            //try
+            //{
+            //    var param = new DynamicParameters();
+            //    param.Add("@PageIndex", pageIndex);
+            //    param.Add("@PageSize", pageSize);
+            //    param.Add("@key", key);
+            //    param.Add("@totalRow", dbType: DbType.Int32, direction: ParameterDirection.Output);
+            //    var result = await _uow.connection.QueryAsync<EventResponse>(
+            //        "GetEventPaging",
+            //        param,
+            //        transaction: _uow.GetTransaction(),
+            //        commandType: CommandType.StoredProcedure
+            //    );
+            //    int totalRow = param.Get<int>("@totalRow");
+            //    return new PageResponse<EventResponse>
+            //    {
+            //        Items = result.ToList(),
+            //        TotalRecords = totalRow,
+            //        PageIndex = pageIndex,
+            //        PageSize = pageSize,
+            //        Success = true,
+            //    };
+            //}catch ( Exception ex ) {
+                
+            //    _logger.LogError(ex.ToString() );
+            //    return new PageResponse<EventResponse>
+            //    {
+            //        Success = false,
+            //        Message = ex.Message,
+            //        Items = new List<EventResponse>(),
+            //        TotalRecords = 0,
+            //        PageIndex = pageIndex,
+            //        PageSize = pageSize
+            //    };
+            //};
+            #endregion
+
         }
 
         // update ->> thiếu update typetick

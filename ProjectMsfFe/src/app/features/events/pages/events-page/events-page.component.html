@@ -3,9 +3,9 @@
 <section class="events-section">
   <h2>All Events</h2>
 
-  <app-filter-tabs (categoryChange)="onCategoryChange($event)"></app-filter-tabs>
+  <app-filter-tabs (categoryChange)="onCategoryChange($event)" (filterFavorites)="onShowFavoritesChange($event)"></app-filter-tabs>
 
-  <app-events-grid [categoryIds]="selectedCategoryIds" [key]="searchKeyword"></app-events-grid>
+  <app-events-grid [categoryIds]="selectedCategoryIds" [key]="searchKeyword" [showFavorites]="showFavorites"></app-events-grid>
 
 
 </section>

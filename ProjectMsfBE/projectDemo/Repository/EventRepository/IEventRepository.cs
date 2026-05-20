@@ -22,6 +22,7 @@ namespace projectDemo.Repository.Ipml
             Guid id,
             PageEventResquest request
         );
+        Task<PageResponse<EventTypeTickResponses>> GetEventCatetoryPage(Guid eventid,PageEventRequestCatetory request);
         Task<EventTypeTickResponses?> GetEventDetailById(Guid eventId);
     }
 }

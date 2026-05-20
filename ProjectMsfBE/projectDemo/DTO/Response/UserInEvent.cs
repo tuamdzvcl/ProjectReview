@@ -9,8 +9,6 @@ namespace projectDemo.DTO.Response
 
         public decimal? TotalAmount { get; set; }
 
-
-
         public string FirstName { get; set; }
         public string LastName { get; set; }
         public Guid ID { get; set; }

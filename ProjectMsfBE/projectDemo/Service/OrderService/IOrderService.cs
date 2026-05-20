@@ -20,6 +20,7 @@ namespace projectDemo.Service.OrderService
             int pageindex,
             int pagesize
         );
+        Task<bool> ListOrderBackJob();
         Task<ApiResponse<OrderResponse>> GetListOrderDetail(Guid OrderID);
     }
 }

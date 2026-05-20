@@ -15,10 +15,10 @@ namespace projectDemo.DTO.Request
         public string? Description { get; set; }
         [TextValidation(ConfigValidation.MinLength, ConfigValidation.MaxLengthStatus,ErrorMessage ="quá số kí tự rồi")]
         public string Location { get; set; }
-        public DateTime? StartDate { get; set; }
-        public DateTime? EndDate { get; set; }
-        public DateTime? SaleStartDate { get; set; }
-        public DateTime? SaleEndDate { get; set; }
+        public DateTimeOffset? StartDate { get; set; }
+        public DateTimeOffset? EndDate { get; set; }
+        public DateTimeOffset? SaleStartDate { get; set; }
+        public DateTimeOffset? SaleEndDate { get; set; }
         [Required(ErrorMessage ="Đừng để trống nhé")]
         [MaxLength(100,ErrorMessage ="ĐỪng vượt quá nhé")]
         public string CatetoryName { get; set; }

@@ -1,3 +1,4 @@
+import { ChildComponent } from './test/child/child.component';
 import { Routes } from '@angular/router';
 import { LoginComponent } from './features/auth/pages/login/login.component';
 import { SignupComponent } from './features/auth/pages/signup/signup.component';
@@ -41,10 +42,13 @@ import { VerifyEmailComponent } from './features/auth/pages/verify-email/verify-
 import { RegisterSuccessComponent } from './features/auth/pages/register-success/register-success.component';
 import { RoleComponent } from './features/roles/pages/admin-roles/role.component';
 import { TestComponent } from './test/test.component';
+import { ParentComponent } from './test/parent/parent.component';
 
 export const routes: Routes = [
   { path: 'header', component: HeaderComponent },
   { path: 'test', component: TestComponent },
+  { path: 'child', component: ChildComponent },
+  { path: 'parent', component: ParentComponent },
   {
     path: '',
     component: MainLayoutComponent,

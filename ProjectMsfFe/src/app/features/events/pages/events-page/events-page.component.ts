@@ -16,6 +16,7 @@ import { UserDropdownComponent } from '../../../../shared/components/user-dropdo
 export class EventsPageComponent implements OnInit {
   selectedCategoryIds: string[] = [];
   searchKeyword: string = '';
+  showFavorites: boolean = false;
 
   constructor(private route: ActivatedRoute) {}
 
@@ -28,5 +29,9 @@ export class EventsPageComponent implements OnInit {
 
   onCategoryChange(categoryIds: string[]) {
     this.selectedCategoryIds = categoryIds;
+  }
+
+  onShowFavoritesChange(showFav: boolean) {
+    this.showFavorites = showFav;
   }
 }

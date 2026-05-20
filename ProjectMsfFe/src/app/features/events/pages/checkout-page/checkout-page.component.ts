@@ -340,7 +340,7 @@ export class CheckoutPageComponent implements OnInit {
             this.bookingService.clearBooking();
             console.log(response);
 
-            // window.location.href = response.PayUrl;
+            window.location.href = response.PayUrl;
           },
           error: (err) => {
             Swal.fire({

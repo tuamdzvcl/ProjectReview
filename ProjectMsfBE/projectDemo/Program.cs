@@ -49,6 +49,7 @@ using projectDemo.Repository.PromotionRepository;
 using projectDemo.Service.PromotionService;
 using projectDemo.BaseInit.Excel;
 using projectDemo.SignalR;
+using projectDemo.Service.UserEventFavoriteService;
 
 namespace projectDemo
 {
@@ -342,7 +343,9 @@ namespace projectDemo
             builder.Services.AddScoped<IPaymentService, PaymentService>();
             builder.Services.AddScoped<ICatetoryService, CatetoryService>();
             builder.Services.AddScoped<ITickService, TickService>();
+            // đăng kí job
             builder.Services.AddHostedService<GmailExpireJob>();
+            builder.Services.AddHostedService<BookingJob>();
             builder.Services.AddScoped<ITickRepository, TickRepository>();
             builder.Services.AddScoped<
                 projectDemo.Repository.UserUpgradeRepository.IUserUpgradeRepository,
@@ -363,7 +366,8 @@ namespace projectDemo
             builder.Services.AddScoped<IPromotionRepository, PromotionRepository>();
             builder.Services.AddScoped<IPromotionService, PromotionServices>();
             builder.Services.AddScoped<IExcelService, ExcelService>();
-
+            builder.Services.AddScoped<IUserEventFavoriteService, UserEventFavoriteService>();
+            builder.Services.AddScoped<IUserEventFavoriteRepository, UserEventFavoriteRepository>();
             builder.Services.AddScoped<IImageService, ImageService>();
             builder.Services.AddHttpClient();
             builder.Services.AddScoped<GoogleAuthService>();
