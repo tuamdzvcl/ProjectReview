@@ -29,13 +29,13 @@ namespace EventTick.Model.Models
         [MaxLength(255)]
         public string Location { get; set; } = null!;
 
-        public DateTime? StartDate { get; set; }
+        public DateTimeOffset? StartDate { get; set; }
 
-        public DateTime? EndDate { get; set; }
+        public DateTimeOffset? EndDate { get; set; }
 
-        public DateTime? SaleStartDate { get; set; }
+        public DateTimeOffset? SaleStartDate { get; set; }
 
-        public DateTime? SaleEndDate { get; set; }
+        public DateTimeOffset? SaleEndDate { get; set; }
 
         public bool? Isfalse { get; set; }
 
@@ -55,7 +55,7 @@ namespace EventTick.Model.Models
 
         [ForeignKey("CatetoryID")]
         public virtual Catetory Catetory { get; set; }
-
+        public virtual ICollection<UserEventFavorite> UserEventFvorites { get; set; }
         public virtual ICollection<TicketType> TicketTypes { get; set; }
 
         public string? Reason { get; set; }

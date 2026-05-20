@@ -73,7 +73,7 @@ namespace projectDemo.Service.EventService
 
         private async Task SyncEndedEventsAsync()
         {
-            var now = ConfigTimeZone.GetVietnamNow();
+            var now = DateTime.UtcNow;
             var expiredEvents = await _uow
                 .context.Set<Event>()
                 .Where(e =>
@@ -115,7 +115,7 @@ namespace projectDemo.Service.EventService
         public bool checkVadidate(EventRequest request)
         {
             // Lấy thời gian hiện tại theo múi giờ Việt Nam (GMT+7)
-            var now = ConfigTimeZone.GetVietnamNow();
+            var now = DateTime.UtcNow;
 
             var hasAnyDate =
                 request.StartDate.HasValue
@@ -308,7 +308,7 @@ namespace projectDemo.Service.EventService
                     SaleEndDate = request.SaleEndDate,
                     Description = request.Description,
                     Location = request.Location,
-                    CreatedDate = DateTime.Now,
+                    CreatedDate = DateTime.UtcNow,
                     CatetoryID = catetory.Id,
                     IsDeleted = false,
                 };
@@ -322,7 +322,7 @@ namespace projectDemo.Service.EventService
                         Status = ticket.Status,
                         EventID = eventEntity.Id,
                         IsDeleted = false,
-                        CreatedDate = DateTime.Now,
+                        CreatedDate = DateTime.UtcNow,
                     })
                     .ToList();
 
@@ -604,7 +604,7 @@ namespace projectDemo.Service.EventService
                 events.SaleEndDate = resquest.SaleEndDate ?? events.SaleEndDate;
                 events.Description = resquest.Description ?? events.Description;
                 events.Location = resquest.Location ?? events.Location;
-                events.UpdatedDate = DateTime.Now;
+                events.UpdatedDate = DateTime.UtcNow;
 
                 if (resquest.TicketTypes != null)
                 {
@@ -636,7 +636,7 @@ namespace projectDemo.Service.EventService
                             ticketEntity.TotalQuantity = ticketRequest.TotalQuantity!.Value;
                             ticketEntity.Price = ticketRequest.Price!.Value;
                             ticketEntity.Status = ticketRequest.Status!.Value;
-                            ticketEntity.UpdatedDate = DateTime.Now;
+                            ticketEntity.UpdatedDate = DateTime.UtcNow;
                             ticketEntity.IsDeleted = false;
                         }
                         else
@@ -649,7 +649,7 @@ namespace projectDemo.Service.EventService
                                 Status = ticketRequest.Status!.Value,
                                 EventID = EventID,
                                 IsDeleted = false,
-                                CreatedDate = DateTime.Now,
+                                CreatedDate = DateTime.UtcNow,
                             };
 
                             await _typeTicketRepository.CreateTicketType(newTicket);
@@ -663,7 +663,7 @@ namespace projectDemo.Service.EventService
                     foreach (var deletedTicket in deletedTickets)
                     {
                         deletedTicket.IsDeleted = true;
-                        deletedTicket.UpdatedDate = DateTime.Now;
+                        deletedTicket.UpdatedDate = DateTime.UtcNow;
                     }
                 }
 
@@ -737,7 +737,7 @@ namespace projectDemo.Service.EventService
                     SaleEndDate = null,
                     Description = originalEvent.Description,
                     Location = originalEvent.Location,
-                    CreatedDate = DateTime.Now,
+                    CreatedDate = DateTime.UtcNow,
                     CatetoryID = originalEvent.CatetoryID,
                     IsDeleted = false,
                 };
@@ -756,7 +756,7 @@ namespace projectDemo.Service.EventService
                             Status = EnumStatusTickType.STOP,
                             EventID = newEvent.Id,
                             IsDeleted = false,
-                            CreatedDate = DateTime.Now,
+                            CreatedDate = DateTime.UtcNow,
                         })
                         .ToList();
 
@@ -841,7 +841,7 @@ namespace projectDemo.Service.EventService
 
                 events.Status = request.Status;
                 events.Reason = request.Reason;
-                events.UpdatedDate = DateTime.Now;
+                events.UpdatedDate = DateTime.UtcNow;
 
                 await _uow.SaveChangesAsync();
 
@@ -972,6 +972,7 @@ namespace projectDemo.Service.EventService
                 query.take = 4;
             if(query.take >=8)
                 query.take = 8;
+
             return await _eventRepository.GetEventCatetoryPage(eventid, query);
         }
     }

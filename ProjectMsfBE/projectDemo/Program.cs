@@ -49,6 +49,7 @@ using projectDemo.Repository.PromotionRepository;
 using projectDemo.Service.PromotionService;
 using projectDemo.BaseInit.Excel;
 using projectDemo.SignalR;
+using projectDemo.Service.UserEventFavoriteService;
 
 namespace projectDemo
 {
@@ -365,7 +366,8 @@ namespace projectDemo
             builder.Services.AddScoped<IPromotionRepository, PromotionRepository>();
             builder.Services.AddScoped<IPromotionService, PromotionServices>();
             builder.Services.AddScoped<IExcelService, ExcelService>();
-
+            builder.Services.AddScoped<IUserEventFavoriteService, UserEventFavoriteService>();
+            builder.Services.AddScoped<IUserEventFavoriteRepository, UserEventFavoriteRepository>();
             builder.Services.AddScoped<IImageService, ImageService>();
             builder.Services.AddHttpClient();
             builder.Services.AddScoped<GoogleAuthService>();

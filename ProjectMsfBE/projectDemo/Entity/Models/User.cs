@@ -66,6 +66,9 @@ namespace EventTick.Model.Models
         public virtual ICollection<ApiLog> ApiLogs { get; set; }
 
         public virtual ICollection<UserUpgrade> UserUpgrades { get; set; }
+
+        public virtual ICollection<UserEventFavorite> UserEventFvorites { get; set; }
+
         public virtual ICollection<UserPromotion> UserPromotions { get; set; }
     }
 }

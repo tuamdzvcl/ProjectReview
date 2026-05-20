@@ -7,6 +7,7 @@ import { AuthData } from '../../core/model/response/auth-data.model';
 import { jwtDecode } from 'jwt-decode';
 import { PermissionStoreService } from '../../core/services/permission-store.service';
 import { UserService } from '../../core/services/user.service';
+import { FaviriteService } from '../../core/services/favorite-event.service';
 
 @Injectable({ providedIn: 'root' })
 export class AuthService extends BaseApiService {
@@ -14,7 +15,8 @@ export class AuthService extends BaseApiService {
     http: HttpClient,
     private tokenService: TokenService,
     private permissionStore: PermissionStoreService,
-    private userService: UserService
+    private userService: UserService,
+    private favoriteService: FaviriteService
   ) {
     super(http);
   }
@@ -26,6 +28,7 @@ export class AuthService extends BaseApiService {
         console.log('[Login] AccessToken:', res.AccessToken ? 'EXISTS' : 'NULL');
         console.log('[Login] RefreshToken:', res.RefreshToken ? 'EXISTS' : 'NULL');
         this.tokenService.setToken(res.AccessToken, res.RefreshToken);
+        this.favoriteService.syncFavoritesFromApi();
       })
     );
   }
@@ -70,6 +73,7 @@ export class AuthService extends BaseApiService {
     this.tokenService.clear();
     this.permissionStore.clear();
     this.userService.clearUserCache();
+    this.favoriteService.clearFavorites();
   }
 
   getUser() {

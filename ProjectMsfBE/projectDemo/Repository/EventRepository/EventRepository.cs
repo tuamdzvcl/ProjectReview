@@ -64,7 +64,7 @@ namespace projectDemo.Repository
             {
                 var pageIndex = request.PageIndex;
                 var pageSize = request.PageSize;
-                var now = DateTime.Now;
+                var now = DateTime.UtcNow;
 
                 var query = _dbSet
         .AsNoTracking()

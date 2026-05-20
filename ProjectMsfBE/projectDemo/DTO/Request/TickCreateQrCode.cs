@@ -7,6 +7,6 @@
         public int TickTypeId {  get; set; }
 
         
-        public DateTime? expiration { get; set;}
+        public DateTimeOffset? expiration { get; set;}
     }
 }

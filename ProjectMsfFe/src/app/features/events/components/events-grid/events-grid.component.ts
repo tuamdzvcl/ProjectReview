@@ -10,6 +10,7 @@ import { EventService } from '../../../../core/services/event.service';
 import { EventModel } from '../../../../core/model/response/event.model';
 import { EventCardComponent } from '../event-card/event-card.component';
 import { FaviriteService } from '../../../../core/services/favorite-event.service';
+import { Subject } from 'rxjs';
 
 @Component({
   selector: 'app-events-grid',
@@ -28,13 +29,13 @@ export class EventsGridComponent implements OnInit, OnChanges {
   pageIndex: number = 1;
   pageSize: number = 8;
   isLoading: boolean = false;
-  isNotCount: boolean = false;
   hasMore: boolean = true;
+  isNotCount: boolean = false;
 
   constructor(
     private eventService: EventService,
     private favoriteService: FaviriteService
-  ) {}
+  ) { }
 
   get displayedEvents(): EventModel[] {
     if (this.showFavorites) {
@@ -42,6 +43,8 @@ export class EventsGridComponent implements OnInit, OnChanges {
         this.favoriteService.isFavorite(event.Id.toString())
       );
     }
+    // TODO: If showFavorites is true, return a filtered array containing only favorite events (using FavoriteService)
+    // TODO: Otherwise, return all events
     return this.events;
   }
 
@@ -69,24 +72,23 @@ export class EventsGridComponent implements OnInit, OnChanges {
   loadEvents() {
     if (this.isLoading || !this.hasMore) return;
     this.isLoading = true;
-
-    const request = this.relatedEventId
+    const request$ = this.relatedEventId
       ? this.eventService.GetEventCatetoryPageEvent(
-          this.relatedEventId,
-          this.pageIndex,
-          this.pageSize,
-          ''
-        )
+        this.relatedEventId,
+        this.pageIndex,
+        this.pageSize,
+        ''
+      )
       : this.eventService.GetEventswithTypeticket(
-          this.pageIndex,
-          this.pageSize,
-          this.key,
-          this.categoryIds
-        );
+        this.pageIndex,
+        this.pageSize,
+        this.key,
+        this.categoryIds
+      );
 
-    request.subscribe({
+    request$.subscribe({
       next: (res) => {
-        debugger;
+        this.isLoading = false
         const filteredEvents = res.items.filter(
           (event: any) => event.Status === 'PUBLISHED'
         );
@@ -96,15 +98,17 @@ export class EventsGridComponent implements OnInit, OnChanges {
         if (res.items.length < this.pageSize) {
           this.hasMore = false;
         }
-        if (res.totalRecords == 0) {
+        if (res.totalRecords < 0) {
           this.isNotCount = true;
         }
       },
       error: (err) => {
+        this.isLoading = false
         console.error('ERROR:', err);
       },
     });
   }
+
   loadMore() {
     this.pageIndex++;
     this.loadEvents();

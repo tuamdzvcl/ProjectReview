@@ -1,4 +1,4 @@
-<div class="event-card">
+<div class="event-card" [routerLink]="['/event', eventmodel.Id]">
   <div class="card-image">
     <img [src]="eventmodel.PosterUrl | imageUrl" />
 
@@ -12,7 +12,7 @@
     </button>
   </div>
 
-  <div class="card-content" [routerLink]="['/event', eventmodel.Id]">
+  <div class="card-content">
     <h3 class="title" [title]="eventmodel.Title">
       {{ eventmodel.Title }}
     </h3>
